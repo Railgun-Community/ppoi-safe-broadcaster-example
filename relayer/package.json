@@ -1,0 +1,15 @@
+{
+  "name": "@railgun-community/lepton-relayer",
+  "version": "1.0.0",
+  "description": "A Relayer service-provider with JSON RPC interface over IPFS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo no tests yet",
+    "start": "node relayer.js"
+  },
+  "author": "Railgun Contributors",
+  "contributors": [
+    "Chris Troutner <chris.troutner@gmail.com>"
+  ],
+  "license": "UNLICENSED"
+}
