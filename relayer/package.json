@@ -11,5 +11,11 @@
   "contributors": [
     "Chris Troutner <chris.troutner@gmail.com>"
   ],
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@chris.troutner/ipfs": "^2.0.2",
+    "@psf/bch-js": "^4.20.13",
+    "ipfs-coord": "^6.7.1",
+    "public-ip": "^4.0.4"
+  }
 }
