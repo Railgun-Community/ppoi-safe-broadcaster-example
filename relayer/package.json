@@ -4,8 +4,9 @@
   "description": "A Relayer service-provider with JSON RPC interface over IPFS",
   "main": "index.js",
   "scripts": {
-    "test": "echo no tests yet",
-    "start": "node relayer.js"
+    "start": "node relayer.js",
+    "test": "export RELAY_ENV=test && nyc --reporter=text mocha --recursive --timeout=15000 test/unit/",
+    "coverage:report": "export RELAY_ENV=test && nyc --reporter=html mocha --timeout 15000 --recursive test/unit/"
   },
   "author": "Railgun Contributors",
   "contributors": [
@@ -17,5 +18,8 @@
     "@psf/bch-js": "^4.20.13",
     "ipfs-coord": "^6.7.1",
     "public-ip": "^4.0.4"
+  },
+  "devDependencies": {
+    "sinon": "^11.1.2"
   }
 }

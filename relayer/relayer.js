@@ -1,29 +1,10 @@
 /*
-  Top level file for starting the Relayer daemon.
-
-  Code is broken up into four categories as per Clean Architecture design pattern:
-  - Entities - primary concepts
-  -
+  This is a wrapper for the top-level index.js library.
+  It starts the Relayer daemon.
 */
 
-// Local libraries.
-const Adapters = require('./src/adapters');
-const Controllers = require('./src/controllers');
+const Relayer = require('./index.js');
 
-// Top-level function that kicks off the Relayer daemon.
-async function startRelayer() {
-  try {
-    console.log('Starting Relays Daemon...');
+const relayer = new Relayer();
 
-    // Load the adapter libraries and wait for any required asynchronous
-    // initialization to complete. e.g. spin up the IPFS node.
-    const adapters = new Adapters();
-    await adapters.start();
-
-    const controllers = new Controllers();
-    controllers.helloWorld();
-  } catch (err) {
-    console.error(err);
-  }
-}
-startRelayer();
+relayer.startRelayer();
