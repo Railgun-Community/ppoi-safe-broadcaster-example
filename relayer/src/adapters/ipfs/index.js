@@ -10,6 +10,7 @@ class IPFS {
     // Encapsulate dependencies
     this.ipfsAdapter = new IpfsAdapter();
     this.IpfsCoordAdapter = IpfsCoordAdapter;
+    this.process = process;
 
     this.ipfsCoordAdapter = {}; // placeholder
 
@@ -45,7 +46,7 @@ class IPFS {
         console.log(
           "IPFS lock file needs to be deleted before this app can start."
         );
-        process.exit(1);
+        this.process.exit(1);
       }
 
       throw err;
