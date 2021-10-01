@@ -7,44 +7,50 @@ const ipfs = {
     ipfs: {}
   },
   ipfsCoordAdapter: {
-    ipfsCoord: {}
+    ipfsCoord: {
+      useCases: {
+        peer: {
+          sendPrivateMessage: () => {}
+        }
+      }
+    }
   }
-}
+};
 
 const localdb = {
   Users: class Users {
-    static findById () {}
-    static find () {}
-    static findOne () {
+    static findById() {}
+    static find() {}
+    static findOne() {
       return {
         validatePassword: localdb.validatePassword
-      }
+      };
     }
 
-    async save () {
-      return {}
+    async save() {
+      return {};
     }
 
-    generateToken () {
-      return '123'
+    generateToken() {
+      return "123";
     }
 
-    toJSON () {
-      return {}
+    toJSON() {
+      return {};
     }
 
-    async remove () {
-      return true
+    async remove() {
+      return true;
     }
 
-    async validatePassword () {
-      return true
+    async validatePassword() {
+      return true;
     }
   },
 
   validatePassword: () => {
-    return true
+    return true;
   }
-}
+};
 
-module.exports = { ipfs, localdb }
+module.exports = { ipfs, localdb };
