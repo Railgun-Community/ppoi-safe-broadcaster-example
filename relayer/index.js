@@ -14,7 +14,6 @@ class Relayer {
   constructor() {
     // Encapsulate dependencies
     this.adapters = new Adapters();
-    this.controllers = new Controllers();
   }
 
   async startRelayer() {
@@ -25,7 +24,8 @@ class Relayer {
       // initialization to complete. e.g. spin up the IPFS node.
       await this.adapters.start();
 
-      this.controllers.helloWorld();
+      // Load the controller libraries. Pass in a handle to the adapters.
+      this.controllers = new Controllers({ adapters: this.adapters });
 
       return true;
     } catch (err) {

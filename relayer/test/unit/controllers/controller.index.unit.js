@@ -8,6 +8,7 @@ const sinon = require("sinon");
 
 // Local libraries
 const Controllers = require("../../../src/controllers");
+const adapters = require("../mocks/adapters");
 
 describe("#controllers", () => {
   let sandbox, uut;
@@ -15,10 +16,25 @@ describe("#controllers", () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 
-    uut = new Controllers();
+    uut = new Controllers({ adapters });
   });
 
   afterEach(() => sandbox.restore());
+
+  describe("#constructor", () => {
+    it("should throw an error if adapters are not passed in", () => {
+      try {
+        uut = new Controllers();
+
+        assert.fail("Unexpected code path");
+      } catch (err) {
+        assert.include(
+          err.message,
+          "Instance of Adapters library required when instantiating Controllers."
+        );
+      }
+    });
+  });
 
   describe("#hello world", () => {
     it("should do something", () => {

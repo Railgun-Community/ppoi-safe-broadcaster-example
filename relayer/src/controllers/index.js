@@ -6,11 +6,20 @@
 */
 
 // Local libraries
-const JSONRPC = require('./json-rpc');
+const JSONRPC = require("./json-rpc");
 
 class Controllers {
   constructor(localConfig = {}) {
-    this.jsonRpc = new JSONRPC();
+    // Dependency Injection.
+    this.adapters = localConfig.adapters;
+    if (!this.adapters) {
+      throw new Error(
+        "Instance of Adapters library required when instantiating Controllers."
+      );
+    }
+
+    // Encapsulate dependencies
+    this.jsonRpc = new JSONRPC(localConfig);
   }
 
   helloWorld() {
