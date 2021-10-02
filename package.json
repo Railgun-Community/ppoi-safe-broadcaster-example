@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Wallet framework for Railgun",
   "author": "Railgun Contributors",
+  "contributors": [
+    "Chris Troutner <chris.troutner@gmail.com>"
+  ],
   "license": "UNLICENSED",
   "main": "index.js",
   "scripts": {

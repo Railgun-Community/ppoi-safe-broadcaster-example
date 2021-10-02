@@ -1,0 +1,11 @@
+*-debug.log
+*-error.log
+/.nyc_output
+/tmp
+/yarn.lock
+/orbitdb
+/ipfsdata
+/coverage
+/.wallets
+node_modules
+/.ipfsdata
