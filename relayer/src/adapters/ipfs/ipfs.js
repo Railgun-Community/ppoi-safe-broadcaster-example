@@ -7,10 +7,10 @@
 
 // Global npm libraries
 // const IPFS = require('ipfs')
-const IPFS = require('@chris.troutner/ipfs');
+const IPFS = require("@chris.troutner/ipfs");
 
 // Local libraries
-const config = require('../../../config');
+const config = require("../../../config");
 
 class IpfsAdapter {
   constructor(localConfig) {
@@ -25,38 +25,40 @@ class IpfsAdapter {
   // Start an IPFS node.
   async start() {
     try {
+      console.log(`Circuit Relay enabled: ${config.isCircuitRelay}`);
+
       // Ipfs Options
       const ipfsOptions = {
-        repo: './.ipfsdata/ipfs',
+        repo: "./.ipfsdata/ipfs",
         start: true,
         config: {
           relay: {
             enabled: true, // enable circuit relay dialer and listener
             hop: {
-              enabled: config.isCircuitRelay, // enable circuit relay HOP (make this node a relay)
-            },
+              enabled: config.isCircuitRelay // enable circuit relay HOP (make this node a relay)
+            }
           },
           pubsub: true, // enable pubsub
           Swarm: {
             ConnMgr: {
               HighWater: 30,
-              LowWater: 10,
-            },
+              LowWater: 10
+            }
           },
           Addresses: {
             Swarm: [
               `/ip4/0.0.0.0/tcp/${this.config.ipfsTcpPort}`,
-              `/ip4/0.0.0.0/tcp/${this.config.ipfsWsPort}/ws`,
-            ],
-          },
-        },
+              `/ip4/0.0.0.0/tcp/${this.config.ipfsWsPort}/ws`
+            ]
+          }
+        }
       };
 
       // Create a new IPFS node.
       this.ipfs = await this.IPFS.create(ipfsOptions);
 
       // Set the 'server' profile so the node does not scan private networks.
-      await this.ipfs.config.profiles.apply('server');
+      await this.ipfs.config.profiles.apply("server");
 
       // Debugging: Display IPFS config settings.
       // const configSettings = await this.ipfs.config.getAll()
@@ -67,7 +69,7 @@ class IpfsAdapter {
 
       return this.ipfs;
     } catch (err) {
-      console.error('Error in ipfs.js/start()');
+      console.error("Error in ipfs.js/start()");
       throw err;
     }
   }
