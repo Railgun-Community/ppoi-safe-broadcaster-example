@@ -35,10 +35,6 @@ class JSONRPC {
     _this = this;
   }
 
-  helloWorld() {
-    console.log("hello world");
-  }
-
   // This method takes a raw string of data from IPFS, parses it, and determines
   // which controller to route the instruction to.
   async router(str, from) {

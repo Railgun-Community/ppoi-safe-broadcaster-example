@@ -22,8 +22,10 @@ class Controllers {
     this.jsonRpc = new JSONRPC(localConfig);
   }
 
-  helloWorld() {
-    return this.jsonRpc.helloWorld();
+  // Add the JSON RPC router to the ipfs-coord adapter.
+  attachRPCControllers() {
+    // Attach the input of the JSON RPC router to the output of ipfs-coord.
+    this.adapters.ipfs.ipfsCoordAdapter.attachRPCRouter(this.jsonRpc.router);
   }
 }
 

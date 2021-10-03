@@ -26,6 +26,7 @@ class Relayer {
 
       // Load the controller libraries. Pass in a handle to the adapters.
       this.controllers = new Controllers({ adapters: this.adapters });
+      this.controllers.attachRPCControllers();
 
       return true;
     } catch (err) {
