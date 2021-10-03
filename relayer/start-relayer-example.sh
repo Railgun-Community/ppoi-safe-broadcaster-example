@@ -20,7 +20,7 @@ export DEBUG_LEVEL=1
 # START required settings
 
 # Human-readable name used to identify this node.
-export CORD_NAME=generic-railgun-relay
+export COORD_NAME=generic-railgun-relay
 
 # 12-word mnemonic. Used for end-to-end encryption.
 export MNEMONIC="ginger dizzy lumber remove legend light add clinic broccoli glass myth skull"
