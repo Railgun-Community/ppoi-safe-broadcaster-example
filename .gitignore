@@ -25,3 +25,4 @@ coverage
 # Project specific
 dist
 .ipfsdata/
+run-dev.sh
