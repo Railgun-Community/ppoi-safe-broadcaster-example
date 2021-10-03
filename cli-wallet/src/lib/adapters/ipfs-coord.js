@@ -152,7 +152,7 @@ class IpfsCoordAdapter {
 
             // Persist the config setting, so it can be used by other commands.
             _this.conf.set('selectedService', thisPeer);
-            console.log(`---->BCH wallet service selected: ${thisPeer}`);
+            console.log(`---->Railgun Relay service selected: ${thisPeer}`);
           }
 
           // Add the peer to the list of serviceProviders.
