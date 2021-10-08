@@ -14,8 +14,7 @@ const peerData = [
     data: {
       apiName: 'ipfs-coord-announce',
       apiVersion: '1.3.2',
-      apiInfo:
-        'You should put an IPFS hash or web URL here to your documentation.',
+      apiInfo: 'You should put an IPFS hash or web URL here to your documentation.',
       ipfsId: 'QmWkjYRRTaxVEuGK8ip2X3trVyJShFs6U9g1h9x6fK5mZ2',
       type: 'node.js',
       ipfsMultiaddrs: [
@@ -40,16 +39,14 @@ const peerData = [
           address: 'simpleledger:qru6kq3p4tv6z2lmy0n560lyhh3z2feay5yffnac0q'
         }
       ],
-      encryptPubKey:
-        '021db6e97650659653ba61dd493dc348a7429cdcbafd4fb73b08b1223bf5bd98df',
+      encryptPubKey: '021db6e97650659653ba61dd493dc348a7429cdcbafd4fb73b08b1223bf5bd98df',
       jsonLd: {
         '@context': 'https://schema.org/',
         '@type': 'WebAPI',
         name: 'trout-bch-wallet-service-dev',
         version: '1.11.1',
-        protocol: 'bch-wallet',
-        description:
-          'IPFS service providing BCH blockchain access needed by a wallet.',
+        protocol: 'railgun-relayer',
+        description: 'IPFS service providing BCH blockchain access needed by a wallet.',
         documentation: 'https://ipfs-bch-wallet-service.fullstack.cash/',
         provider: {
           '@type': 'Organization',
@@ -92,14 +89,12 @@ const peerData = [
           address: 'simpleledger:qq4pk63gngzxnnhne39n0sl7kn2ekhnxngh0zlkg6n'
         }
       ],
-      encryptPubKey:
-        '037676cdeac8376a75c19f62b40aa06feebc788a6704e1a1d13dcf478d090d7205',
+      encryptPubKey: '037676cdeac8376a75c19f62b40aa06feebc788a6704e1a1d13dcf478d090d7205',
       jsonLd: {
         '@context': 'https://schema.org/',
         '@type': 'WebAPI',
         name: 'ipfs-bch-wallet-service-dsl',
-        description:
-          'IPFS service providing BCH blockchain access needed by a wallet.',
+        description: 'IPFS service providing BCH blockchain access needed by a wallet.',
         documentation: 'https://ipfs-bch-wallet-service.fullstack.cash/',
         provider: {
           '@type': 'Organization',
