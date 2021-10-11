@@ -241,4 +241,31 @@ describe('#REST-API', () => {
       assert.equal(ctx.body, 'test data')
     })
   })
+
+  describe('#getRelays', () => {
+    it('should get relays, hydrated with peer data', async () => {
+      // Load mock data for testing purposes.
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode = {}
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode.relayData = mockData.mockRelayData
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode.peerData = mockData.mockPeerData
+
+      const result = uut.getRelays()
+      // console.log('result: ', result)
+
+      // 3 entries in the mock data, so this function should return 3 entries.
+      assert.equal(result.length, 3)
+
+      // First entry should have a 'name' from the peer data.
+      assert.property(result[0], 'name')
+
+      // Third entry should have an empty name, because there is no peer data for it.
+      assert.equal(result[2].name, '')
+    })
+
+    it('should report errors and return an empty object', async () => {
+      const result = uut.getRelays()
+
+      assert.isObject(result)
+    })
+  })
 })

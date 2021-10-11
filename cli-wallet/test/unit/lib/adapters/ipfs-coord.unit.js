@@ -3,7 +3,7 @@
 */
 
 // Public npm libraries.
-const assert = require('chai').assert
+const { assert } = require('chai')
 const sinon = require('sinon')
 const cloneDeep = require('lodash.clonedeep')
 const EventEmitter = require('events')
@@ -31,7 +31,11 @@ describe('#ipfs-coord', () => {
     sandbox = sinon.createSandbox()
   })
 
-  afterEach(() => sandbox.restore())
+  afterEach(() => {
+    clearInterval(uut.pollServiceInterval)
+
+    sandbox.restore()
+  })
 
   describe('#constructor', () => {
     it('should throw an error if ipfs instance is not included', () => {
