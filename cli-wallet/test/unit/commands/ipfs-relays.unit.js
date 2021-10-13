@@ -1,6 +1,4 @@
-'use strict'
-
-const assert = require('chai').assert
+const { assert } = require('chai')
 const sinon = require('sinon')
 
 const IpfsRelays = require('../../../src/commands/ipfs-relays')
@@ -26,6 +24,7 @@ describe('#ipfs-relays', () => {
       const result = await uut.run()
       assert.isFalse(result)
     })
+
     it('should display circuit relays and return true', async () => {
       sandbox.stub(uut.axios, 'post').resolves({ data: RelaysMock })
       const result = await uut.run()
