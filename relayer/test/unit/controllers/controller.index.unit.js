@@ -35,10 +35,4 @@ describe("#controllers", () => {
       }
     });
   });
-
-  describe("#hello world", () => {
-    it("should do something", () => {
-      uut.helloWorld();
-    });
-  });
 });

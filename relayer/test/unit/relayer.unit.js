@@ -24,6 +24,7 @@ describe("#relayer", () => {
     it("should start the relayer daemon", async () => {
       // Mock dependencies
       sandbox.stub(uut.adapters, "start").resolves();
+      sandbox.stub(uut.controllers, "attachRPCControllers").resolves();
 
       const result = await uut.startRelayer();
 

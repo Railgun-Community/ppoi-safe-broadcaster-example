@@ -14,6 +14,7 @@ class Relayer {
   constructor() {
     // Encapsulate dependencies
     this.adapters = new Adapters();
+    this.controllers = new Controllers({ adapters: this.adapters });
   }
 
   async startRelayer() {
@@ -25,7 +26,6 @@ class Relayer {
       await this.adapters.start();
 
       // Load the controller libraries. Pass in a handle to the adapters.
-      this.controllers = new Controllers({ adapters: this.adapters });
       this.controllers.attachRPCControllers();
 
       return true;

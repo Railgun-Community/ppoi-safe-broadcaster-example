@@ -10,12 +10,12 @@ const rpcData = {
       balances: [
         {
           balance: {},
-          address: 'addressString',
-        },
-      ],
-    },
-  },
-};
+          address: 'addressString'
+        }
+      ]
+    }
+  }
+}
 
 const mockRelayData = [
   {
@@ -25,9 +25,9 @@ const mockRelayData = [
     ipfsId: 'QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77',
     isBootstrap: false,
     metrics: {
-      aboutLatency: [596, 769, 1029],
+      aboutLatency: [596, 769, 1029]
     },
-    latencyScore: 682,
+    latencyScore: 682
   },
   {
     multiaddr: '/ip4/143.198.60.119/tcp/4003/ws/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
@@ -36,9 +36,9 @@ const mockRelayData = [
     ipfsId: 'QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
     isBootstrap: false,
     metrics: {
-      aboutLatency: [1080, 530, 1137],
+      aboutLatency: [1080, 530, 1137]
     },
-    latencyScore: 805,
+    latencyScore: 805
   },
   {
     multiaddr: '/ip4/143.198.60.119/tcp/4003/ws/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKq',
@@ -47,11 +47,11 @@ const mockRelayData = [
     ipfsId: 'QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKq',
     isBootstrap: false,
     metrics: {
-      aboutLatency: [1080, 530, 1137],
+      aboutLatency: [1080, 530, 1137]
     },
-    latencyScore: 805,
-  },
-];
+    latencyScore: 805
+  }
+]
 
 const mockPeerData = [
   {
@@ -68,7 +68,7 @@ const mockPeerData = [
         '/ip4/127.0.0.1/tcp/5268/p2p/QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77',
         '/ip4/127.0.0.1/tcp/5269/ws/p2p/QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77',
         '/ip4/139.162.76.54/tcp/5268/p2p/QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77',
-        '/ip4/139.162.76.54/tcp/5269/ws/p2p/QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77',
+        '/ip4/139.162.76.54/tcp/5269/ws/p2p/QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77'
       ],
       orbitdb:
         '/orbitdb/zdpuApooyo2rWMuDkuTrEcxQghJKzmyQSpfUEvBhx45UNgLJX/QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK7721101115',
@@ -78,13 +78,13 @@ const mockPeerData = [
         {
           blockchain: 'BCH',
           type: 'cashAddr',
-          address: 'bitcoincash:qpsaewu50nnm9gjn7e0ejmusrflfd8lrdy8szg2564',
+          address: 'bitcoincash:qpsaewu50nnm9gjn7e0ejmusrflfd8lrdy8szg2564'
         },
         {
           blockchain: 'BCH',
           type: 'slpAddr',
-          address: 'simpleledger:qpsaewu50nnm9gjn7e0ejmusrflfd8lrdyttfnl5yt',
-        },
+          address: 'simpleledger:qpsaewu50nnm9gjn7e0ejmusrflfd8lrdyttfnl5yt'
+        }
       ],
       encryptPubKey: '0338122208e2842f39afabd23deadbe2acfdcbe69d127c24835e05603771f1e85d',
       jsonLd: {
@@ -99,12 +99,12 @@ const mockPeerData = [
         provider: {
           '@type': 'Organization',
           name: 'Permissionless Software Foundation',
-          url: 'https://PSFoundation.cash',
+          url: 'https://PSFoundation.cash'
         },
-        identifier: 'QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77',
+        identifier: 'QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77'
       },
-      updatedAt: '2021-10-11T15:59:59.857Z',
-    },
+      updatedAt: '2021-10-11T15:59:59.857Z'
+    }
   },
   {
     from: 'QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
@@ -124,7 +124,7 @@ const mockPeerData = [
         '/ip4/127.0.0.1/tcp/4001/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
         '/ip4/127.0.0.1/tcp/4003/ws/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
         '/ip4/143.198.60.119/tcp/4001/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
-        '/ip4/143.198.60.119/tcp/4003/ws/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
+        '/ip4/143.198.60.119/tcp/4003/ws/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp'
       ],
       orbitdb:
         '/orbitdb/zdpuAxU8itEdbqjDxCeF3C5pRN9HSXmtivJi7ygMhnew3nAPf/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp21101011',
@@ -133,19 +133,19 @@ const mockPeerData = [
       circuitRelayInfo: {
         ip4: '143.198.60.119',
         tcpPort: '4001',
-        crDomain: 'relayer.fullstackcash.nl',
+        crDomain: 'relayer.fullstackcash.nl'
       },
       cryptoAddresses: [
         {
           blockchain: 'BCH',
           type: 'cashAddr',
-          address: 'bitcoincash:qzyvlftxcmwwca6qgg3l0zqqrk33hlcxhcpuv84awv',
+          address: 'bitcoincash:qzyvlftxcmwwca6qgg3l0zqqrk33hlcxhcpuv84awv'
         },
         {
           blockchain: 'BCH',
           type: 'slpAddr',
-          address: 'simpleledger:qzyvlftxcmwwca6qgg3l0zqqrk33hlcxhcd88uqasj',
-        },
+          address: 'simpleledger:qzyvlftxcmwwca6qgg3l0zqqrk33hlcxhcd88uqasj'
+        }
       ],
       encryptPubKey: '038264a85c945601ce96a5727f6ec524f16b3228fffd7c2d26ce047111be5598ad',
       jsonLd: {
@@ -159,14 +159,14 @@ const mockPeerData = [
         provider: {
           '@type': 'Organization',
           name: 'Railgun DAO',
-          url: 'https://www.railgun.org/',
+          url: 'https://www.railgun.org/'
         },
-        identifier: 'QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
+        identifier: 'QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp'
       },
-      updatedAt: '2021-10-11T15:59:51.430Z',
-    },
-  },
-];
+      updatedAt: '2021-10-11T15:59:51.430Z'
+    }
+  }
+]
 
 const ipfsMockPeers = [
   {
@@ -175,7 +175,7 @@ const ipfsMockPeers = [
     direction: 'outbound',
     muxer: '/mplex/6.7.0',
     latency: 'n/a',
-    streams: [],
+    streams: []
   },
   {
     addr: '/ip4/143.198.60.119/tcp/4003/ws/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
@@ -183,7 +183,7 @@ const ipfsMockPeers = [
     direction: 'outbound',
     muxer: '/mplex/6.7.0',
     latency: 'n/a',
-    streams: [],
+    streams: []
   },
   // This data is used to exercise some of the exception code paths.
   {
@@ -192,13 +192,13 @@ const ipfsMockPeers = [
     direction: 'outbound',
     muxer: '/mplex/6.7.0',
     latency: 'n/a',
-    streams: [],
-  },
-];
+    streams: []
+  }
+]
 
 module.exports = {
   rpcData,
   mockRelayData,
   mockPeerData,
-  ipfsMockPeers,
-};
+  ipfsMockPeers
+}
