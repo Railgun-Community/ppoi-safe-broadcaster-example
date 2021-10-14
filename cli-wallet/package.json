@@ -11,6 +11,7 @@
   },
   "bugs": "https://github.com/Railgun-Community/lepton/issues",
   "dependencies": {
+    "@chris.troutner/ipfs": "2.0.2",
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
@@ -19,7 +20,6 @@
     "cli-table": "^0.3.6",
     "collect.js": "^4.28.6",
     "conf-cli": "^0.1.9",
-    "@chris.troutner/ipfs": "2.0.2",
     "ipfs-coord": "^6.7.1",
     "jsonrpc-lite": "^2.2.0",
     "koa": "^2.13.1",

@@ -5,6 +5,7 @@
 // Public npm packages.
 const { assert } = require('chai')
 const sinon = require('sinon')
+const cloneDeep = require('lodash.clonedeep')
 
 // Local libraries
 const RailgunService = require('../../../src/commands/railgun-service')
@@ -13,9 +14,12 @@ const RailgunService = require('../../../src/commands/railgun-service')
 describe('#railgun-about', () => {
   let sandbox
   let uut
+  let mockPeers
 
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
+
+    mockPeers = cloneDeep(mockPeersRef)
 
     uut = new RailgunService()
   })
@@ -101,11 +105,36 @@ describe('#railgun-about', () => {
       }
     })
 
-    // TODO:
-    // it('should handle peers without a protocol specified')
+    it('should handle peers without a protocol specified', async () => {
+      // Remove the protocol from the peer data.
+      delete mockPeers[0].protocol
 
-    // TODO:
-    // it('should set a new service peer when select flag is present')
+      // Mock dependencies
+      sandbox.stub(uut.axios, 'post').resolves({ data: mockPeers })
+      const flags = {}
+
+      const result = await uut.getServicePeers(flags)
+      // console.log('result: ', result);
+
+      // Expecting an empty array
+      assert.equal(result.length, 0)
+    })
+
+    it('should set a new service peer when select flag is present', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.axios, 'post').resolves({ data: mockPeers })
+      sandbox.stub(uut, 'selectService').returns()
+
+      const flags = {
+        select: 'Qm...something'
+      }
+
+      const result = await uut.getServicePeers(flags)
+      // console.log('result: ', result);
+
+      // Expecting one element in returned array
+      assert.equal(result.length, 1)
+    })
   })
 
   describe('#run', () => {
@@ -128,7 +157,7 @@ describe('#railgun-about', () => {
   })
 })
 
-const mockPeers = [
+const mockPeersRef = [
   {
     addr: '/ip4/143.198.60.119/tcp/4001/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
     peer: 'QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
