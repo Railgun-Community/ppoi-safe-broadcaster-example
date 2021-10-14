@@ -1,17 +1,17 @@
 /*
-  This is the JSON RPC router for the users API
+  This is the JSON RPC router for the about API
 */
 
 // Public npm libraries
-const jsonrpc = require('jsonrpc-lite')
+const jsonrpc = require("jsonrpc-lite");
 
 // Local libraries
-const config = require('../../../../config')
+const config = require("../../../../config");
 
 class AboutRPC {
-  constructor (localConfig) {
+  constructor(localConfig) {
     // Encapsulate dependencies
-    this.jsonrpc = jsonrpc
+    this.jsonrpc = jsonrpc;
   }
 
   /**
@@ -32,15 +32,14 @@ class AboutRPC {
   // This is the top-level router for this library.
   // This is a bit different than other router libraries, because there is
   // only one response, which is a string about this node.
-  async aboutRouter (rpcData) {
+  async aboutRouter(rpcData) {
     return {
       success: true,
       status: 200,
-      // message: aboutStr,
       message: JSON.stringify(config.announceJsonLd),
-      endpoint: 'about'
-    }
+      endpoint: "about"
+    };
   }
 }
 
-module.exports = AboutRPC
+module.exports = AboutRPC;

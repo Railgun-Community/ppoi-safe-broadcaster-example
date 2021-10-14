@@ -8,6 +8,7 @@ const jsonrpc = require("jsonrpc-lite");
 
 // Local support libraries
 const AboutController = require("./about");
+const RateController = require("./rate");
 
 // A global reference to 'this' instance of the Class.
 let _this;
@@ -25,6 +26,7 @@ class JSONRPC {
     // Encapsulate dependencies
     this.jsonrpc = jsonrpc;
     this.aboutController = new AboutController();
+    this.rateController = new RateController();
     this.ipfsCoord = this.adapters.ipfs.ipfsCoordAdapter.ipfsCoord;
 
     // Cache to store IDs of processed JSON RPC commands. Used to prevent
@@ -98,6 +100,9 @@ class JSONRPC {
         //   break;
         case "about":
           retObj = await _this.aboutController.aboutRouter(parsedData);
+          break;
+        case "rate":
+          retObj = await _this.rateController.rateRouter(parsedData);
       }
 
       // console.log('retObj: ', retObj)
