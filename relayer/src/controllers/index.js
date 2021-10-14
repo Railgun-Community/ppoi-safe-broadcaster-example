@@ -17,13 +17,13 @@ class Controllers {
         "Instance of Adapters library required when instantiating Controllers."
       );
     }
-
-    // Encapsulate dependencies
-    this.jsonRpc = new JSONRPC(localConfig);
   }
 
   // Add the JSON RPC router to the ipfs-coord adapter.
   attachRPCControllers() {
+    // Instantiate here rather than constructor, after adapters have initialized.
+    this.jsonRpc = new JSONRPC({ adapters: this.adapters });
+
     // Attach the input of the JSON RPC router to the output of ipfs-coord.
     this.adapters.ipfs.ipfsCoordAdapter.attachRPCRouter(this.jsonRpc.router);
   }

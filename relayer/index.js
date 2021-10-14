@@ -25,7 +25,7 @@ class Relayer {
       // initialization to complete. e.g. spin up the IPFS node.
       await this.adapters.start();
 
-      // Load the controller libraries. Pass in a handle to the adapters.
+      // Load the controller libraries.
       this.controllers.attachRPCControllers();
 
       return true;
