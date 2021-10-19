@@ -28,7 +28,7 @@ class SubmitTxRPC {
    * and relays that transaction to the blockchain.
    */
   async submitTxRouter(rpcData) {
-    // console.log("rpcData: ", rpcData);
+    console.log("rpcData: ", rpcData);
 
     const hex = rpcData.payload.params.hex;
 
