@@ -27,14 +27,12 @@ class SubmitTxRPC {
    * This endpoint accepts a hexidecimal string representation of a transaction,
    * and relays that transaction to the blockchain.
    */
-
-  // Currently the 'method' property is not included because there is only one
-  // response. If this function needs more resolution, additional methods
-  // like GET, POST, PUT can be implemented.
   async submitTxRouter(rpcData) {
     // console.log("rpcData: ", rpcData);
 
     const hex = rpcData.payload.params.hex;
+
+    // TODO: Add business logic around handling and broadcasting of TX hex.
 
     return {
       success: true,
