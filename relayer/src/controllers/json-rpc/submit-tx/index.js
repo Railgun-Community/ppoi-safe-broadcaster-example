@@ -32,12 +32,15 @@ class SubmitTxRPC {
   // response. If this function needs more resolution, additional methods
   // like GET, POST, PUT can be implemented.
   async submitTxRouter(rpcData) {
-    console.log("rpcData: ", rpcData);
+    // console.log("rpcData: ", rpcData);
+
+    const hex = rpcData.payload.params.hex;
 
     return {
       success: true,
       status: 200,
-      message: 10, // Hard-coded value. TODO: Replace with more biz logic.
+      message: "Hex recieved successfully", // Hard-coded value. TODO: Replace with more biz logic.
+      hex,
       endpoint: "submitTx"
     };
   }
