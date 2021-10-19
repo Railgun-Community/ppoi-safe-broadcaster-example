@@ -1,6 +1,11 @@
 /*
   This library interacts with the relayer-service via the JSON RPC
   over IPFS.
+
+  Commands from the CLI wallet call this library. The purpose of this library
+  is to convert the commands into an RPC call, and then pipe that command to
+  the selected Relayer. It does that by calling a generic REST API endpoint
+  running on the local machine.
 */
 
 // Configuration variables.
@@ -41,7 +46,7 @@ class RelayerService {
           params: {}
         }
       })
-      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
+      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
       // If there is a timeout or other network failure.
       if (result.data.success === false) throw new Error(result.data.message)
@@ -65,7 +70,7 @@ class RelayerService {
           params: {}
         }
       })
-      console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
+      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
       // If there is a timeout or other network failure.
       if (result.data.success === false) throw new Error(result.data.message)
