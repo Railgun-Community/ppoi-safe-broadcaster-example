@@ -179,5 +179,70 @@ describe('#relayer-service.js', () => {
         assert.equal(err.message, 'test error')
       }
     })
+
+    it('should throw error if Relayer returns error', async () => {
+      try {
+        // Mock dependencies
+        sandbox
+          .stub(uut.axios, 'post')
+          .resolves({ data: { success: false, message: 'test failure' } })
+
+        const hex = 'test'
+        await uut.submitTx(hex)
+        // console.log('result: ', result);
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'test failure')
+      }
+    })
+  })
+
+  describe('#getState', () => {
+    const mockStateData = {
+      success: true,
+      status: 200,
+      message: "I'm a little teapot!",
+      endpoint: 'getState'
+    }
+
+    it('should get the contract state from the Relayer', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.axios, 'post').resolves({ data: mockStateData })
+
+      const result = await uut.getState()
+      // console.log('result: ', result);
+
+      assert.equal(result.endpoint, 'getState')
+    })
+
+    it('should catch, report, and throw an error', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut, 'checkServiceId').throws(new Error('test error'))
+
+        await uut.getState()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.equal(err.message, 'test error')
+      }
+    })
+
+    it('should throw error if Relayer returns error', async () => {
+      try {
+        // Mock dependencies
+        sandbox
+          .stub(uut.axios, 'post')
+          .resolves({ data: { success: false, message: 'test failure' } })
+
+        await uut.getState()
+        // console.log('result: ', result);
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'test failure')
+      }
+    })
   })
 })
