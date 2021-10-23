@@ -10,6 +10,7 @@ const jsonrpc = require("jsonrpc-lite");
 const AboutController = require("./about");
 const RateController = require("./rate");
 const SubmitTxRPC = require("./submit-tx");
+const GetStateRPC = require("./get-state");
 
 // A global reference to 'this' instance of the Class.
 let _this;
@@ -29,6 +30,7 @@ class JSONRPC {
     this.aboutController = new AboutController();
     this.rateController = new RateController();
     this.submitTxController = new SubmitTxRPC();
+    this.getStateController = new GetStateRPC();
     this.ipfsCoord = this.adapters.ipfs.ipfsCoordAdapter.ipfsCoord;
 
     // Cache to store IDs of processed JSON RPC commands. Used to prevent
@@ -108,6 +110,9 @@ class JSONRPC {
           break;
         case "submitTx":
           retObj = await _this.submitTxController.submitTxRouter(parsedData);
+          break;
+        case "getState":
+          retObj = await _this.getStateController.getStateRouter(parsedData);
           break;
       }
 
