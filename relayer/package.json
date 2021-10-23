@@ -16,7 +16,7 @@
   "dependencies": {
     "@chris.troutner/ipfs": "^2.0.2",
     "@psf/bch-js": "^4.20.13",
-    "ipfs-coord": "^6.7.1",
+    "ipfs-coord": "^6.7.3",
     "jsonrpc-lite": "^2.2.0",
     "public-ip": "^4.0.4"
   },
