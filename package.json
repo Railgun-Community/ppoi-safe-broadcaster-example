@@ -46,7 +46,7 @@
   "dependencies": {
     "chai-as-promised": "^7.1.1",
     "encoding-down": "^7.0.0",
-    "ethers": "^5.4.4",
+    "ethers": "^5.5.1",
     "levelup": "^5.0.1"
   }
 }

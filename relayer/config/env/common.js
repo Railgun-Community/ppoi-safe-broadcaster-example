@@ -44,5 +44,8 @@ module.exports = {
     }
   },
 
-  debugLevel: process.env.DEBUG_LEVEL ? parseInt(process.env.DEBUG_LEVEL) : 1
+  debugLevel: process.env.DEBUG_LEVEL ? parseInt(process.env.DEBUG_LEVEL) : 1,
+
+  // Railgun - Whitelist of contracts to send to.
+  addrWhitelist: ["0x78d3bcdd9ae4b5f26bd60cd8014412528f68a4a7"]
 };
