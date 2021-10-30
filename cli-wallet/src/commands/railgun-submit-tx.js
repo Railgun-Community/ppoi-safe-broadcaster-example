@@ -23,7 +23,7 @@ class SubmitTx extends Command {
       const { flags } = this.parse(SubmitTx);
 
       const data = await this.submitTx(flags);
-      console.log('Relayer message: ', data);
+      console.log('TXID hash: ', data);
     } catch (err) {
       console.log('Error in railgun-submit-tx.js/run(): ', err);
 
@@ -40,7 +40,9 @@ class SubmitTx extends Command {
       const result = await this.relayerService.submitTx(hex);
       // console.log('result: ', result);
 
-      return result.message;
+      // console.log(`TXID hash: ${result.txInfo.hash}`);
+
+      return result.txInfo.hash;
     } catch (err) {
       console.error('Error in submitTx()');
       throw err;
