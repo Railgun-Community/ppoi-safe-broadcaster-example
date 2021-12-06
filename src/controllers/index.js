@@ -7,7 +7,7 @@
 
 // Local libraries
 const JSONRPC = require("./json-rpc");
-
+const UseCases = require("../use-cases");
 class Controllers {
   constructor(localConfig = {}) {
     // Dependency Injection.
@@ -17,12 +17,16 @@ class Controllers {
         "Instance of Adapters library required when instantiating Controllers."
       );
     }
+    this.useCases = new UseCases({ adapters: this.adapters });
   }
 
   // Add the JSON RPC router to the ipfs-coord adapter.
   attachRPCControllers() {
     // Instantiate here rather than constructor, after adapters have initialized.
-    this.jsonRpc = new JSONRPC({ adapters: this.adapters });
+    this.jsonRpc = new JSONRPC({
+      adapters: this.adapters,
+      useCases: this.useCases
+    });
 
     // Attach the input of the JSON RPC router to the output of ipfs-coord.
     this.adapters.ipfs.ipfsCoordAdapter.attachRPCRouter(this.jsonRpc.router);

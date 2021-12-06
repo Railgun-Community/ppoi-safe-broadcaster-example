@@ -24,11 +24,18 @@ class JSONRPC {
         "Instance of Adapters library required when instantiating JSON RPC Controllers."
       );
     }
+    this.useCases = localConfig.useCases;
+    if (!this.useCases) {
+      throw new Error(
+        'Instance of Use Cases library required when instantiating User JSON RPC Controller.'
+      );
+    }
+    this.feeLib = this.useCases.fee
 
     // Encapsulate dependencies
     this.jsonrpc = jsonrpc;
     this.aboutController = new AboutController();
-    this.rateController = new RateController();
+    this.rateController = new RateController(localConfig);
     this.submitTxController = new SubmitTxRPC();
     this.getStateController = new GetStateRPC();
     this.ipfsCoord = this.adapters.ipfs.ipfsCoordAdapter.ipfsCoord;
@@ -46,7 +53,7 @@ class JSONRPC {
   async router(str, from) {
     try {
       // console.log('router str: ', str)
-      console.log("JSON RPC router recieved data from: ", from);
+      // console.log("JSON RPC router recieved data from: ", from);
 
       // Exit quietly if 'from' is not specified.
       if (!from || typeof from !== "string") {

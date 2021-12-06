@@ -14,6 +14,7 @@ const { v4: uid } = require("uuid");
 // Local libraries.
 const JSONRPC = require("../../../src/controllers/json-rpc");
 const adapters = require("../mocks/adapters");
+const UseCasesMock = require("../mocks/use-cases");
 
 describe("#JSON RPC", () => {
   let uut;
@@ -22,8 +23,8 @@ describe("#JSON RPC", () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 
-    // const useCases = new UseCasesMock()
-    uut = new JSONRPC({ adapters });
+    const useCases = new UseCasesMock();
+    uut = new JSONRPC({ adapters, useCases });
   });
 
   afterEach(() => sandbox.restore());
@@ -113,7 +114,7 @@ describe("#JSON RPC", () => {
       // Force ipfs-coord communication.
       uut.ipfsCoord.ipfs = {
         orbitdb: {
-          sendToDb: () => {}
+          sendToDb: () => { }
         }
       };
 

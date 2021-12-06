@@ -8,6 +8,7 @@ const assert = require("chai").assert;
 
 // Local libraries
 const RateRPC = require("../../../src/controllers/json-rpc/rate");
+const UseCasesMock = require("../mocks/use-cases");
 
 describe("#RateRPC", () => {
   let uut;
@@ -16,7 +17,8 @@ describe("#RateRPC", () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 
-    uut = new RateRPC();
+    const useCases = new UseCasesMock();
+    uut = new RateRPC({ useCases });
   });
 
   afterEach(() => sandbox.restore());
@@ -24,13 +26,14 @@ describe("#RateRPC", () => {
   describe("#rateRouter", () => {
     it("should return rate information", async () => {
       const result = await uut.rateRouter();
-      // console.log("result: ", result);
+      console.log("result: ", result);
 
       assert.property(result, "success");
       assert.equal(result.success, true);
       assert.property(result, "status");
       assert.equal(result.status, 200);
       assert.property(result, "message");
+      assert.isNumber(result.message);
       assert.property(result, "endpoint");
       assert.equal(result.endpoint, "rate");
     });

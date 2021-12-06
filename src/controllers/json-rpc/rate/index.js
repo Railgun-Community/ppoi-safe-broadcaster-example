@@ -12,6 +12,7 @@ class RateRPC {
   constructor(localConfig) {
     // Encapsulate dependencies
     this.jsonrpc = jsonrpc;
+    this.feeLib = localConfig.useCases.fee;
   }
 
   /**
@@ -35,7 +36,7 @@ class RateRPC {
     return {
       success: true,
       status: 200,
-      message: 10, // Hard-coded value. TODO: Replace with more biz logic.
+      message: this.feeLib.getFee(),
       endpoint: "rate"
     };
   }
