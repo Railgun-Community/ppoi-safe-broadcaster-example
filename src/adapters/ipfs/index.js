@@ -4,12 +4,14 @@
 
 const IpfsAdapter = require("./ipfs");
 const IpfsCoordAdapter = require("./ipfs-coord");
+const IpfsPinnerAdapter = require('./ipfs-pinner');
 
 class IPFS {
   constructor(localConfig = {}) {
     // Encapsulate dependencies
     this.ipfsAdapter = new IpfsAdapter();
     this.IpfsCoordAdapter = IpfsCoordAdapter;
+    this.IpfsPinnerAdapter = IpfsPinnerAdapter;
     this.process = process;
 
     this.ipfsCoordAdapter = {}; // placeholder
@@ -28,6 +30,14 @@ class IPFS {
 
       // this.ipfs is a Promise that will resolve into an instance of an IPFS node.
       this.ipfs = this.ipfsAdapter.ipfs;
+
+      this.ipfsPinner = new this.IpfsPinnerAdapter({
+        ipfs: this.ipfs
+      });
+
+      await this.ipfsPinner.start();
+      console.log('ipfs-pinner is ready.');
+
 
       // Start ipfs-coord
       this.ipfsCoordAdapter = new this.IpfsCoordAdapter({

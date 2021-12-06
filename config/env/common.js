@@ -6,7 +6,7 @@
 // Set the human-readable name that identifies this node in the IPFS subnetwork.
 const ipfsCoordName = process.env.COORD_NAME
   ? process.env.COORD_NAME
-  : "ipfs-bch-wallet-service";
+  : "ipfs-railgun-wallet-service";
 console.log("Human readible IPFS handle: ", ipfsCoordName);
 
 // Get the version from the package.json file.
@@ -26,6 +26,12 @@ module.exports = {
 
   // BCH Mnemonic for generating encryption keys and payment address
   mnemonic: process.env.MNEMONIC ? process.env.MNEMONIC : "",
+  pins: {
+    wasm: 'QmW8TdpMXRrovAJCwEc6eBqTgYUUwsmLFBJ8EaLnKC9iSE', // wasm compressed
+    zkey: 'QmdVGrmr9VvdwsEi9Kx8jYtsHePwKh89Miyp5smXnkAnh4', // zkey compressed
+    vkey: 'QmSA6uoKHov79o4YMRYux7urybWJbP6CKZaw8mT5zp2AV9', // vkey compressed
+  },
+  pinTimeout: 1000 * 60 * 2,
 
   // JSON-LD and Schema.org schema with info about this app.
   announceJsonLd: {

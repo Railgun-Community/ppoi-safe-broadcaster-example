@@ -23,7 +23,11 @@ class MockIpfsInstance {
         apply: () => {}
       }
     }
+    this.pin = {
+      addAll: (source) => { return source.map((i) => ({ cid: i })) }
+    }
   }
+
 
   stop () {}
 }

@@ -10,6 +10,7 @@ const sinon = require("sinon");
 const IPFSLib = require("../../../../src/adapters/ipfs");
 const IPFSMock = require("./mocks/ipfs-mock");
 const IPFSCoordMock = require("./mocks/ipfs-coord-mock");
+const IPFSPinnerMock = require("./mocks/ipfs-pinner-mock");
 
 describe("#IPFS-adapter-index", () => {
   let sandbox, uut;
@@ -27,6 +28,7 @@ describe("#IPFS-adapter-index", () => {
       // Mock dependencies.
       uut.ipfsAdapter = new IPFSMock();
       uut.IpfsCoordAdapter = IPFSCoordMock;
+      uut.IpfsPinnerAdapter = IPFSPinnerMock;
 
       const result = await uut.start();
 

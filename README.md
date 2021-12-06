@@ -1,12 +1,12 @@
-# @railgun-community/lepton
-Wallet framework for Railgun
+# @railgun-community/relayer
+Relayer framework for Railgun
 
 ## Installing
 ### With NPM
-`npm install @railgun-community/lepton`
+`npm install @railgun-community/relayer`
 
 ### With Yarn
-`yarn add @railgun-community/lepton`
+`yarn add @railgun-community/relayer`
 
 ## Developing
 ### Install nodejs

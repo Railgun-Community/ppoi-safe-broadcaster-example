@@ -5,5 +5,8 @@
 */
 
 module.exports = {
-  env: "test"
+  env: "test",
+  pins: {
+    test: 'QmdZvJyYSBmo6XWfK7tDohk4R1vcEnsZ6LHr5Mh33jJVAu',
+  },
 };

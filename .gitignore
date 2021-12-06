@@ -26,3 +26,4 @@ coverage
 dist
 .ipfsdata/
 run-dev.sh
+start-relayer.sh

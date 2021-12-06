@@ -88,6 +88,7 @@ class RestApi {
       app.use(this.router.allowedMethods())
 
       // Start the HTTP server.
+      // @todo allow configuration of port 
       const port = 5000
       await app.listen(port)
       console.log(`REST API started on port ${port}`)
