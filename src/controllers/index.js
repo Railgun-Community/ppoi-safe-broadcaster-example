@@ -8,6 +8,7 @@
 // Local libraries
 const JSONRPC = require("./json-rpc");
 const UseCases = require("../use-cases");
+const TimerControllers = require("./timer-controllers");
 class Controllers {
   constructor(localConfig = {}) {
     // Dependency Injection.
@@ -18,6 +19,8 @@ class Controllers {
       );
     }
     this.useCases = new UseCases({ adapters: this.adapters });
+
+
   }
 
   // Add the JSON RPC router to the ipfs-coord adapter.
@@ -30,6 +33,16 @@ class Controllers {
 
     // Attach the input of the JSON RPC router to the output of ipfs-coord.
     this.adapters.ipfs.ipfsCoordAdapter.attachRPCRouter(this.jsonRpc.router);
+  }
+
+  attachTimerControllers() {
+    this.timer = new TimerControllers({
+      statusLog: console.log,
+      adapters: this.adapters,
+      useCases: this.useCases
+    });
+    this.timer.statusLog('ding dong status log');
+    this.timer.startTimers(this.adapters.ipfs, this.useCases);
   }
 }
 

@@ -28,6 +28,8 @@ class Relayer {
       // Load the controller libraries.
       this.controllers.attachRPCControllers();
 
+      this.controllers.attachTimerControllers({ adapters: this.adapters })
+
       return true;
     } catch (err) {
       console.error(err);
