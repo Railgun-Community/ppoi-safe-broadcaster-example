@@ -1,5 +1,5 @@
 import { Waku, WakuMessage, getBootstrapNodes } from 'js-waku';
-import { client } from './networking/jsonrpc';
+import { client } from './services/networking/jsonrpc';
 import { initRelayer } from './services/relayer-init';
 
 const { log } = console;
