@@ -1,11 +1,10 @@
 import { Network } from './network-models';
+import { WalletConfig } from './wallet-models';
 
 export type DefaultsConfig = {};
 
 export type WalletsConfig = {
-  wallets: {
-    mnemonic: string;
-  }[];
+  wallets: WalletConfig[];
 };
 
 export type NetworksConfig = NumMapType<Network>;

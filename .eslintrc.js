@@ -18,6 +18,7 @@ module.exports = {
   rules: {
     'no-unused-vars': 0,
     'no-shadow': 0,
+    'implicit-arrow-linebreak': 0,
     'import/prefer-default-export': 0,
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
   },

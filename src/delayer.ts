@@ -1,5 +1,6 @@
 import { Waku, WakuMessage, getBootstrapNodes } from 'js-waku';
 import { client } from './jsonrpc';
+import { initRelayer } from './services/init-service';
 
 const { log } = console;
 const ContentTopic = '/railgun/1/relayer/proto';
@@ -27,6 +28,8 @@ const processIncomingMessage = async (wakuMessage: WakuMessage) => {
 
 const main = async () => {
   log('starting delayer');
+
+  initRelayer();
 
   delayer = await Waku.create({ bootstrap: true });
   await delayer.waitForConnectedPeer();
