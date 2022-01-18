@@ -2,11 +2,11 @@ import { NetworksConfig } from '../models/config-models';
 import { GasTokenWrappedAddress } from '../models/token-models';
 
 // Fallback Provider configs
-import configProvidersBinanceSmartChain from './providers/config-providers-binance-smart-chain';
-import configProvidersEthereum from './providers/config-providers-ethereum';
-import configProvidersHardhat from './providers/config-providers-hardhat';
-import configProvidersPolygon from './providers/config-providers-polygon';
-import configProvidersRopsten from './providers/config-providers-ropsten';
+import fallbackProvidersEthereum from './fallback-providers/1-ethereum';
+import fallbackProvidersRopsten from './fallback-providers/3-ropsten';
+import fallbackProvidersBinanceSmartChain from './fallback-providers/56-binance-smart-chain';
+import fallbackProvidersPolygon from './fallback-providers/137-polygon';
+import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
 
 export default {
   1: {
@@ -18,7 +18,7 @@ export default {
     },
     railContract: '0xbf0Af567D60318f66460Ec78b464589E3f9dA48e',
     coingeckoId: 'ethereum',
-    fallbackProviderConfig: configProvidersEthereum,
+    fallbackProviderConfig: fallbackProvidersEthereum,
   },
   3: {
     name: 'Ropsten Test Network',
@@ -29,7 +29,7 @@ export default {
     },
     railContract: '0x791532E6155E0F69cEE328B356C8B6A8DaFB9076',
     coingeckoId: 'ethereum',
-    fallbackProviderConfig: configProvidersRopsten,
+    fallbackProviderConfig: fallbackProvidersRopsten,
   },
   56: {
     name: 'Binance Smart Chain',
@@ -40,7 +40,7 @@ export default {
     },
     railContract: '', // TODO
     coingeckoId: 'binance-smart-chain',
-    fallbackProviderConfig: configProvidersBinanceSmartChain,
+    fallbackProviderConfig: fallbackProvidersBinanceSmartChain,
   },
   137: {
     name: 'Polygon PoS',
@@ -51,7 +51,7 @@ export default {
     },
     railContract: '', // TODO
     coingeckoId: 'polygon-pos',
-    fallbackProviderConfig: configProvidersPolygon,
+    fallbackProviderConfig: fallbackProvidersPolygon,
   },
   31337: {
     name: 'HardHat Test Network',
@@ -62,6 +62,6 @@ export default {
     },
     railContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
     coingeckoId: 'ethereum',
-    fallbackProviderConfig: configProvidersHardhat,
+    fallbackProviderConfig: fallbackProvidersHardhat,
   },
 } as NetworksConfig;
