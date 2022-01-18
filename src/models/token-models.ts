@@ -3,3 +3,9 @@ export enum BaseTokenWrappedAddress {
   BinanceWBNB = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c', // WBNB
   PolygonWMATIC = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270', // WMATIC
 }
+
+export type GasTokenConfig = {
+  wrappedAddress: BaseTokenWrappedAddress;
+  symbol: string;
+  decimals: number;
+};
