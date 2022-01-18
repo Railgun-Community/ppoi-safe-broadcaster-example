@@ -1,6 +1,6 @@
 import { Waku, WakuMessage, getBootstrapNodes } from 'js-waku';
-import { client } from './jsonrpc';
-import { initRelayer } from './services/init-service';
+import { client } from './networking/jsonrpc';
+import { initRelayer } from './services/relayer-init';
 
 const { log } = console;
 const ContentTopic = '/railgun/1/relayer/proto';

@@ -2,9 +2,9 @@
   "name": "delayer",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "tsc && node dist/delayer.js",
+    "start": "tsc && node dist/main.js",
     "lint": "eslint . --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
