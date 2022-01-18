@@ -1,0 +1,32 @@
+{
+  "name": "delayer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "tsc && node dist/delayer.js",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/ws": "^8.2.2",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "swc-node": "^1.0.0",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "js-waku": "^0.14.2",
+    "json-rpc-2.0": "^1.0.0",
+    "node-fetch": "^3.1.0",
+    "protons": "^2.0.3",
+    "rpc-websockets": "^7.4.16",
+    "ws": "^8.4.1"
+  }
+}
