@@ -1,13 +1,12 @@
 import { NetworksConfig } from '../models/config-models';
-import { Network } from '../models/network-models';
-import { BaseTokenWrappedAddress } from '../models/token-models';
+import { GasTokenWrappedAddress } from '../models/token-models';
 
-const networksConfig: NumMapType<Network> = {
+export default {
   1: {
     name: 'Ethereum',
     gasToken: {
       symbol: 'ETH',
-      wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
+      wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
       decimals: 18,
     },
     railContract: '0xbf0Af567D60318f66460Ec78b464589E3f9dA48e',
@@ -17,7 +16,7 @@ const networksConfig: NumMapType<Network> = {
     name: 'Ropsten Test Network',
     gasToken: {
       symbol: 'ETH',
-      wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
+      wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
       decimals: 18,
     },
     railContract: '0x791532E6155E0F69cEE328B356C8B6A8DaFB9076',
@@ -27,7 +26,7 @@ const networksConfig: NumMapType<Network> = {
     name: 'Binance Smart Chain',
     gasToken: {
       symbol: 'BNB',
-      wrappedAddress: BaseTokenWrappedAddress.BinanceWBNB,
+      wrappedAddress: GasTokenWrappedAddress.BinanceWBNB,
       decimals: 18,
     },
     railContract: '', // TODO
@@ -37,7 +36,7 @@ const networksConfig: NumMapType<Network> = {
     name: 'Polygon PoS',
     gasToken: {
       symbol: 'MATIC',
-      wrappedAddress: BaseTokenWrappedAddress.PolygonWMATIC,
+      wrappedAddress: GasTokenWrappedAddress.PolygonWMATIC,
       decimals: 18,
     },
     railContract: '', // TODO
@@ -47,12 +46,10 @@ const networksConfig: NumMapType<Network> = {
     name: 'HardHat Test Network',
     gasToken: {
       symbol: 'ETH',
-      wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
+      wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
       decimals: 18,
     },
     railContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
     coingeckoId: 'ethereum',
   },
-};
-
-export default networksConfig as NetworksConfig;
+} as NetworksConfig;

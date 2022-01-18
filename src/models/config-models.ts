@@ -8,6 +8,4 @@ export type WalletsConfig = {
   }[];
 };
 
-export type NetworksConfig = {
-  networks: NumMapType<Network>;
-};
+export type NetworksConfig = NumMapType<Network>;

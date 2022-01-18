@@ -6,7 +6,7 @@ const ContentTopic = '/railgun/1/relayer/proto';
 
 let delayer: Waku;
 
-type JSONRPCRequest = { method: string, params: any; };
+type JSONRPCRequest = { method: string; params: any };
 
 // send jsonrpc request through waku relayer
 async function sendRequest(request: JSONRPCRequest): Promise<void> {
