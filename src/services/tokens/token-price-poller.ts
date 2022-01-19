@@ -4,8 +4,11 @@ import {
   configTokenPricesGetter,
   TokenPricesGetter,
 } from '../../config/config-token-price-getter';
+import configTokens from '../../config/config-tokens';
+import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
 import { allNetworkChainIDs } from '../chains/network-chain-ids';
+import { calculateFee } from '../fees/calculate-fee';
 import { allTokenAddressesForNetwork } from './network-tokens';
 import {
   cacheTokenPricesForNetwork,
@@ -36,7 +39,17 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
 
 const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
   try {
-    pullAndCacheCurrentPricesForAllNetworks(tokenPricesGetter);
+    await pullAndCacheCurrentPricesForAllNetworks(tokenPricesGetter);
+    //
+    // NOTE: Helpful to test fee calculator:
+    // await calculateFee(
+    //   1,
+    //   '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    //   undefined,
+    // );
+    //
+  } catch (err) {
+    logger.error(err);
   } finally {
     await delay(configDefaults.tokenPriceRefreshDelayInMS);
     pollPrices(tokenPricesGetter);

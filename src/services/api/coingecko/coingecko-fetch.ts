@@ -46,8 +46,8 @@ export const getCoingeckoData = async (
       },
     });
     return rsp.data;
-  } catch (error: any) {
-    logger.error(`getCoingeckoData error: ${error.message}`);
+  } catch (err) {
+    logger.warn(`getCoingeckoData error: ${err.message}`);
     if (
       !retryCount ||
       retryCount < configDefaults.numRetriesCoingeckoPriceLookup
@@ -60,6 +60,6 @@ export const getCoingeckoData = async (
         retryCount ? retryCount + 1 : 1,
       );
     }
-    throw new Error(error);
+    throw new Error(err);
   }
 };

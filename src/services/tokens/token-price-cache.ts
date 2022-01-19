@@ -37,13 +37,19 @@ const logTokenLookupError = (
 export const lookUpTokenPrice = (
   chainID: NetworkChainID,
   tokenAddress: string,
-): Optional<TokenPrice> => {
-  const cachedPrice = tokenPriceCache[chainID][tokenAddress.toLowerCase()];
+): TokenPrice => {
+  const cachedNetworkPrices = tokenPriceCache[chainID];
+  if (!cachedNetworkPrices) {
+    logTokenLookupError('NO NETWORK PRICES', chainID, tokenAddress);
+    throw new Error(`No prices cached for network: ${chainID}`);
+  }
+
+  const cachedPrice = cachedNetworkPrices[tokenAddress.toLowerCase()];
 
   // No price available.
   if (!cachedPrice) {
     logTokenLookupError('NO TOKEN PRICE', chainID, tokenAddress);
-    return undefined;
+    throw new Error(`No cached price for token: ${tokenAddress}`);
   }
 
   // Token price expired (configurable per network: priceTTLInMS).
@@ -57,7 +63,7 @@ export const lookUpTokenPrice = (
       chainID,
       tokenAddress,
     );
-    return undefined;
+    throw new Error(`Price expired for token: ${tokenAddress}`);
   }
 
   return cachedPrice;

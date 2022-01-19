@@ -14,4 +14,5 @@ export type GasTokenConfig = {
 
 export type TokenConfig = {
   symbol: string;
+  decimals: number;
 };

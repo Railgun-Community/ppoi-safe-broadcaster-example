@@ -6,7 +6,8 @@ export const logger = {
   warn: (obj: any) => {
     console.warn(JSON.stringify(obj));
   },
-  error: (obj: any) => {
-    console.error(JSON.stringify(obj));
+  error: (error: Error) => {
+    console.error(error.message);
+    console.log(error.stack);
   },
 };

@@ -1,17 +1,17 @@
 /* eslint-disable no-underscore-dangle */
-export function hexToBuf(hex: string | Buffer | Uint8Array): Buffer {
+export const hexToBuf = (hex: string | Buffer | Uint8Array): Buffer => {
   if (typeof hex === 'string') {
     return Buffer.from(hex.replace(/^0x/i, ''), 'hex');
   }
   return Buffer.from(hex);
-}
+};
 
-export function bufToHex(buf: Uint8Array | Buffer | ArrayBuffer): string {
+export const bufToHex = (buf: Uint8Array | Buffer | ArrayBuffer): string => {
   const _buf = Buffer.from(buf);
   return _buf.toString('hex');
-}
+};
 
-export function removeNaNs(a: number[]): number[] {
+export const removeNaNs = (a: number[]): number[] => {
   const newArray: number[] = [];
   a.forEach((item) => {
     if (!Number.isNaN(item)) {
@@ -19,4 +19,4 @@ export function removeNaNs(a: number[]): number[] {
     }
   });
   return newArray;
-}
+};

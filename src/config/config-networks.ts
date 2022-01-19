@@ -11,6 +11,11 @@ import { RailProxyContract } from '../models/contract-constants';
 import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../models/config-models';
 
+const defaultFees = {
+  slippageBuffer: 0.05,
+  profit: 0.05,
+};
+
 export default {
   [NetworkChainID.Ethereum]: {
     name: 'Ethereum',
@@ -19,10 +24,11 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
       decimals: 18,
     },
+    fees: defaultFees,
     railContract: RailProxyContract.Ethereum,
     coingeckoId: CoingeckoID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
-    priceTTLInMS: 3 * 60 * 1000,
+    priceTTLInMS: 5 * 60 * 1000,
   },
   [NetworkChainID.Ropsten]: {
     name: 'Ropsten Test Network',
@@ -31,9 +37,10 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.RopstenWETH,
       decimals: 18,
     },
+    fees: defaultFees,
     railContract: RailProxyContract.Ropsten,
     fallbackProviderConfig: fallbackProvidersRopsten,
-    priceTTLInMS: 3 * 60 * 1000,
+    priceTTLInMS: 5 * 60 * 1000,
   },
   [NetworkChainID.BinanceSmartChain]: {
     name: 'Binance Smart Chain',
@@ -42,10 +49,11 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.BinanceWBNB,
       decimals: 18,
     },
+    fees: defaultFees,
     railContract: RailProxyContract.BinanceSmartChain,
     coingeckoId: CoingeckoID.BinanceSmartChain,
     fallbackProviderConfig: fallbackProvidersBinanceSmartChain,
-    priceTTLInMS: 3 * 60 * 1000,
+    priceTTLInMS: 5 * 60 * 1000,
   },
   [NetworkChainID.PolygonPOS]: {
     name: 'Polygon PoS',
@@ -54,10 +62,11 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.PolygonWMATIC,
       decimals: 18,
     },
+    fees: defaultFees,
     railContract: RailProxyContract.PolygonPOS,
     coingeckoId: CoingeckoID.PolygonPOS,
     fallbackProviderConfig: fallbackProvidersPolygon,
-    priceTTLInMS: 3 * 60 * 1000,
+    priceTTLInMS: 5 * 60 * 1000,
   },
   [NetworkChainID.HardHat]: {
     name: 'HardHat Test Network',
@@ -66,8 +75,9 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.None,
       decimals: 18,
     },
+    fees: defaultFees,
     railContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
     fallbackProviderConfig: fallbackProvidersHardhat,
-    priceTTLInMS: 3 * 60 * 1000,
+    priceTTLInMS: 5 * 60 * 1000,
   },
 } as NetworksConfig;
