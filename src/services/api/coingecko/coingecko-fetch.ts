@@ -1,5 +1,6 @@
 import axios from 'axios';
 import configDefaults from '../../../config/config-defaults';
+import { logger } from '../../../util/logger';
 
 const COINGECKO_API_URL = 'https://api.coingecko.com/api/v3/';
 
@@ -46,12 +47,12 @@ export const getCoingeckoData = async (
     });
     return rsp.data;
   } catch (error: any) {
-    console.error(`getCoingeckoData error: ${error.message}`);
+    logger.error(`getCoingeckoData error: ${error.message}`);
     if (
       !retryCount ||
       retryCount < configDefaults.numRetriesCoingeckoPriceLookup
     ) {
-      console.log('Retrying getCoingeckoData request...');
+      logger.log('Retrying getCoingeckoData request...');
       return getCoingeckoData(
         endpoint,
         endpointParam,

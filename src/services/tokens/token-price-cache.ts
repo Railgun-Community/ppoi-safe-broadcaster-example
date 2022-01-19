@@ -1,6 +1,7 @@
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import configTokens from '../../config/config-tokens';
+import { logger } from '../../util/logger';
 
 export type TokenPrice = {
   price: number;
@@ -17,21 +18,20 @@ export const cacheTokenPricesForNetwork = (
   chainID: NetworkChainID,
   tokenPrices: TokenAddressesToPrice,
 ) => {
-  console.log(
+  logger.log(
     `[temp] token prices for chain ${chainID}: ${JSON.stringify(tokenPrices)}`,
   );
   tokenPriceCache[chainID] = tokenPrices;
 };
 
-const logTokenError = (
+const logTokenLookupError = (
   errorMsg: string,
   chainID: NetworkChainID,
   tokenAddress: string,
 ) => {
   const tokenSymbol = configTokens[chainID][tokenAddress].symbol;
   const tokenDetails = `${tokenSymbol} on ${configNetworks[chainID].name} (${tokenAddress})`;
-  // eslint-disable-next-line no-console
-  console.warn(`${errorMsg}: ${tokenDetails}`);
+  logger.warn(`${errorMsg}: ${tokenDetails}`);
 };
 
 export const lookUpTokenPrice = (
@@ -42,7 +42,7 @@ export const lookUpTokenPrice = (
 
   // No price available.
   if (!cachedPrice) {
-    logTokenError('NO TOKEN PRICE', chainID, tokenAddress);
+    logTokenLookupError('NO TOKEN PRICE', chainID, tokenAddress);
     return undefined;
   }
 
@@ -52,7 +52,7 @@ export const lookUpTokenPrice = (
   const priceExpired = expiration < Date.now();
   if (priceExpired) {
     const expirationTimeLapsed = Date.now() - expiration;
-    logTokenError(
+    logTokenLookupError(
       `TOKEN PRICE EXPIRED by ${expirationTimeLapsed} ms`,
       chainID,
       tokenAddress,
