@@ -1,20 +1,20 @@
-import { Waku, WakuMessage, getBootstrapNodes } from 'js-waku';
+import { Waku, WakuMessage } from 'js-waku';
 import { client } from './services/networking/jsonrpc';
 import { initRelayer } from './services/relayer-init';
 
 const { log } = console;
 const ContentTopic = '/railgun/1/relayer/proto';
 
-let delayer: Waku;
+let waku: Waku;
 
-type JSONRPCRequest = { method: string; params: any };
+type JSONRPCRequest = { method: string; params: any; };
 
 // send jsonrpc request through waku relayer
 async function sendRequest(request: JSONRPCRequest): Promise<void> {
   const payload = JSON.stringify(request);
   log('relaying request: ', request);
   const msg = await WakuMessage.fromUtf8String(payload, ContentTopic);
-  await delayer.relay.send(msg);
+  await waku.relay.send(msg);
 }
 
 // extract jsonrpc request from WakuMessage and get response from JSONRPC server method
@@ -30,12 +30,12 @@ const main = async () => {
   log('starting delayer');
 
   initRelayer();
-
-  delayer = await Waku.create({ bootstrap: true });
-  await delayer.waitForConnectedPeer();
+  waku = await Waku.create({ bootstrap: { default: true } });
+  await waku.waitForConnectedPeer();
+  log('peers:', waku.relay.getPeers());
 
   // only process messages matching our ContentTopic
-  delayer.relay.addObserver(processIncomingMessage, [ContentTopic]);
+  waku.relay.addObserver(processIncomingMessage, [ContentTopic]);
 
   await sendRequest({ method: 'greet', params: { name: 'railgun' } });
 };

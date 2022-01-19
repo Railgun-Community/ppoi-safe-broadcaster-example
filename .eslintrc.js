@@ -19,6 +19,7 @@ module.exports = {
     'no-unused-vars': 0,
     'no-shadow': 0,
     'implicit-arrow-linebreak': 0,
+    'no-restricted-syntax': 0,
     'import/prefer-default-export': 0,
     'arrow-body-style': 0,
     'operator-linebreak': 0,
