@@ -17,7 +17,7 @@ const tokenPriceMapFromCoingeckoPriceMap = (
     if (!coingeckoPriceData) return; // Token price not found.
 
     tokenPriceMap[tokenAddress.toLowerCase()] = {
-      updatedAt: coingeckoPriceData.last_updated_at,
+      updatedAt: coingeckoPriceData.last_updated_at * 1000, // Convert Sec to MSec
       price: Number(coingeckoPriceData[currency]),
     };
   });
@@ -43,6 +43,7 @@ export const coingeckoPriceLookupByAddresses = async (
     coingeckoNetworkId,
     params,
   );
+
   const tokenPriceMap = tokenPriceMapFromCoingeckoPriceMap(
     coingeckoPriceMap,
     currency,

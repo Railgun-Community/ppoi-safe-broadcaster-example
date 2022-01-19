@@ -18,7 +18,7 @@ export const cacheTokenPricesForNetwork = (
   tokenPrices: TokenAddressesToPrice,
 ) => {
   console.log(
-    `token prices for chain ${chainID}: ${JSON.stringify(tokenPrices)}`,
+    `[temp] token prices for chain ${chainID}: ${JSON.stringify(tokenPrices)}`,
   );
   tokenPriceCache[chainID] = tokenPrices;
 };

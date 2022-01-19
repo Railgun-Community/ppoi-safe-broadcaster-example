@@ -1,4 +1,5 @@
 import configDefaults from '../../config/config-defaults';
+import configNetworks from '../../config/config-networks';
 import {
   configTokenPricesGetter,
   TokenPricesGetter,
@@ -19,6 +20,10 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
   const chainIDs = allNetworkChainIDs();
   chainIDs.forEach((chainID) => {
     const tokenAddresses = allTokenAddressesForNetwork(chainID);
+    const gasTokenAddress = configNetworks[chainID].gasToken.wrappedAddress;
+    if (gasTokenAddress) {
+      tokenAddresses.push(gasTokenAddress);
+    }
     networkPromises.push(tokenPricesGetter(chainID, tokenAddresses));
   });
 
@@ -30,9 +35,12 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
 };
 
 const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
-  pullAndCacheCurrentPricesForAllNetworks(tokenPricesGetter);
-  await delay(configDefaults.tokenPriceRefreshDelayInMS);
-  pollPrices(tokenPricesGetter);
+  try {
+    pullAndCacheCurrentPricesForAllNetworks(tokenPricesGetter);
+  } finally {
+    await delay(configDefaults.tokenPriceRefreshDelayInMS);
+    pollPrices(tokenPricesGetter);
+  }
 };
 
 export const initPricePoller = () => {

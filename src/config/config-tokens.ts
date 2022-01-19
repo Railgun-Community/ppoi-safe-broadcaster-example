@@ -2,9 +2,9 @@ import { NetworkTokensConfig } from '../models/config-models';
 import { NetworkChainID } from './config-chain-ids';
 
 enum TokenAddressEth {
+  USDT = '0xdac17f958d2ee523a2206206994597c13d831ec7',
   WETH = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   WBTC = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-  USDT = '0xdac17f958d2ee523a2206206994597c13d831ec7',
 }
 enum TokenAddressRopsten {
   WETH = '0xc778417e063141139fce010982780140aa0cd5ab',
@@ -20,6 +20,12 @@ export default {
   [NetworkChainID.Ethereum]: {
     [TokenAddressEth.WETH]: {
       symbol: 'WETH',
+    },
+    [TokenAddressEth.USDT]: {
+      symbol: 'USDT',
+    },
+    [TokenAddressEth.WBTC]: {
+      symbol: 'WBTC',
     },
   },
   [NetworkChainID.Ropsten]: {
