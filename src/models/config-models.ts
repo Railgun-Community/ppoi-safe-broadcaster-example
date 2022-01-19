@@ -1,10 +1,19 @@
+import { NetworkChainID } from '../config/config-chain-ids';
 import { Network } from './network-models';
+import { TokenConfig } from './token-models';
 import { WalletConfig } from './wallet-models';
 
+type ChainIDMapType<T> = {
+  [index in NetworkChainID]: T;
+};
+
 export type DefaultsConfig = {};
+
+type AddressToTokenMap = MapType<TokenConfig>;
+export type NetworkTokensConfig = ChainIDMapType<AddressToTokenMap>;
 
 export type WalletsConfig = {
   wallets: WalletConfig[];
 };
 
-export type NetworksConfig = NumMapType<Network>;
+export type NetworksConfig = ChainIDMapType<Network>;

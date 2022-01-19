@@ -1,4 +1,3 @@
-import { NetworksConfig } from '../models/config-models';
 import { GasTokenWrappedAddress } from '../models/token-models';
 
 // Fallback Provider configs
@@ -9,9 +8,11 @@ import fallbackProvidersPolygon from './fallback-providers/137-polygon';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
 import { CoingeckoID } from '../models/api-constants';
 import { RailProxyContract } from '../models/contract-constants';
+import { NetworkChainID } from './config-chain-ids';
+import { NetworksConfig } from '../models/config-models';
 
 export default {
-  1: {
+  [NetworkChainID.Ethereum]: {
     name: 'Ethereum',
     gasToken: {
       symbol: 'ETH',
@@ -22,7 +23,7 @@ export default {
     coingeckoId: CoingeckoID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
   },
-  3: {
+  [NetworkChainID.Ropsten]: {
     name: 'Ropsten Test Network',
     gasToken: {
       symbol: 'ETH',
@@ -32,7 +33,7 @@ export default {
     railContract: RailProxyContract.Ropsten,
     fallbackProviderConfig: fallbackProvidersRopsten,
   },
-  56: {
+  [NetworkChainID.BinanceSmartChain]: {
     name: 'Binance Smart Chain',
     gasToken: {
       symbol: 'BNB',
@@ -43,7 +44,7 @@ export default {
     coingeckoId: CoingeckoID.BinanceSmartChain,
     fallbackProviderConfig: fallbackProvidersBinanceSmartChain,
   },
-  137: {
+  [NetworkChainID.PolygonPOS]: {
     name: 'Polygon PoS',
     gasToken: {
       symbol: 'MATIC',
@@ -54,7 +55,7 @@ export default {
     coingeckoId: CoingeckoID.PolygonPOS,
     fallbackProviderConfig: fallbackProvidersPolygon,
   },
-  31337: {
+  [NetworkChainID.HardHat]: {
     name: 'HardHat Test Network',
     gasToken: {
       symbol: 'ETH',
