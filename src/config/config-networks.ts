@@ -22,6 +22,7 @@ export default {
     railContract: RailProxyContract.Ethereum,
     coingeckoId: CoingeckoID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
+    priceTTLInMS: 3 * 60 * 1000,
   },
   [NetworkChainID.Ropsten]: {
     name: 'Ropsten Test Network',
@@ -32,6 +33,7 @@ export default {
     },
     railContract: RailProxyContract.Ropsten,
     fallbackProviderConfig: fallbackProvidersRopsten,
+    priceTTLInMS: 3 * 60 * 1000,
   },
   [NetworkChainID.BinanceSmartChain]: {
     name: 'Binance Smart Chain',
@@ -43,6 +45,7 @@ export default {
     railContract: RailProxyContract.BinanceSmartChain,
     coingeckoId: CoingeckoID.BinanceSmartChain,
     fallbackProviderConfig: fallbackProvidersBinanceSmartChain,
+    priceTTLInMS: 3 * 60 * 1000,
   },
   [NetworkChainID.PolygonPOS]: {
     name: 'Polygon PoS',
@@ -54,6 +57,7 @@ export default {
     railContract: RailProxyContract.PolygonPOS,
     coingeckoId: CoingeckoID.PolygonPOS,
     fallbackProviderConfig: fallbackProvidersPolygon,
+    priceTTLInMS: 3 * 60 * 1000,
   },
   [NetworkChainID.HardHat]: {
     name: 'HardHat Test Network',
@@ -64,5 +68,6 @@ export default {
     },
     railContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
     fallbackProviderConfig: fallbackProvidersHardhat,
+    priceTTLInMS: 3 * 60 * 1000,
   },
 } as NetworksConfig;

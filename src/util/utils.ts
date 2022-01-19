@@ -10,3 +10,13 @@ export function bufToHex(buf: Uint8Array | Buffer | ArrayBuffer): string {
   const _buf = Buffer.from(buf);
   return _buf.toString('hex');
 }
+
+export function removeNaNs(a: number[]): number[] {
+  const newArray: number[] = [];
+  a.forEach((item) => {
+    if (!Number.isNaN(item)) {
+      newArray.push(item);
+    }
+  });
+  return newArray;
+}

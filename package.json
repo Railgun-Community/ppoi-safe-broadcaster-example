@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/main.js",
+  "engines": {
+    "node": ">=14.17.6"
+  },
   "scripts": {
     "start": "tsc && node dist/main.js",
     "lint": "eslint . --ext .ts",
@@ -24,6 +27,7 @@
   "dependencies": {
     "@ethersproject/providers": "^5.5.2",
     "@ethersproject/shims": "^5.5.0",
+    "axios": "^0.25.0",
     "ethers": "^5.5.3",
     "js-waku": "^0.14.2",
     "json-rpc-2.0": "^1.0.0",

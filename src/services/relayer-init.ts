@@ -3,7 +3,9 @@ import { Wallet } from 'ethers';
 import configNetworks from '../config/config-networks';
 import configWallets from '../config/config-wallets';
 import { ActiveWallet } from '../models/wallet-models';
+import { initPricePoller } from './tokens/token-price-poller';
 import { createFallbackProviderFromJsonConfig } from './providers/network-providers';
+import { allNetworkChainIDs } from './chains/network-chain-ids';
 
 const activeWallets: ActiveWallet[] = [];
 const activeNetworks: NumMapType<BaseProvider> = {};
@@ -19,8 +21,7 @@ const initWallets = () => {
 };
 
 const initNetworks = () => {
-  const chainIds = Object.keys(configNetworks);
-  chainIds.forEach((chainId) => {
+  allNetworkChainIDs().forEach((chainId) => {
     const { fallbackProviderConfig, name } = configNetworks[chainId];
     if (fallbackProviderConfig.chainId !== Number(chainId)) {
       throw new Error(
@@ -36,4 +37,5 @@ const initNetworks = () => {
 export const initRelayer = () => {
   initWallets();
   initNetworks();
+  initPricePoller();
 };

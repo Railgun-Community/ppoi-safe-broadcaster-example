@@ -20,6 +20,8 @@ module.exports = {
     'no-shadow': 0,
     'implicit-arrow-linebreak': 0,
     'import/prefer-default-export': 0,
+    'arrow-body-style': 0,
+    'operator-linebreak': 0,
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
   },
 };
