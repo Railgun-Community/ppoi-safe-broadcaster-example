@@ -24,11 +24,10 @@ export default {
     name: 'Ropsten Test Network',
     gasToken: {
       symbol: 'ETH',
-      wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
+      wrappedAddress: GasTokenWrappedAddress.RopstenWETH,
       decimals: 18,
     },
     railContract: '0x791532E6155E0F69cEE328B356C8B6A8DaFB9076',
-    coingeckoId: 'ethereum',
     fallbackProviderConfig: fallbackProvidersRopsten,
   },
   56: {
@@ -57,11 +56,10 @@ export default {
     name: 'HardHat Test Network',
     gasToken: {
       symbol: 'ETH',
-      wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
+      wrappedAddress: GasTokenWrappedAddress.None,
       decimals: 18,
     },
     railContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
-    coingeckoId: 'ethereum',
     fallbackProviderConfig: fallbackProvidersHardhat,
   },
 } as NetworksConfig;
