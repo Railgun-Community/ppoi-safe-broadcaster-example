@@ -7,6 +7,8 @@ import fallbackProvidersRopsten from './fallback-providers/3-ropsten';
 import fallbackProvidersBinanceSmartChain from './fallback-providers/56-binance-smart-chain';
 import fallbackProvidersPolygon from './fallback-providers/137-polygon';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
+import { CoingeckoID } from '../models/api-constants';
+import { RailProxyContract } from '../models/contract-constants';
 
 export default {
   1: {
@@ -16,8 +18,8 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
       decimals: 18,
     },
-    railContract: '0xbf0Af567D60318f66460Ec78b464589E3f9dA48e',
-    coingeckoId: 'ethereum',
+    railContract: RailProxyContract.Ethereum,
+    coingeckoId: CoingeckoID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
   },
   3: {
@@ -27,7 +29,7 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.RopstenWETH,
       decimals: 18,
     },
-    railContract: '0x791532E6155E0F69cEE328B356C8B6A8DaFB9076',
+    railContract: RailProxyContract.Ropsten,
     fallbackProviderConfig: fallbackProvidersRopsten,
   },
   56: {
@@ -37,8 +39,8 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.BinanceWBNB,
       decimals: 18,
     },
-    railContract: '', // TODO
-    coingeckoId: 'binance-smart-chain',
+    railContract: RailProxyContract.BinanceSmartChain,
+    coingeckoId: CoingeckoID.BinanceSmartChain,
     fallbackProviderConfig: fallbackProvidersBinanceSmartChain,
   },
   137: {
@@ -48,8 +50,8 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.PolygonWMATIC,
       decimals: 18,
     },
-    railContract: '', // TODO
-    coingeckoId: 'polygon-pos',
+    railContract: RailProxyContract.PolygonPOS,
+    coingeckoId: CoingeckoID.PolygonPOS,
     fallbackProviderConfig: fallbackProvidersPolygon,
   },
   31337: {
