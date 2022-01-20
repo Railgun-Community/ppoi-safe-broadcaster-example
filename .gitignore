@@ -28,3 +28,4 @@ dist
 run-dev.sh
 start-relayer.sh
 tsconfig.tsbuildinfo
+pnpm-lock.yaml

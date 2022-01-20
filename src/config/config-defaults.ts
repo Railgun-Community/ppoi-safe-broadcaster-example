@@ -6,4 +6,9 @@ export default {
 
   // Retry Coingecko lookup one time.
   numRetriesCoingeckoPriceLookup: 1,
+
+  // waku options
+  directPeers: [
+    '/dns4/relayer.of.holdings/tcp/443/wss/p2p/16Uiu2HAm8xGMm2KAgvqbERJb38h7h9UdDVhmbGFBzRkC17qqHezv',
+  ],
 };

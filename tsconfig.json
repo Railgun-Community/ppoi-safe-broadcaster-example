@@ -9,6 +9,7 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "rootDir": "src",
+    "baseUrl": "./src",
     "outDir": "dist",
     "lib": [
       "es2020",

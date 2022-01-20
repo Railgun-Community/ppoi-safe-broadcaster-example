@@ -21,6 +21,7 @@ module.exports = {
     'implicit-arrow-linebreak': 0,
     'no-restricted-syntax': 0,
     'import/prefer-default-export': 0,
+    'import/no-unresolved': 0,
     'arrow-body-style': 0,
     'operator-linebreak': 0,
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
