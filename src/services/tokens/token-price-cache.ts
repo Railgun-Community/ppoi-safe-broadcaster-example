@@ -21,6 +21,13 @@ export const cacheTokenPricesForNetwork = (
   logger.log(
     `[temp] token prices for chain ${chainID}: ${JSON.stringify(tokenPrices)}`,
   );
+  for (const address of Object.keys(tokenPrices)) {
+    logger.log(
+      `${address} updated ago (sec): ${
+        (Date.now() - tokenPrices[address].updatedAt) / 1000
+      }`,
+    );
+  }
   tokenPriceCache[chainID] = tokenPrices;
 };
 
