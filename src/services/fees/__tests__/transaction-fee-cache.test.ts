@@ -41,7 +41,7 @@ describe('transaction-fee-cache', () => {
       MOCK_SERIALIZED_TRANSACTION,
       MOCK_TOKEN_ADDRESS,
     );
-    expect(cachedFee.feeDecimal).to.equal(MOCK_FEE);
+    expect(cachedFee?.feeDecimal).to.equal(MOCK_FEE);
 
     // Wait for cache to expire.
     await delay(51);

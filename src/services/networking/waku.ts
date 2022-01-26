@@ -1,12 +1,13 @@
 import { Waku, WakuMessage } from 'js-waku';
 import { client } from 'services/networking/jsonrpc';
 import debug from 'debug';
+import { CreateOptions } from 'js-waku/build/main/lib/waku';
 
 const dbg = debug('delayer:waku');
 let waku: Waku;
 
 export const ContentTopic = '/railgun/1/relayer/proto';
-export type JSONRPCRequest = { method: string; params: any; };
+export type JSONRPCRequest = { method: string; params: any };
 
 // send jsonrpc request through waku relayer
 export async function sendRequest(request: JSONRPCRequest): Promise<void> {
@@ -25,13 +26,16 @@ const processIncomingMessage = async (wakuMessage: WakuMessage) => {
   dbg('JSONRPC response:', res);
 };
 
-export const initWaku = async (createOptions?): Promise<Waku> => {
+export const initWaku = async (
+  directPeers: string[],
+  createOptions?: CreateOptions,
+): Promise<Waku> => {
   const options = createOptions ?? { bootstrap: { default: true } };
 
   waku = await Waku.create(options);
   dbg('initializing Waku');
   await waku.waitForConnectedPeer();
-  await waku.dial(options.libp2p.directPeers[0]).catch((e) => {
+  await waku.dial(directPeers[0]).catch((e) => {
     dbg(e);
   });
   waku.libp2p.connectionManager.on('peer:connect', (connection) => {
@@ -42,7 +46,9 @@ export const initWaku = async (createOptions?): Promise<Waku> => {
   });
 
   // eslint-disable-next-line no-promise-executor-return
-  await new Promise((resolve) => waku.libp2p.pubsub.once('gossipsub:heartbeat', resolve));
+  await new Promise((resolve) =>
+    waku.libp2p.pubsub.once('gossipsub:heartbeat', resolve),
+  );
   dbg('heartbeat resolved');
   waku.libp2p.peerStore.on('change:protocols', ({ peerId, protocols }) => {
     dbg({ peerId, protocols });

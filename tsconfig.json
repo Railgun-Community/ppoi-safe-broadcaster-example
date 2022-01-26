@@ -8,6 +8,8 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
     "baseUrl": "./src",
     "outDir": "dist",
     "lib": ["es2020", "dom"],
@@ -15,7 +17,7 @@
     "typeRoots": ["node_modules/@types", "src/types"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules/**", "src/**/__tests__", "test"],
+  "exclude": ["src/**/__tests__", "test"],
   "compileOnSave": false,
   "ts-node": {
     "files": true

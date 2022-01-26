@@ -46,7 +46,7 @@ export const getCoingeckoData = async (
       },
     });
     return rsp.data;
-  } catch (err) {
+  } catch (err: any) {
     logger.warn(`getCoingeckoData error: ${err.message}`);
     if (
       !retryCount ||

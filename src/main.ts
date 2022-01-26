@@ -10,13 +10,12 @@ const main = async (): Promise<void> => {
   dbg('starting delayer');
 
   initRelayer();
+  const directPeers = configDefaults.directPeers;
   const options = {
     bootstrap: { default: true },
-    libp2p: {
-      directPeers: configDefaults.directPeers,
-    },
+    libp2p: {},
   };
-  const waku = await initWaku(options);
+  const waku = await initWaku(directPeers, options);
   dbg('waku peers', waku.relay.getPeers());
 
   await sendRequest({ method: 'greet', params: { name: 'railgun' } });

@@ -45,7 +45,7 @@ const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
     //   '{}',
     //   '0xdac17f958d2ee523a2206206994597c13d831ec7',
     // );
-  } catch (err) {
+  } catch (err: any) {
     logger.error(err);
   } finally {
     await delay(configDefaults.tokenPriceRefreshDelayInMS);

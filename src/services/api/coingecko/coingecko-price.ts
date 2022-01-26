@@ -18,7 +18,7 @@ const tokenPriceMapFromCoingeckoPriceMap = (
 
     tokenPriceMap[tokenAddress.toLowerCase()] = {
       updatedAt: coingeckoPriceData.last_updated_at * 1000, // Convert Sec to MSec
-      price: Number(coingeckoPriceData[currency]),
+      price: Number((coingeckoPriceData as any)[currency]),
     };
   });
 

@@ -7,7 +7,7 @@ const dbg = debug('delayer:jsonrpc');
 export const server = new Server({ host: 'localhost', port: 8081 });
 export const client = new Client('ws://localhost:8081');
 
-const greet = ({ name }) => `hello, ${name}`;
+const greet = ({ name }: any) => `hello, ${name}`;
 server.register('greet', greet);
 
 server.on('socket-error', (socket, error) => {
