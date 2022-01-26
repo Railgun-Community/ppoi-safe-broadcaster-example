@@ -3,6 +3,6 @@ export type WalletConfig = {
 };
 
 export type ActiveWallet = {
-  publicKey: string;
+  address: string;
   privateKey: string;
 };

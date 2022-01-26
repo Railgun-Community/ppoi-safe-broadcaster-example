@@ -10,7 +10,7 @@ import {
   resetTokenPriceCache,
   TokenPrice,
 } from '../token-price-cache';
-import { mockTokenDetails } from '../../../test/mocks.test';
+import { mockTokenConfig } from '../../../test/mocks.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -20,9 +20,9 @@ const MOCK_TOKEN_ADDRESS_2 = 'b456';
 
 describe('token-price-cache', () => {
   before(() => {
-    mockTokenDetails(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1);
-    mockTokenDetails(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2);
-    mockTokenDetails(NetworkChainID.Ropsten, MOCK_TOKEN_ADDRESS_1);
+    mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1);
+    mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2);
+    mockTokenConfig(NetworkChainID.Ropsten, MOCK_TOKEN_ADDRESS_1);
   });
 
   beforeEach(() => {

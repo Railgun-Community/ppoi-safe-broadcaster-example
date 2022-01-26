@@ -1,7 +1,8 @@
+import { BaseProvider, Network } from '@ethersproject/providers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configTokens from '../config/config-tokens';
 
-export const mockTokenDetails = (
+export const mockTokenConfig = (
   chainID: NetworkChainID,
   tokenAddress: string,
 ) => {
@@ -9,4 +10,8 @@ export const mockTokenDetails = (
     symbol: tokenAddress.toUpperCase(),
     decimals: 18,
   };
+};
+
+export const getMockProvider = (): BaseProvider => {
+  return new BaseProvider({ name: 'Ethereum', chainId: 1 });
 };

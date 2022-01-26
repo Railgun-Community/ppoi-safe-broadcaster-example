@@ -7,7 +7,7 @@ import {
   resetTokenPriceCache,
   TokenAddressesToPrice,
 } from '../token-price-cache';
-import { mockTokenDetails } from '../../../test/mocks.test';
+import { mockTokenConfig } from '../../../test/mocks.test';
 import configDefaults from '../../../config/config-defaults';
 import configTokenPriceGetter, {
   TokenPricesGetter,
@@ -55,8 +55,8 @@ describe('token-price-poller', () => {
   before(() => {
     configTokenPriceGetter.tokenPriceGetter = mockTokenPriceGetter;
     configDefaults.tokenPriceRefreshDelayInMS = 3 * 1000; // 3 second refresh.
-    mockTokenDetails(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1);
-    mockTokenDetails(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2);
+    mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1);
+    mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2);
   });
 
   beforeEach(() => {

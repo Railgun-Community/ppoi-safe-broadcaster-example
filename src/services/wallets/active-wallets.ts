@@ -1,3 +1,4 @@
+import { BaseProvider } from '@ethersproject/providers';
 import { Wallet } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configWallets from '../../config/config-wallets';
@@ -10,10 +11,14 @@ export const initWallets = () => {
   configWallets.wallets.forEach(({ mnemonic }) => {
     const wallet = Wallet.fromMnemonic(mnemonic);
     activeWallets.push({
-      publicKey: wallet.publicKey,
+      address: wallet.address,
       privateKey: wallet.privateKey,
     });
   });
+};
+
+export const walletForIndex = (index: number, provider: BaseProvider) => {
+  return new Wallet(activeWallets[index].privateKey, provider);
 };
 
 export const getAnyWalletForNetwork = (chainID: NetworkChainID) => {
@@ -21,5 +26,5 @@ export const getAnyWalletForNetwork = (chainID: NetworkChainID) => {
     throw new Error('No wallets initialized.');
   }
   const provider = getProviderForNetwork(chainID);
-  return new Wallet(activeWallets[0].privateKey, provider);
+  return walletForIndex(0, provider);
 };
