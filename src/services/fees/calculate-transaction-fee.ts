@@ -1,8 +1,7 @@
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import configTokens from '../../config/config-tokens';
-import { logger } from '../../util/logger';
 import { lookUpCachedTokenPrice } from '../tokens/token-price-cache';
 import { deserializePopulatedTransaction } from '../transactions/populated-transaction';
 import { estimateMaximumGas } from './gas-estimate';
