@@ -7,7 +7,7 @@ export enum GasTokenWrappedAddress {
 }
 
 export type GasTokenConfig = {
-  wrappedAddress?: GasTokenWrappedAddress;
+  wrappedAddress?: GasTokenWrappedAddress | string;
   symbol: string;
   decimals: number;
 };

@@ -14,7 +14,7 @@ export type Network = {
   railContract: string;
   fallbackProviderConfig: FallbackProviderJsonConfig;
   gasToken: GasTokenConfig;
-  coingeckoId?: CoingeckoID;
+  coingeckoId?: CoingeckoID | string;
   priceTTLInMS: number;
   fees: NetworkFeeSettings;
 };

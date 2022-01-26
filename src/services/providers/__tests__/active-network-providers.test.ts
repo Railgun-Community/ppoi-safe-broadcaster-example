@@ -3,34 +3,19 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { NetworkChainID } from '../../../config/config-chain-ids';
 import configNetworks from '../../../config/config-networks';
-import { FallbackProviderJsonConfig } from '../../../models/provider-models';
 import {
   getProviderForNetwork,
   initNetworkProviders,
 } from '../active-network-providers';
+import { getMockFallbackProviderConfig } from '../../../test/mocks.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const mockConfig: FallbackProviderJsonConfig = {
-  chainId: 1,
-  providers: [
-    {
-      provider: 'https://eth.railgun.ch',
-      priority: 1,
-      weight: 1,
-    },
-    {
-      provider: 'https://cloudflare-eth.com',
-      priority: 2,
-      weight: 1,
-    },
-  ],
-};
-
 describe('active-network-providers', () => {
   before(() => {
-    configNetworks[NetworkChainID.Ethereum].fallbackProviderConfig = mockConfig;
+    configNetworks[NetworkChainID.Ethereum].fallbackProviderConfig =
+      getMockFallbackProviderConfig();
     initNetworkProviders();
   });
 
