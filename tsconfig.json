@@ -15,7 +15,7 @@
     "typeRoots": ["node_modules/@types", "src/types", "src/global.d.ts"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules/**", "src/**/__tests__"],
+  "exclude": ["node_modules/**", "src/**/__tests__", "src/test"],
   "compileOnSave": false,
   "ts-node": {
     "files": true
