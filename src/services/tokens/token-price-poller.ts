@@ -1,13 +1,11 @@
 import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
-import {
-  configTokenPricesGetter,
+import configTokenPriceGetter, {
   TokenPricesGetter,
 } from '../../config/config-token-price-getter';
 import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
 import { allNetworkChainIDs } from '../chains/network-chain-ids';
-import { calculateTransactionFee } from '../fees/calculate-transaction-fee';
 import { allTokenAddressesForNetwork } from './network-tokens';
 import {
   cacheTokenPricesForNetwork,
@@ -40,8 +38,6 @@ const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
   try {
     await pullAndCacheCurrentPricesForAllNetworks(tokenPricesGetter);
 
-    console.log(configDefaults.debugLevel);
-
     // NOTE: Just for debugging. Helpful to test fee calculator.
     // TODO: Remove this.
     // await calculateTransactionFee(
@@ -58,5 +54,5 @@ const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
 };
 
 export const initPricePoller = () => {
-  pollPrices(configTokenPricesGetter);
+  pollPrices(configTokenPriceGetter.tokenPriceGetter);
 };

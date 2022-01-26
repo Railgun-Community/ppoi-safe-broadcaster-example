@@ -1,5 +1,5 @@
 /// <reference types="../../../global" />
-/* globals describe it beforeEach, afterEach */
+/* globals describe, it, before, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { NetworkChainID } from '../../../config/config-chain-ids';
@@ -19,11 +19,14 @@ const MOCK_TOKEN_ADDRESS_1 = 'a123';
 const MOCK_TOKEN_ADDRESS_2 = 'b456';
 
 describe('token-price-cache', () => {
-  beforeEach(() => {
-    resetTokenPriceCache();
+  before(() => {
     mockTokenDetails(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1);
     mockTokenDetails(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2);
     mockTokenDetails(NetworkChainID.Ropsten, MOCK_TOKEN_ADDRESS_1);
+  });
+
+  beforeEach(() => {
+    resetTokenPriceCache();
   });
 
   it('Should error on empty map', () => {

@@ -19,7 +19,7 @@ export const cacheTokenPricesForNetwork = (
   chainID: NetworkChainID,
   tokenPrices: TokenAddressesToPrice,
 ) => {
-  logger.debugLog(
+  logger.log(
     `token prices for chain ${chainID}: ${JSON.stringify(tokenPrices)}`,
   );
   tokenPriceCache[chainID] = tokenPrices;

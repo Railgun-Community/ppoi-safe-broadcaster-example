@@ -6,25 +6,7 @@ const hasDebugLevel = (debugLevels: DebugLevel[]): boolean => {
 };
 
 /* eslint-disable no-console */
-export const logger = {
-  debugLog: (obj: any) => {
-    if (!hasDebugLevel([DebugLevel.Logs])) {
-      return;
-    }
-    logger.log(obj);
-  },
-  debugWarn: (obj: any) => {
-    if (!hasDebugLevel([DebugLevel.Logs, DebugLevel.Error])) {
-      return;
-    }
-    logger.warn(obj);
-  },
-  debugError: (error: Error) => {
-    if (!hasDebugLevel([DebugLevel.Logs, DebugLevel.Error])) {
-      return;
-    }
-    logger.error(error);
-  },
+const loggerImpl = {
   log: (obj: any) => {
     console.log(JSON.stringify(obj));
   },
@@ -34,5 +16,35 @@ export const logger = {
   error: (error: Error) => {
     console.error(error.message);
     console.log(error.stack);
+  },
+};
+
+export const logger = {
+  log: (obj: any) => {
+    if (!hasDebugLevel([DebugLevel.Logs])) {
+      return;
+    }
+    if (hasDebugLevel([DebugLevel.None])) {
+      return;
+    }
+    loggerImpl.log(obj);
+  },
+  warn: (obj: any) => {
+    if (!hasDebugLevel([DebugLevel.Logs, DebugLevel.Error])) {
+      return;
+    }
+    if (hasDebugLevel([DebugLevel.None])) {
+      return;
+    }
+    loggerImpl.warn(obj);
+  },
+  error: (error: Error) => {
+    if (!hasDebugLevel([DebugLevel.Logs, DebugLevel.Error])) {
+      return;
+    }
+    if (hasDebugLevel([DebugLevel.None])) {
+      return;
+    }
+    loggerImpl.error(error);
   },
 };
