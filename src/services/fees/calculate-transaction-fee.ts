@@ -1,14 +1,16 @@
-import { BigNumber, PopulatedTransaction } from 'ethers';
+import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import configTokens from '../../config/config-tokens';
 import { lookUpTokenPrice } from '../tokens/token-price-cache';
+import { deserializePopulatedTransaction } from '../transactions/populated-transaction';
 import { estimateMaximumGas } from './gas-estimate';
+import { cacheFeeForTransaction } from './transaction-fee-cache';
 
-export const calculateFee = async (
+export const calculateTransactionFee = async (
   chainID: NetworkChainID,
   tokenAddress: string,
-  populatedTransaction: PopulatedTransaction,
+  serializedTransaction: string,
 ): Promise<BigNumber> => {
   const networkConfig = configNetworks[chainID];
   const networkGasToken = networkConfig.gasToken;
@@ -31,10 +33,19 @@ export const calculateFee = async (
   const profit = priceRatio * networkConfig.fees.slippageBuffer;
   const totalFeeRatio = priceRatio + slippage + profit;
 
+  const populatedTransaction = deserializePopulatedTransaction(
+    serializedTransaction,
+  );
   const maximumGas = await estimateMaximumGas(chainID, populatedTransaction);
 
   // TODO: Take number of decimals for token into account (?)
   const feeForTokenDecimal = Math.ceil(maximumGas.toNumber() * totalFeeRatio);
+
+  cacheFeeForTransaction(
+    serializedTransaction,
+    tokenAddress,
+    feeForTokenDecimal,
+  );
 
   return BigNumber.from(feeForTokenDecimal);
 };

@@ -5,7 +5,7 @@ import { logger } from '../../util/logger';
 
 export type TokenPrice = {
   price: number;
-  updatedAt: number;
+  updatedAt: number; // In milliseconds.
 };
 
 export type TokenAddressesToPrice = MapType<Optional<TokenPrice>>;
@@ -18,16 +18,9 @@ export const cacheTokenPricesForNetwork = (
   chainID: NetworkChainID,
   tokenPrices: TokenAddressesToPrice,
 ) => {
-  logger.log(
-    `[temp] token prices for chain ${chainID}: ${JSON.stringify(tokenPrices)}`,
+  logger.debugLog(
+    `token prices for chain ${chainID}: ${JSON.stringify(tokenPrices)}`,
   );
-  for (const address of Object.keys(tokenPrices)) {
-    logger.log(
-      `${address} updated ago (sec): ${
-        (Date.now() - tokenPrices[address].updatedAt) / 1000
-      }`,
-    );
-  }
   tokenPriceCache[chainID] = tokenPrices;
 };
 
