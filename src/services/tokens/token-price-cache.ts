@@ -2,6 +2,7 @@ import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import configTokens from '../../config/config-tokens';
 import { logger } from '../../util/logger';
+import { resetMapObject } from '../../util/utils';
 
 export type TokenPrice = {
   price: number;
@@ -22,6 +23,10 @@ export const cacheTokenPricesForNetwork = (
     `token prices for chain ${chainID}: ${JSON.stringify(tokenPrices)}`,
   );
   tokenPriceCache[chainID] = tokenPrices;
+};
+
+export const resetTokenPriceCache = () => {
+  resetMapObject(tokenPriceCache);
 };
 
 const logTokenLookupError = (
