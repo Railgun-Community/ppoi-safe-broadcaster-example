@@ -40,12 +40,13 @@ const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
   try {
     await pullAndCacheCurrentPricesForAllNetworks(tokenPricesGetter);
 
-    // NOTE: Helpful to test fee calculator:
-    await calculateTransactionFee(
-      1,
-      undefined,
-      '0xdac17f958d2ee523a2206206994597c13d831ec7',
-    );
+    // NOTE: Just for debugging. Helpful to test fee calculator.
+    // TODO: Remove this.
+    // await calculateTransactionFee(
+    //   1,
+    //   '{}',
+    //   '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    // );
   } catch (err) {
     logger.error(err);
   } finally {

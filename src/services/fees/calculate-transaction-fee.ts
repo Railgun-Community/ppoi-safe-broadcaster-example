@@ -1,7 +1,8 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import configTokens from '../../config/config-tokens';
+import { logger } from '../../util/logger';
 import { lookUpCachedTokenPrice } from '../tokens/token-price-cache';
 import { deserializePopulatedTransaction } from '../transactions/populated-transaction';
 import { estimateMaximumGas } from './gas-estimate';
@@ -28,7 +29,7 @@ export const calculateTransactionFee = async (
     networkGasToken.wrappedAddress,
   );
 
-  const priceRatio = gasTokenPrice.price / tokenPrice.price;
+  const priceRatio = tokenPrice.price / gasTokenPrice.price;
   const slippage = priceRatio * networkConfig.fees.slippageBuffer;
   const profit = priceRatio * networkConfig.fees.slippageBuffer;
   const totalFeeRatio = priceRatio + slippage + profit;
@@ -39,6 +40,7 @@ export const calculateTransactionFee = async (
   const maximumGas = await estimateMaximumGas(chainID, populatedTransaction);
 
   // TODO: Take number of decimals for token into account (?)
+  // TODO: Remove decimal numbers.
   const feeForTokenDecimal = Math.ceil(maximumGas.toNumber() * totalFeeRatio);
 
   cacheFeeForTransaction(
