@@ -12,7 +12,7 @@
     "compile": "npm run clean && tsc && tsc-alias",
     "start": "npm run compile && node dist/main.js",
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
-    "test": "npm run compile-test && nyc mocha --file ./dist/test/setup.test.js --require ts-node/register --exit 'dist/**/__tests__/*.test.js'"
+    "test": "npm run compile-test && nyc mocha --file ./src/test/setup.test.ts --require ts-node/register --exit 'src/**/__tests__/*.test.ts'"
   },
   "keywords": [],
   "author": "",
