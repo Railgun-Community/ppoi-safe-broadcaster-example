@@ -34,7 +34,7 @@ const logTokenLookupError = (
   logger.warn(`${errorMsg}: ${tokenDetails}`);
 };
 
-export const lookUpTokenPrice = (
+export const lookUpCachedTokenPrice = (
   chainID: NetworkChainID,
   tokenAddress: string,
 ): TokenPrice => {

@@ -1,13 +1,9 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { BigNumber, PopulatedTransaction } from 'ethers';
+import { PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
+import { TransactionGasDetails } from '../fees/calculate-gas';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getAnyWalletForNetwork } from '../wallets/active-wallets';
-
-export interface TransactionGasDetails {
-  gasEstimate: BigNumber;
-  gasPrice: BigNumber;
-}
 
 const setGasDetails = (
   populatedTransaction: PopulatedTransaction,

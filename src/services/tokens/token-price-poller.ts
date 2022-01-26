@@ -43,8 +43,8 @@ const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
     // NOTE: Helpful to test fee calculator:
     await calculateTransactionFee(
       1,
-      '0xdac17f958d2ee523a2206206994597c13d831ec7',
       undefined,
+      '0xdac17f958d2ee523a2206206994597c13d831ec7',
     );
   } catch (err) {
     logger.error(err);
