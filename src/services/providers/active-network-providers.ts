@@ -20,6 +20,8 @@ export const initNetworkProviders = () => {
   });
 };
 
-export const getProviderForNetwork = (chainID: NetworkChainID) => {
+export const getProviderForNetwork = (
+  chainID: NetworkChainID,
+): BaseProvider => {
   return activeNetworkProviders[chainID];
 };
