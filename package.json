@@ -8,10 +8,10 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "compile": "npm run clean && tsc",
-    "compile-test": "npm run clean && tsc --project tsconfig.test.json",
-    "start": "npm run compile && tsc-alias && node dist/main.js",
     "lint": "eslint . --ext .ts",
+    "compile": "npm run clean && tsc && tsc-alias",
+    "start": "npm run compile && node dist/main.js",
+    "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
     "test": "npm run compile-test && nyc mocha --exit 'dist/**/__tests__/*.test.js'"
   },
   "keywords": [],
