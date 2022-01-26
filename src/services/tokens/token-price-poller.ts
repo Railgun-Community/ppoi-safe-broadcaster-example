@@ -40,6 +40,8 @@ const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
   try {
     await pullAndCacheCurrentPricesForAllNetworks(tokenPricesGetter);
 
+    console.log(configDefaults.debugLevel);
+
     // NOTE: Just for debugging. Helpful to test fee calculator.
     // TODO: Remove this.
     // await calculateTransactionFee(

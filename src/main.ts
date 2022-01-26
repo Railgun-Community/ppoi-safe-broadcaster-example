@@ -1,7 +1,8 @@
 import { initRelayer } from 'services/relayer-init';
 import { initWaku, sendRequest } from 'services/networking/waku';
-import defaultConfig from 'config/config-defaults';
 import debug from 'debug';
+import configDefaults from 'config/config-defaults';
+import { DebugLevel } from './models/debug-models';
 
 const dbg = debug('delayer:main');
 
@@ -12,7 +13,7 @@ const main = async (): Promise<void> => {
   const options = {
     bootstrap: { default: true },
     libp2p: {
-      directPeers: defaultConfig.directPeers,
+      directPeers: configDefaults.directPeers,
     },
   };
   const waku = await initWaku(options);

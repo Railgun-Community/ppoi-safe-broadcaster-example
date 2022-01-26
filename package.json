@@ -7,9 +7,12 @@
     "node": ">=14.17.6"
   },
   "scripts": {
-    "start": "tsc && tsc-alias && node dist/main.js",
+    "clean": "rm -rf dist",
+    "compile": "npm run clean && tsc",
+    "compile-test": "npm run clean && tsc --project tsconfig.test.json",
+    "start": "npm run compile && tsc-alias && node dist/main.js",
     "lint": "eslint . --ext .ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run compile-test && nyc mocha --exit 'dist/**/__tests__/*.test.js'"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +29,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.2",
     "mocha": "^9.2.0",
+    "nyc": "^15.1.0",
     "swc-node": "^1.0.0",
     "tsc-alias": "^1.5.0",
     "typescript": "^4.5.4"

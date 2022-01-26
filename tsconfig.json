@@ -11,26 +11,12 @@
     "rootDir": "src",
     "baseUrl": "./src",
     "outDir": "dist",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
-    "types": [
-      "node"
-    ],
-    "typeRoots": [
-      "node_modules/@types",
-      "src/types"
-    ],
+    "lib": ["es2020", "dom"],
+    "types": ["node", "mocha"],
+    "typeRoots": ["node_modules/@types", "src/types"]
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules/**",
-    "src/**/*.spec.ts",
-    "src/test_utils"
-  ],
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules/**", "src/**/__tests__"],
   "compileOnSave": false,
   "ts-node": {
     "files": true
