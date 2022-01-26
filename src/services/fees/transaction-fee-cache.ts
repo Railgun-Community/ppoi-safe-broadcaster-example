@@ -1,5 +1,6 @@
 import configDefaults from '../../config/config-defaults';
 import { logger } from '../../util/logger';
+import { resetMapObject } from '../../util/utils';
 
 type CachedFee = {
   feeDecimal: number;
@@ -7,7 +8,7 @@ type CachedFee = {
 };
 
 // Cached token prices per network.
-// {cacheKey: {address, }}
+// {cacheKey: CachedFee}
 const transactionFeeCache: MapType<CachedFee> = {};
 
 const cacheKey = (
@@ -15,6 +16,10 @@ const cacheKey = (
   tokenAddress: string,
 ): string => {
   return `${serializedTransaction}|${tokenAddress}`;
+};
+
+export const resetTransactionFeeCache = () => {
+  resetMapObject(transactionFeeCache);
 };
 
 export const cacheFeeForTransaction = (
