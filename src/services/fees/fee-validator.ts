@@ -13,7 +13,7 @@ export const validateFee = async (
   // Check packaged fee against cached fee.
   // Cache expires with TTL setting: transactionFeeCacheTTLInMS.
   const cachedFee = lookUpCachedFee(serializedTransaction, tokenAddress);
-  if (cachedFee && packagedFee.toNumber() <= cachedFee.feeDecimal) {
+  if (cachedFee && packagedFee.toNumber() >= cachedFee.feeDecimal) {
     return;
   }
 
@@ -24,7 +24,7 @@ export const validateFee = async (
       serializedTransaction,
       tokenAddress,
     );
-    if (packagedFee.lte(calculatedFee)) {
+    if (packagedFee.gte(calculatedFee)) {
       return;
     }
   } catch (err: any) {
