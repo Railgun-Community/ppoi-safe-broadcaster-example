@@ -10,6 +10,7 @@ import { CoingeckoNetworkID } from '../models/api-constants';
 import { RailProxyContract } from '../models/contract-constants';
 import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../models/config-models';
+import { QuickSyncURL } from '../models/network-models';
 
 const defaultFees = {
   slippageBuffer: 0.05,
@@ -41,6 +42,7 @@ export default {
     railContract: RailProxyContract.Ropsten,
     fallbackProviderConfig: fallbackProvidersRopsten,
     priceTTLInMS: 5 * 60 * 1000,
+    quickSyncURL: QuickSyncURL.Ropsten,
   },
   [NetworkChainID.BinanceSmartChain]: {
     name: 'Binance Smart Chain',

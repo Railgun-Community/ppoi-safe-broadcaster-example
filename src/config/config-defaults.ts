@@ -13,6 +13,9 @@ export default {
   // Options: None, Error, Logs
   debugLevel: DebugLevel.Logs,
 
+  // Whether to show verbose Lepton debugging logs.
+  debugLepton: false,
+
   // How long to cache the fee sent for a given transaction.
   transactionFeeCacheTTLInMS: 120 * 1000,
 

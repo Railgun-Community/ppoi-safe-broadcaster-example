@@ -20,6 +20,7 @@
   "devDependencies": {
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.4",
+    "@types/leveldown": "^4.0.3",
     "@types/mocha": "^9.1.0",
     "@types/node": "^17.0.12",
     "@types/sinon": "^10.0.8",
@@ -41,12 +42,13 @@
   "dependencies": {
     "@ethersproject/providers": "^5.5.2",
     "@ethersproject/shims": "^5.5.0",
-    "@railgun-community/lepton": "github:Railgun-Community/lepton",
+    "@railgun-community/lepton": "git+https://github.com/Railgun-Community/lepton.git",
     "axios": "^0.25.0",
     "debug": "^4.3.3",
     "ethers": "^5.5.3",
     "js-waku": "^0.15.0",
     "json-rpc-2.0": "^1.0.0",
+    "leveldown": "^6.1.0",
     "node-fetch": "^3.1.0",
     "protons": "^2.0.3",
     "rpc-websockets": "^7.4.16",

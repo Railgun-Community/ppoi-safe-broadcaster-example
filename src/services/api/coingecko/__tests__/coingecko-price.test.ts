@@ -34,7 +34,7 @@ describe('coingecko-price', () => {
       expect(priceData['usd']).to.be.a('number');
       expect(priceData.last_updated_at).to.be.a('number');
     });
-  }).timeout(10000);
+  }).timeout(20000);
 
   it('Should format prices from mock Coingecko response', async () => {
     const nowTimestamp = Date.now();
@@ -79,7 +79,7 @@ describe('coingecko-price', () => {
         params,
       ),
     ).to.be.rejected;
-    expect(stubAxiosGet.calledTwice).to.be.true;
+    expect(stubAxiosGet.callCount).to.equal(2);
     stubAxiosGet.restore();
   });
 }).timeout(30000);

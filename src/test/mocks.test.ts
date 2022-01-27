@@ -3,7 +3,7 @@ import { PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configTokens from '../config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
-import { Network } from '../models/network-models';
+import { Network, QuickSyncURL } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 
 export const mockTokenConfig = (
@@ -34,6 +34,27 @@ export const getMockFallbackProviderConfig = (): FallbackProviderJsonConfig => {
   };
 };
 
+export const getMockRopstenFallbackProviderConfig =
+  (): FallbackProviderJsonConfig => {
+    return {
+      chainId: 3,
+      providers: [
+        {
+          provider:
+            'https://ropsten.infura.io/v3/84842078b09946638c03157f83405213',
+          priority: 1,
+          weight: 1,
+        },
+        {
+          provider:
+            'https://eth-rinkeby.gateway.pokt.network/v1/6004bd4d0040261633ade991',
+          priority: 1,
+          weight: 1,
+        },
+      ],
+    };
+  };
+
 export const getMockProvider = (): BaseProvider => {
   return new BaseProvider({ name: 'Ethereum', chainId: 1 });
 };
@@ -54,6 +75,25 @@ export const getMockNetwork = (): Network => {
     coingeckoId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: getMockFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
+  };
+};
+
+export const getMockRopstenNetwork = (): Network => {
+  return {
+    name: 'Ropsten',
+    gasToken: {
+      symbol: 'ETH',
+      wrappedAddress: '0x00',
+      decimals: 18,
+    },
+    fees: {
+      slippageBuffer: 0.05,
+      profit: 0.05,
+    },
+    railContract: '0x00',
+    fallbackProviderConfig: getMockRopstenFallbackProviderConfig(),
+    priceTTLInMS: 5 * 60 * 1000,
+    quickSyncURL: QuickSyncURL.Ropsten,
   };
 };
 
