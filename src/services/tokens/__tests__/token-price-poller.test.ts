@@ -12,7 +12,7 @@ import configDefaults from '../../../config/config-defaults';
 import configTokenPriceGetter, {
   TokenPricesGetter,
 } from '../../../config/config-token-price-getter';
-import { initPricePoller } from '../token-price-poller';
+import { initPricePoller, stopPolling } from '../token-price-poller';
 import { delay } from '../../../util/promise-utils';
 
 chai.use(chaiAsPromised);
@@ -68,6 +68,7 @@ describe('token-price-poller', () => {
 
     // Wait for async call to finish.
     await delay(10);
+    stopPolling();
 
     expect(() =>
       lookUpCachedTokenPrice(NetworkChainID.Ropsten, MOCK_TOKEN_ADDRESS_1),

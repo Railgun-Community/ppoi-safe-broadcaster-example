@@ -12,6 +12,8 @@ import {
   TokenAddressesToPrice,
 } from './token-price-cache';
 
+let shouldPoll = true;
+
 const pullAndCacheCurrentPricesForAllNetworks = async (
   tokenPricesGetter: TokenPricesGetter,
 ): Promise<void> => {
@@ -41,10 +43,17 @@ const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
     logger.error(err);
   } finally {
     await delay(configDefaults.tokenPriceRefreshDelayInMS);
-    pollPrices(tokenPricesGetter);
+    if (shouldPoll) {
+      pollPrices(tokenPricesGetter);
+    }
   }
 };
 
+export const stopPolling = () => {
+  shouldPoll = false;
+};
+
 export const initPricePoller = () => {
+  shouldPoll = true;
   pollPrices(configTokenPriceGetter.tokenPriceGetter);
 };

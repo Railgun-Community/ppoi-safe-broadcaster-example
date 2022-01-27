@@ -37,7 +37,6 @@ describe('coingecko-price', () => {
 
   it('Should format prices from mock Coingecko response', async () => {
     const nowTimestamp = Date.now();
-
     const stubInitPricePoller = sinon
       .stub(coingeckoFetchModule, 'getCoingeckoData')
       .resolves({
@@ -50,13 +49,11 @@ describe('coingecko-price', () => {
           last_updated_at: nowTimestamp / 1000 - 30,
         },
       });
-
     const tokenAddressesToPrice = await coingeckoPriceLookupByAddresses(
       CoingeckoNetworkID.Ethereum,
       TOKEN_ADDRESSES,
       'usd',
     );
-
     TOKEN_ADDRESSES.forEach((address) => {
       const priceData = tokenAddressesToPrice[address];
       expect(priceData).to.be.an('object');

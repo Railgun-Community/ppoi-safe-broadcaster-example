@@ -14,8 +14,7 @@ const loggerImpl = {
     console.warn(JSON.stringify(obj));
   },
   error: (error: Error) => {
-    console.error(error.message);
-    console.log(error.stack);
+    console.error(error);
   },
 };
 
