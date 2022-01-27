@@ -1,21 +1,16 @@
 /* globals describe, before, it, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import configWallets from '../../../config/config-wallets';
 import { getMockProvider } from '../../../test/mocks.test';
-import { initWallets, walletForIndex } from '../active-wallets';
+import { walletForIndex } from '../active-wallets';
+import { setupSingleTestWallet } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('active-wallets', () => {
   before(() => {
-    configWallets.wallets = [
-      {
-        mnemonic: 'test test test test test test test test test test test junk',
-      },
-    ];
-    initWallets();
+    setupSingleTestWallet();
   });
 
   it('Should have correct wallet address and keys', () => {

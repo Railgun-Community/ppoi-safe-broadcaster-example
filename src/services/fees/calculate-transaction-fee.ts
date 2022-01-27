@@ -38,6 +38,11 @@ export const calculateTransactionFee = async (
   );
   const maximumGas = await estimateMaximumGas(chainID, populatedTransaction);
 
+  // TODO:
+  // Precision (p) = 10^8
+  // USDT/ETH Ratio Value (r) = p * USDT/ETH = 1000
+  // Guard: r < 10^3 => fail.
+
   // TODO: Take number of decimals for token into account (?)
   // TODO: Remove decimal numbers.
   const feeForTokenDecimal = Math.ceil(maximumGas.toNumber() * totalFeeRatio);

@@ -1,4 +1,5 @@
 import { BaseProvider } from '@ethersproject/providers';
+import { PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configTokens from '../config/config-tokens';
 import { Network } from '../models/network-models';
@@ -53,4 +54,8 @@ export const getMockNetwork = (): Network => {
     fallbackProviderConfig: getMockFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
   };
+};
+
+export const getMockPopulatedTransaction = (): PopulatedTransaction => {
+  return {};
 };
