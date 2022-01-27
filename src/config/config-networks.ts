@@ -6,7 +6,7 @@ import fallbackProvidersRopsten from './fallback-providers/3-ropsten';
 import fallbackProvidersBinanceSmartChain from './fallback-providers/56-binance-smart-chain';
 import fallbackProvidersPolygon from './fallback-providers/137-polygon';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
-import { CoingeckoID } from '../models/api-constants';
+import { CoingeckoNetworkID } from '../models/api-constants';
 import { RailProxyContract } from '../models/contract-constants';
 import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../models/config-models';
@@ -26,7 +26,7 @@ export default {
     },
     fees: defaultFees,
     railContract: RailProxyContract.Ethereum,
-    coingeckoId: CoingeckoID.Ethereum,
+    coingeckoId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
     priceTTLInMS: 5 * 60 * 1000,
   },
@@ -51,7 +51,7 @@ export default {
     },
     fees: defaultFees,
     railContract: RailProxyContract.BinanceSmartChain,
-    coingeckoId: CoingeckoID.BinanceSmartChain,
+    coingeckoId: CoingeckoNetworkID.BinanceSmartChain,
     fallbackProviderConfig: fallbackProvidersBinanceSmartChain,
     priceTTLInMS: 5 * 60 * 1000,
   },
@@ -64,7 +64,7 @@ export default {
     },
     fees: defaultFees,
     railContract: RailProxyContract.PolygonPOS,
-    coingeckoId: CoingeckoID.PolygonPOS,
+    coingeckoId: CoingeckoNetworkID.PolygonPOS,
     fallbackProviderConfig: fallbackProvidersPolygon,
     priceTTLInMS: 5 * 60 * 1000,
   },

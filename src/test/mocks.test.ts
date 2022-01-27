@@ -2,6 +2,7 @@ import { BaseProvider } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configTokens from '../config/config-tokens';
+import { CoingeckoNetworkID } from '../models/api-constants';
 import { Network } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 
@@ -50,7 +51,7 @@ export const getMockNetwork = (): Network => {
       profit: 0.05,
     },
     railContract: '0x00',
-    coingeckoId: 'ethereum',
+    coingeckoId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: getMockFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
   };

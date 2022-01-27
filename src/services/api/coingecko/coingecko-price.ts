@@ -1,3 +1,4 @@
+import { CoingeckoNetworkID } from '../../../models/api-constants';
 import { TokenAddressesToPrice } from '../../tokens/token-price-cache';
 import { CoingeckoApiEndpoint, getCoingeckoData } from './coingecko-fetch';
 
@@ -26,7 +27,7 @@ const tokenPriceMapFromCoingeckoPriceMap = (
 };
 
 export const coingeckoPriceLookupByAddresses = async (
-  coingeckoNetworkId: string,
+  coingeckoNetworkId: CoingeckoNetworkID,
   tokenAddresses: string[],
   currency = 'usd',
 ): Promise<TokenAddressesToPrice> => {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import configDefaults from '../../../config/config-defaults';
+import { CoingeckoNetworkID } from '../../../models/api-constants';
 import { logger } from '../../../util/logger';
 
 const COINGECKO_API_URL = 'https://api.coingecko.com/api/v3/';
@@ -21,23 +22,23 @@ const paramString = (params?: MapType<any>) => {
 
 const createUrl = (
   endpoint: CoingeckoApiEndpoint,
-  endpointParam?: string,
+  coingeckoNetworkId?: CoingeckoNetworkID,
   params?: MapType<any>,
 ) => {
   const url = `${COINGECKO_API_URL}${endpoint}${
-    endpointParam || ''
+    coingeckoNetworkId || ''
   }${paramString(params)}`;
   return url;
 };
 
 export const getCoingeckoData = async (
   endpoint: CoingeckoApiEndpoint,
-  endpointParam?: string,
+  coingeckoNetworkId?: CoingeckoNetworkID,
   params?: MapType<any>,
   retryCount?: number,
 ): Promise<any> => {
   try {
-    const url = createUrl(endpoint, endpointParam, params);
+    const url = createUrl(endpoint, coingeckoNetworkId, params);
     const rsp = await axios.get(url, {
       method: 'GET',
       headers: {
@@ -55,7 +56,7 @@ export const getCoingeckoData = async (
       logger.log('Retrying getCoingeckoData request...');
       return getCoingeckoData(
         endpoint,
-        endpointParam,
+        coingeckoNetworkId,
         params,
         retryCount ? retryCount + 1 : 1,
       );
