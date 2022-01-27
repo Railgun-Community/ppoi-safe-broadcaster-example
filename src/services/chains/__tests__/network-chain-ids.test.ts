@@ -1,8 +1,7 @@
 /* globals describe, it, before, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import configNetworks from '../../../config/config-networks';
-import { getMockNetwork } from '../../../test/mocks.test';
+import { setupTestNetwork } from '../../../test/setup.test';
 import { allNetworkChainIDs } from '../network-chain-ids';
 
 chai.use(chaiAsPromised);
@@ -10,7 +9,7 @@ const { expect } = chai;
 
 describe('network-chain-ids', () => {
   before(() => {
-    configNetworks[1] = getMockNetwork();
+    setupTestNetwork();
   });
 
   it('Should pull correct chain IDs', () => {

@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
+import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
 import configTokens from '../../config/config-tokens';
 import { lookUpCachedTokenPrice } from '../tokens/token-price-cache';
@@ -28,7 +29,7 @@ export const calculateTransactionFee = async (
     networkGasToken.wrappedAddress,
   );
 
-  const priceRatio = tokenPrice.price / gasTokenPrice.price;
+  const priceRatio = gasTokenPrice.price / tokenPrice.price;
   const slippage = priceRatio * networkConfig.fees.slippageBuffer;
   const profit = priceRatio * networkConfig.fees.slippageBuffer;
   const totalFeeRatio = priceRatio + slippage + profit;
@@ -38,20 +39,33 @@ export const calculateTransactionFee = async (
   );
   const maximumGas = await estimateMaximumGas(chainID, populatedTransaction);
 
-  // TODO:
-  // Precision (p) = 10^8
-  // USDT/ETH Ratio Value (r) = p * USDT/ETH = 1000
-  // Guard: r < 10^3 => fail.
+  const precision = configDefaults.transactionFeePrecision;
+  const ratioMinimum = configDefaults.transactionFeeRatioMinimum;
 
-  // TODO: Take number of decimals for token into account (?)
-  // TODO: Remove decimal numbers.
-  const feeForTokenDecimal = Math.ceil(maximumGas.toNumber() * totalFeeRatio);
+  const ratio = totalFeeRatio * precision;
+  if (ratio < ratioMinimum) {
+    throw new Error(
+      `Price ratio between token (${tokenPrice.price}) and gas token (${gasTokenPrice.price})
+      is not precise enough to provide an accurate fee.`,
+    );
+  }
+
+  const roundedRatio = BigNumber.from(Math.round(ratio));
+  const decimalDifference = networkGasToken.decimals - tokenConfig.decimals;
+  const decimalRatio = BigNumber.from(10).pow(
+    BigNumber.from(decimalDifference),
+  );
+
+  const maximumGasFeeForToken = maximumGas
+    .mul(roundedRatio)
+    .div(decimalRatio)
+    .div(BigNumber.from(precision));
 
   cacheFeeForTransaction(
     serializedTransaction,
     tokenAddress,
-    feeForTokenDecimal,
+    maximumGasFeeForToken,
   );
 
-  return BigNumber.from(feeForTokenDecimal);
+  return BigNumber.from(maximumGasFeeForToken);
 };

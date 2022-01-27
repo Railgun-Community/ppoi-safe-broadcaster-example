@@ -8,13 +8,15 @@ import {
   resetTransactionFeeCache,
 } from '../transaction-fee-cache';
 import { delay } from '../../../util/promise-utils';
+import { BigNumber } from 'ethers';
+import { getMockSerializedTransaction } from '../../../test/mocks.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MOCK_SERIALIZED_TRANSACTION = '123';
+const MOCK_SERIALIZED_TRANSACTION = getMockSerializedTransaction();
 const MOCK_TOKEN_ADDRESS = '0x00';
-const MOCK_FEE = 10.0;
+const MOCK_FEE = BigNumber.from(10);
 
 describe('transaction-fee-cache', () => {
   before(() => {
@@ -41,7 +43,7 @@ describe('transaction-fee-cache', () => {
       MOCK_SERIALIZED_TRANSACTION,
       MOCK_TOKEN_ADDRESS,
     );
-    expect(cachedFee?.feeDecimal).to.equal(MOCK_FEE);
+    expect(cachedFee?.maximumGasFeeString).to.equal(MOCK_FEE.toString());
 
     // Wait for cache to expire.
     await delay(51);

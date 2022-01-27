@@ -59,3 +59,7 @@ export const getMockNetwork = (): Network => {
 export const getMockPopulatedTransaction = (): PopulatedTransaction => {
   return {};
 };
+
+export const getMockSerializedTransaction = (): string => {
+  return JSON.stringify(getMockPopulatedTransaction());
+};

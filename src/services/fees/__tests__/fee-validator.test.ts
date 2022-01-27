@@ -9,12 +9,13 @@ import {
   cacheFeeForTransaction,
   resetTransactionFeeCache,
 } from '../transaction-fee-cache';
+import { getMockSerializedTransaction } from '../../../test/mocks.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const CHAIN_ID = 1;
-const MOCK_SERIALIZED_TRANSACTION = '123';
+const MOCK_SERIALIZED_TRANSACTION = getMockSerializedTransaction();
 const MOCK_TOKEN_ADDRESS = '0x00';
 
 let calculateTransactionFeeStub: SinonStub;
@@ -50,14 +51,22 @@ describe('fee-validator', () => {
   });
 
   it('Should validate if packaged fee > cached fee', async () => {
-    cacheFeeForTransaction(MOCK_SERIALIZED_TRANSACTION, MOCK_TOKEN_ADDRESS, 10);
+    cacheFeeForTransaction(
+      MOCK_SERIALIZED_TRANSACTION,
+      MOCK_TOKEN_ADDRESS,
+      BigNumber.from(10),
+    );
     stubCalculateTransactionFeeError();
     await expect(validatePackagedFee(BigNumber.from(15))).to.be.fulfilled;
     expect(calculateTransactionFeeStub.notCalled).to.be.true;
   });
 
   it('Should invalidate if packaged fee < cached fee, no calculated fee', async () => {
-    cacheFeeForTransaction(MOCK_SERIALIZED_TRANSACTION, MOCK_TOKEN_ADDRESS, 10);
+    cacheFeeForTransaction(
+      MOCK_SERIALIZED_TRANSACTION,
+      MOCK_TOKEN_ADDRESS,
+      BigNumber.from(10),
+    );
     stubCalculateTransactionFeeError();
     await expect(validatePackagedFee(BigNumber.from(5))).to.be.rejected;
     expect(calculateTransactionFeeStub.calledOnce).to.be.true;
