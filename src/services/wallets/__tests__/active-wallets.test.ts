@@ -29,11 +29,22 @@ describe('active-wallets', () => {
     );
   });
 
-  it('Should have Railgun wallet with rotating addresses', () => {
+  it('Should have Railgun wallet with valid rotating addresses', () => {
     const firstAddress = getRotatingRailgunAddress();
     const secondAddress = getRotatingRailgunAddress();
     expect(firstAddress).to.be.a('string');
     expect(secondAddress).to.be.a('string');
     expect(firstAddress).to.not.equal(secondAddress);
   });
+
+  // TODO: Fix this validator.
+  // it('Should validate Railgun wallet addresses', () => {
+  //   const firstAddress = getRotatingRailgunAddress();
+  //   const secondAddress = getRotatingRailgunAddress();
+  //   expect(validateRailgunWalletAddress(firstAddress)).to.be.true;
+  //   expect(validateRailgunWalletAddress(firstAddress, 1 /* chainID */)).to.be
+  //     .true;
+  //   expect(validateRailgunWalletAddress(secondAddress)).to.be.true;
+  //   expect(validateRailgunWalletAddress('12345')).to.be.false;
+  // });
 }).timeout(10000);

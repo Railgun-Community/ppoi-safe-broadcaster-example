@@ -1,4 +1,5 @@
 import { BaseProvider } from '@ethersproject/providers';
+import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
 import { Wallet } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
@@ -48,6 +49,29 @@ export const getRotatingRailgunAddress = (chainID?: NetworkChainID) => {
     change,
     chainID,
   );
+};
+
+export const validateRailgunWalletAddress_TODO = (
+  address: string,
+  chainID?: number,
+) => {
+  let decodedPublicKey;
+  try {
+    decodedPublicKey = decode(address).publicKey;
+  } catch (err: any) {
+    return false;
+  }
+
+  // TODO: Rotating index makes this broken.
+  const index = 0;
+  const change = false;
+  const keypair = shieldedReceiverWallet.getKeypair(
+    configDefaults.leptonDbEncryptionKey,
+    index,
+    change,
+    chainID,
+  );
+  return decodedPublicKey === keypair.publicKey;
 };
 
 export const walletForIndex = (index: number, provider: BaseProvider) => {
