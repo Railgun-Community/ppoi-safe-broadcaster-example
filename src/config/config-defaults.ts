@@ -26,6 +26,9 @@ export default {
   // We guard against price ratios under this amount, which are too imprecise.
   transactionFeeRatioMinimum: Math.pow(10, 3),
 
+  // Key used to encrypt wallets in the Lepton database.
+  leptonDbEncryptionKey: '12345',
+
   // waku options
   directPeers: [
     '/dns4/relayer.of.holdings/tcp/443/wss/p2p/16Uiu2HAm8xGMm2KAgvqbERJb38h7h9UdDVhmbGFBzRkC17qqHezv',

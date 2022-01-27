@@ -2,14 +2,14 @@ import { initRelayer } from 'services/init/relayer-init';
 import { initWaku, sendRequest } from 'services/networking/waku';
 import debug from 'debug';
 import configDefaults from 'config/config-defaults';
-import { DebugLevel } from './models/debug-models';
 
 const dbg = debug('delayer:main');
 
 const main = async (): Promise<void> => {
-  dbg('starting delayer');
+  dbg('Warming up Relayer.');
 
-  initRelayer();
+  await initRelayer();
+
   const directPeers = configDefaults.directPeers;
   const options = {
     bootstrap: { default: true },

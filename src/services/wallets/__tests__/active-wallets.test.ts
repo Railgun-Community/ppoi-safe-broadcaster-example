@@ -2,15 +2,17 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getMockProvider } from '../../../test/mocks.test';
-import { walletForIndex } from '../active-wallets';
+import { getRotatingRailgunAddress, walletForIndex } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
+import { initLepton } from '../../lepton/lepton-init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('active-wallets', () => {
-  before(() => {
-    setupSingleTestWallet();
+  before(async () => {
+    initLepton();
+    await setupSingleTestWallet();
   });
 
   it('Should have correct wallet address and keys', () => {
@@ -25,5 +27,13 @@ describe('active-wallets', () => {
     expect(wallet.privateKey).to.equal(
       '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
     );
+  });
+
+  it('Should have Railgun wallet with rotating addresses', () => {
+    const firstAddress = getRotatingRailgunAddress();
+    const secondAddress = getRotatingRailgunAddress();
+    expect(firstAddress).to.be.a('string');
+    expect(secondAddress).to.be.a('string');
+    expect(firstAddress).to.not.equal(secondAddress);
   });
 }).timeout(10000);

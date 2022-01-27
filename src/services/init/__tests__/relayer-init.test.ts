@@ -16,7 +16,7 @@ describe('relayer-init', () => {
     const stubInitLepton = sinon.stub(leptonInitModule, 'initLepton').returns();
     const stubInitWallets = sinon
       .stub(activeWalletsModule, 'initWallets')
-      .returns();
+      .resolves();
     const stubInitNetworkProviders = sinon
       .stub(activeProvidersModule, 'initNetworkProviders')
       .returns();
@@ -24,7 +24,7 @@ describe('relayer-init', () => {
       .stub(activeTokenPricePollerModule, 'initPricePoller')
       .returns();
 
-    initRelayer();
+    await initRelayer();
 
     expect(stubInitLepton.calledOnce).to.be.true;
     expect(stubInitWallets.calledOnce).to.be.true;

@@ -16,13 +16,14 @@ before(() => {
   setupTests();
 });
 
-export const setupSingleTestWallet = () => {
+export const setupSingleTestWallet = async () => {
   configWallets.wallets = [
     {
       mnemonic: 'test test test test test test test test test test test junk',
+      isShieldedReceiver: true,
     },
   ];
-  initWallets();
+  await initWallets();
 };
 
 export const setupTestNetwork = (): Network => {
