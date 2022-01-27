@@ -5,10 +5,7 @@ import { BigNumber, utils } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import configTokens from '../../../config/config-tokens';
 import { Network } from '../../../models/network-models';
-import {
-  getMockPopulatedTransaction,
-  getMockSerializedTransaction,
-} from '../../../test/mocks.test';
+import { getMockSerializedTransaction } from '../../../test/mocks.test';
 import { setupTestNetwork, testChainID } from '../../../test/setup.test';
 import {
   cacheTokenPricesForNetwork,

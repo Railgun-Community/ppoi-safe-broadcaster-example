@@ -1,4 +1,4 @@
-import { initRelayer } from 'services/relayer-init';
+import { initRelayer } from 'services/init/relayer-init';
 import { initWaku, sendRequest } from 'services/networking/waku';
 import debug from 'debug';
 import configDefaults from 'config/config-defaults';

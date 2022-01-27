@@ -28,7 +28,6 @@ export const cacheFeeForTransaction = (
   tokenAddress: string,
   maximumGasFee: BigNumber,
 ) => {
-  // TODO: Remove decimal numbers: only BigNumber.
   logger.log(`cache new fee for tx: ${maximumGasFee}`);
   const key = cacheKey(serializedTransaction, tokenAddress);
   const cachedFee: CachedFee = {
