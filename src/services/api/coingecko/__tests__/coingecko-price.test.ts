@@ -6,6 +6,7 @@ import { CoingeckoNetworkID } from '../../../../models/api-constants';
 import { CoingeckoApiEndpoint, getCoingeckoData } from '../coingecko-fetch';
 import { coingeckoPriceLookupByAddresses } from '../coingecko-price';
 import * as coingeckoFetchModule from '../coingecko-fetch';
+import axios from 'axios';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -33,7 +34,7 @@ describe('coingecko-price', () => {
       expect(priceData['usd']).to.be.a('number');
       expect(priceData.last_updated_at).to.be.a('number');
     });
-  });
+  }).timeout(10000);
 
   it('Should format prices from mock Coingecko response', async () => {
     const nowTimestamp = Date.now();
@@ -62,5 +63,23 @@ describe('coingecko-price', () => {
     });
 
     stubInitPricePoller.restore();
+  });
+
+  it('Should retry Coingecko API fetch on error', async () => {
+    const stubAxiosGet = sinon.stub(axios, 'get').throws();
+    const params = {
+      contract_addresses: TOKEN_ADDRESSES.join(','),
+      vs_currencies: 'usd',
+      include_last_updated_at: true,
+    };
+    expect(
+      getCoingeckoData(
+        CoingeckoApiEndpoint.PriceLookup,
+        CoingeckoNetworkID.Ethereum,
+        params,
+      ),
+    ).to.be.rejected;
+    expect(stubAxiosGet.calledTwice).to.be.true;
+    stubAxiosGet.restore();
   });
 }).timeout(30000);

@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 export const hexToBuf = (hex: string | Buffer | Uint8Array): Buffer => {
   if (typeof hex === 'string') {
     return Buffer.from(hex.replace(/^0x/i, ''), 'hex');
