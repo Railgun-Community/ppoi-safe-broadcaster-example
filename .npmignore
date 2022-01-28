@@ -1,6 +1,7 @@
 # Node
 node_modules
 package-lock.json
+pnpm-local.yaml
 
 # Log files
 npm-debug.log*

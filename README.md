@@ -1,13 +1,20 @@
-relay jsonrpc messages over js-waku (https://wakuconnect.dev/)
+# Delayer: transaction anonymizing relayer for RAILGUN
 
-# Run code
+The RAILGUN relayer network runs on [Waku](https://wakunetwork.com/), a secure and decentralized messaging protocol.
 
-- install pnpm
-- `pnpm install`
-- `export DEBUG=delayer:*` to enable logging
-- `pnpm start`
+## Run RAILGUN relayer
 
-# Run tests
+- just use npm/yarn
+- `npm install`
+- `npm run server` or
+- `npm run server-debug` (DEBUG mode)
 
-- `pnpm test`
-- `pnpm run test-coverage` (with code coverage visualizer)
+## Run RAILGUN demo client
+
+- `npm run client` or
+- `npm run client-debug` (DEBUG mode)
+
+## Run tests
+
+- `npm run test`
+- npm run test-coverage` (with code coverage visualizer)

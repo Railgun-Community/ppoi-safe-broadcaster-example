@@ -28,4 +28,5 @@ export default {
     'require-await': 'error',
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
   },
+  ignorePatterns: ['dist'],
 };
