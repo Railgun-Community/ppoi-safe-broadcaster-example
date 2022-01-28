@@ -85,3 +85,8 @@ export const getAnyWalletForNetwork = (chainID: NetworkChainID) => {
   const provider = getProviderForNetwork(chainID);
   return walletForIndex(0, provider);
 };
+
+export const getBestWalletForNetwork = (chainID: NetworkChainID) => {
+  const provider = getProviderForNetwork(chainID);
+  return walletForIndex(0, provider);
+};

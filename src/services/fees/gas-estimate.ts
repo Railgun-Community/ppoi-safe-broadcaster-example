@@ -1,6 +1,6 @@
 import { BigNumber, PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
-import { getAnyWalletForNetwork } from '../wallets/active-wallets';
+import { getProviderForNetwork } from '../providers/active-network-providers';
 
 const calculateGasLimitHex = (gasEstimate: BigNumber): BigNumber => {
   // Gas Limit: Add 20% to gas estimate.
@@ -11,10 +11,10 @@ export const estimateMaximumGas = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
 ): Promise<BigNumber> => {
-  const wallet = getAnyWalletForNetwork(chainID);
+  const provider = getProviderForNetwork(chainID);
   const [gasEstimate, gasPrice] = await Promise.all([
-    wallet.estimateGas(populatedTransaction),
-    wallet.getGasPrice(),
+    provider.estimateGas(populatedTransaction),
+    provider.getGasPrice(),
   ]);
   const gasLimit = calculateGasLimitHex(gasEstimate);
   return gasLimit.mul(gasPrice);

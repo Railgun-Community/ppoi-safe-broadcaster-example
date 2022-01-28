@@ -47,7 +47,7 @@ describe('logger', () => {
     expect(consoleErrorStub.calledOnce).to.be.true;
   });
 
-  it('Should test Error mode logs warn and error types', () => {
+  it('Should test None log mode sends no logs', () => {
     configDefaults.debugLevel = DebugLevel.None;
     testAllLogTypes();
     expect(consoleLogStub.notCalled).to.be.true;

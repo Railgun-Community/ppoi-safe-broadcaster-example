@@ -20,10 +20,10 @@ export const executeTransaction = async (
   populatedTransaction: PopulatedTransaction,
   gasDetails: TransactionGasDetails,
 ): Promise<TransactionResponse> => {
-  const provider = getProviderForNetwork(chainID);
   const wallet = getAnyWalletForNetwork(chainID);
   const txWithGas = setGasDetails(populatedTransaction, gasDetails);
   const signedTransaction = await wallet.signTransaction(txWithGas);
+  const provider = getProviderForNetwork(chainID);
   const txResponse = await provider.sendTransaction(signedTransaction);
   return txResponse;
 };
