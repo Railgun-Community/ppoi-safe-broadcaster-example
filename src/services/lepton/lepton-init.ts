@@ -4,11 +4,7 @@ import leveldown from 'leveldown';
 import { artifactsGetter } from './artifacts';
 import { quickSync } from '../api/quick-sync/quick-sync';
 import configDefaults from '../../config/config-defaults';
-
-export type LeptonDebugger = {
-  log: (msg: string) => void;
-  error: (error: Error) => void;
-};
+import { LeptonDebugger } from '@railgun-community/lepton/dist/models/types';
 
 let lepton: Lepton;
 

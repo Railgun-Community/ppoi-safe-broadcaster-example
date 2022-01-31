@@ -1,3 +1,4 @@
+import { QuickSync } from '@railgun-community/lepton';
 import {
   Commitment,
   Nullifier,
@@ -17,7 +18,7 @@ export type QuickSyncEventLog = {
   nullifiers: Nullifier[];
 };
 
-export const quickSync = async (
+export const quickSync: QuickSync = async (
   chainID: NetworkChainID,
   _startingBlock: number,
 ): Promise<QuickSyncEventLog> => {

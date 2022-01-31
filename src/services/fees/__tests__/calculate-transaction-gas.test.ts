@@ -33,7 +33,7 @@ const MOCK_GAS_TOKEN = GasTokenWrappedAddress.EthereumWETH;
 const MOCK_TOKEN_ADDRESS = '0x001';
 const MOCK_TOKEN_ADDRESS_6_DECIMALS = '0x002';
 
-// 0.12 ETH total (gas limit) estimated.
+// 0.10 estimate (est * price), 0.12 ETH total (gas limit).
 const MOCK_GAS_ESTIMATE = BigNumber.from('400000000000');
 const MOCK_GAS_PRICE = BigNumber.from('250000');
 
@@ -65,7 +65,7 @@ describe('calculate-transaction-gas', () => {
   it('Should create gas details from token fee', async () => {
     createGasEstimateStubs(MOCK_GAS_ESTIMATE, MOCK_GAS_PRICE);
 
-    const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(18)); // $390 "USDC" (0.12 ETH) + 10% fee.
+    const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(18)); // $390 "USDC" (0.12 ETH) + 10% profit/buffer fee.
     const gasDetails = await createTransactionGasDetails(
       MOCK_CHAIN_ID,
       getMockPopulatedTransaction(),
@@ -80,7 +80,7 @@ describe('calculate-transaction-gas', () => {
   it('Should create gas details from token fee (6 decimals)', async () => {
     createGasEstimateStubs(MOCK_GAS_ESTIMATE, MOCK_GAS_PRICE);
 
-    const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(6)); // $390 "USDT" (0.12 ETH) + 10% fee.
+    const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(6)); // $390 "USDT" (0.12 ETH) + 10% profit/buffer fee.
     const gasDetails = await createTransactionGasDetails(
       MOCK_CHAIN_ID,
       getMockPopulatedTransaction(),
