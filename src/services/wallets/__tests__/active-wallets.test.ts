@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getMockProvider } from '../../../test/mocks.test';
-import { getRotatingRailgunAddress, walletForIndex } from '../active-wallets';
+import { getRailgunAddress, walletForIndex } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 
@@ -29,22 +29,10 @@ describe('active-wallets', () => {
     );
   });
 
-  it('Should have Railgun wallet with valid rotating addresses', () => {
-    const firstAddress = getRotatingRailgunAddress();
-    const secondAddress = getRotatingRailgunAddress();
-    expect(firstAddress).to.be.a('string');
-    expect(secondAddress).to.be.a('string');
-    expect(firstAddress).to.not.equal(secondAddress);
+  it('Should have Railgun wallet with valid address', () => {
+    const railgunAddress = getRailgunAddress();
+    expect(railgunAddress).to.equal(
+      'rgany1q8y4j4ssfa53xxcuy6wrq6yd8tld6rp6z4wjwr5x96jvr7y6vqapkz2ffkk',
+    );
   });
-
-  // TODO: Fix this validator.
-  // it('Should validate Railgun wallet addresses', () => {
-  //   const firstAddress = getRotatingRailgunAddress();
-  //   const secondAddress = getRotatingRailgunAddress();
-  //   expect(validateRailgunWalletAddress(firstAddress)).to.be.true;
-  //   expect(validateRailgunWalletAddress(firstAddress, 1 /* chainID */)).to.be
-  //     .true;
-  //   expect(validateRailgunWalletAddress(secondAddress)).to.be.true;
-  //   expect(validateRailgunWalletAddress('12345')).to.be.false;
-  // });
 }).timeout(10000);
