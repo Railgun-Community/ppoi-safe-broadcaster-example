@@ -5,9 +5,8 @@ import { NetworkChainID } from '../../config/config-chain-ids';
 import configDefaults from '../../config/config-defaults';
 import configWallets from '../../config/config-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
+import { resetArray } from '../../util/utils';
 import { getLepton } from '../lepton/lepton-init';
-import { getProviderForNetwork } from '../providers/active-network-providers';
-import { isWalletAvailable } from './available-wallets';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -16,6 +15,7 @@ let shieldedReceiverWallet: RailgunWallet;
 const RAILGUN_ADDRESS_INDEX = 0;
 
 export const initWallets = async () => {
+  resetWallets();
   configWallets.wallets.forEach(
     async ({ mnemonic, priority, isShieldedReceiver }) => {
       const wallet = EthersWallet.fromMnemonic(mnemonic);
@@ -29,6 +29,10 @@ export const initWallets = async () => {
       }
     },
   );
+};
+
+export const resetWallets = () => {
+  resetArray(activeWallets);
 };
 
 const initShieldedReceiverWallet = async (mnemonic: string) => {
@@ -61,32 +65,9 @@ export const createEthersWallet = (
   return new EthersWallet(activeWallet.privateKey, provider);
 };
 
-export const getFirstActiveWallet = (): ActiveWallet => {
+export const getActiveWallets = (): ActiveWallet[] => {
   if (activeWallets.length < 1) {
     throw new Error('No wallets initialized.');
   }
-  return activeWallets[0];
-};
-
-export const getBestWalletForNetwork = (
-  chainID: NetworkChainID,
-): EthersWallet => {
-  // Simple sort:
-  // - Availability (isProcessing).
-  // - Priority.
-  // - Amount of (gas token) available (TODO).
-  const sortedAvailableWallets = activeWallets
-    .filter((wallet) => isWalletAvailable(wallet))
-    .sort((a, b) => {
-      // Sort ascending by priority.
-      return a.priority - b.priority;
-    });
-
-  if (sortedAvailableWallets.length < 1) {
-    throw new Error('No wallets available.');
-  }
-
-  const bestWallet = sortedAvailableWallets[0];
-  const provider = getProviderForNetwork(chainID);
-  return new EthersWallet(bestWallet.privateKey, provider);
+  return activeWallets;
 };

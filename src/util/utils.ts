@@ -27,3 +27,7 @@ export const resetMapObject = (map: MapType<any> | NumMapType<any>) => {
     }
   }
 };
+
+export const resetArray = (a: any[]) => {
+  a.length = 0;
+};

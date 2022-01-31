@@ -5,7 +5,7 @@ import { setupSingleTestWallet } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import { isWalletAvailable, setWalletAvailable } from '../available-wallets';
 import { NetworkChainID } from '../../../config/config-chain-ids';
-import { getFirstActiveWallet } from '../active-wallets';
+import { getActiveWallets } from '../active-wallets';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -19,7 +19,7 @@ describe('available-wallets', () => {
   });
 
   it('Should update available wallets correctly', () => {
-    const wallet = getFirstActiveWallet();
+    const wallet = getActiveWallets()[0];
     expect(isWalletAvailable(wallet)).to.be.true;
 
     setWalletAvailable(wallet, false);

@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { getMockProvider } from '../../../test/mocks.test';
 import {
   createEthersWallet,
-  getFirstActiveWallet,
+  getActiveWallets,
   getRailgunAddress,
 } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
@@ -20,9 +20,9 @@ describe('active-wallets', () => {
   });
 
   it('Should have correct wallet address and keys', () => {
+    const activeWallet = getActiveWallets()[0];
     const provider = getMockProvider();
-    const wallet = getFirstActiveWallet();
-    const ethersWallet = createEthersWallet(wallet, provider);
+    const ethersWallet = createEthersWallet(activeWallet, provider);
     expect(ethersWallet.address).to.equal(
       '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     );
