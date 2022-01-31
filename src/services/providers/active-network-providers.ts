@@ -23,5 +23,9 @@ export const initNetworkProviders = () => {
 export const getProviderForNetwork = (
   chainID: NetworkChainID,
 ): BaseProvider => {
-  return activeNetworkProviders[chainID];
+  const provider = activeNetworkProviders[chainID];
+  if (!provider) {
+    throw new Error(`No active provider for chain ${chainID}.`);
+  }
+  return provider;
 };

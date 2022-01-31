@@ -2,7 +2,7 @@ import { CoingeckoNetworkID } from './api-constants';
 import { FallbackProviderJsonConfig } from './provider-models';
 import { GasTokenConfig } from './token-models';
 
-type NetworkFeeSettings = {
+export type NetworkFeeSettings = {
   // As a percentage of the estimated gas fee.
   slippageBuffer: 0.05;
   // As a percentage of the estimated gas fee.

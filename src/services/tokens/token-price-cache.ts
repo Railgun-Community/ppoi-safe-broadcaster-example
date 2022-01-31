@@ -1,6 +1,7 @@
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import configTokens from '../../config/config-tokens';
+import { GasTokenConfig, Token, TokenConfig } from '../../models/token-models';
 import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';
 
@@ -72,4 +73,20 @@ export const lookUpCachedTokenPrice = (
   }
 
   return cachedPrice;
+};
+
+export const getTransactionTokenPrices = (
+  chainID: NetworkChainID,
+  token: Token,
+  gasToken: GasTokenConfig,
+): { gasTokenPrice: TokenPrice; tokenPrice: TokenPrice } => {
+  const tokenPrice = lookUpCachedTokenPrice(chainID, token.address);
+  const gasTokenPrice = lookUpCachedTokenPrice(
+    chainID,
+    gasToken.wrappedAddress,
+  );
+  return {
+    tokenPrice,
+    gasTokenPrice,
+  };
 };

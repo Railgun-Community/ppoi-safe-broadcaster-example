@@ -1,7 +1,7 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
-import { TransactionGasDetails } from '../fees/calculate-gas';
+import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getAnyWalletForNetwork } from '../wallets/active-wallets';
 
@@ -10,7 +10,7 @@ const setGasDetails = (
   gasDetails: TransactionGasDetails,
 ): PopulatedTransaction => {
   const txWithGas = populatedTransaction;
-  txWithGas.gasLimit = gasDetails.gasEstimate;
+  txWithGas.gasLimit = gasDetails.gasLimit;
   txWithGas.gasPrice = gasDetails.gasPrice;
   return txWithGas;
 };

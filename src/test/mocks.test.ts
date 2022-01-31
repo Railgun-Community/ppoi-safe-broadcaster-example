@@ -5,14 +5,16 @@ import configTokens from '../config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import { Network, QuickSyncURL } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
+import { GasTokenWrappedAddress } from '../models/token-models';
 
 export const mockTokenConfig = (
   chainID: NetworkChainID,
   tokenAddress: string,
+  decimals = 18,
 ) => {
   configTokens[chainID][tokenAddress] = {
     symbol: tokenAddress.toUpperCase(),
-    decimals: 18,
+    decimals,
   };
 };
 
@@ -64,7 +66,7 @@ export const getMockNetwork = (): Network => {
     name: 'Ethereum',
     gasToken: {
       symbol: 'ETH',
-      wrappedAddress: '0x00',
+      wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
       decimals: 18,
     },
     fees: {
