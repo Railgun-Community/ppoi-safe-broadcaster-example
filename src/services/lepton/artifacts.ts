@@ -1,24 +1,9 @@
-enum ArtifactName {
-  ZKEY = 'zkey',
-  WASM = 'wasm',
-  VKEY = 'vkey',
-}
-
-type ArtifactGroup = {
-  [ArtifactName.ZKEY]: Buffer;
-  [ArtifactName.WASM]: Buffer;
-  [ArtifactName.VKEY]: object;
-};
-
-let artifacts: ArtifactGroup;
-
-export const setSmallArtifacts = (newArtifacts: ArtifactGroup) => {
-  artifacts = newArtifacts;
-};
+// @ts-ignore
+import artifacts from 'railgun-artifacts';
 
 export const artifactsGetter = async () => {
   if (!artifacts) {
-    throw new Error('Small artifacts not available.');
+    throw new Error('Artifacts not available.');
   }
-  return artifacts;
+  return artifacts.small;
 };

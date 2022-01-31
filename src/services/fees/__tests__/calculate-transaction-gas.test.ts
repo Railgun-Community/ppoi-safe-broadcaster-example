@@ -4,7 +4,6 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../../../config/config-chain-ids';
-import configDefaults from '../../../config/config-defaults';
 import configNetworks from '../../../config/config-networks';
 import { GasTokenWrappedAddress } from '../../../models/token-models';
 import {

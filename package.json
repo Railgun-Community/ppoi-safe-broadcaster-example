@@ -52,6 +52,7 @@
     "leveldown": "^6.1.0",
     "node-fetch": "^3.1.0",
     "protons": "^2.0.3",
+    "railgun-artifacts": "https://npm.railgun.org/railgun-artifacts-0.0.1.tgz",
     "rpc-websockets": "^7.4.16",
     "ws": "^8.4.1"
   }
