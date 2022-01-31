@@ -1,9 +1,11 @@
 import { WalletsConfig } from '../models/config-models';
+import { WalletConfig } from '../models/wallet-models';
 
-export default {
-  wallets: [
-    {
-      mnemonic: 'test test test test test test test test test test test junk',
-    },
-  ],
-} as WalletsConfig;
+const wallets: WalletConfig[] = [
+  {
+    mnemonic: 'test test test test test test test test test test test junk',
+    priority: 1,
+  },
+];
+
+export default { wallets } as WalletsConfig;

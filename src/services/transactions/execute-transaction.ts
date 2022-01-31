@@ -3,7 +3,7 @@ import { PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { getAnyWalletForNetwork } from '../wallets/active-wallets';
+import { getBestWalletForNetwork } from '../wallets/active-wallets';
 
 const setGasDetails = (
   populatedTransaction: PopulatedTransaction,
@@ -20,7 +20,7 @@ export const executeTransaction = async (
   populatedTransaction: PopulatedTransaction,
   gasDetails: TransactionGasDetails,
 ): Promise<TransactionResponse> => {
-  const wallet = getAnyWalletForNetwork(chainID);
+  const wallet = getBestWalletForNetwork(chainID);
   const txWithGas = setGasDetails(populatedTransaction, gasDetails);
   const signedTransaction = await wallet.signTransaction(txWithGas);
   const provider = getProviderForNetwork(chainID);

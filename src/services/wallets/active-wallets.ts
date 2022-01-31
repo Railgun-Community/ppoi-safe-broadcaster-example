@@ -1,13 +1,13 @@
 import { BaseProvider } from '@ethersproject/providers';
-import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
-import { Wallet } from 'ethers';
+import { Wallet as EthersWallet } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configDefaults from '../../config/config-defaults';
 import configWallets from '../../config/config-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
 import { getLepton } from '../lepton/lepton-init';
 import { getProviderForNetwork } from '../providers/active-network-providers';
+import { isWalletAvailable } from './available-wallets';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -16,16 +16,19 @@ let shieldedReceiverWallet: RailgunWallet;
 const RAILGUN_ADDRESS_INDEX = 0;
 
 export const initWallets = async () => {
-  configWallets.wallets.forEach(async ({ mnemonic, isShieldedReceiver }) => {
-    const wallet = Wallet.fromMnemonic(mnemonic);
-    activeWallets.push({
-      address: wallet.address,
-      privateKey: wallet.privateKey,
-    });
-    if (isShieldedReceiver) {
-      await initShieldedReceiverWallet(mnemonic);
-    }
-  });
+  configWallets.wallets.forEach(
+    async ({ mnemonic, priority, isShieldedReceiver }) => {
+      const wallet = EthersWallet.fromMnemonic(mnemonic);
+      activeWallets.push({
+        address: wallet.address,
+        privateKey: wallet.privateKey,
+        priority,
+      });
+      if (isShieldedReceiver) {
+        await initShieldedReceiverWallet(mnemonic);
+      }
+    },
+  );
 };
 
 const initShieldedReceiverWallet = async (mnemonic: string) => {
@@ -51,20 +54,39 @@ export const getRailgunAddress = (chainID?: NetworkChainID) => {
   );
 };
 
-export const walletForIndex = (index: number, provider: BaseProvider) => {
-  return new Wallet(activeWallets[index].privateKey, provider);
+export const createEthersWallet = (
+  activeWallet: ActiveWallet,
+  provider: BaseProvider,
+): EthersWallet => {
+  return new EthersWallet(activeWallet.privateKey, provider);
 };
 
-export const getAnyWalletForNetwork = (chainID: NetworkChainID) => {
+export const getFirstActiveWallet = (): ActiveWallet => {
   if (activeWallets.length < 1) {
     throw new Error('No wallets initialized.');
   }
-  const provider = getProviderForNetwork(chainID);
-  return walletForIndex(0, provider);
+  return activeWallets[0];
 };
 
-export const getBestWalletForNetwork = (chainID: NetworkChainID) => {
-  // TODO: Complete this logic.
+export const getBestWalletForNetwork = (
+  chainID: NetworkChainID,
+): EthersWallet => {
+  // Simple sort:
+  // - Availability (isProcessing).
+  // - Priority.
+  // - Amount of (gas token) available (TODO).
+  const sortedAvailableWallets = activeWallets
+    .filter((wallet) => isWalletAvailable(wallet))
+    .sort((a, b) => {
+      // Sort ascending by priority.
+      return a.priority - b.priority;
+    });
+
+  if (sortedAvailableWallets.length < 1) {
+    throw new Error('No wallets available.');
+  }
+
+  const bestWallet = sortedAvailableWallets[0];
   const provider = getProviderForNetwork(chainID);
-  return walletForIndex(0, provider);
+  return new EthersWallet(bestWallet.privateKey, provider);
 };

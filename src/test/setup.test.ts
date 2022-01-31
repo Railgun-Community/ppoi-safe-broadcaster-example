@@ -20,6 +20,7 @@ export const setupSingleTestWallet = async () => {
   configWallets.wallets = [
     {
       mnemonic: 'test test test test test test test test test test test junk',
+      priority: 1,
       isShieldedReceiver: true,
     },
   ];
