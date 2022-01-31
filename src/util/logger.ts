@@ -20,27 +20,24 @@ const loggerImpl = {
 
 export const logger = {
   log: (obj: any) => {
-    if (!hasDebugLevel([DebugLevel.Logs])) {
+    if (hasDebugLevel([DebugLevel.None])) {
       return;
     }
-    if (hasDebugLevel([DebugLevel.None])) {
+    if (!hasDebugLevel([DebugLevel.VerboseLogs])) {
       return;
     }
     loggerImpl.log(obj);
   },
   warn: (obj: any) => {
-    if (!hasDebugLevel([DebugLevel.Logs, DebugLevel.Error])) {
+    if (hasDebugLevel([DebugLevel.None])) {
       return;
     }
-    if (hasDebugLevel([DebugLevel.None])) {
+    if (!hasDebugLevel([DebugLevel.VerboseLogs, DebugLevel.WarningsErrors])) {
       return;
     }
     loggerImpl.warn(obj);
   },
   error: (error: Error) => {
-    if (!hasDebugLevel([DebugLevel.Logs, DebugLevel.Error])) {
-      return;
-    }
     if (hasDebugLevel([DebugLevel.None])) {
       return;
     }

@@ -31,27 +31,35 @@ describe('logger', () => {
     consoleErrorStub.restore();
   });
 
-  it('Should test Logs mode logs all types', () => {
-    configDefaults.debugLevel = DebugLevel.Logs;
-    testAllLogTypes();
-    expect(consoleLogStub.calledOnce).to.be.true;
-    expect(consoleWarnStub.calledOnce).to.be.true;
-    expect(consoleErrorStub.calledOnce).to.be.true;
-  });
-
-  it('Should test Error mode logs warn and error types', () => {
-    configDefaults.debugLevel = DebugLevel.Error;
-    testAllLogTypes();
-    expect(consoleLogStub.notCalled).to.be.true;
-    expect(consoleWarnStub.calledOnce).to.be.true;
-    expect(consoleErrorStub.calledOnce).to.be.true;
-  });
-
   it('Should test None log mode sends no logs', () => {
     configDefaults.debugLevel = DebugLevel.None;
     testAllLogTypes();
     expect(consoleLogStub.notCalled).to.be.true;
     expect(consoleWarnStub.notCalled).to.be.true;
     expect(consoleErrorStub.notCalled).to.be.true;
+  });
+
+  it('Should test Logs mode logs all types', () => {
+    configDefaults.debugLevel = DebugLevel.VerboseLogs;
+    testAllLogTypes();
+    expect(consoleLogStub.calledOnce).to.be.true;
+    expect(consoleWarnStub.calledOnce).to.be.true;
+    expect(consoleErrorStub.calledOnce).to.be.true;
+  });
+
+  it('Should test Warnings mode logs warn and error types', () => {
+    configDefaults.debugLevel = DebugLevel.WarningsErrors;
+    testAllLogTypes();
+    expect(consoleLogStub.notCalled).to.be.true;
+    expect(consoleWarnStub.calledOnce).to.be.true;
+    expect(consoleErrorStub.calledOnce).to.be.true;
+  });
+
+  it('Should test Errors mode logs only error types', () => {
+    configDefaults.debugLevel = DebugLevel.OnlyErrors;
+    testAllLogTypes();
+    expect(consoleLogStub.notCalled).to.be.true;
+    expect(consoleWarnStub.notCalled).to.be.true;
+    expect(consoleErrorStub.calledOnce).to.be.true;
   });
 }).timeout(10000);

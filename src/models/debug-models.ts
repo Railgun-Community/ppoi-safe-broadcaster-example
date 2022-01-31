@@ -1,5 +1,6 @@
 export enum DebugLevel {
   None = 'None',
-  Error = 'Error',
-  Logs = 'Logs',
+  VerboseLogs = 'VerboseLogs',
+  WarningsErrors = 'WarningsErrors',
+  OnlyErrors = 'OnlyErrors',
 }

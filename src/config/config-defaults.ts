@@ -10,8 +10,8 @@ export default {
   numRetriesCoingeckoPriceLookup: 1,
 
   // Log extra information about tokens, fees and incoming transactions.
-  // Options: None, Error, Logs
-  debugLevel: DebugLevel.Logs,
+  // Options: None, VerboseLogs, WarningsErrors, OnlyErrors
+  debugLevel: DebugLevel.VerboseLogs,
 
   // Whether to show verbose Lepton debugging logs.
   debugLepton: false,
