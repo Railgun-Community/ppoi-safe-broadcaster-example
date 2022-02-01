@@ -8,21 +8,23 @@ export type TokenPricesGetter = (
   tokenAddresses: string[],
 ) => Promise<TokenAddressesToPrice>;
 
+export const tokenPriceGetter = async (
+  chainID: NetworkChainID,
+  tokenAddresses: string[],
+) => {
+  const { coingeckoId } = configNetworks[chainID];
+  if (!coingeckoId) {
+    // TODO: Assign simple values for test nets without
+    // price lookups available (Ropsten, HardHat).
+    return {};
+  }
+  const tokenAddressesToPrice = await coingeckoPriceLookupByAddresses(
+    coingeckoId,
+    tokenAddresses,
+  );
+  return tokenAddressesToPrice;
+};
+
 export default {
-  tokenPriceGetter: async (
-    chainID: NetworkChainID,
-    tokenAddresses: string[],
-  ) => {
-    const { coingeckoId } = configNetworks[chainID];
-    if (!coingeckoId) {
-      // TODO: Assign simple values for test nets without
-      // price lookups available (Ropsten, HardHat).
-      return {};
-    }
-    const tokenAddressesToPrice = await coingeckoPriceLookupByAddresses(
-      coingeckoId,
-      tokenAddresses,
-    );
-    return tokenAddressesToPrice;
-  },
+  tokenPriceGetter,
 } as { tokenPriceGetter: TokenPricesGetter };

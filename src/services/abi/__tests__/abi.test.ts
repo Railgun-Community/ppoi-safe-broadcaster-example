@@ -10,7 +10,8 @@ const { expect } = chai;
 describe('abi', () => {
   it('Should get ABI for each network', async () => {
     allNetworkChainIDs().forEach((chainID) => {
-      expect(() => abiForChain(chainID)).to.not.throw;
+      const abi = abiForChain(chainID);
+      expect(abi).to.be.an('array');
     });
   });
-}).timeout(30000);
+}).timeout(10000);

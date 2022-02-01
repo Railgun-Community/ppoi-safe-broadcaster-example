@@ -27,9 +27,6 @@ export const getTransactionTokens = (
   const token = tokenForAddress(chainID, tokenAddress);
   const networkConfig = configNetworks[chainID];
   const gasToken = networkConfig.gasToken;
-  if (!gasToken.wrappedAddress) {
-    throw new Error(`No gas token address for network: ${chainID}`);
-  }
   return {
     token,
     gasToken,
