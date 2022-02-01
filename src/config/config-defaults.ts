@@ -16,8 +16,11 @@ export default {
   // Whether to show verbose Lepton debugging logs.
   debugLepton: false,
 
+  // How long to cache Gas Token balances.
+  gasTokenBalanceCacheTTLInMS: 5 * 60 * 1000,
+
   // How long to cache the fee sent for a given transaction.
-  transactionFeeCacheTTLInMS: 120 * 1000,
+  transactionFeeCacheTTLInMS: 2 * 60 * 1000,
 
   // Precision for transaction fee ratio calculations.
   transactionFeePrecision: Math.pow(10, 8),

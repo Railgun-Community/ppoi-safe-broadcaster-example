@@ -114,3 +114,8 @@ export const getMockToken = (): Token => {
     decimals: 18,
   };
 };
+
+export const getMockWalletAddress = (): string => {
+  // Vitalik public address
+  return '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B';
+};

@@ -21,7 +21,7 @@ const MOCK_FEE = BigNumber.from(10);
 describe('transaction-fee-cache', () => {
   before(() => {
     // Set TTL to 50 ms.
-    configDefaults.transactionFeeCacheTTLInMS = 50;
+    configDefaults.transactionFeeCacheTTLInMS = 10;
   });
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('transaction-fee-cache', () => {
     expect(cachedFee?.maximumGasFeeString).to.equal(MOCK_FEE.toString());
 
     // Wait for cache to expire.
-    await delay(51);
+    await delay(11);
 
     expect(
       lookUpCachedFee(MOCK_SERIALIZED_TRANSACTION, MOCK_TOKEN_ADDRESS),

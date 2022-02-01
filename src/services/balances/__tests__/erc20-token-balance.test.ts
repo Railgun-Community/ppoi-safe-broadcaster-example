@@ -5,12 +5,16 @@ import { NetworkChainID } from '../../../config/config-chain-ids';
 import configNetworks from '../../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { getERC20TokenBalance } from '../erc20-token-balance';
-import { getMockNetwork, getMockToken } from '../../../test/mocks.test';
+import {
+  getMockNetwork,
+  getMockToken,
+  getMockWalletAddress,
+} from '../../../test/mocks.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MOCK_WALLET_ADDRESS = '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B'; // Vitalik public address.
+const MOCK_WALLET_ADDRESS = getMockWalletAddress();
 
 describe('erc20-token-balance', () => {
   before(() => {

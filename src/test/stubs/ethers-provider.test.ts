@@ -4,6 +4,7 @@ import sinon, { SinonStub } from 'sinon';
 
 let estimateGasStub: SinonStub;
 let getGasPriceStub: SinonStub;
+let gasBalanceStub: SinonStub;
 
 export const createGasEstimateStubs = (
   estimateGas: BigNumber,
@@ -20,4 +21,14 @@ export const createGasEstimateStubs = (
 export const restoreGasEstimateStubs = () => {
   estimateGasStub?.restore();
   getGasPriceStub?.restore();
+};
+
+export const createGasBalanceStub = (balance: BigNumber) => {
+  gasBalanceStub = sinon
+    .stub(BaseProvider.prototype, 'getBalance')
+    .resolves(balance);
+};
+
+export const restoreGasBalanceStub = () => {
+  gasBalanceStub?.restore();
 };
