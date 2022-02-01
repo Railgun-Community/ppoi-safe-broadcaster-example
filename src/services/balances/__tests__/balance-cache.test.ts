@@ -25,6 +25,10 @@ const { expect } = chai;
 
 const MOCK_WALLET_ADDRESS = getMockWalletAddress();
 
+const shouldUpdateEthWalletBalance = (address: string) => {
+  return shouldUpdateCachedGasTokenBalance(NetworkChainID.Ethereum, address);
+};
+
 describe('balance-cache', () => {
   before(() => {
     initWallets();
@@ -45,12 +49,7 @@ describe('balance-cache', () => {
     const firstWalletAddress = getActiveWallets()[0].address;
 
     await updateAllActiveWalletsGasTokenBalances();
-    expect(
-      shouldUpdateCachedGasTokenBalance(
-        NetworkChainID.Ethereum,
-        firstWalletAddress,
-      ),
-    ).to.be.false;
+    expect(shouldUpdateEthWalletBalance(firstWalletAddress)).to.be.false;
     const ethBalance = await getCachedGasTokenBalance(
       NetworkChainID.Ethereum,
       firstWalletAddress,
@@ -65,29 +64,20 @@ describe('balance-cache', () => {
 
   it('Should only refresh balances when necessary', async () => {
     configDefaults.gasTokenBalanceCacheTTLInMS = 10;
-    expect(
-      shouldUpdateCachedGasTokenBalance(
-        NetworkChainID.Ethereum,
-        MOCK_WALLET_ADDRESS,
-      ),
-    ).to.be.true;
+    expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.true;
     await updateCachedGasTokenBalance(
       NetworkChainID.Ethereum,
       MOCK_WALLET_ADDRESS,
     );
-    expect(
-      shouldUpdateCachedGasTokenBalance(
-        NetworkChainID.Ethereum,
-        MOCK_WALLET_ADDRESS,
-      ),
-    ).to.be.false;
+    expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.false;
 
     await delay(11);
-    expect(
-      shouldUpdateCachedGasTokenBalance(
-        NetworkChainID.Ethereum,
-        MOCK_WALLET_ADDRESS,
-      ),
-    ).to.be.true;
+    expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.true;
+
+    await getCachedGasTokenBalance(
+      NetworkChainID.Ethereum,
+      MOCK_WALLET_ADDRESS,
+    );
+    expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.false;
   });
 }).timeout(30000);
