@@ -5,7 +5,7 @@ import configTokens from '../config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import { Network, QuickSyncURL } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
-import { GasTokenWrappedAddress } from '../models/token-models';
+import { GasTokenWrappedAddress, Token } from '../models/token-models';
 
 export const mockTokenConfig = (
   chainID: NetworkChainID,
@@ -105,4 +105,12 @@ export const getMockPopulatedTransaction = (): PopulatedTransaction => {
 
 export const getMockSerializedTransaction = (): string => {
   return JSON.stringify(getMockPopulatedTransaction());
+};
+
+export const getMockToken = (): Token => {
+  return {
+    address: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
+    symbol: 'SHIB',
+    decimals: 18,
+  };
 };
