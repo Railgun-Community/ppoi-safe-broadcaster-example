@@ -20,7 +20,10 @@ export const executeTransaction = async (
   populatedTransaction: PopulatedTransaction,
   gasDetails: TransactionGasDetails,
 ): Promise<TransactionResponse> => {
-  const wallet = getBestMatchWalletForNetwork(chainID);
+  const wallet = await getBestMatchWalletForNetwork(
+    chainID,
+    gasDetails.gasLimit,
+  );
   const txWithGas = setGasDetails(populatedTransaction, gasDetails);
   const signedTransaction = await wallet.signTransaction(txWithGas);
   const provider = getProviderForNetwork(chainID);

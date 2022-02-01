@@ -10,13 +10,15 @@ import {
 import { getBestMatchWalletForNetwork } from '../best-match-wallet';
 import configWallets from '../../../config/config-wallets';
 import { WalletConfig } from '../../../models/wallet-models';
-import { Wallet as EthersWallet } from 'ethers';
+import { BigNumber, Wallet as EthersWallet } from 'ethers';
 import { NetworkChainID } from '../../../config/config-chain-ids';
 import {
   resetAvailableWallets,
   setWalletAvailable,
 } from '../available-wallets';
 import { getMockProvider } from '../../../test/mocks.test';
+import sinon, { SinonStub } from 'sinon';
+import * as BalanceCacheModule from '../../balances/balance-cache';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -28,6 +30,8 @@ const MOCK_MNEMONIC_2 =
   'sense arena duck shine near cluster awful gravity act security cargo knock';
 const MOCK_MNEMONIC_3 =
   'odor crucial flip innocent train smile jump pair agent cabbage gun never';
+
+let getCachedGasTokenBalanceStub: SinonStub;
 
 const setupMockWallets = async (wallets: WalletConfig[]) => {
   configWallets.wallets = wallets;
@@ -42,10 +46,17 @@ const addressForMnemonic = (mnemonic: string): string => {
 describe('best-match-wallet', () => {
   before(async () => {
     initLepton();
+    getCachedGasTokenBalanceStub = sinon
+      .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
+      .resolves(BigNumber.from(500));
   });
 
   afterEach(() => {
     resetAvailableWallets();
+  });
+
+  after(() => {
+    getCachedGasTokenBalanceStub.restore();
   });
 
   it('Should select best match wallet ordered by priority', async () => {
@@ -65,7 +76,10 @@ describe('best-match-wallet', () => {
       },
     ]);
 
-    const bestWallet = getBestMatchWalletForNetwork(MOCK_CHAIN_ID);
+    const bestWallet = await getBestMatchWalletForNetwork(
+      MOCK_CHAIN_ID,
+      BigNumber.from(100),
+    );
     expect(bestWallet.address).to.equal(addressForMnemonic(MOCK_MNEMONIC_3));
   });
 
@@ -94,7 +108,10 @@ describe('best-match-wallet', () => {
     expect(firstWallet.address).to.equal(addressForMnemonic(MOCK_MNEMONIC_1));
     setWalletAvailable(firstActiveWallet, false);
 
-    const bestWallet = getBestMatchWalletForNetwork(MOCK_CHAIN_ID);
+    const bestWallet = await getBestMatchWalletForNetwork(
+      MOCK_CHAIN_ID,
+      BigNumber.from(100),
+    );
     expect(bestWallet.address).to.equal(addressForMnemonic(MOCK_MNEMONIC_3));
   });
 
@@ -110,8 +127,22 @@ describe('best-match-wallet', () => {
     const firstWallet = getActiveWallets()[0];
     setWalletAvailable(firstWallet, false);
 
-    expect(() => getBestMatchWalletForNetwork(MOCK_CHAIN_ID)).to.throw(
-      'No wallets available.',
-    );
+    await expect(
+      getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(100)),
+    ).to.be.rejectedWith('All wallets busy or out of funds.');
+  });
+
+  it('Should error if all wallets out of funds', async () => {
+    await setupMockWallets([
+      {
+        mnemonic: MOCK_MNEMONIC_1,
+        priority: 1,
+        isShieldedReceiver: true,
+      },
+    ]);
+
+    await expect(
+      getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(1000)),
+    ).to.be.rejectedWith('All wallets busy or out of funds.');
   });
 }).timeout(10000);

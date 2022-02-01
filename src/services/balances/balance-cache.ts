@@ -71,3 +71,22 @@ export const getCachedGasTokenBalance = async (
   }
   return gasTokenBalanceCache[chainID][walletAddress].balance;
 };
+
+export const getActiveWalletGasTokenBalanceMapForChain = async (
+  chainID: NetworkChainID,
+): Promise<MapType<BigNumber>> => {
+  const activeWallets = getActiveWallets();
+
+  const getBalancePromises: Promise<BigNumber>[] = [];
+  activeWallets.forEach(({ address }) => {
+    getBalancePromises.push(getCachedGasTokenBalance(chainID, address));
+  });
+  const balances = await Promise.all(getBalancePromises);
+
+  const balanceMap: MapType<BigNumber> = {};
+  activeWallets.forEach(({ address }, index) => {
+    balanceMap[address] = balances[index];
+  });
+
+  return balanceMap;
+};
