@@ -28,12 +28,13 @@ export const calculateTokenFeePerUnitGasToken = (
   const gasToken = networkConfig.gasToken;
   const oneUnitGas = BigNumber.from(10).pow(BigNumber.from(gasToken.decimals));
 
-  const tokenFeePerUnitGas = oneUnitGas
-    .mul(roundedPriceRatio)
-    .div(decimalRatio)
-    .div(BigNumber.from(precision));
-
-  return tokenFeePerUnitGas;
+  const tokenFee = getTokenFee(
+    oneUnitGas,
+    roundedPriceRatio,
+    decimalRatio,
+    precision,
+  );
+  return tokenFee;
 };
 
 export const calculateTokenFeeForTransaction = async (
@@ -52,10 +53,12 @@ export const calculateTokenFeeForTransaction = async (
     serializedTransaction,
   );
   const maximumGas = await estimateMaximumGas(chainID, populatedTransaction);
-  const maximumGasFeeForToken = maximumGas
-    .mul(roundedPriceRatio)
-    .div(decimalRatio)
-    .div(BigNumber.from(precision));
+  const maximumGasFeeForToken = getTokenFee(
+    maximumGas,
+    roundedPriceRatio,
+    decimalRatio,
+    precision,
+  );
 
   cacheFeeForTransaction(
     serializedTransaction,
@@ -64,6 +67,18 @@ export const calculateTokenFeeForTransaction = async (
   );
 
   return BigNumber.from(maximumGasFeeForToken);
+};
+
+const getTokenFee = (
+  gas: BigNumber,
+  roundedPriceRatio: BigNumber,
+  decimalRatio: BigNumber,
+  precision: number,
+) => {
+  return gas
+    .mul(roundedPriceRatio)
+    .div(decimalRatio)
+    .div(BigNumber.from(precision));
 };
 
 const getTokenRatiosFromCachedPrices = (
