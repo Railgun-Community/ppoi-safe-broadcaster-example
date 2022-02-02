@@ -1,4 +1,5 @@
 import { BaseProvider } from '@ethersproject/providers';
+import { babyjubjub } from '@railgun-community/lepton/dist/utils';
 import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
 import { Wallet as EthersWallet } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
@@ -22,13 +23,14 @@ export const initWallets = async () => {
       activeWallets.push({
         address: wallet.address,
         privateKey: wallet.privateKey,
+        mnemonic,
         priority,
+        isShieldedReceiver: isShieldedReceiver === true,
       });
-      if (isShieldedReceiver) {
-        await initShieldedReceiverWallet(mnemonic);
-      }
     },
   );
+  const activeReceiverWallet = getActiveReceiverWallet();
+  await initShieldedReceiverWallet(activeReceiverWallet.mnemonic);
 };
 
 export const resetWallets = () => {
@@ -44,14 +46,35 @@ const initShieldedReceiverWallet = async (mnemonic: string) => {
   shieldedReceiverWallet = lepton.wallets[walletID];
 };
 
-export const getRailgunAddress = (chainID?: NetworkChainID) => {
-  if (!shieldedReceiverWallet) {
+export const getActiveReceiverWallet = (): ActiveWallet => {
+  const receiverWallets = activeWallets.filter(
+    (wallet) => wallet.isShieldedReceiver,
+  );
+  if (receiverWallets.length !== 1) {
     throw new Error(
-      'No receiver wallet configured. Please add `isShieldedReceiver` boolean value to one of your wallets.',
+      'Requires one receiver wallet. Add `isShieldedReceiver` boolean value to one of your configured wallets',
     );
   }
+  return receiverWallets[0];
+};
+
+export const getActiveReceiverWalletPublicKey = (): string => {
+  const privateKey = getActiveReceiverWallet().privateKey;
+  return babyjubjub.privateKeyToPubKey(privateKey);
+};
+
+export const getShieldedReceiverWallet = (): RailgunWallet => {
+  if (!shieldedReceiverWallet) {
+    throw new Error(
+      'No receiver wallet configured. Please add `isShieldedReceiver` boolean value to one of your configured wallets.',
+    );
+  }
+  return shieldedReceiverWallet;
+};
+
+export const getRailgunAddress = (chainID?: NetworkChainID) => {
   const change = false;
-  return shieldedReceiverWallet.getAddress(
+  return getShieldedReceiverWallet().getAddress(
     RAILGUN_ADDRESS_INDEX,
     change,
     chainID,

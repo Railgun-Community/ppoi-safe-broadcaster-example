@@ -6,6 +6,8 @@ export type WalletConfig = {
 
 export type ActiveWallet = {
   address: string;
+  mnemonic: string;
   privateKey: string;
   priority: number;
+  isShieldedReceiver: boolean;
 };

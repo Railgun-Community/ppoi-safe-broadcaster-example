@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { allNetworkChainIDs } from '../../chains/network-chain-ids';
-import { abiForChain } from '../abi';
+import { abiForChainToken } from '../abi';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -10,7 +10,7 @@ const { expect } = chai;
 describe('abi', () => {
   it('Should get ABI for each network', async () => {
     allNetworkChainIDs().forEach((chainID) => {
-      const abi = abiForChain(chainID);
+      const abi = abiForChainToken(chainID);
       expect(abi).to.be.an('array');
     });
   });

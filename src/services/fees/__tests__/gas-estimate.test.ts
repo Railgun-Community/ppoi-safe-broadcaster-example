@@ -10,7 +10,7 @@ import {
 import {
   createGasEstimateStubs,
   restoreGasEstimateStubs,
-} from '../../../test/stubs/ethers-provider.test';
+} from '../../../test/stubs/ethers-provider-stubs.test';
 import { BigNumber } from 'ethers';
 import configNetworks from '../../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';

@@ -15,7 +15,7 @@ import {
 import {
   createGasEstimateStubs,
   restoreGasEstimateStubs,
-} from '../../../test/stubs/ethers-provider.test';
+} from '../../../test/stubs/ethers-provider-stubs.test';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import {
   cacheTokenPricesForNetwork,
@@ -69,8 +69,8 @@ describe('calculate-transaction-gas', () => {
     const gasDetails = await createTransactionGasDetails(
       MOCK_CHAIN_ID,
       getMockPopulatedTransaction(),
-      tokenFee,
       MOCK_TOKEN_ADDRESS,
+      tokenFee,
     );
 
     expect(gasDetails.gasLimit.toString()).to.equal('480000000000');
@@ -84,8 +84,8 @@ describe('calculate-transaction-gas', () => {
     const gasDetails = await createTransactionGasDetails(
       MOCK_CHAIN_ID,
       getMockPopulatedTransaction(),
-      tokenFee,
       MOCK_TOKEN_ADDRESS_6_DECIMALS,
+      tokenFee,
     );
 
     expect(gasDetails.gasLimit.toString()).to.equal('480000000000');
@@ -103,8 +103,8 @@ describe('calculate-transaction-gas', () => {
     const gasDetails = await createTransactionGasDetails(
       MOCK_CHAIN_ID,
       getMockPopulatedTransaction(),
-      tokenFee,
       MOCK_TOKEN_ADDRESS,
+      tokenFee,
     );
 
     expect(gasDetails.gasLimit.toString()).to.equal('480000000000');
@@ -119,8 +119,8 @@ describe('calculate-transaction-gas', () => {
       createTransactionGasDetails(
         MOCK_CHAIN_ID,
         getMockPopulatedTransaction(),
-        tokenFee,
         MOCK_TOKEN_ADDRESS,
+        tokenFee,
       ),
     ).to.be.rejected;
   });

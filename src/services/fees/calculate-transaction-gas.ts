@@ -18,8 +18,8 @@ export type TransactionGasDetails = {
 export const createTransactionGasDetails = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
-  tokenFee: BigNumber,
   tokenAddress: string,
+  tokenFee: BigNumber,
 ): Promise<TransactionGasDetails> => {
   const { gasEstimate, gasPrice: gasPriceEstimate } = await getGasDetails(
     chainID,

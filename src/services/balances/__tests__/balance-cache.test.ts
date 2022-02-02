@@ -14,7 +14,7 @@ import configDefaults from '../../../config/config-defaults';
 import {
   createGasBalanceStub,
   restoreGasBalanceStub,
-} from '../../../test/stubs/ethers-provider.test';
+} from '../../../test/stubs/ethers-provider-stubs.test';
 import { BigNumber } from 'ethers';
 import { getMockWalletAddress } from '../../../test/mocks.test';
 import { getActiveWallets, initWallets } from '../../wallets/active-wallets';

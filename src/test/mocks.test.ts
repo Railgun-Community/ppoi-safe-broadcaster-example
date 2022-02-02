@@ -1,8 +1,10 @@
 import { BaseProvider } from '@ethersproject/providers';
+import { babyjubjub } from '@railgun-community/lepton/dist/utils';
 import { PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configTokens from '../config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
+import { RailProxyContract } from '../models/contract-constants';
 import { Network, QuickSyncURL } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 import { GasTokenWrappedAddress, Token } from '../models/token-models';
@@ -92,7 +94,7 @@ export const getMockRopstenNetwork = (): Network => {
       slippageBuffer: 0.05,
       profit: 0.05,
     },
-    railContract: '0x00',
+    railContract: RailProxyContract.Ropsten,
     fallbackProviderConfig: getMockRopstenFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
     quickSyncURL: QuickSyncURL.Ropsten,
@@ -118,4 +120,10 @@ export const getMockToken = (): Token => {
 export const getMockWalletAddress = (): string => {
   // Vitalik public address
   return '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B';
+};
+
+export const getMockWalletPubKey = (): string => {
+  const privateKey =
+    '0f75f0f0f1e2d1021b1d7f839bea176d24c87e089ee959c6fb9c0e650473d684';
+  return babyjubjub.privateKeyToPubKey(privateKey);
 };
