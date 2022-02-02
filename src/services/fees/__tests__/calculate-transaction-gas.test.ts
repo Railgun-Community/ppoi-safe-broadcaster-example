@@ -22,7 +22,7 @@ import {
   resetTokenPriceCache,
   TokenPrice,
 } from '../../tokens/token-price-cache';
-import { calculateTransactionFee } from '../calculate-transaction-fee';
+import { calculateTokenFeeForTransaction } from '../calculate-token-fee';
 import { createTransactionGasDetails } from '../calculate-transaction-gas';
 
 chai.use(chaiAsPromised);
@@ -92,10 +92,10 @@ describe('calculate-transaction-gas', () => {
     expect(gasDetails.gasPrice.toString()).to.equal('250000');
   });
 
-  it('[e2e] Should calculate transaction fee, then calculate equivalent gas fee', async () => {
+  it('[e2e] Should calculate token fee, then calculate equivalent gas fee', async () => {
     createGasEstimateStubs(MOCK_GAS_ESTIMATE, MOCK_GAS_PRICE);
 
-    const tokenFee = await calculateTransactionFee(
+    const tokenFee = await calculateTokenFeeForTransaction(
       MOCK_CHAIN_ID,
       getMockSerializedTransaction(),
       MOCK_TOKEN_ADDRESS,

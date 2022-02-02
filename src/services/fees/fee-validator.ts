@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import { logger } from '../../util/logger';
-import { calculateTransactionFee } from './calculate-transaction-fee';
+import { calculateTokenFeeForTransaction } from './calculate-token-fee';
 import { lookUpCachedFee } from './transaction-fee-cache';
 
 export const validateFee = async (
@@ -22,7 +22,7 @@ export const validateFee = async (
 
   try {
     // Re-calculate the fee if cache is expired.
-    const calculatedFee = await calculateTransactionFee(
+    const calculatedFee = await calculateTokenFeeForTransaction(
       chainID,
       serializedTransaction,
       tokenAddress,

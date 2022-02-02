@@ -7,7 +7,7 @@ import { getTransactionTokenPrices } from '../tokens/token-price-cache';
 import {
   getRoundedTokenToGasPriceRatio,
   getTransactionTokenToGasDecimalRatio,
-} from './calculate-transaction-fee';
+} from './calculate-token-fee';
 import { calculateGasLimit, getGasDetails } from './gas-estimate';
 
 export type TransactionGasDetails = {
@@ -44,7 +44,7 @@ export const createTransactionGasDetails = async (
   );
   const decimalRatio = getTransactionTokenToGasDecimalRatio(token, gasToken);
 
-  // This is the inverse of the fee calculation in calculate-transaction-fee.ts.
+  // This is the inverse of the fee calculation in calculate-token-fee.ts.
   const translatedTotalGas = tokenFee
     .mul(BigNumber.from(precision))
     .mul(decimalRatio)

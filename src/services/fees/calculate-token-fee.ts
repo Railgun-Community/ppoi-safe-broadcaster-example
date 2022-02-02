@@ -13,35 +13,47 @@ import { deserializePopulatedTransaction } from '../transactions/populated-trans
 import { estimateMaximumGas } from './gas-estimate';
 import { cacheFeeForTransaction } from './transaction-fee-cache';
 
-export const calculateTransactionFee = async (
+export const calculateTokenFeePerUnitGasToken = (
+  chainID: NetworkChainID,
+  tokenAddress: string,
+) => {
+  const precision = configDefaults.transactionFeePrecision;
+  const { roundedPriceRatio, decimalRatio } = getTokenRatiosFromCachedPrices(
+    chainID,
+    tokenAddress,
+    precision,
+  );
+
+  const networkConfig = configNetworks[chainID];
+  const gasToken = networkConfig.gasToken;
+  const oneUnitGas = BigNumber.from(10).pow(BigNumber.from(gasToken.decimals));
+
+  const tokenFeePerUnitGas = oneUnitGas
+    .mul(roundedPriceRatio)
+    .div(decimalRatio)
+    .div(BigNumber.from(precision));
+
+  return tokenFeePerUnitGas;
+};
+
+export const calculateTokenFeeForTransaction = async (
   chainID: NetworkChainID,
   serializedTransaction: string,
   tokenAddress: string,
 ): Promise<BigNumber> => {
-  const networkConfig = configNetworks[chainID];
-  const { token, gasToken } = getTransactionTokens(chainID, tokenAddress);
-  const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
-    chainID,
-    token,
-    gasToken,
-  );
-
   const precision = configDefaults.transactionFeePrecision;
-  const roundedRatio = getRoundedTokenToGasPriceRatio(
-    tokenPrice,
-    gasTokenPrice,
-    networkConfig.fees,
+  const { roundedPriceRatio, decimalRatio } = getTokenRatiosFromCachedPrices(
+    chainID,
+    tokenAddress,
     precision,
   );
-  const decimalRatio = getTransactionTokenToGasDecimalRatio(token, gasToken);
 
   const populatedTransaction = deserializePopulatedTransaction(
     serializedTransaction,
   );
   const maximumGas = await estimateMaximumGas(chainID, populatedTransaction);
-
   const maximumGasFeeForToken = maximumGas
-    .mul(roundedRatio)
+    .mul(roundedPriceRatio)
     .div(decimalRatio)
     .div(BigNumber.from(precision));
 
@@ -52,6 +64,30 @@ export const calculateTransactionFee = async (
   );
 
   return BigNumber.from(maximumGasFeeForToken);
+};
+
+const getTokenRatiosFromCachedPrices = (
+  chainID: NetworkChainID,
+  tokenAddress: string,
+  precision: number,
+) => {
+  const networkConfig = configNetworks[chainID];
+  const { token, gasToken } = getTransactionTokens(chainID, tokenAddress);
+  const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
+    chainID,
+    token,
+    gasToken,
+  );
+
+  const roundedPriceRatio = getRoundedTokenToGasPriceRatio(
+    tokenPrice,
+    gasTokenPrice,
+    networkConfig.fees,
+    precision,
+  );
+  const decimalRatio = getTransactionTokenToGasDecimalRatio(token, gasToken);
+
+  return { roundedPriceRatio, decimalRatio };
 };
 
 export const getRoundedTokenToGasPriceRatio = (
@@ -74,8 +110,8 @@ export const getRoundedTokenToGasPriceRatio = (
     );
   }
 
-  const roundedRatio = BigNumber.from(Math.round(ratio));
-  return roundedRatio;
+  const roundedPriceRatio = BigNumber.from(Math.round(ratio));
+  return roundedPriceRatio;
 };
 
 export const getTransactionTokenToGasDecimalRatio = (
