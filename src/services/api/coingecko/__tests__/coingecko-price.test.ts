@@ -143,8 +143,6 @@ describe('coingecko-price', () => {
   });
 
   it('Should run configured price getter for Ropsten', async () => {
-    const nowTimestamp = Date.now();
-
     const tokenAddressesToPrice = await tokenPriceGetter(
       NetworkChainID.Ropsten,
       TOKEN_ADDRESSES,

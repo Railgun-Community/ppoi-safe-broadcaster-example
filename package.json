@@ -43,7 +43,7 @@
   "dependencies": {
     "@ethersproject/providers": "^5.5.2",
     "@ethersproject/shims": "^5.5.0",
-    "@railgun-community/lepton": "git+https://github.com/Railgun-Community/lepton.git",
+    "@railgun-community/lepton": "https://npm.railgun.org/ci/railgun-community-lepton-0.0.1.tgz",
     "axios": "^0.25.0",
     "debug": "^4.3.3",
     "ethers": "^5.5.3",
