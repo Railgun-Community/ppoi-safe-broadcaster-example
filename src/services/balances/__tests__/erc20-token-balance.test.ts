@@ -27,5 +27,5 @@ describe('erc20-token-balance', () => {
     await expect(
       getERC20TokenBalance(NetworkChainID.Ethereum, MOCK_WALLET_ADDRESS, token),
     ).to.not.be.rejected;
-  }).timeout(10000);
-}).timeout(30000);
+  }).timeout(30000);
+}).timeout(60000);
