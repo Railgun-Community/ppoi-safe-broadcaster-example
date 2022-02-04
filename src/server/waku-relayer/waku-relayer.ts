@@ -115,14 +115,16 @@ export class WakuRelayer {
   private async broadcastFeesForChain(chainID: NetworkChainID) {
     // Map from tokenAddress to BigNumber hex string
     const fees: MapType<string> = getAllUnitTokenFeesForChain(chainID);
+    const feesString = JSON.stringify(fees);
     const message = await WakuMessage.fromUtf8String(
-      JSON.stringify(fees),
+      feesString,
       contentTopics.fees(chainID),
     );
     const result = await this.client
       .publish(message, this.topic)
       .catch(this.logger);
-    this.logger(`Broadcasting fees for chain ${chainID}: `, result);
+    this.logger(`Broadcasting fees for chain ${chainID}: `, feesString);
+    this.logger(`Result: ${result}`);
   }
 
   async broadcastFeesOnInterval(frequency: number = 15 * 1000) {
