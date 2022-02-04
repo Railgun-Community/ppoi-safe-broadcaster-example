@@ -16,6 +16,7 @@ import { NetworkChainID } from '../config/config-chain-ids';
 import { allNetworkChainIDs } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
+import configDefaults from '../config/config-defaults';
 
 export const contentTopics = {
   default: () => '/railgun/1/default/json',
@@ -127,8 +128,8 @@ export class WakuRelayer {
     this.logger(`Result: ${result}`);
   }
 
-  async broadcastFeesOnInterval(frequency: number = 15 * 1000) {
-    await delay(frequency);
+  async broadcastFeesOnInterval() {
+    await delay(configDefaults.broadcastFeesDelayInMS);
     const chainIDs = allNetworkChainIDs();
     const broadcastPromises: Promise<void>[] = chainIDs.map((chainID) =>
       this.broadcastFeesForChain(chainID),

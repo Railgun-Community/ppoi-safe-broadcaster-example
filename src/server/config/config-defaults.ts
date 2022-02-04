@@ -32,6 +32,9 @@ export default {
   // Key used to encrypt wallets in the Lepton database.
   leptonDbEncryptionKey: '12345',
 
+  // Broadcast fees every 15 seconds.
+  broadcastFeesDelayInMS: 15 * 1000,
+
   // waku options
   directPeers: [
     '/dns4/relayer.of.holdings/tcp/8000/wss/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg',
