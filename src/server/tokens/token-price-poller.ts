@@ -5,7 +5,7 @@ import configTokenPriceGetter, {
 } from '../config/config-token-price-getter';
 import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
-import { allNetworkChainIDs } from '../chains/network-chain-ids';
+import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { allTokenAddressesForNetwork } from './network-tokens';
 import {
   cacheTokenPricesForNetwork,
@@ -19,7 +19,7 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
 ): Promise<void> => {
   const networkPromises: Promise<TokenAddressesToPrice>[] = [];
 
-  const chainIDs = allNetworkChainIDs();
+  const chainIDs = configuredNetworkChainIDs();
   chainIDs.forEach((chainID) => {
     const tokenAddresses = allTokenAddressesForNetwork(chainID);
     const gasTokenAddress = configNetworks[chainID].gasToken.wrappedAddress;

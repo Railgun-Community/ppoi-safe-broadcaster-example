@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
-import { allNetworkChainIDs } from '../chains/network-chain-ids';
+import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { getActiveWallets } from '../wallets/active-wallets';
 import { getGasTokenBalance } from './gas-token-balance';
 
@@ -36,7 +36,7 @@ export const updateAllActiveWalletsGasTokenBalances = async () => {
   const activeWallets = getActiveWallets();
   const balanceUpdatePromises: Promise<void>[] = [];
 
-  allNetworkChainIDs().forEach((chainID) => {
+  configuredNetworkChainIDs().forEach((chainID) => {
     activeWallets.forEach(async ({ address }) => {
       balanceUpdatePromises.push(updateCachedGasTokenBalance(chainID, address));
     });

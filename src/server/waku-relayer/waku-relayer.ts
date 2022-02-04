@@ -13,7 +13,7 @@ import { WakuMessage } from 'js-waku';
 import { greetMethod } from './methods/greet-method';
 import { processTransactionMethod } from './methods/populate-transaction-method';
 import { NetworkChainID } from '../config/config-chain-ids';
-import { allNetworkChainIDs } from '../chains/network-chain-ids';
+import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
 import configDefaults from '../config/config-defaults';
@@ -54,7 +54,9 @@ export class WakuRelayer {
     this.allContentTopics = [
       contentTopics.default(),
       contentTopics.greet(),
-      ...allNetworkChainIDs().map((chainID) => contentTopics.fees(chainID)),
+      ...configuredNetworkChainIDs().map((chainID) =>
+        contentTopics.fees(chainID),
+      ),
     ];
   }
 
@@ -126,7 +128,7 @@ export class WakuRelayer {
 
   async broadcastFeesOnInterval() {
     await delay(configDefaults.broadcastFeesDelayInMS);
-    const chainIDs = allNetworkChainIDs();
+    const chainIDs = configuredNetworkChainIDs();
     const broadcastPromises: Promise<void>[] = chainIDs.map((chainID) =>
       this.broadcastFeesForChain(chainID),
     );

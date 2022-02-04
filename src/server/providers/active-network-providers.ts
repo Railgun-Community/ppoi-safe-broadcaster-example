@@ -1,14 +1,14 @@
 import { BaseProvider, FallbackProvider } from '@ethersproject/providers';
 import configNetworks from '../config/config-networks';
 import { createFallbackProviderFromJsonConfig } from './fallback-providers';
-import { allNetworkChainIDs } from '../chains/network-chain-ids';
+import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { initLeptonNetwork } from '../lepton/lepton-init';
 
 const activeNetworkProviders: NumMapType<FallbackProvider> = {};
 
 export const initNetworkProviders = () => {
-  allNetworkChainIDs().forEach((chainId) => {
+  configuredNetworkChainIDs().forEach((chainId) => {
     const network = configNetworks[chainId];
     if (!network) {
       return;
