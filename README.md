@@ -6,13 +6,8 @@ The RAILGUN relayer network runs on [Waku](https://wakunetwork.com/), a secure a
 
 - just use npm/yarn
 - `npm install`
-- `npm run server` or
-- `npm run server-debug` (DEBUG mode)
-
-## Run RAILGUN demo client
-
-- `npm run client` or
-- `npm run client-debug` (DEBUG mode)
+- `npm start` or
+- `npm run debug` (DEBUG mode)
 
 ## Run tests
 

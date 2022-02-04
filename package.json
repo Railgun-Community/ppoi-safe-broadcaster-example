@@ -10,13 +10,12 @@
     "clean": "rm -rf dist",
     "lint": "eslint . --ext .ts",
     "compile": "npm run clean && tsc && tsc-alias",
-    "server": "npm run compile && node -r dotenv/config dist/server.js",
-    "server-debug": "env DEBUG=relayer*,waku:jsonrpc-api npm run server",
-    "client": "npm run compile && node -r dotenv/config dist/client.js",
-    "client-debug": "env DEBUG=relayer*,waku:waku npm run client",
+    "start": "npm run compile && node -r dotenv/config dist/main.js",
+    "debug": "env DEBUG=relayer*,waku:jsonrpc-api npm run server",
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
     "test": "npm run compile-test && mocha 'src/**/__tests__/*.test.ts'",
-    "test-coverage": "npm run compile-test && nyc mocha 'src/**/__tests__/*.test.ts'"
+    "test-coverage": "npm run compile-test && nyc mocha 'src/**/__tests__/*.test.ts'",
+    "prepare": "npm run compile"
   },
   "keywords": [],
   "author": "",
