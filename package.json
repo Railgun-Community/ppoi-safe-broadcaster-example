@@ -38,7 +38,6 @@
     "mocha": "^9.2.0",
     "nyc": "^15.1.0",
     "sinon": "^12.0.1",
-    "swc-node": "^1.0.0",
     "ts-node": "^10.4.0",
     "tsc-alias": "^1.5.0",
     "typescript": "^4.5.4"
@@ -56,9 +55,6 @@
     "ethers": "^5.5.3",
     "js-waku": "^0.16.0",
     "level": "^7.0.1",
-    "node-fetch": "^3.1.0",
-    "peer-id": "^0.16.0",
-    "protons": "^2.0.3",
     "railgun-artifacts": "https://npm.railgun.org/railgun-artifacts-0.0.1.tgz"
   }
 }
