@@ -1,12 +1,15 @@
 import { NetworkChainID } from '../config/config-chain-ids';
 import { removeNaNs } from '../../util/utils';
 import configNetworks from '../config/config-networks';
+import configDefaults from '../config/config-defaults';
 
 export const allNetworkChainIDs = (): NetworkChainID[] => {
-  const chainIDs = removeNaNs(
+  const chainIDs: NetworkChainID[] = removeNaNs(
     Object.keys(NetworkChainID).map((chainID) => {
       return Number(chainID) as NetworkChainID;
     }),
   );
-  return chainIDs.filter((chainID: NetworkChainID) => configNetworks[chainID]);
+  return chainIDs
+    .filter((chainID) => configDefaults.useNetworks.includes(chainID))
+    .filter((chainID) => configNetworks[chainID] != null);
 };
