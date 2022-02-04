@@ -5,7 +5,7 @@ import { initPricePoller } from '../tokens/token-price-poller';
 import { logger } from '../../util/logger';
 
 export const initRelayer = async () => {
-  initLepton();
+  initLepton('server-db');
   await initWallets();
   initNetworkProviders();
   initPricePoller();

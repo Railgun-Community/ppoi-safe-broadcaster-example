@@ -14,7 +14,7 @@ const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
 
 describe('available-wallets', () => {
   before(async () => {
-    initLepton();
+    initLepton('test-db');
     await setupSingleTestWallet();
   });
 

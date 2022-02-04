@@ -15,11 +15,11 @@ export const getLepton = () => {
   return lepton;
 };
 
-export const initLepton = () => {
+export const initLepton = (dbName: string) => {
   if (lepton) {
     return;
   }
-  const leveldownDB = new leveldown('db');
+  const leveldownDB = new leveldown(dbName);
   const leptonDebugger: LeptonDebugger = {
     log: (msg: string) => logger.log(msg),
     error: (error: Error) => logger.error(error),

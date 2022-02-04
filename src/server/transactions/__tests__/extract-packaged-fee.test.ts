@@ -82,7 +82,7 @@ const createRopstenTransaction = async (
 
 describe('extract-packaged-fee', () => {
   before(async () => {
-    initLepton();
+    initLepton('test-db');
     lepton = getLepton();
 
     configWallets.wallets = [
