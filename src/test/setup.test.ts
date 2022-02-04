@@ -5,7 +5,7 @@ import configNetworks from '../config/config-networks';
 import configWallets from '../config/config-wallets';
 import { DebugLevel } from '../models/debug-models';
 import { Network } from '../models/network-models';
-import { initWallets } from '../services/wallets/active-wallets';
+import { initWallets } from '../server/wallets/active-wallets';
 import { getMockNetwork } from './mocks.test';
 
 const setupTests = () => {

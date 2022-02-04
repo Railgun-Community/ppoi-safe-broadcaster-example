@@ -8,7 +8,7 @@ import {
   WakuApiClient,
   WakuApiClientOptions,
   WakuRelayMessage,
-} from 'services/networking/waku-api-client';
+} from 'server/networking/waku-api-client';
 import { WakuMessage } from 'js-waku';
 import { greetMethod } from './methods/greet-method';
 import { processTransactionMethod } from './methods/populate-transaction-method';

@@ -1,6 +1,6 @@
 import debug from 'debug';
-import { initRelayer } from 'services/init/relayer-init';
-import { WakuRelayer, WAKU_TOPIC } from 'services/waku-relayer/waku-relayer';
+import { initRelayer } from 'server/init/relayer-init';
+import { WakuRelayer, WAKU_TOPIC } from 'server/waku-relayer/waku-relayer';
 
 const dbg = debug('relayer:main');
 
