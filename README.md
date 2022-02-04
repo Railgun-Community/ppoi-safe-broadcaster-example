@@ -1,4 +1,4 @@
-# Delayer: transaction anonymizing relayer for RAILGUN
+# Transaction anonymizing relayer for RAILGUN
 
 The RAILGUN relayer network runs on [Waku](https://wakunetwork.com/), a secure and decentralized messaging protocol.
 
