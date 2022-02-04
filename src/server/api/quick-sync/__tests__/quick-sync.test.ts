@@ -16,8 +16,7 @@ describe('quick-sync', () => {
     configNetworks[NetworkChainID.Ropsten] = getMockRopstenNetwork();
   });
 
-  // Skip until Ropsten relayer URL updated.
-  it.skip('Should run live Railgun Event Log fetch for Ropsten', async () => {
+  it('Should run live Railgun Event Log fetch for Ropsten', async () => {
     const eventLog = await quickSync(NetworkChainID.Ropsten, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitments.length).to.be.at.least(40);
