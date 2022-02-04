@@ -57,7 +57,11 @@ export class WakuRelayer {
       ...configuredNetworkChainIDs().map((chainID) =>
         contentTopics.fees(chainID),
       ),
+      ...configuredNetworkChainIDs().map((chainID) =>
+        contentTopics.transact(chainID),
+      ),
     ];
+    this.logger(this.allContentTopics);
   }
 
   static async init(options: WakuRelayerOptions): Promise<WakuRelayer> {
@@ -138,6 +142,7 @@ export class WakuRelayer {
 
   async poll(frequency: number = 5000) {
     setInterval(async () => {
+      this.logger(this.allContentTopics);
       const messages = await this.client
         .getMessages(this.topic, this.allContentTopics)
         .catch((e) => {
