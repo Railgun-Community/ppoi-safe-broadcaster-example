@@ -17,12 +17,8 @@ import { allNetworkChainIDs } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
 import configDefaults from '../config/config-defaults';
+import { contentTopics } from './topics';
 
-export const contentTopics = {
-  default: () => '/railgun/1/default/json',
-  greet: () => '/railgun/1/greet/json',
-  fees: (chainID: NetworkChainID) => `/railgun/1/${chainID}/fees/json`,
-};
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 export const RAILGUN_TOPIC = '/railgun/1/relayer/proto';
 
