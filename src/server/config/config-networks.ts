@@ -44,32 +44,33 @@ export default {
     priceTTLInMS: 5 * 60 * 1000,
     quickSyncURL: QuickSyncURL.Ropsten,
   },
-  [NetworkChainID.BinanceSmartChain]: {
-    name: 'Binance Smart Chain',
-    gasToken: {
-      symbol: 'BNB',
-      wrappedAddress: GasTokenWrappedAddress.BinanceWBNB,
-      decimals: 18,
-    },
-    fees: defaultFees,
-    railContract: RailProxyContract.BinanceSmartChain,
-    coingeckoId: CoingeckoNetworkID.BinanceSmartChain,
-    fallbackProviderConfig: fallbackProvidersBinanceSmartChain,
-    priceTTLInMS: 5 * 60 * 1000,
-  },
-  [NetworkChainID.PolygonPOS]: {
-    name: 'Polygon PoS',
-    gasToken: {
-      symbol: 'MATIC',
-      wrappedAddress: GasTokenWrappedAddress.PolygonWMATIC,
-      decimals: 18,
-    },
-    fees: defaultFees,
-    railContract: RailProxyContract.PolygonPOS,
-    coingeckoId: CoingeckoNetworkID.PolygonPOS,
-    fallbackProviderConfig: fallbackProvidersPolygon,
-    priceTTLInMS: 5 * 60 * 1000,
-  },
+  // TODO: Add back and test BSC/Poly networks.
+  // [NetworkChainID.BinanceSmartChain]: {
+  //   name: 'Binance Smart Chain',
+  //   gasToken: {
+  //     symbol: 'BNB',
+  //     wrappedAddress: GasTokenWrappedAddress.BinanceWBNB,
+  //     decimals: 18,
+  //   },
+  //   fees: defaultFees,
+  //   railContract: RailProxyContract.BinanceSmartChain,
+  //   coingeckoId: CoingeckoNetworkID.BinanceSmartChain,
+  //   fallbackProviderConfig: fallbackProvidersBinanceSmartChain,
+  //   priceTTLInMS: 5 * 60 * 1000,
+  // },
+  // [NetworkChainID.PolygonPOS]: {
+  //   name: 'Polygon PoS',
+  //   gasToken: {
+  //     symbol: 'MATIC',
+  //     wrappedAddress: GasTokenWrappedAddress.PolygonWMATIC,
+  //     decimals: 18,
+  //   },
+  //   fees: defaultFees,
+  //   railContract: RailProxyContract.PolygonPOS,
+  //   coingeckoId: CoingeckoNetworkID.PolygonPOS,
+  //   fallbackProviderConfig: fallbackProvidersPolygon,
+  //   priceTTLInMS: 5 * 60 * 1000,
+  // },
   [NetworkChainID.HardHat]: {
     name: 'HardHat Test Network',
     gasToken: {

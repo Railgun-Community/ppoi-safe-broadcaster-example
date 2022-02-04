@@ -9,7 +9,11 @@ const activeNetworkProviders: NumMapType<FallbackProvider> = {};
 
 export const initNetworkProviders = () => {
   allNetworkChainIDs().forEach((chainId) => {
-    const { fallbackProviderConfig, name } = configNetworks[chainId];
+    const network = configNetworks[chainId];
+    if (!network) {
+      return;
+    }
+    const { fallbackProviderConfig, name } = network;
     if (fallbackProviderConfig.chainId !== Number(chainId)) {
       throw new Error(
         `Fallback Provider chain ID ${fallbackProviderConfig.chainId} does not match ID ${chainId} for network: ${name}`,
