@@ -12,11 +12,15 @@ import {
 import { WakuMessage } from 'js-waku';
 import { greetMethod } from './methods/greet-method';
 import { processTransactionMethod } from './methods/populate-transaction-method';
+import { NetworkChainID } from '../config/config-chain-ids';
+import { allNetworkChainIDs } from '../chains/network-chain-ids';
+import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
+import { delay } from '../../util/promise-utils';
 
-export const ContentTopics = {
-  default: '/railgun/1/default/json',
-  greet: '/railgun/1/greet/json',
-  fees: '/railgun/1/fees/json',
+export const contentTopics = {
+  default: () => '/railgun/1/default/json',
+  greet: () => '/railgun/1/greet/json',
+  fees: (chainID: NetworkChainID) => `/railgun/1/${chainID}/fees/json`,
 };
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 export const RAILGUN_TOPIC = '/railgun/1/relayer/proto';
@@ -39,7 +43,7 @@ export class WakuRelayer {
 
   topic: string;
 
-  contentTopics: string[];
+  allContentTopics: string[];
 
   methods: MapType<JsonRPCMessageHandler> = {
     greet: greetMethod,
@@ -50,7 +54,11 @@ export class WakuRelayer {
     this.client = client;
     this.logger = debug('relayer:waku:relayer');
     this.topic = options.topic;
-    this.contentTopics = Object.values(ContentTopics);
+    this.allContentTopics = [
+      contentTopics.default(),
+      contentTopics.greet(),
+      ...allNetworkChainIDs().map((chainID) => contentTopics.fees(chainID)),
+    ];
   }
 
   static async init(options: WakuRelayerOptions): Promise<WakuRelayer> {
@@ -58,14 +66,14 @@ export class WakuRelayer {
     await client.subscribe([options.topic]);
     const relayer = new WakuRelayer(client, options);
     relayer.poll(options.pollFrequency);
-    relayer.broadcastFees({ usd: 1 });
+    relayer.broadcastFeesOnInterval();
     return relayer;
   }
 
   async request(
     method: string,
     params: any,
-    contentTopic = ContentTopics.default,
+    contentTopic = contentTopics.default(),
   ) {
     const payload: JsonRpcPayload = formatJsonRpcRequest(method, params);
     const msg = await WakuMessage.fromUtf8String(
@@ -104,24 +112,33 @@ export class WakuRelayer {
     }
   }
 
-  // TODO: Fix this any with a type.
-  async broadcastFees(feesObj: any, frequency: number = 15 * 1000) {
-    setInterval(async () => {
-      const message = await WakuMessage.fromUtf8String(
-        JSON.stringify(feesObj),
-        ContentTopics.fees,
-      );
-      const result = await this.client
-        .publish(message, this.topic)
-        .catch(this.logger);
-      this.logger('broadcasting fees: ', result);
-    }, frequency);
+  private async broadcastFeesForChain(chainID: NetworkChainID) {
+    // Map from tokenAddress to BigNumber hex string
+    const fees: MapType<string> = getAllUnitTokenFeesForChain(chainID);
+    const message = await WakuMessage.fromUtf8String(
+      JSON.stringify(fees),
+      contentTopics.fees(chainID),
+    );
+    const result = await this.client
+      .publish(message, this.topic)
+      .catch(this.logger);
+    this.logger(`Broadcasting fees for chain ${chainID}: `, result);
+  }
+
+  async broadcastFeesOnInterval(frequency: number = 15 * 1000) {
+    await delay(frequency);
+    const chainIDs = allNetworkChainIDs();
+    const broadcastPromises: Promise<void>[] = chainIDs.map((chainID) =>
+      this.broadcastFeesForChain(chainID),
+    );
+    await Promise.all(broadcastPromises);
+    this.broadcastFeesOnInterval();
   }
 
   async poll(frequency: number = 5000) {
     setInterval(async () => {
       const messages = await this.client
-        .getMessages(this.topic, this.contentTopics)
+        .getMessages(this.topic, this.allContentTopics)
         .catch((e) => {
           this.logger(e.message);
           return [];

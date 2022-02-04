@@ -4,7 +4,10 @@ import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { NetworkFeeSettings } from '../../models/network-models';
 import { GasTokenConfig, Token } from '../../models/token-models';
-import { getTransactionTokens } from '../tokens/network-tokens';
+import {
+  allTokenAddressesForNetwork,
+  getTransactionTokens,
+} from '../tokens/network-tokens';
 import {
   getTransactionTokenPrices,
   TokenPrice,
@@ -12,6 +15,26 @@ import {
 import { deserializePopulatedTransaction } from '../transactions/populated-transaction';
 import { estimateMaximumGas } from './gas-estimate';
 import { cacheFeeForTransaction } from './transaction-fee-cache';
+import { logger } from '../../util/logger';
+
+export const getAllUnitTokenFeesForChain = (
+  chainID: NetworkChainID,
+): MapType<string> => {
+  const tokenAddresses = allTokenAddressesForNetwork(chainID);
+  const tokenFeesForChain: MapType<string> = {};
+  tokenAddresses.forEach((tokenAddress) => {
+    try {
+      tokenFeesForChain[tokenAddress] = calculateTokenFeePerUnitGasToken(
+        chainID,
+        tokenAddress,
+      ).toHexString();
+    } catch (err: any) {
+      // No op.
+      logger.warn(err);
+    }
+  });
+  return tokenFeesForChain;
+};
 
 export const calculateTokenFeePerUnitGasToken = (
   chainID: NetworkChainID,
