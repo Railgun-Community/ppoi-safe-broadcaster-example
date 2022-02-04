@@ -15,7 +15,7 @@ const { expect } = chai;
 
 describe('active-wallets', () => {
   before(async () => {
-    initLepton('test-db');
+    initLepton('test.db');
     await setupSingleTestWallet();
   });
 

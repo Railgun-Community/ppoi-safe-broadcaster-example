@@ -45,7 +45,7 @@ const addressForMnemonic = (mnemonic: string): string => {
 
 describe('best-match-wallet', () => {
   before(async () => {
-    initLepton('test-db');
+    initLepton('test.db');
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
       .resolves(BigNumber.from(500));

@@ -4,7 +4,7 @@ import { initClientWallets } from '../wallets/client-wallets';
 import { logger } from '../../util/logger';
 
 export const initClient = async () => {
-  initLepton('client-db');
+  initLepton('client.db');
   initClientWallets();
   initNetworkProviders();
   logger.log('Client ready.');
