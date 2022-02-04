@@ -1,6 +1,8 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { ERC20Transaction } from '@railgun-community/lepton';
+import { ERC20TransactionSerialized } from '@railgun-community/lepton/dist/transaction/erc20';
 import { BytesData } from '@railgun-community/lepton/dist/utils/bytes';
+import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
 import { TokenAmount } from '../../models/token-models';
 import { NetworkChainID } from '../../server/config/config-chain-ids';
 import { TransactionGasDetails } from '../../server/fees/calculate-transaction-gas';
@@ -16,7 +18,7 @@ export type ProvedTransaction = {
 };
 
 export type ERC20TransactionAction = (
-  erc20Transaction: any,
+  erc20Transaction: ERC20Transaction,
   tokenAmount: TokenAmount,
   toWalletAddress: string,
 ) => void;
@@ -31,14 +33,15 @@ export const generateProofTransaction = async (
 ): Promise<PopulatedTransaction> => {
   const railWallet = getRailgunClientWalletForID(railWalletID);
 
-  const txs: any[] = await erc20TransactionsFromTokenAmounts(
-    tokenAmounts,
-    railWallet,
-    toWalletAddress,
-    encryptionKey,
-    chainID,
-    action,
-  );
+  const txs: ERC20TransactionSerialized[] =
+    await erc20TransactionsFromTokenAmounts(
+      tokenAmounts,
+      railWallet,
+      toWalletAddress,
+      encryptionKey,
+      chainID,
+      action,
+    );
 
   const railContract = getContractForNetwork(chainID);
 
@@ -48,16 +51,16 @@ export const generateProofTransaction = async (
 
 const erc20TransactionsFromTokenAmounts = async (
   tokenAmounts: TokenAmount[],
-  railWallet: any,
+  railWallet: RailgunWallet,
   toWalletAddress: string,
   encryptionKey: BytesData,
   chainID: NetworkChainID,
   action: ERC20TransactionAction,
-): Promise<any[]> => {
+): Promise<ERC20TransactionSerialized[]> => {
   const lepton = getLepton();
   const prover = lepton.prover;
 
-  const txs: any[] = [];
+  const txs: ERC20TransactionSerialized[] = [];
 
   for (const tokenAmount of tokenAmounts) {
     const erc20Transaction = new ERC20Transaction(
