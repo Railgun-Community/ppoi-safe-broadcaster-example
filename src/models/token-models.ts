@@ -1,3 +1,5 @@
+import { BigNumber } from 'ethers';
+
 export enum GasTokenWrappedAddress {
   None = '',
   EthereumWETH = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
@@ -19,4 +21,9 @@ export type TokenConfig = {
 
 export type Token = TokenConfig & {
   address: string;
+};
+
+export type TokenAmount = {
+  tokenAddress: string;
+  amount: BigNumber;
 };
