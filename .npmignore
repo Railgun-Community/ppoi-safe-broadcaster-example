@@ -28,3 +28,4 @@ test
 .gitignore
 .eslintrc.json
 tsconfig.json
+*.db/

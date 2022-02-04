@@ -31,5 +31,5 @@ start-relayer.sh
 pnpm-lock.yaml
 
 # Leveldown database
-.db/
+*.db/
 tsconfig.tsbuildinfo
