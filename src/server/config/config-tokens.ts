@@ -49,5 +49,10 @@ export default {
       decimals: 18,
     },
   },
-  [NetworkChainID.HardHat]: {},
+  [NetworkChainID.HardHat]: {
+    '0x5FbDB2315678afecb367f032d93F642f64180aa3': {
+      symbol: 'TEST',
+      decimals: 18,
+    },
+  },
 } as NetworkTokensConfig;
