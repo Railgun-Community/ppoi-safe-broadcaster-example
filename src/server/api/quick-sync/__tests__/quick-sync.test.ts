@@ -4,8 +4,8 @@ import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import { quickSync } from '../quick-sync';
 import axios from 'axios';
-import { NetworkChainID } from '../../../../config/config-chain-ids';
-import configNetworks from '../../../../config/config-networks';
+import { NetworkChainID } from '../../../config/config-chain-ids';
+import configNetworks from '../../../config/config-networks';
 import { getMockRopstenNetwork } from '../../../../test/mocks.test';
 
 chai.use(chaiAsPromised);

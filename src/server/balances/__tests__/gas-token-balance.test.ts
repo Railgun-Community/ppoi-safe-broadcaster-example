@@ -1,8 +1,8 @@
 /* globals describe, it, before, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { NetworkChainID } from '../../../config/config-chain-ids';
-import configNetworks from '../../../config/config-networks';
+import { NetworkChainID } from '../../config/config-chain-ids';
+import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { getGasTokenBalance } from '../gas-token-balance';
 import { getMockNetwork, getMockWalletAddress } from '../../../test/mocks.test';

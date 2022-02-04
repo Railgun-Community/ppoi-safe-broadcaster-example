@@ -3,7 +3,7 @@ import { logger } from '../../util/logger';
 import leveldown from 'leveldown';
 import { artifactsGetter } from './artifacts';
 import { quickSync } from '../api/quick-sync/quick-sync';
-import configDefaults from '../../config/config-defaults';
+import configDefaults from '../config/config-defaults';
 import { LeptonDebugger } from '@railgun-community/lepton/dist/models/types';
 
 let lepton: Lepton;

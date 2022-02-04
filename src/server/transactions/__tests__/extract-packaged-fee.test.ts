@@ -14,9 +14,9 @@ import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
-import { NetworkChainID } from '../../../config/config-chain-ids';
-import configDefaults from '../../../config/config-defaults';
-import configWallets from '../../../config/config-wallets';
+import { NetworkChainID } from '../../config/config-chain-ids';
+import configDefaults from '../../config/config-defaults';
+import configWallets from '../../config/config-wallets';
 import {
   getMockRopstenNetwork,
   getMockToken,

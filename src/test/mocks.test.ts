@@ -1,8 +1,8 @@
 import { BaseProvider } from '@ethersproject/providers';
 import { babyjubjub } from '@railgun-community/lepton/dist/utils';
 import { PopulatedTransaction } from 'ethers';
-import { NetworkChainID } from '../config/config-chain-ids';
-import configTokens from '../config/config-tokens';
+import { NetworkChainID } from '../server/config/config-chain-ids';
+import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import { RailProxyContract } from '../models/contract-constants';
 import { Network, QuickSyncURL } from '../models/network-models';

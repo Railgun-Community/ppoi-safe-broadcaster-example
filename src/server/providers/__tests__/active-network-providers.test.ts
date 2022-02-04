@@ -1,8 +1,8 @@
 /* globals describe, before, it, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { NetworkChainID } from '../../../config/config-chain-ids';
-import configNetworks from '../../../config/config-networks';
+import { NetworkChainID } from '../../config/config-chain-ids';
+import configNetworks from '../../config/config-networks';
 import {
   getProviderForNetwork,
   initNetworkProviders,

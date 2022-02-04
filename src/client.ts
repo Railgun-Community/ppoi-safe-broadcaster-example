@@ -2,7 +2,8 @@ import { Waku, WakuMessage, DefaultPubSubTopic } from 'js-waku';
 import debug from 'debug';
 import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
 import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
-import configDefaults from 'config/config-defaults';
+import configDefaults from 'server/config/config-defaults';
+import { initClient } from './client/init/client-init';
 
 const dbg = debug('delayer:client');
 
@@ -70,6 +71,8 @@ const connect = async (): Promise<Waku> => {
 };
 
 const main = async () => {
+  initClient();
+
   dbg('connecting to waku..');
   const waku = await connect();
   dbg('connected');

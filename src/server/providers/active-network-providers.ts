@@ -1,8 +1,8 @@
 import { BaseProvider } from '@ethersproject/providers';
-import configNetworks from '../../config/config-networks';
+import configNetworks from '../config/config-networks';
 import { createFallbackProviderFromJsonConfig } from './fallback-providers';
 import { allNetworkChainIDs } from '../chains/network-chain-ids';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../config/config-chain-ids';
 
 const activeNetworkProviders: NumMapType<BaseProvider> = {};
 

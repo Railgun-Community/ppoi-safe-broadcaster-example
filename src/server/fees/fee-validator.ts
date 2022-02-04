@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../config/config-chain-ids';
 import { logger } from '../../util/logger';
 import { calculateTokenFeeForTransaction } from './calculate-token-fee';
 import { lookUpCachedFee } from './transaction-fee-cache';

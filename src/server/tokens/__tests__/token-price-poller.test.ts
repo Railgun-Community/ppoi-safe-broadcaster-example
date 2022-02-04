@@ -1,17 +1,17 @@
 /* globals describe, it, before, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { NetworkChainID } from '../../../config/config-chain-ids';
+import { NetworkChainID } from '../../config/config-chain-ids';
 import {
   lookUpCachedTokenPrice,
   resetTokenPriceCache,
   TokenAddressesToPrice,
 } from '../token-price-cache';
 import { mockTokenConfig } from '../../../test/mocks.test';
-import configDefaults from '../../../config/config-defaults';
+import configDefaults from '../../config/config-defaults';
 import configTokenPriceGetter, {
   TokenPricesGetter,
-} from '../../../config/config-token-price-getter';
+} from '../../config/config-token-price-getter';
 import { initPricePoller, stopPolling } from '../token-price-poller';
 import { delay } from '../../../util/promise-utils';
 

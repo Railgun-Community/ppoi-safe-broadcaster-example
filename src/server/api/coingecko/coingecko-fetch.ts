@@ -1,5 +1,5 @@
 import axios from 'axios';
-import configDefaults from '../../../config/config-defaults';
+import configDefaults from '../../config/config-defaults';
 import { CoingeckoNetworkID } from '../../../models/api-constants';
 import { logger } from '../../../util/logger';
 

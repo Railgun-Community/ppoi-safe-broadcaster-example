@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
-import configDefaults from '../../config/config-defaults';
+import configDefaults from '../../server/config/config-defaults';
 import { DebugLevel } from '../../models/debug-models';
 import { logger } from '../logger';
 

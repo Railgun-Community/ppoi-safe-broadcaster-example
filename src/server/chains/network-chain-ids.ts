@@ -1,4 +1,4 @@
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../config/config-chain-ids';
 import { removeNaNs } from '../../util/utils';
 
 export const allNetworkChainIDs = (): NetworkChainID[] => {

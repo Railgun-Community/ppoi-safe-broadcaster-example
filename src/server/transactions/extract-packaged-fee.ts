@@ -2,8 +2,8 @@ import { ERC20Note } from '@railgun-community/lepton';
 import { babyjubjub } from '@railgun-community/lepton/dist/utils';
 import { hexlify } from '@railgun-community/lepton/dist/utils/bytes';
 import { BigNumber, Contract, PopulatedTransaction } from 'ethers';
-import { NetworkChainID } from '../../config/config-chain-ids';
-import configNetworks from '../../config/config-networks';
+import { NetworkChainID } from '../config/config-chain-ids';
+import configNetworks from '../config/config-networks';
 import { abiForRailContract } from '../abi/abi';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import {

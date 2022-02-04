@@ -1,7 +1,7 @@
 /* globals describe, it, before, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { NetworkChainID } from '../../../config/config-chain-ids';
+import { NetworkChainID } from '../../config/config-chain-ids';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import {
   getCachedGasTokenBalance,
@@ -10,7 +10,7 @@ import {
   updateAllActiveWalletsGasTokenBalances,
   updateCachedGasTokenBalance,
 } from '../balance-cache';
-import configDefaults from '../../../config/config-defaults';
+import configDefaults from '../../config/config-defaults';
 import {
   createGasBalanceStub,
   restoreGasBalanceStub,

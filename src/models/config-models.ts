@@ -1,4 +1,4 @@
-import { NetworkChainID } from '../config/config-chain-ids';
+import { NetworkChainID } from '../server/config/config-chain-ids';
 import { Network } from './network-models';
 import { TokenConfig } from './token-models';
 import { WalletConfig } from './wallet-models';

@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber, utils } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
-import configTokens from '../../../config/config-tokens';
+import configTokens from '../../config/config-tokens';
 import { Network } from '../../../models/network-models';
 import { getMockSerializedTransaction } from '../../../test/mocks.test';
 import { setupTestNetwork, testChainID } from '../../../test/setup.test';

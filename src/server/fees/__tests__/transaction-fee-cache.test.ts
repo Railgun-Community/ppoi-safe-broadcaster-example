@@ -1,7 +1,7 @@
 /* globals describe, it, before, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import configDefaults from '../../../config/config-defaults';
+import configDefaults from '../../config/config-defaults';
 import {
   cacheFeeForTransaction,
   lookUpCachedFee,

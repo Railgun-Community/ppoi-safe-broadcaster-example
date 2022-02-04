@@ -1,4 +1,4 @@
-import { FallbackProviderJsonConfig } from '../../models/provider-models';
+import { FallbackProviderJsonConfig } from '../../../models/provider-models';
 
 const config: FallbackProviderJsonConfig = {
   chainId: 1,

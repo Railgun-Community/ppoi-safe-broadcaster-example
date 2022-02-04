@@ -1,5 +1,5 @@
-import { WalletsConfig } from '../models/config-models';
-import { WalletConfig } from '../models/wallet-models';
+import { WalletsConfig } from '../../models/config-models';
+import { WalletConfig } from '../../models/wallet-models';
 
 const wallets: WalletConfig[] = [
   {

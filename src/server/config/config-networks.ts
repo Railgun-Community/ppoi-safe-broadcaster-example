@@ -1,4 +1,4 @@
-import { GasTokenWrappedAddress } from '../models/token-models';
+import { GasTokenWrappedAddress } from '../../models/token-models';
 
 // Fallback Provider configs
 import fallbackProvidersEthereum from './fallback-providers/1-ethereum';
@@ -6,11 +6,11 @@ import fallbackProvidersRopsten from './fallback-providers/3-ropsten';
 import fallbackProvidersBinanceSmartChain from './fallback-providers/56-binance-smart-chain';
 import fallbackProvidersPolygon from './fallback-providers/137-polygon';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
-import { CoingeckoNetworkID } from '../models/api-constants';
-import { RailProxyContract } from '../models/contract-constants';
+import { CoingeckoNetworkID } from '../../models/api-constants';
+import { RailProxyContract } from '../../models/contract-constants';
 import { NetworkChainID } from './config-chain-ids';
-import { NetworksConfig } from '../models/config-models';
-import { QuickSyncURL } from '../models/network-models';
+import { NetworksConfig } from '../../models/config-models';
+import { QuickSyncURL } from '../../models/network-models';
 
 const defaultFees = {
   slippageBuffer: 0.05,

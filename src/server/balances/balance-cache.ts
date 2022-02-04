@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
-import { NetworkChainID } from '../../config/config-chain-ids';
-import configDefaults from '../../config/config-defaults';
+import { NetworkChainID } from '../config/config-chain-ids';
+import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
 import { allNetworkChainIDs } from '../chains/network-chain-ids';
 import { getActiveWallets } from '../wallets/active-wallets';

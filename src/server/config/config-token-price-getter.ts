@@ -1,5 +1,5 @@
-import { coingeckoPriceLookupByAddresses } from '../server/api/coingecko/coingecko-price';
-import { TokenAddressesToPrice } from '../server/tokens/token-price-cache';
+import { coingeckoPriceLookupByAddresses } from '../api/coingecko/coingecko-price';
+import { TokenAddressesToPrice } from '../tokens/token-price-cache';
 import { NetworkChainID } from './config-chain-ids';
 import configNetworks from './config-networks';
 

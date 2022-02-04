@@ -1,5 +1,5 @@
 import { BigNumber, Contract } from 'ethers';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../config/config-chain-ids';
 import { Token } from '../../models/token-models';
 import { logger } from '../../util/logger';
 import { abiForChainToken } from '../abi/abi';

@@ -1,6 +1,6 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../config/config-chain-ids';
 import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';

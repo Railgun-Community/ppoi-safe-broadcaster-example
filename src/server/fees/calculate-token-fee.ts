@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
-import { NetworkChainID } from '../../config/config-chain-ids';
-import configDefaults from '../../config/config-defaults';
-import configNetworks from '../../config/config-networks';
+import { NetworkChainID } from '../config/config-chain-ids';
+import configDefaults from '../config/config-defaults';
+import configNetworks from '../config/config-networks';
 import { NetworkFeeSettings } from '../../models/network-models';
 import { GasTokenConfig, Token } from '../../models/token-models';
 import { getTransactionTokens } from '../tokens/network-tokens';

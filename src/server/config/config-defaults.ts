@@ -1,4 +1,4 @@
-import { DebugLevel } from '../models/debug-models';
+import { DebugLevel } from '../../models/debug-models';
 
 export default {
   // Refresh all token prices every 30 seconds.

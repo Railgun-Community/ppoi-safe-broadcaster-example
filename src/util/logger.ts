@@ -1,4 +1,4 @@
-import configDefaults from '../config/config-defaults';
+import configDefaults from '../server/config/config-defaults';
 import { DebugLevel } from '../models/debug-models';
 
 const hasDebugLevel = (debugLevels: DebugLevel[]): boolean => {

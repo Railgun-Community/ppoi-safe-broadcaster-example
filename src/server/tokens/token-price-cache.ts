@@ -1,6 +1,6 @@
-import { NetworkChainID } from '../../config/config-chain-ids';
-import configNetworks from '../../config/config-networks';
-import configTokens from '../../config/config-tokens';
+import { NetworkChainID } from '../config/config-chain-ids';
+import configNetworks from '../config/config-networks';
+import configTokens from '../config/config-tokens';
 import { GasTokenConfig, Token, TokenConfig } from '../../models/token-models';
 import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';

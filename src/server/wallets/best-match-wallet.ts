@@ -1,5 +1,5 @@
 import { BigNumber, Wallet as EthersWallet } from 'ethers';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../config/config-chain-ids';
 import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet, getActiveWallets } from './active-wallets';

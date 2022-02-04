@@ -1,8 +1,8 @@
-import configDefaults from '../../config/config-defaults';
-import configNetworks from '../../config/config-networks';
+import configDefaults from '../config/config-defaults';
+import configNetworks from '../config/config-networks';
 import configTokenPriceGetter, {
   TokenPricesGetter,
-} from '../../config/config-token-price-getter';
+} from '../config/config-token-price-getter';
 import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
 import { allNetworkChainIDs } from '../chains/network-chain-ids';

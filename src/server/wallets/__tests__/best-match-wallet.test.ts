@@ -8,10 +8,10 @@ import {
   initWallets,
 } from '../active-wallets';
 import { getBestMatchWalletForNetwork } from '../best-match-wallet';
-import configWallets from '../../../config/config-wallets';
+import configWallets from '../../config/config-wallets';
 import { WalletConfig } from '../../../models/wallet-models';
 import { BigNumber, Wallet as EthersWallet } from 'ethers';
-import { NetworkChainID } from '../../../config/config-chain-ids';
+import { NetworkChainID } from '../../config/config-chain-ids';
 import {
   resetAvailableWallets,
   setWalletAvailable,

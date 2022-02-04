@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import configDefaults from '../../config/config-defaults';
+import configDefaults from '../config/config-defaults';
 import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';
 

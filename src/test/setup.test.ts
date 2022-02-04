@@ -1,8 +1,8 @@
 /* globals describe, it, before, beforeEach, afterEach */
-import { NetworkChainID } from '../config/config-chain-ids';
-import configDefaults from '../config/config-defaults';
-import configNetworks from '../config/config-networks';
-import configWallets from '../config/config-wallets';
+import { NetworkChainID } from '../server/config/config-chain-ids';
+import configDefaults from '../server/config/config-defaults';
+import configNetworks from '../server/config/config-networks';
+import configWallets from '../server/config/config-wallets';
 import { DebugLevel } from '../models/debug-models';
 import { Network } from '../models/network-models';
 import { initWallets } from '../server/wallets/active-wallets';

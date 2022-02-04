@@ -6,11 +6,11 @@ import { CoingeckoNetworkID } from '../../../../models/api-constants';
 import { CoingeckoApiEndpoint, getCoingeckoData } from '../coingecko-fetch';
 import { coingeckoPriceLookupByAddresses } from '../coingecko-price';
 import * as coingeckoFetchModule from '../coingecko-fetch';
-import { tokenPriceGetter } from '../../../../config/config-token-price-getter';
+import { tokenPriceGetter } from '../../../config/config-token-price-getter';
 import axios from 'axios';
-import { NetworkChainID } from '../../../../config/config-chain-ids';
+import { NetworkChainID } from '../../../config/config-chain-ids';
 import { TokenAddressesToPrice } from '../../../tokens/token-price-cache';
-import configNetworks from '../../../../config/config-networks';
+import configNetworks from '../../../config/config-networks';
 import {
   getMockNetwork,
   getMockRopstenNetwork,

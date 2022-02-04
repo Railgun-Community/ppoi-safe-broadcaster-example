@@ -1,4 +1,4 @@
-import { NetworkTokensConfig } from '../models/config-models';
+import { NetworkTokensConfig } from '../../models/config-models';
 import { NetworkChainID } from './config-chain-ids';
 
 enum TokenAddressEth {

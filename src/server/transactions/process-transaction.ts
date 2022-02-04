@@ -1,5 +1,5 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../config/config-chain-ids';
 import { createTransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { validateFee } from '../fees/fee-validator';
 import { executeTransaction } from './execute-transaction';
