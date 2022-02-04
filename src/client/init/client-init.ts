@@ -5,7 +5,7 @@ import { logger } from '../../util/logger';
 
 export const initClient = async () => {
   initLepton('client.db');
-  initClientWallets();
+  await initClientWallets();
   initNetworkProviders();
   logger.log('Client ready.');
 };
