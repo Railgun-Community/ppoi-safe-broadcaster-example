@@ -7,6 +7,11 @@ import configNetworks from '../config/config-networks';
 import { abiForRailContract } from '../abi/abi';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getRailgunWalletKeypair } from '../wallets/active-wallets';
+import { bytes } from '@railgun-community/lepton/dist/utils';
+
+const parseFormattedTokenAddress = (formattedTokenAddress: string) => {
+  return '0x' + bytes.trim(formattedTokenAddress, 20);
+};
 
 type PackagedFee = {
   tokenAddress: string;
@@ -59,7 +64,7 @@ export const extractPackagedFeeFromTransaction = (
 
   // Return first payment.
   return {
-    tokenAddress: tokens[0].toLowerCase(),
+    tokenAddress: parseFormattedTokenAddress(tokens[0].toLowerCase()),
     packagedFeeAmount: tokenPaymentAmounts[tokens[0]],
   };
 };

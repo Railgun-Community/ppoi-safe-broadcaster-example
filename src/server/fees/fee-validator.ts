@@ -10,6 +10,8 @@ export const validateFee = async (
   tokenAddress: string,
   packagedFee: BigNumber,
 ) => {
+  logger.log(`validateFee: ${tokenAddress} (chain ${chainID})`);
+
   // Check packaged fee against cached fee.
   // Cache expires with TTL setting: transactionFeeCacheTTLInMS.
   const cachedFee = lookUpCachedFee(serializedTransaction, tokenAddress);
@@ -20,9 +22,11 @@ export const validateFee = async (
     return;
   }
 
+  let calculatedFee;
+
   try {
     // Re-calculate the fee if cache is expired.
-    const calculatedFee = await calculateTokenFeeForTransaction(
+    calculatedFee = await calculateTokenFeeForTransaction(
       chainID,
       serializedTransaction,
       tokenAddress,
@@ -35,7 +39,9 @@ export const validateFee = async (
     throw new Error(`Unable to refresh Relayer token fee: ${err.message}`);
   }
 
-  throw new Error(
-    'Relayer token fee has expired. Please refresh and try again.',
-  );
+  logger.log(`cachedFee: ${cachedFee?.maximumGasFeeString}`);
+  logger.log(`calculatedFee: ${calculatedFee.toString()}`);
+  logger.log(`tokenFee: ${packagedFee.toString()}`);
+
+  throw new Error('Token fee too low. Please refresh and try again.');
 };

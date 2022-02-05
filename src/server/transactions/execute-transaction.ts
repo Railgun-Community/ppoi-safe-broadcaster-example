@@ -24,6 +24,8 @@ export const executeTransaction = async (
     chainID,
     gasDetails.gasLimit,
   );
+  const txCount = await wallet.getTransactionCount();
+  populatedTransaction.nonce = txCount;
   const txWithGas = setGasDetails(populatedTransaction, gasDetails);
   const signedTransaction = await wallet.signTransaction(txWithGas);
   const provider = getProviderForNetwork(chainID);
