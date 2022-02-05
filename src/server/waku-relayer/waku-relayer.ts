@@ -11,7 +11,7 @@ import {
 } from 'server/networking/waku-api-client';
 import { WakuMessage } from 'js-waku';
 import { greetMethod } from './methods/greet-method';
-import { transactMethod } from './methods/populate-transaction-method';
+import { transactMethod } from './methods/transact-method';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';

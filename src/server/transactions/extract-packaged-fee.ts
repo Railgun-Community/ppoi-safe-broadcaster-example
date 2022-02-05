@@ -6,10 +6,7 @@ import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
 import { abiForRailContract } from '../abi/abi';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import {
-  getActiveReceiverWallet,
-  getActiveReceiverWalletPublicKey,
-} from '../wallets/active-wallets';
+import { getRailgunWalletKeypair } from '../wallets/active-wallets';
 
 type PackagedFee = {
   tokenAddress: string;
@@ -37,8 +34,9 @@ export const extractPackagedFeeFromTransaction = (
     throw new Error('Contract method invalid');
   }
 
-  const walletPrivateKey = getActiveReceiverWallet().privateKey;
-  const walletPublicKey = getActiveReceiverWalletPublicKey();
+  const keypair = getRailgunWalletKeypair(chainID);
+  const walletPrivateKey = keypair.privateKey;
+  const walletPublicKey = keypair.pubkey;
 
   const tokenPaymentAmounts: MapType<BigNumber> = {};
 

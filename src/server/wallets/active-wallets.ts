@@ -58,9 +58,21 @@ export const getActiveReceiverWallet = (): ActiveWallet => {
   return receiverWallets[0];
 };
 
-export const getActiveReceiverWalletPublicKey = (): string => {
-  const privateKey = getActiveReceiverWallet().privateKey;
-  return babyjubjub.privateKeyToPubKey(privateKey);
+export const getRailgunWalletKeypair = (
+  chainID: NetworkChainID,
+): {
+  privateKey: string;
+  pubkey: string;
+  address: string;
+} => {
+  const index = 0;
+  const change = false;
+  return getShieldedReceiverWallet().getKeypair(
+    configDefaults.leptonDbEncryptionKey,
+    index,
+    change,
+    chainID,
+  );
 };
 
 export const getShieldedReceiverWallet = (): RailgunWallet => {
