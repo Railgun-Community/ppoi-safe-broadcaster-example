@@ -1,9 +1,9 @@
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
-import configTokens from '../config/config-tokens';
-import { GasTokenConfig, Token, TokenConfig } from '../../models/token-models';
+import { GasTokenConfig, Token } from '../../models/token-models';
 import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';
+import { tokenForAddress } from './network-tokens';
 
 export type TokenPrice = {
   price: number;
@@ -35,7 +35,7 @@ const logTokenLookupError = (
   chainID: NetworkChainID,
   tokenAddress: string,
 ) => {
-  const tokenSymbol = configTokens[chainID][tokenAddress].symbol;
+  const tokenSymbol = tokenForAddress(chainID, tokenAddress).symbol;
   const tokenDetails = `${tokenSymbol} on ${configNetworks[chainID].name} (${tokenAddress})`;
   logger.warn(`${errorMsg}: ${tokenDetails}`);
 };

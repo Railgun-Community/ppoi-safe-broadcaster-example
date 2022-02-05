@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 
 export enum GasTokenWrappedAddress {
-  None = '',
+  None = 'NO_GAS_TOKEN_ADDRESS',
   EthereumWETH = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
   RopstenWETH = '0xc778417e063141139fce010982780140aa0cd5ab', // (Ropsten) WETH
   BinanceWBNB = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c', // WBNB

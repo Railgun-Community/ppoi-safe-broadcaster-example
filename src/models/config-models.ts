@@ -7,7 +7,7 @@ type ChainIDMapType<T> = {
   [index in NetworkChainID]: T;
 };
 
-type AddressToTokenMap = MapType<TokenConfig>;
+export type AddressToTokenMap = MapType<TokenConfig>;
 export type NetworkTokensConfig = ChainIDMapType<AddressToTokenMap>;
 
 export type WalletsConfig = {

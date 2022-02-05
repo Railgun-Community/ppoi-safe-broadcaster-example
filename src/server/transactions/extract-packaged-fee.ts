@@ -61,7 +61,7 @@ export const extractPackagedFeeFromTransaction = (
 
   // Return first payment.
   return {
-    tokenAddress: tokens[0],
+    tokenAddress: tokens[0].toLowerCase(),
     packagedFeeAmount: tokenPaymentAmounts[tokens[0]],
   };
 };
