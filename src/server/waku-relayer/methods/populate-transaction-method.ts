@@ -3,7 +3,7 @@ import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
 import { processTransaction } from '../../transactions/process-transaction';
 
-export const processTransactionMethod = async (
+export const transactMethod = async (
   params: any,
   id: number,
   _logger: debug.Debugger,

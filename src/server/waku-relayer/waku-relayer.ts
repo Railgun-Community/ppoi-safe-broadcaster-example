@@ -11,7 +11,7 @@ import {
 } from 'server/networking/waku-api-client';
 import { WakuMessage } from 'js-waku';
 import { greetMethod } from './methods/greet-method';
-import { processTransactionMethod } from './methods/populate-transaction-method';
+import { transactMethod } from './methods/populate-transaction-method';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
@@ -44,7 +44,7 @@ export class WakuRelayer {
 
   methods: MapType<JsonRPCMessageHandler> = {
     greet: greetMethod,
-    processTransaction: processTransactionMethod,
+    transact: transactMethod,
   };
 
   constructor(client: WakuApiClient, options: WakuRelayerOptions) {
