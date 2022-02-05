@@ -1,4 +1,5 @@
 import { coingeckoPriceLookupByAddresses } from '../api/coingecko/coingecko-price';
+import { allTokenAddressesForNetwork } from '../tokens/network-tokens';
 import { TokenAddressesToPrice } from '../tokens/token-price-cache';
 import { NetworkChainID } from './config-chain-ids';
 import configNetworks from './config-networks';
@@ -8,14 +9,35 @@ export type TokenPricesGetter = (
   tokenAddresses: string[],
 ) => Promise<TokenAddressesToPrice>;
 
+const testNetworkDefaultPrices = (
+  chainID: NetworkChainID,
+): TokenAddressesToPrice => {
+  // Assigns simple values for test nets without
+  // price lookups available (eg. Ropsten, HardHat).
+  const network = configNetworks[chainID];
+  const tokenAddresses = allTokenAddressesForNetwork(chainID);
+  const tokenAddressesToPrice: TokenAddressesToPrice = {};
+  tokenAddresses.forEach((tokenAddress) => {
+    // Assign all tokens as $1 USD.
+    tokenAddressesToPrice[tokenAddress] = { price: 1.0, updatedAt: Date.now() };
+  });
+  tokenAddressesToPrice[network.gasToken.wrappedAddress] = {
+    price: 2000.0,
+    updatedAt: Date.now(),
+  };
+  return tokenAddressesToPrice;
+};
+
 export const tokenPriceGetter = async (
   chainID: NetworkChainID,
   tokenAddresses: string[],
-) => {
-  const { coingeckoId } = configNetworks[chainID];
+): Promise<TokenAddressesToPrice> => {
+  const network = configNetworks[chainID];
+  const { coingeckoId } = network;
   if (!coingeckoId) {
-    // TODO: Assign simple values for test nets without
-    // price lookups available (Ropsten, HardHat).
+    if (network.isTestNetwork) {
+      return testNetworkDefaultPrices(chainID);
+    }
     return {};
   }
   const tokenAddressesToPrice = await coingeckoPriceLookupByAddresses(

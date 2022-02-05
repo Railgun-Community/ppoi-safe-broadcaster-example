@@ -18,6 +18,7 @@ export type Network = {
   priceTTLInMS: number;
   fees: NetworkFeeSettings;
   quickSyncURL?: QuickSyncURL;
+  isTestNetwork?: boolean;
 };
 
 export enum QuickSyncURL {

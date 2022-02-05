@@ -43,6 +43,7 @@ export default {
     fallbackProviderConfig: fallbackProvidersRopsten,
     priceTTLInMS: 5 * 60 * 1000,
     quickSyncURL: QuickSyncURL.Ropsten,
+    isTestNetwork: true,
   },
   [NetworkChainID.BinanceSmartChain]: {
     name: 'Binance Smart Chain',
@@ -81,5 +82,6 @@ export default {
     railContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
     fallbackProviderConfig: fallbackProvidersHardhat,
     priceTTLInMS: 5 * 60 * 1000,
+    isTestNetwork: true,
   },
 } as NetworksConfig;

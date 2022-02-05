@@ -48,18 +48,15 @@ export class WakuRelayer {
   };
 
   constructor(client: WakuApiClient, options: WakuRelayerOptions) {
+    const chainIDs = configuredNetworkChainIDs();
     this.client = client;
     this.logger = debug('relayer:waku:relayer');
     this.topic = options.topic;
     this.allContentTopics = [
       contentTopics.default(),
       contentTopics.greet(),
-      ...configuredNetworkChainIDs().map((chainID) =>
-        contentTopics.fees(chainID),
-      ),
-      ...configuredNetworkChainIDs().map((chainID) =>
-        contentTopics.transact(chainID),
-      ),
+      ...chainIDs.map((chainID) => contentTopics.fees(chainID)),
+      ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
     this.logger(this.allContentTopics);
   }
