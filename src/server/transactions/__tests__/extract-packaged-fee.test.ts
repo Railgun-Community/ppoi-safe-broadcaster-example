@@ -131,8 +131,7 @@ describe('extract-packaged-fee', () => {
       ROPSTEN_CHAIN_ID,
       populatedTransaction,
     );
-    const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));
-    expect(packagedFee.tokenAddress).to.equal(tokenAddressHexlify);
+    expect(packagedFee.tokenAddress).to.equal(MOCK_TOKEN_ADDRESS.toLowerCase());
     expect(packagedFee.packagedFeeAmount.toString()).to.equal('1000');
   }).timeout(60000);
 
