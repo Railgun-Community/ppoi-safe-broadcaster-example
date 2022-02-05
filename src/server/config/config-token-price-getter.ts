@@ -18,14 +18,13 @@ const testNetworkDefaultPrices = (
   const tokenAddresses = allTokenAddressesForNetwork(chainID);
   const tokenAddressesToPrice: TokenAddressesToPrice = {};
   tokenAddresses.forEach((tokenAddress) => {
-    // Assign all tokens as $1 USD.
     tokenAddressesToPrice[tokenAddress.toLowerCase()] = {
-      price: 1.0,
+      price: 2000.0, // Fake token price.
       updatedAt: Date.now(),
     };
   });
   tokenAddressesToPrice[network.gasToken.wrappedAddress.toLowerCase()] = {
-    price: 2000.0,
+    price: 2000.0, // Fake gas price.
     updatedAt: Date.now(),
   };
   return tokenAddressesToPrice;
