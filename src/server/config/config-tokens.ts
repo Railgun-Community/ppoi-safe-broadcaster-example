@@ -36,6 +36,10 @@ export default {
       symbol: 'WETH',
       decimals: 18,
     },
+    '0xAa753fb4e77ea8Adb16200865839ffB1d86BAE5E': {
+      symbol: 'TESTERC20',
+      decimals: 18,
+    },
   },
   [NetworkChainID.BinanceSmartChain]: {
     [TokenAddressBSC.WBNB]: {
@@ -51,7 +55,7 @@ export default {
   },
   [NetworkChainID.HardHat]: {
     '0x5FbDB2315678afecb367f032d93F642f64180aa3': {
-      symbol: 'TEST',
+      symbol: 'TESTERC20',
       decimals: 18,
     },
   },
