@@ -1,7 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
 import { WakuMessage } from 'js-waku';
-import EventEmitter from 'events';
 import axiosRetry from 'axios-retry';
 import debug from 'debug';
 
@@ -18,34 +17,19 @@ export type WakuApiClientOptions = {
 };
 
 export class WakuApiClient {
-  logger;
-
+  logger: debug.Debugger;
   http: AxiosInstance;
-
-  httpConfig;
-
-  events: EventEmitter;
 
   constructor(options: WakuApiClientOptions) {
     this.logger = debug('waku:jsonrpc-api');
-    this.events = new EventEmitter();
-    this.httpConfig = {
+    const httpConfig = {
       timeout: 10000,
       baseURL: options.url,
       headers: { 'Content-Type': 'application/json' },
     };
-    this.http = axios.create(this.httpConfig);
+    this.http = axios.create(httpConfig);
     axiosRetry(this.http, { retries: 4 });
-    this.logger('relaying via ', options.url);
-  }
-
-  /**
-   * Create WakuApiClient
-   */
-  static async init(options: WakuApiClientOptions): Promise<WakuApiClient> {
-    const client = new WakuApiClient(options);
-
-    return client;
+    this.logger('Relaying via ', options.url);
   }
 
   async request(method: string, params: any) {

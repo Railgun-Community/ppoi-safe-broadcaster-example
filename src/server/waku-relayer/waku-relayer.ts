@@ -35,11 +35,8 @@ export type WakuRelayerOptions = {
 
 export class WakuRelayer {
   client: WakuApiClient;
-
   logger: debug.Debugger;
-
   topic: string;
-
   allContentTopics: string[];
 
   methods: MapType<JsonRPCMessageHandler> = {
@@ -62,7 +59,7 @@ export class WakuRelayer {
   }
 
   static async init(options: WakuRelayerOptions): Promise<WakuRelayer> {
-    const client = await WakuApiClient.init(options);
+    const client = new WakuApiClient(options);
     await client.subscribe([options.topic]);
     const relayer = new WakuRelayer(client, options);
     relayer.poll(options.pollFrequency);
