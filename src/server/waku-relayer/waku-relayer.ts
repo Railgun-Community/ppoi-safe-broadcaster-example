@@ -136,7 +136,6 @@ export class WakuRelayer {
 
   async poll(frequency: number = 5000) {
     setInterval(async () => {
-      this.logger(this.allContentTopics);
       const messages = await this.client
         .getMessages(this.topic, this.allContentTopics)
         .catch((e) => {
