@@ -2,11 +2,7 @@ import { DebugLevel } from '../../models/debug-models';
 import { NetworkChainID } from './config-chain-ids';
 
 export default {
-  // Refresh all token prices every 30 seconds.
-  // Note that free Coingecko API tier only allows 50 requests per minute.
-  // We send one request per network for every refresh (disregarding test nets).
-  tokenPriceRefreshDelayInMS: 30 * 1000,
-
+  // Blockchain networks to activate.
   useNetworks: [
     NetworkChainID.Ethereum,
     NetworkChainID.Ropsten,
@@ -14,6 +10,11 @@ export default {
     NetworkChainID.PolygonPOS,
     NetworkChainID.HardHat,
   ],
+
+  // Refresh all token prices every 30 seconds.
+  // Note that free Coingecko API tier only allows 50 requests per minute.
+  // We send one request per network for every refresh (disregarding test nets).
+  tokenPriceRefreshDelayInMS: 30 * 1000,
 
   // Retry Coingecko lookup one time.
   numRetriesCoingeckoPriceLookup: 1,
@@ -44,7 +45,7 @@ export default {
   // Broadcast fees every 15 seconds.
   broadcastFeesDelayInMS: 15 * 1000,
 
-  // waku options
+  // Waku options.
   directPeers: [
     '/dns4/relayer.of.holdings/tcp/8000/wss/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg',
   ],
