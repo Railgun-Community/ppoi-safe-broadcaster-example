@@ -12,6 +12,7 @@ export type NetworkFeeSettings = {
 export type Network = {
   name: string;
   railContract: string;
+  deploymentBlock?: number;
   fallbackProviderConfig: FallbackProviderJsonConfig;
   gasToken: GasTokenConfig;
   coingeckoId?: CoingeckoNetworkID;

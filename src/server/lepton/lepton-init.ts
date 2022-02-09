@@ -43,7 +43,7 @@ export const initLeptonNetwork = (chainID: NetworkChainID) => {
 
   const network = configNetworks[chainID];
   const provider = getProviderForNetwork(chainID);
-  const deploymentBlock = 0; // TODO: Add deployment blocks for each network.
+  const deploymentBlock = network.deploymentBlock ?? 0;
 
   // Note: This call is async, but we call it synchronously
   // so it runs the slow scan in the background.
