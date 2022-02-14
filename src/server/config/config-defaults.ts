@@ -4,11 +4,11 @@ import { NetworkChainID } from './config-chain-ids';
 export default {
   // Blockchain networks to activate.
   useNetworks: [
-    NetworkChainID.Ethereum,
     NetworkChainID.Ropsten,
-    NetworkChainID.BinanceSmartChain,
-    NetworkChainID.PolygonPOS,
     NetworkChainID.HardHat,
+    // NetworkChainID.Ethereum,
+    // NetworkChainID.BinanceSmartChain,
+    // NetworkChainID.PolygonPOS,
   ],
 
   // Refresh all token prices every 30 seconds.
