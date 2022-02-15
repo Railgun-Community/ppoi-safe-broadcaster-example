@@ -1,11 +1,12 @@
-import { QuickSync, QuickSyncCommitmentEvent } from '@railgun-community/lepton';
+import { QuickSync } from '@railgun-community/lepton';
+import { CommitmentEvent } from '@railgun-community/lepton/dist/contract/erc20';
 import { Nullifier } from '@railgun-community/lepton/dist/merkletree';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import { getRailgunEventLog } from './railgun-event-log';
 
 export type QuickSyncEventLog = {
-  commitmentEvents: QuickSyncCommitmentEvent[];
+  commitmentEvents: CommitmentEvent[];
   nullifierEvents: Nullifier[];
 };
 
