@@ -19,8 +19,8 @@ describe('quick-sync', () => {
   it('Should run live Railgun Event Log fetch for Ropsten', async () => {
     const eventLog = await quickSync(NetworkChainID.Ropsten, 0);
     expect(eventLog).to.be.an('object');
-    expect(eventLog.commitments.length).to.be.at.least(40);
-    expect(eventLog.nullifiers.length).to.be.at.least(10);
+    expect(eventLog.commitmentEvents.length).to.be.at.least(40);
+    expect(eventLog.nullifierEvents.length).to.be.at.least(10);
   }).timeout(10000);
 
   it('Should retry Railgun Event Log API fetch on error', async () => {

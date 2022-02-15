@@ -1,21 +1,12 @@
-import { QuickSync } from '@railgun-community/lepton';
-import {
-  Commitment,
-  Nullifier,
-} from '@railgun-community/lepton/dist/merkletree';
+import { QuickSync, QuickSyncCommitmentEvent } from '@railgun-community/lepton';
+import { Nullifier } from '@railgun-community/lepton/dist/merkletree';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import { getRailgunEventLog } from './railgun-event-log';
 
-type QuickSyncCommitmentEvent = {
-  tree: number;
-  startingIndex: number;
-  leaves: Commitment[];
-};
-
 export type QuickSyncEventLog = {
-  commitments: QuickSyncCommitmentEvent[];
-  nullifiers: Nullifier[];
+  commitmentEvents: QuickSyncCommitmentEvent[];
+  nullifierEvents: Nullifier[];
 };
 
 export const quickSync: QuickSync = async (
@@ -26,8 +17,8 @@ export const quickSync: QuickSync = async (
   if (!quickSyncURL) {
     // Return empty logs, Lepton will default to full scan.
     return {
-      commitments: [],
-      nullifiers: [],
+      commitmentEvents: [],
+      nullifierEvents: [],
     };
   }
   return getRailgunEventLog(quickSyncURL);
