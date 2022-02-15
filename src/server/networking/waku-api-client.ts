@@ -18,6 +18,7 @@ export type WakuApiClientOptions = {
 
 export class WakuApiClient {
   logger: debug.Debugger;
+
   http: AxiosInstance;
 
   constructor(options: WakuApiClientOptions) {
@@ -52,6 +53,7 @@ export class WakuApiClient {
     if (error) {
       this.logger(error.message);
     }
+    return [];
   }
 
   async subscribe(topics: string[]) {
@@ -69,10 +71,11 @@ export class WakuApiClient {
    * @todo be less convenient and don't depend on js-waku
    */
   async publish(message: WakuMessage, topic: string) {
-    if (!message.timestamp || !message.payload) {
-      return;
+    if (!message.payload) {
+      this.logger('Tried to pubish empty message');
+      return false;
     }
-    const timestamp = message.timestamp.getTime() / 1000;
+    const timestamp = (message.timestamp as Date).getTime() / 1000;
     const payload = Buffer.from(message.payload).toString('hex');
     const { contentTopic } = message;
     this.logger('publishing to contentTopic', contentTopic);

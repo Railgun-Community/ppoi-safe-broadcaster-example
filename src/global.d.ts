@@ -9,7 +9,6 @@ namespace NodeJS {
     LEPTON_DB: string; // location of leveldown db 'server.db'
     DEBUG: string; // filter for trace output, eg "relayer:*,waku:waku"
 
-
     // the following should be set via docker secrets but fallback to env is allowed
     DB_ENCRYPTION_KEY: string; // encrypts the
     MNEMONIC: string; // 12-workd wallet mnemonic phrase

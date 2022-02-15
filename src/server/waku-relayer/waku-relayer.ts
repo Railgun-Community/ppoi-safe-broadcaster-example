@@ -1,6 +1,5 @@
 import {
   formatJsonRpcRequest,
-  formatJsonRpcResult,
 } from '@walletconnect/jsonrpc-utils';
 import { JsonRpcPayload, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import debug from 'debug';
@@ -35,8 +34,11 @@ export type WakuRelayerOptions = {
 
 export class WakuRelayer {
   client: WakuApiClient;
+
   logger: debug.Debugger;
+
   topic: string;
+
   allContentTopics: string[];
 
   methods: MapType<JsonRPCMessageHandler> = {

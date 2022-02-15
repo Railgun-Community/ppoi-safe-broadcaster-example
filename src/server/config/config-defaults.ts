@@ -34,11 +34,11 @@ export default {
   transactionFeeCacheTTLInMS: 2 * 60 * 1000,
 
   // Precision for transaction fee ratio calculations.
-  transactionFeePrecision: Math.pow(10, 8),
+  transactionFeePrecision: 10 ** 8,
 
   // Used when calculating the ratio of token price to gas token price.
   // We guard against price ratios under this amount, which are too imprecise.
-  transactionFeeRatioMinimum: Math.pow(10, 3),
+  transactionFeeRatioMinimum: 10 ** 3,
 
   // directory in which leveldown db will be stored
   leptonDb: process.env.LEPTON_DB ?? 'server.db',
