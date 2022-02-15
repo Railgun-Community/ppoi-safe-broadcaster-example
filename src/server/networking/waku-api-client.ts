@@ -39,14 +39,19 @@ export class WakuApiClient {
       return response.data;
     } catch (e: any) {
       this.logger('Error posting to relay-api', req, e.message);
-      throw e;
+      throw Error(e.message);
     }
   }
 
   async getDebug() {
     const data = await this.request('get_waku_v2_debug_v1_info', []);
-    const { result } = data;
-    return result.listenAddresses;
+    const { result, error } = data;
+    if (result) {
+      return result.listenAddresses;
+    }
+    if (error) {
+      this.logger(error.message);
+    }
   }
 
   async subscribe(topics: string[]) {

@@ -1,9 +1,11 @@
 import { WalletsConfig } from '../../models/config-models';
 import { WalletConfig } from '../../models/wallet-models';
 
+import configDefaults from './config-defaults';
+
 const wallets: WalletConfig[] = [
   {
-    mnemonic: 'test test test test test test test test test test test junk',
+    mnemonic: configDefaults.mnemonic,
     priority: 1,
     isShieldedReceiver: true,
   },

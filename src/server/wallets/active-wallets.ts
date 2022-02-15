@@ -8,6 +8,7 @@ import configWallets from '../config/config-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
 import { resetArray } from '../../util/utils';
 import { getLepton } from '../lepton/lepton-init';
+import { isValidMnemonic } from 'ethers/lib/utils';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -19,6 +20,9 @@ export const initWallets = async () => {
   resetWallets();
   configWallets.wallets.forEach(
     async ({ mnemonic, priority, isShieldedReceiver }) => {
+      if (!isValidMnemonic(mnemonic)) {
+        throw Error("Invalid or missing MNEMONIC (use docker secret or insecure env for testing");
+      }
       const wallet = EthersWallet.fromMnemonic(mnemonic);
       activeWallets.push({
         address: wallet.address,
@@ -39,6 +43,10 @@ export const resetWallets = () => {
 
 const initShieldedReceiverWallet = async (mnemonic: string) => {
   const lepton = getLepton();
+  const encryptionKey = configDefaults.leptonDbEncryptionKey;
+  if (!encryptionKey) {
+    throw Error("DB_ENCRYPTION_KEY not set (use docker secret, or env for insecure testing)");
+  }
   const walletID = await lepton.createWalletFromMnemonic(
     configDefaults.leptonDbEncryptionKey,
     mnemonic,

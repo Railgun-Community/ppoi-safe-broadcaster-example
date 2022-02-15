@@ -51,6 +51,7 @@
     "axios": "^0.24",
     "axios-retry": "^3.2.4",
     "debug": "^4.3.3",
+    "docker-secret": "^1.2.4",
     "dotenv": "^14.3.2",
     "ethers": "^5.5.3",
     "js-waku": "^0.16.0",

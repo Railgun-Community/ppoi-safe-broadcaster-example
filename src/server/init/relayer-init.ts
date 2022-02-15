@@ -3,9 +3,10 @@ import { initWallets } from '../wallets/active-wallets';
 import { initNetworkProviders } from '../providers/active-network-providers';
 import { initPricePoller } from '../tokens/token-price-poller';
 import { logger } from '../../util/logger';
+import configDefaults from 'server/config/config-defaults';
 
 export const initRelayer = async () => {
-  initLepton('server.db');
+  initLepton(configDefaults.leptonDb);
   await initWallets();
   initNetworkProviders();
   initPricePoller();

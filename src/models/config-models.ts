@@ -15,3 +15,8 @@ export type WalletsConfig = {
 };
 
 export type NetworksConfig = ChainIDMapType<Network>;
+
+export type Secrets = {
+  dbEncryptionKey: string;
+  mnemonic: string;
+};
