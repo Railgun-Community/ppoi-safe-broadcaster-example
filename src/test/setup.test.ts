@@ -1,4 +1,5 @@
-/* globals describe, it, before, beforeEach, afterEach */
+/* globals describe, it, before, beforeEach, afterEach, after */
+import fs from 'fs';
 import { NetworkChainID } from '../server/config/config-chain-ids';
 import configDefaults from '../server/config/config-defaults';
 import configNetworks from '../server/config/config-networks';
@@ -8,8 +9,13 @@ import { Network } from '../models/network-models';
 import { initWallets } from '../server/wallets/active-wallets';
 import { getMockNetwork } from './mocks.test';
 
+const TEST_DB = 'test.db';
+
 const setupTests = () => {
+  configDefaults.mnemonic = 'test test test test test test test test test test test junk';
   configDefaults.debugLevel = DebugLevel.None;
+  configDefaults.leptonDb = TEST_DB;
+  configDefaults.leptonDbEncryptionKey = '12345';
 };
 
 before(() => {
@@ -27,12 +33,18 @@ export const setupSingleTestWallet = async () => {
   await initWallets();
 };
 
+export const testChainID = (): NetworkChainID => {
+  return 1;
+};
+
 export const setupTestNetwork = (): Network => {
   const testNetwork = getMockNetwork();
   configNetworks[testChainID()] = testNetwork;
   return testNetwork;
 };
 
-export const testChainID = (): NetworkChainID => {
-  return 1;
-};
+after(() => {
+  const { log } = console;
+  fs.rm(TEST_DB, { recursive: true }, (err) => { log('error removing test db'); });
+  log('removed test db');
+});
