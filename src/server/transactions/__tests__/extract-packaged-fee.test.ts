@@ -126,6 +126,7 @@ describe('extract-packaged-fee', () => {
       createRopstenTransaction(walletPublicKey, fee, MOCK_TOKEN_ADDRESS),
     ]);
     const populatedTransaction = await contract.transact(transactions);
+    console.log(populatedTransaction.data);
     const packagedFee = extractPackagedFeeFromTransaction(
       ROPSTEN_CHAIN_ID,
       populatedTransaction,

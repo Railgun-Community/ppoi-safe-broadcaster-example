@@ -31,9 +31,6 @@ export const extractPackagedFeeFromTransaction = (
   const abi = abiForProxyContract();
   const contract = new Contract(network.proxyContract, abi, provider);
 
-  console.log(populatedTransaction.data);
-  console.log(populatedTransaction.value);
-
   const parsedTransaction = contract.interface.parseTransaction({
     data: populatedTransaction.data ?? '',
     value: populatedTransaction.value,
@@ -79,10 +76,11 @@ const extractFeesFromRailgunTransactions = (
   walletPublicKey: string,
 ) => {
   // TODO: Confirm these types. (Build into Lepton).
-  const commitmentsOut = railgunTx['_commitmentsOut'] as {
+  const commitmentsOut = railgunTx['commitmentsOut'] as {
     hash: BigNumber;
     ciphertext: BigNumber[];
     senderPubKey: BigNumber[];
+    revealKey: BigNumber[];
   }[];
 
   commitmentsOut.forEach((commitment) => {
