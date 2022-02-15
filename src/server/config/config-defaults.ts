@@ -4,9 +4,9 @@ import { NetworkChainID } from './config-chain-ids';
 export default {
   // Blockchain networks to activate.
   useNetworks: [
+    NetworkChainID.Ethereum,
     NetworkChainID.Ropsten,
     NetworkChainID.HardHat,
-    // NetworkChainID.Ethereum,
     // NetworkChainID.BinanceSmartChain,
     // NetworkChainID.PolygonPOS,
   ],

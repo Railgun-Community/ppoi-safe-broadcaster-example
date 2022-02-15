@@ -43,7 +43,6 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 let lepton: Lepton;
-let railContractAddress: string;
 let contract: ERC20RailgunContract;
 let railgunWallet: RailgunWallet;
 const RANDOM =
@@ -95,7 +94,7 @@ describe('extract-packaged-fee', () => {
     await initWallets();
 
     const ropstenNetwork = getMockRopstenNetwork();
-    railContractAddress = ropstenNetwork.railContract;
+    const proxyContract = ropstenNetwork.proxyContract;
     initNetworkProviders();
     const provider = getProviderForNetwork(ROPSTEN_CHAIN_ID);
 
@@ -103,11 +102,11 @@ describe('extract-packaged-fee', () => {
     // We just need to load the merkletrees.
     lepton.loadNetwork(
       ROPSTEN_CHAIN_ID,
-      railContractAddress,
+      proxyContract,
       provider as FallbackProvider,
       0, // deploymentBlock
     );
-    contract = new ERC20RailgunContract(railContractAddress, provider);
+    contract = new ERC20RailgunContract(proxyContract, provider);
     railgunWallet = getShieldedReceiverWallet();
 
     const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));

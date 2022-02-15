@@ -4,7 +4,7 @@ import { hexlify } from '@railgun-community/lepton/dist/utils/bytes';
 import { BigNumber, Contract, PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
-import { abiForRailContract } from '../abi/abi';
+import { abiForProxyContract } from '../abi/abi';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getRailgunWalletKeypair } from '../wallets/active-wallets';
 import { bytes } from '@railgun-community/lepton/dist/utils';
@@ -23,13 +23,16 @@ export const extractPackagedFeeFromTransaction = (
   populatedTransaction: PopulatedTransaction,
 ): PackagedFee => {
   const network = configNetworks[chainID];
-  if (populatedTransaction.to !== network.railContract) {
+  if (populatedTransaction.to !== network.proxyContract) {
     throw new Error('Invalid contract address.');
   }
 
   const provider = getProviderForNetwork(chainID);
-  const abi = abiForRailContract();
-  const contract = new Contract(network.railContract, abi, provider);
+  const abi = abiForProxyContract();
+  const contract = new Contract(network.proxyContract, abi, provider);
+
+  console.log(populatedTransaction.data);
+  console.log(populatedTransaction.value);
 
   const parsedTransaction = contract.interface.parseTransaction({
     data: populatedTransaction.data ?? '',

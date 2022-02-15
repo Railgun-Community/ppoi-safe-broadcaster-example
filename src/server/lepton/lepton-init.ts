@@ -47,5 +47,5 @@ export const initLeptonNetwork = (chainID: NetworkChainID) => {
 
   // Note: This call is async, but we call it synchronously
   // so it runs the slow scan in the background.
-  lepton.loadNetwork(chainID, network.railContract, provider, deploymentBlock);
+  lepton.loadNetwork(chainID, network.proxyContract, provider, deploymentBlock);
 };

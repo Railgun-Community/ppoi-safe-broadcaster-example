@@ -2,7 +2,7 @@ import { NetworkChainID } from '../config/config-chain-ids';
 import ABI_RAILGUN from './json/railgun.json';
 import ABI_ERC20 from './json/erc20.json';
 
-export const abiForRailContract = () => {
+export const abiForProxyContract = () => {
   return ABI_RAILGUN;
 };
 
