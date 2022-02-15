@@ -37,7 +37,7 @@ describe('active-wallets', () => {
   it('Should have Railgun wallet with valid address', () => {
     const railgunAddress = getRailgunAddress();
     expect(railgunAddress).to.equal(
-      'rgany1q8y4j4ssfa53xxcuy6wrq6yd8tld6rp6z4wjwr5x96jvr7y6vqapkz2ffkk',
+      'rgany1qyglk9smgj240x2xmj2laj7p5hexw0a30vvdqnv9gk020nsd7yzgw8ypm04',
     );
   });
 }).timeout(10000);
