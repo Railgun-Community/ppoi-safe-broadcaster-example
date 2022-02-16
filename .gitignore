@@ -29,6 +29,7 @@ run-dev.sh
 start-relayer.sh
 .tsbuildinfo
 pnpm-lock.yaml
+doc/
 
 # Leveldown database
 *.db/
