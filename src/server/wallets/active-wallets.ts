@@ -1,5 +1,4 @@
 import { BaseProvider } from '@ethersproject/providers';
-import { babyjubjub } from '@railgun-community/lepton/dist/utils';
 import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
 import { Wallet as EthersWallet } from 'ethers';
 import { isValidMnemonic } from 'ethers/lib/utils';
@@ -24,10 +23,12 @@ const initShieldedReceiverWallet = async (mnemonic: string) => {
   const lepton = getLepton();
   const encryptionKey = configDefaults.leptonDbEncryptionKey;
   if (!encryptionKey) {
-    throw Error('DB_ENCRYPTION_KEY not set (use docker secret, or env for insecure testing)');
+    throw Error(
+      'DB_ENCRYPTION_KEY not set (use docker secret, or env for insecure testing)',
+    );
   }
   const walletID = await lepton.createWalletFromMnemonic(
-    configDefaults.leptonDbEncryptionKey,
+    encryptionKey,
     mnemonic,
   );
   shieldedReceiverWallet = lepton.wallets[walletID];
@@ -48,9 +49,11 @@ export const getActiveReceiverWallet = (): ActiveWallet => {
 export const initWallets = async () => {
   resetWallets();
   configWallets.wallets.forEach(
-    async ({ mnemonic, priority, isShieldedReceiver }) => {
+    ({ mnemonic, priority, isShieldedReceiver }) => {
       if (!isValidMnemonic(mnemonic)) {
-        throw Error('Invalid or missing MNEMONIC (use docker secret or insecure env for testing');
+        throw Error(
+          'Invalid or missing MNEMONIC (use docker secret or insecure env for testing',
+        );
       }
       const wallet = EthersWallet.fromMnemonic(mnemonic);
       activeWallets.push({

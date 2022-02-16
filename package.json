@@ -13,8 +13,8 @@
     "start": "npm run compile && node -r dotenv/config dist/main.js",
     "debug": "env DEBUG=relayer*,waku:jsonrpc-api npm start",
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
-    "test": "npm run compile-test && mocha 'src/**/__tests__/*.test.ts'",
-    "test-coverage": "npm run compile-test && nyc mocha 'src/**/__tests__/*.test.ts'",
+    "test": "npm run compile-test && env-cmd -e test mocha 'src/**/__tests__/*.test.ts'",
+    "test-coverage": "npm run compile-test && env-cmd -e test nyc mocha 'src/**/__tests__/*.test.ts'",
     "prepare": "npm run compile"
   },
   "keywords": [],
@@ -32,6 +32,7 @@
     "@typescript-eslint/parser": "^5.9.1",
     "bn.js": "^5.2.0",
     "chai": "^4.3.5",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.2",

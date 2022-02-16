@@ -1,6 +1,8 @@
-/* globals describe, it, before, beforeEach, afterEach */
+/* eslint-disable no-unused-expressions */
+/* globals describe, it, before, after, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import {
@@ -15,7 +17,6 @@ import {
   createGasBalanceStub,
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
-import { BigNumber } from 'ethers';
 import { getMockWalletAddress } from '../../../test/mocks.test';
 import { getActiveWallets, initWallets } from '../../wallets/active-wallets';
 import { delay } from '../../../util/promise-utils';

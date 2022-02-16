@@ -1,4 +1,4 @@
-/* globals describe, before, it, beforeEach, afterEach */
+/* globals describe, before, after, it, beforeEach, afterEach */
 import { FallbackProvider } from '@ethersproject/providers';
 import { ERC20Note, Lepton } from '@railgun-community/lepton';
 import { ERC20RailgunContract } from '@railgun-community/lepton/dist/contract';
@@ -54,7 +54,7 @@ const ROPSTEN_CHAIN_ID = NetworkChainID.Ropsten;
 const MOCK_MNEMONIC_1 =
   'hint profit virus forest angry puzzle index same feel behind grant repair';
 
-const createRopstenTransaction = async (
+const createRopstenTransaction = (
   receiverWalletPublicKey: string,
   fee: BigNumber,
   tokenAddress: string,
@@ -94,7 +94,7 @@ describe('extract-packaged-fee', () => {
     await initWallets();
 
     const ropstenNetwork = getMockRopstenNetwork();
-    const proxyContract = ropstenNetwork.proxyContract;
+    const { proxyContract } = ropstenNetwork;
     initNetworkProviders();
     const provider = getProviderForNetwork(ROPSTEN_CHAIN_ID);
 
@@ -126,7 +126,6 @@ describe('extract-packaged-fee', () => {
       createRopstenTransaction(walletPublicKey, fee, MOCK_TOKEN_ADDRESS),
     ]);
     const populatedTransaction = await contract.transact(transactions);
-    console.log(populatedTransaction.data);
     const packagedFee = extractPackagedFeeFromTransaction(
       ROPSTEN_CHAIN_ID,
       populatedTransaction,

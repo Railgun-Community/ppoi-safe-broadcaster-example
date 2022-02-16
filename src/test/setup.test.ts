@@ -12,10 +12,8 @@ import { getMockNetwork } from './mocks.test';
 const TEST_DB = 'test.db';
 
 const setupTests = () => {
-  configDefaults.mnemonic = 'test test test test test test test test test test test junk';
   configDefaults.debugLevel = DebugLevel.None;
   configDefaults.leptonDb = TEST_DB;
-  configDefaults.leptonDbEncryptionKey = '12345';
 };
 
 before(() => {
@@ -45,6 +43,8 @@ export const setupTestNetwork = (): Network => {
 
 after(() => {
   const { log } = console;
-  fs.rm(TEST_DB, { recursive: true }, (err) => { log('error removing test db'); });
+  fs.rm(TEST_DB, { recursive: true }, (err) => {
+    log('error removing test db');
+  });
   log('removed test db');
 });
