@@ -1,20 +1,24 @@
+import debug from 'debug';
 import configDefaults from '../server/config/config-defaults';
 import { DebugLevel } from '../models/debug-models';
+
+const dbgLog = debug('relayer:log');
+const dbgWarn = debug('relayer:warn');
+const dbgError = debug('relayer:error');
 
 const hasDebugLevel = (debugLevels: DebugLevel[]): boolean => {
   return debugLevels.includes(configDefaults.debugLevel);
 };
 
-/* eslint-disable no-console */
 const loggerImpl = {
   log: (obj: any) => {
-    console.log(JSON.stringify(obj));
+    dbgLog(obj);
   },
   warn: (obj: any) => {
-    console.warn(JSON.stringify(obj));
+    dbgWarn(obj);
   },
   error: (error: Error) => {
-    console.error(error);
+    dbgError(error);
   },
 };
 
