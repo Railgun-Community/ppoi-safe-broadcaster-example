@@ -46,7 +46,7 @@
   "dependencies": {
     "@ethersproject/providers": "^5.5.2",
     "@ethersproject/shims": "^5.5.0",
-    "@railgun-community/lepton": "https://npm.railgun.org/ci/railgun-community-lepton-0.0.4.tgz",
+    "@railgun-community/lepton": "https://npm.railgun.org/ci/0.0.5/railgun-community-lepton-0.0.5.tgz",
     "@walletconnect/jsonrpc-types": "^1.0.0",
     "@walletconnect/jsonrpc-utils": "^1.0.0",
     "axios": "^0.24",
