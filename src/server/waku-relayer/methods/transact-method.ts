@@ -11,14 +11,11 @@ export const transactMethod = async (
   const { chainID, serializedTransaction } = params;
   try {
     const txResponse = await processTransaction(chainID, serializedTransaction);
-    console.log('txResponse');
-    console.log(txResponse);
+    logger('txResponse');
+    logger(txResponse);
     return formatJsonRpcResult(id, JSON.stringify(txResponse));
   } catch (err: any) {
-    console.error(err);
-    if (logger.log) {
-      logger.log(err);
-    }
+    logger(err);
     return formatJsonRpcResult(id, err.message);
   }
 };

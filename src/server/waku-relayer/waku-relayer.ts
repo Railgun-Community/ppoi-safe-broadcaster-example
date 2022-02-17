@@ -7,7 +7,6 @@ import {
   WakuRelayMessage,
 } from 'server/networking/waku-api-client';
 import { WakuMessage } from 'js-waku';
-import { greetMethod } from './methods/greet-method';
 import { transactMethod } from './methods/transact-method';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
@@ -15,13 +14,15 @@ import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
 import configDefaults from '../config/config-defaults';
 import { contentTopics } from './topics';
-import {
-  getRailgunWalletKeypair,
-  getRailgunWalletPubKey,
-} from '../wallets/active-wallets';
+import { getRailgunWalletPubKey } from '../wallets/active-wallets';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 export const RAILGUN_TOPIC = '/railgun/1/relayer/proto';
+
+export type FeeBroadcastData = {
+  fees: MapType<string>;
+  pubkey: string;
+};
 
 type JsonRPCMessageHandler = (
   params: any,
@@ -37,7 +38,7 @@ export type WakuRelayerOptions = {
 export class WakuRelayer {
   client: WakuApiClient;
 
-  logger: debug.Debugger;
+  dbg: debug.Debugger;
 
   topic: string;
 
@@ -46,23 +47,21 @@ export class WakuRelayer {
   walletPublicKey: string;
 
   methods: MapType<JsonRPCMessageHandler> = {
-    greet: greetMethod,
     transact: transactMethod,
   };
 
   constructor(client: WakuApiClient, options: WakuRelayerOptions) {
     const chainIDs = configuredNetworkChainIDs();
     this.client = client;
-    this.logger = debug('relayer:waku:relayer');
+    this.dbg = debug('relayer:waku:relayer');
     this.topic = options.topic;
     this.allContentTopics = [
       contentTopics.default(),
-      contentTopics.greet(),
       ...chainIDs.map((chainID) => contentTopics.fees(chainID)),
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
     this.walletPublicKey = getRailgunWalletPubKey();
-    this.logger(this.allContentTopics);
+    this.dbg(this.allContentTopics);
   }
 
   static async init(options: WakuRelayerOptions): Promise<WakuRelayer> {
@@ -101,34 +100,38 @@ export class WakuRelayer {
 
       if (method in this.methods) {
         const age = Date.now() / 1000 - timestamp;
-        this.logger(`handling message on ${contentTopic} (${age}s old)`);
-        const response = await this.methods[method](params, id, this.logger);
+        this.dbg(`handling message on ${contentTopic} (${age}s old)`);
+        const response = await this.methods[method](params, id, this.dbg);
         const rpcResult = await WakuMessage.fromUtf8String(
           JSON.stringify(response),
           contentTopic,
         );
         await this.client.publish(rpcResult, this.topic).catch((e) => {
-          this.logger('Error publishing response', e.message);
+          this.dbg('Error publishing response', e.message);
         });
       }
     } catch (e) {
-      this.logger('caught error', e);
+      console.log(e);
+      this.dbg('caught error', e);
     }
   }
 
   private async broadcastFeesForChain(chainID: NetworkChainID) {
     // Map from tokenAddress to BigNumber hex string
     const fees: MapType<string> = getAllUnitTokenFeesForChain(chainID);
-    const feesString = JSON.stringify({ fees, pubkey: this.walletPublicKey });
+    const feeBroadcastData: FeeBroadcastData = {
+      fees,
+      pubkey: this.walletPublicKey,
+    };
     const message = await WakuMessage.fromUtf8String(
-      feesString,
+      JSON.stringify(feeBroadcastData),
       contentTopics.fees(chainID),
     );
     const result = await this.client
       .publish(message, this.topic)
-      .catch(this.logger);
-    this.logger(`Broadcasting fees for chain ${chainID}: `, feesString);
-    this.logger(`Result: ${result}`);
+      .catch(this.dbg);
+    this.dbg(`Broadcasting fees for chain ${chainID}: `, fees);
+    this.dbg(`Result: ${result}`);
   }
 
   async broadcastFeesOnInterval() {
@@ -145,10 +148,10 @@ export class WakuRelayer {
     const messages = await this.client
       .getMessages(this.topic, this.allContentTopics)
       .catch((e) => {
-        this.logger(e.message);
+        this.dbg(e.message);
         return [];
       });
-    await Promise.all(messages.map(this.handleMessage));
+    await Promise.all(messages.map((message) => this.handleMessage(message)));
     await delay(frequency);
     this.poll(frequency);
   }

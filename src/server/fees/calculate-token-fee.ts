@@ -15,7 +15,6 @@ import {
 import { deserializePopulatedTransaction } from '../transactions/populated-transaction';
 import { estimateMaximumGas } from './gas-estimate';
 import { cacheFeeForTransaction } from './transaction-fee-cache';
-import { logger } from '../../util/logger';
 
 export const getAllUnitTokenFeesForChain = (
   chainID: NetworkChainID,
@@ -30,7 +29,6 @@ export const getAllUnitTokenFeesForChain = (
       ).toHexString();
     } catch (err: any) {
       // No op.
-      logger.warn(err);
     }
   });
   return tokenFeesForChain;
