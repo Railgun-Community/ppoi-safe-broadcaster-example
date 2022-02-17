@@ -11,7 +11,7 @@
     "lint": "eslint . --ext .ts",
     "compile": "npm run clean && tsc && tsc-alias",
     "start": "npm run compile && node -r dotenv/config dist/main.js",
-    "debug": "env DEBUG=relayer*,waku:jsonrpc-api npm start",
+    "debug": "env DEBUG=relayer*,waku:jsonrpc-api env-cmd -e debug npm start",
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
     "test": "npm run compile-test && env-cmd -e test mocha 'src/**/__tests__/*.test.ts'",
     "test-coverage": "npm run compile-test && env-cmd -e test nyc mocha 'src/**/__tests__/*.test.ts'",
