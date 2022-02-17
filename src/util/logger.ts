@@ -1,10 +1,19 @@
-import debug from 'debug';
 import configDefaults from '../server/config/config-defaults';
 import { DebugLevel } from '../models/debug-models';
+import DebugWrapper from './debug-wrapper';
 
-const dbgLog = debug('relayer:log');
-const dbgWarn = debug('relayer:warn');
-const dbgError = debug('relayer:error');
+// Wrapped for testing purposes.
+const dbgLog = new DebugWrapper('relayer:log');
+const dbgWarn = new DebugWrapper('relayer:warn');
+const dbgError = new DebugWrapper('relayer:error');
+
+export const getDbgInstances = () => {
+  return {
+    dbgLog,
+    dbgWarn,
+    dbgError,
+  };
+};
 
 const hasDebugLevel = (debugLevels: DebugLevel[]): boolean => {
   return debugLevels.includes(configDefaults.debugLevel);
@@ -12,13 +21,13 @@ const hasDebugLevel = (debugLevels: DebugLevel[]): boolean => {
 
 const loggerImpl = {
   log: (obj: any) => {
-    dbgLog(obj);
+    dbgLog.call(obj);
   },
   warn: (obj: any) => {
-    dbgWarn(obj);
+    dbgWarn.call(obj);
   },
   error: (error: Error) => {
-    dbgError(error);
+    dbgError.call(error);
   },
 };
 

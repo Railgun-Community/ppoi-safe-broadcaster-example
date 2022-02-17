@@ -6,9 +6,12 @@ import {
   createEthersWallet,
   getActiveWallets,
   getRailgunAddress,
+  getRailgunWalletKeypair,
+  getRailgunWalletPubKey,
 } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
+import { NetworkChainID } from '../../config/config-chain-ids';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -39,5 +42,13 @@ describe('active-wallets', () => {
     expect(railgunAddress).to.equal(
       'rgany1qyglk9smgj240x2xmj2laj7p5hexw0a30vvdqnv9gk020nsd7yzgw8ypm04',
     );
+  });
+
+  it('Should check pubkey value matches across networks', () => {
+    const pubkeyChain0 = getRailgunWalletPubKey();
+    const pubkeyRopsten = getRailgunWalletKeypair(
+      NetworkChainID.Ropsten,
+    ).pubkey;
+    expect(pubkeyChain0).to.equal(pubkeyRopsten);
   });
 }).timeout(10000);

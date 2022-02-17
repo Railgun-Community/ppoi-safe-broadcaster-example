@@ -17,6 +17,8 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   rules: {
     'no-unused-vars': 0,
+    'no-use-before-define': 0,
+    'no-unused-expressions': 0,
     'no-shadow': 0,
     'implicit-arrow-linebreak': 0,
     'no-restricted-syntax': 0,

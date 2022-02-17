@@ -48,7 +48,7 @@ export const calculateTokenFeePerUnitGasToken = (
   );
 
   const networkConfig = configNetworks[chainID];
-  const gasToken = networkConfig.gasToken;
+  const { gasToken } = networkConfig;
   const oneUnitGas = BigNumber.from(10).pow(BigNumber.from(gasToken.decimals));
 
   const tokenFee = getTokenFee(

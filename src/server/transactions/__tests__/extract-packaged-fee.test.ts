@@ -29,6 +29,7 @@ import {
 } from '../../providers/active-network-providers';
 import {
   getRailgunWalletKeypair,
+  getRailgunWalletPubKey,
   getShieldedReceiverWallet,
   initWallets,
 } from '../../wallets/active-wallets';
@@ -120,8 +121,7 @@ describe('extract-packaged-fee', () => {
 
   it('Should extract fee correctly', async () => {
     const fee = BigNumber.from('1000');
-    const keypair = getRailgunWalletKeypair(ROPSTEN_CHAIN_ID);
-    const walletPublicKey = keypair.pubkey;
+    const walletPublicKey = getRailgunWalletPubKey();
     const transactions = await Promise.all([
       createRopstenTransaction(walletPublicKey, fee, MOCK_TOKEN_ADDRESS),
     ]);

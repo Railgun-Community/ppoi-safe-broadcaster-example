@@ -1,16 +1,15 @@
 import { ERC20Note } from '@railgun-community/lepton';
 import { babyjubjub } from '@railgun-community/lepton/dist/utils';
-import { hexlify } from '@railgun-community/lepton/dist/utils/bytes';
+import { hexlify, trim } from '@railgun-community/lepton/dist/utils/bytes';
 import { BigNumber, Contract, PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
 import { abiForProxyContract } from '../abi/abi';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getRailgunWalletKeypair } from '../wallets/active-wallets';
-import { bytes } from '@railgun-community/lepton/dist/utils';
 
 const parseFormattedTokenAddress = (formattedTokenAddress: string) => {
-  return '0x' + bytes.trim(formattedTokenAddress, 20);
+  return `0x${trim(formattedTokenAddress, 20)}`;
 };
 
 type PackagedFee = {
@@ -45,8 +44,9 @@ export const extractPackagedFeeFromTransaction = (
 
   const tokenPaymentAmounts: MapType<BigNumber> = {};
 
-  // TODO: Fix the any's with a real type.
-  const railgunTxs = parsedTransaction.args['_transactions'] as any;
+  // TODO: Fix the any's with a real type from Lepton.
+  // eslint-disable-next-line no-underscore-dangle
+  const railgunTxs = parsedTransaction.args._transactions as any;
 
   railgunTxs.forEach((railgunTx: any) =>
     extractFeesFromRailgunTransactions(
@@ -76,7 +76,7 @@ const extractFeesFromRailgunTransactions = (
   walletPublicKey: string,
 ) => {
   // TODO: Confirm these types. (Build into Lepton).
-  const commitmentsOut = railgunTx['commitmentsOut'] as {
+  const commitmentsOut = railgunTx.commitmentsOut as {
     hash: BigNumber;
     ciphertext: BigNumber[];
     senderPubKey: BigNumber[];
@@ -103,14 +103,17 @@ const extractFeesFromRailgunTransactions = (
     );
 
     if (decryptedNote.pubkey === walletPublicKey) {
-      if (`0x${decryptedNote.hash}` !== commitment.hash.toHexString())
+      if (`0x${decryptedNote.hash}` !== commitment.hash.toHexString()) {
         throw new Error(
           'Client attempted to steal from relayer via invalid ciphertext.',
         );
+      }
 
       if (!tokenPaymentAmounts[decryptedNote.token]) {
+        // eslint-disable-next-line no-param-reassign
         tokenPaymentAmounts[decryptedNote.token] = BigNumber.from(0);
       }
+      // eslint-disable-next-line no-param-reassign
       tokenPaymentAmounts[decryptedNote.token] = tokenPaymentAmounts[
         decryptedNote.token
       ].add(BigNumber.from(decryptedNote.amount));

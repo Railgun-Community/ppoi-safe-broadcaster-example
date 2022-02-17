@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-import { initRelayer } from '../relayer-init';
+import { initRelayerModules } from '../relayer-init';
 import * as leptonInitModule from '../../lepton/lepton-init';
 import * as activeWalletsModule from '../../wallets/active-wallets';
 import * as activeProvidersModule from '../../providers/active-network-providers';
@@ -24,7 +24,7 @@ describe('relayer-init', () => {
       .stub(activeTokenPricePollerModule, 'initPricePoller')
       .returns();
 
-    await initRelayer();
+    await initRelayerModules();
 
     expect(stubInitLepton.calledOnce).to.be.true;
     expect(stubInitWallets.calledOnce).to.be.true;

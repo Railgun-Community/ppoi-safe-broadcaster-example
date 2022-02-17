@@ -5,7 +5,7 @@ import { initNetworkProviders } from '../providers/active-network-providers';
 import { initPricePoller } from '../tokens/token-price-poller';
 import { logger } from '../../util/logger';
 
-export const initRelayer = async () => {
+export const initRelayerModules = async () => {
   initLepton(configDefaults.leptonDb);
   await initWallets();
   initNetworkProviders();

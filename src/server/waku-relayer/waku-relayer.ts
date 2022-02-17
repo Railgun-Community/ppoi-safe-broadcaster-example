@@ -1,6 +1,4 @@
-import {
-  formatJsonRpcRequest,
-} from '@walletconnect/jsonrpc-utils';
+import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
 import { JsonRpcPayload, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import debug from 'debug';
 import {
@@ -17,6 +15,10 @@ import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
 import configDefaults from '../config/config-defaults';
 import { contentTopics } from './topics';
+import {
+  getRailgunWalletKeypair,
+  getRailgunWalletPubKey,
+} from '../wallets/active-wallets';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 export const RAILGUN_TOPIC = '/railgun/1/relayer/proto';
@@ -41,6 +43,8 @@ export class WakuRelayer {
 
   allContentTopics: string[];
 
+  walletPublicKey: string;
+
   methods: MapType<JsonRPCMessageHandler> = {
     greet: greetMethod,
     transact: transactMethod,
@@ -57,6 +61,7 @@ export class WakuRelayer {
       ...chainIDs.map((chainID) => contentTopics.fees(chainID)),
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
+    this.walletPublicKey = getRailgunWalletPubKey();
     this.logger(this.allContentTopics);
   }
 
@@ -114,7 +119,7 @@ export class WakuRelayer {
   private async broadcastFeesForChain(chainID: NetworkChainID) {
     // Map from tokenAddress to BigNumber hex string
     const fees: MapType<string> = getAllUnitTokenFeesForChain(chainID);
-    const feesString = JSON.stringify(fees);
+    const feesString = JSON.stringify({ fees, pubkey: this.walletPublicKey });
     const message = await WakuMessage.fromUtf8String(
       feesString,
       contentTopics.fees(chainID),
@@ -137,18 +142,14 @@ export class WakuRelayer {
   }
 
   async poll(frequency: number = 5000) {
-    setInterval(async () => {
-      const messages = await this.client
-        .getMessages(this.topic, this.allContentTopics)
-        .catch((e) => {
-          this.logger(e.message);
-          return [];
-        });
-      await Promise.all(
-        messages.map(async (message) => {
-          this.handleMessage(message);
-        }),
-      );
-    }, frequency);
+    const messages = await this.client
+      .getMessages(this.topic, this.allContentTopics)
+      .catch((e) => {
+        this.logger(e.message);
+        return [];
+      });
+    await Promise.all(messages.map(this.handleMessage));
+    await delay(frequency);
+    this.poll(frequency);
   }
 }

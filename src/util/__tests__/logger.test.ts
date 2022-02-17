@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
 import configDefaults from '../../server/config/config-defaults';
 import { DebugLevel } from '../../models/debug-models';
-import { logger } from '../logger';
+import { getDbgInstances, logger } from '../logger';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -21,14 +21,15 @@ const testAllLogTypes = () => {
 
 describe('logger', () => {
   beforeEach(() => {
-    consoleLogStub = sinon.stub(console, 'log').returns();
-    consoleWarnStub = sinon.stub(console, 'warn').returns();
-    consoleErrorStub = sinon.stub(console, 'error').returns();
+    const { dbgLog, dbgWarn, dbgError } = getDbgInstances();
+    consoleLogStub = sinon.stub(dbgLog, 'call').returns();
+    consoleWarnStub = sinon.stub(dbgWarn, 'call').returns();
+    consoleErrorStub = sinon.stub(dbgError, 'call').returns();
   });
   afterEach(() => {
-    consoleLogStub.restore();
-    consoleWarnStub.restore();
-    consoleErrorStub.restore();
+    consoleLogStub?.restore();
+    consoleWarnStub?.restore();
+    consoleErrorStub?.restore();
   });
 
   it('Should test None log mode sends no logs', () => {

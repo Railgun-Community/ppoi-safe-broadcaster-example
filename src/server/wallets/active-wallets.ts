@@ -24,7 +24,7 @@ const initShieldedReceiverWallet = async (mnemonic: string) => {
   const encryptionKey = configDefaults.leptonDbEncryptionKey;
   if (!encryptionKey) {
     throw Error(
-      'DB_ENCRYPTION_KEY not set (use docker secret, or env for insecure testing)',
+      'DB_ENCRYPTION_KEY not set (use docker secret, or env-cmdrc for insecure testing)',
     );
   }
   const walletID = await lepton.createWalletFromMnemonic(
@@ -52,7 +52,7 @@ export const initWallets = async () => {
     ({ mnemonic, priority, isShieldedReceiver }) => {
       if (!isValidMnemonic(mnemonic)) {
         throw Error(
-          'Invalid or missing MNEMONIC (use docker secret or insecure env for testing',
+          'Invalid or missing MNEMONIC (use docker secret or insecure env-cmdrc for testing)',
         );
       }
       const wallet = EthersWallet.fromMnemonic(mnemonic);
@@ -93,6 +93,11 @@ export const getRailgunWalletKeypair = (
     change,
     chainID,
   );
+};
+
+export const getRailgunWalletPubKey = () => {
+  const chainID = 0;
+  return getRailgunWalletKeypair(chainID).pubkey;
 };
 
 export const getRailgunAddress = (chainID?: NetworkChainID) => {
