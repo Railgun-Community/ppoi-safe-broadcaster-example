@@ -24,5 +24,5 @@ export type Network = {
 };
 
 export enum QuickSyncURL {
-  Ropsten = 'http://relayer.railgun.ch:3000/',
+  Ropsten = 'https://relayer.railgun.ch/events/3',
 }

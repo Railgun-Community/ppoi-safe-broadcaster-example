@@ -1,8 +1,14 @@
+import { CommitmentEvent } from '@railgun-community/lepton/dist/contract/erc20';
+import { Nullifier } from '@railgun-community/lepton/dist/merkletree';
 import axios from 'axios';
 import { logger } from '../../../util/logger';
-import { QuickSyncEventLog } from './quick-sync';
 
 const NUM_RETRIES = 2;
+
+export type QuickSyncEventLog = {
+  commitmentEvents: CommitmentEvent[];
+  nullifierEvents: Nullifier[];
+};
 
 export const getRailgunEventLog = async (
   quickSyncURL?: string,

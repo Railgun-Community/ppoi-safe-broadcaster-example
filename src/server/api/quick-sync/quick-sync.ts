@@ -1,20 +1,13 @@
 import { QuickSync } from '@railgun-community/lepton';
-import { CommitmentEvent } from '@railgun-community/lepton/dist/contract/erc20';
-import { Nullifier } from '@railgun-community/lepton/dist/merkletree';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
-import { getRailgunEventLog } from './railgun-event-log';
-
-export type QuickSyncEventLog = {
-  commitmentEvents: CommitmentEvent[];
-  nullifierEvents: Nullifier[];
-};
+import { getRailgunEventLog, QuickSyncEventLog } from './railgun-event-log';
 
 export const quickSync: QuickSync = async (
   chainID: NetworkChainID,
   _startingBlock: number,
 ): Promise<QuickSyncEventLog> => {
-  const quickSyncURL = configNetworks[chainID].quickSyncURL;
+  const { quickSyncURL } = configNetworks[chainID];
   if (!quickSyncURL) {
     // Return empty logs, Lepton will default to full scan.
     return {
@@ -22,5 +15,6 @@ export const quickSync: QuickSync = async (
       nullifierEvents: [],
     };
   }
-  return getRailgunEventLog(quickSyncURL);
+  const log = await getRailgunEventLog(quickSyncURL);
+  return log;
 };
