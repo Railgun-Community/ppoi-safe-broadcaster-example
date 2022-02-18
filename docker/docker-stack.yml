@@ -1,0 +1,68 @@
+version: '3.9'
+
+networks:
+  railgun:
+
+volumes:
+  waku:
+    name: 'waku'
+  relayer1:
+    name: 'relayer1'
+  relayer2:
+    name: 'relayer2'
+
+
+services:
+  waku:
+    image: wakunode:latest
+    hostname: "waku"
+    ports:
+      - 60000:60000
+      - 8000:8000
+    deploy:
+      replicas: 1
+    entrypoint: ["/app/run-waku.sh"]
+    volumes:
+      - waku:/mnt
+
+  relayer1:
+    image: 'relayer:latest'
+    hostname: "relayer1"
+    deploy:
+      replicas: 1
+    environment:
+      WAKU_RPC_URL: "http://waku:8546"
+      LEPTON_DB: '/mnt/relayer1.db'
+      LOG_LEVEL: 'debug'
+      DEBUG: 'relayer*,waku:jsonrpc-api'
+    secrets:
+      - MNEMONIC
+      - DB_ENCRYPTION_KEY
+    depends_on:
+      - waku
+    volumes:
+      - relayer1:/mnt
+
+  relayer2:
+    image: 'relayer:latest'
+    hostname: "relayer2"
+    deploy:
+      replicas: 1
+    environment:
+      WAKU_RPC_URL: "http://waku:8546"
+      LEPTON_DB: '/mnt/relayer2.db'
+      LOG_LEVEL: 'debug'
+      DEBUG: 'relayer*,waku:jsonrpc-api'
+    secrets:
+      - MNEMONIC
+      - DB_ENCRYPTION_KEY
+    depends_on:
+      - waku
+    volumes:
+      - relayer1:/mnt
+
+secrets:
+  MNEMONIC:
+    external: true
+  DB_ENCRYPTION_KEY:
+    external: true

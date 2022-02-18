@@ -20,13 +20,14 @@ Several environment variables should be set:
 
 - Prereqs: Install docker and gnupg
 - Initialize docker swarm if you don't already have one: `docker swarm init`
-- Generate `DB_ENCRYPTION_KEY` docker secret: `gpg --gen-random --armor 1 14 | docker secret create DB_ENCRYPTION_KEY -`
-- `echo "mnemonic mnemonic..." | docker secret create MNEMONIC -`
-- Build docker image: `docker/build.sh`
-- Run image independently: `docker/run.sh`
-- OR create service: `docker/create.sh`
-- Generate waku `nodekey`: `docker/rand32.sh | docker secret create nodekey -`
-- Pull nim-waku image: `docker pull statusteam/nim-waku:deploy-v2-test`
+- Generate `DB_ENCRYPTION_KEY` docker secret: `docker/nodekey.sh | docker secret create DB_ENCRYPTION_KEY -`
+- Generate `nodekey` docker secret: `docker/nodekey.sh | docker secret create nodekey -`
+- Register `MNEMONIC` docker secret: `echo "my mnemonic words..." | docker secret create MNEMONIC -`
+- Build `relayer` and `waku` docker images: `docker/build.sh`
+- Deploy stack: `docker/deploy.sh`
+
+## Configuration
+Customize your relayer by copying `src/MY-CONFIG.example.ts` to `src/MY_CONFIG.ts`. You should specify the networks you want to run on, @todo etc
 
 ## Run tests
 
