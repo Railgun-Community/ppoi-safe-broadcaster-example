@@ -1,9 +1,11 @@
 /* globals describe, before, it, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { Wallet as EthersWallet } from 'ethers';
 import { getMockProvider } from '../../../test/mocks.test';
 import {
   createEthersWallet,
+  derivationPathForIndex,
   getActiveWallets,
   getRailgunAddress,
   getRailgunWalletKeypair,
@@ -15,6 +17,9 @@ import { NetworkChainID } from '../../config/config-chain-ids';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+
+const MOCK_MNEMONIC =
+  'hint profit virus forest angry puzzle index same feel behind grant repair';
 
 describe('active-wallets', () => {
   before(async () => {

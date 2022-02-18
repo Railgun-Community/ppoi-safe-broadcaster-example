@@ -27,8 +27,8 @@ import {
   initNetworkProviders,
 } from '../../providers/active-network-providers';
 import {
+  getRailgunWallet,
   getRailgunWalletPubKey,
-  getShieldedReceiverWallet,
   initWallets,
 } from '../../wallets/active-wallets';
 import { extractPackagedFeeFromTransaction } from '../extract-packaged-fee';
@@ -100,7 +100,7 @@ describe('extract-packaged-fee', () => {
       0, // deploymentBlock
     );
     contract = new ERC20RailgunContract(proxyContract, provider);
-    railgunWallet = getShieldedReceiverWallet();
+    railgunWallet = getRailgunWallet();
 
     const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));
     createLeptonWalletBalancesStub(tokenAddressHexlify, TREE);

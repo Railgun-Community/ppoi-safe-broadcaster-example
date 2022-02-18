@@ -6,39 +6,36 @@ import sinon, { SinonStub } from 'sinon';
 import { initLepton } from '../../lepton/lepton-init';
 import {
   createEthersWallet,
+  derivationPathForIndex,
   getActiveWallets,
   initWallets,
 } from '../active-wallets';
 import { getBestMatchWalletForNetwork } from '../best-match-wallet';
-import { WalletConfig } from '../../../models/wallet-models';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import {
   resetAvailableWallets,
   setWalletAvailable,
 } from '../available-wallets';
-import { getMockProvider } from '../../../test/mocks.test';
+import { getMockNetwork, getMockProvider } from '../../../test/mocks.test';
 import * as BalanceCacheModule from '../../balances/balance-cache';
+import configDefaults from '../../config/config-defaults';
+import configNetworks from '../../config/config-networks';
+import { initNetworkProviders } from '../../providers/active-network-providers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
-const MOCK_MNEMONIC_1 =
+const MOCK_MNEMONIC =
   'hint profit virus forest angry puzzle index same feel behind grant repair';
-const MOCK_MNEMONIC_2 =
-  'sense arena duck shine near cluster awful gravity act security cargo knock';
-const MOCK_MNEMONIC_3 =
-  'odor crucial flip innocent train smile jump pair agent cabbage gun never';
 
 let getCachedGasTokenBalanceStub: SinonStub;
 
-const setupMockWallets = async (wallets: WalletConfig[]) => {
-  // config.wallets = wallets;
-  await initWallets();
-};
-
-const addressForMnemonic = (mnemonic: string): string => {
-  const ethersWallet = EthersWallet.fromMnemonic(mnemonic);
+const addressForIndex = (index: number): string => {
+  const ethersWallet = EthersWallet.fromMnemonic(
+    MOCK_MNEMONIC,
+    derivationPathForIndex(index),
+  );
   return ethersWallet.address;
 };
 
@@ -48,6 +45,8 @@ describe('best-match-wallet', () => {
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
       .resolves(BigNumber.from(500));
+    configNetworks[NetworkChainID.Ethereum] = getMockNetwork();
+    initNetworkProviders();
   });
 
   afterEach(() => {
@@ -59,69 +58,78 @@ describe('best-match-wallet', () => {
   });
 
   it('Should select best match wallet ordered by priority', async () => {
-    await setupMockWallets([
-      {
-        mnemonic: MOCK_MNEMONIC_1,
-        priority: 3,
-        isShieldedReceiver: true,
-      },
-      {
-        mnemonic: MOCK_MNEMONIC_2,
-        priority: 2,
-      },
-      {
-        mnemonic: MOCK_MNEMONIC_3,
-        priority: 1,
-      },
-    ]);
+    configDefaults.wallet = {
+      mnemonic: MOCK_MNEMONIC,
+      hdWallets: [
+        {
+          index: 0,
+          priority: 3,
+        },
+        {
+          index: 1,
+          priority: 2,
+        },
+        {
+          index: 2,
+          priority: 1,
+        },
+      ],
+    };
+    await initWallets();
 
     const bestWallet = await getBestMatchWalletForNetwork(
       MOCK_CHAIN_ID,
       BigNumber.from(100),
     );
-    expect(bestWallet.address).to.equal(addressForMnemonic(MOCK_MNEMONIC_3));
+    expect(bestWallet.address).to.equal(addressForIndex(2));
   });
 
   it('Should skip unavailable wallets when selecting best match', async () => {
-    await setupMockWallets([
-      {
-        mnemonic: MOCK_MNEMONIC_1,
-        priority: 1,
-        isShieldedReceiver: true,
-      },
-      {
-        mnemonic: MOCK_MNEMONIC_2,
-        priority: 2,
-      },
-      {
-        mnemonic: MOCK_MNEMONIC_3,
-        priority: 1,
-      },
-    ]);
+    configDefaults.wallet = {
+      mnemonic: MOCK_MNEMONIC,
+      hdWallets: [
+        {
+          index: 0,
+          priority: 1,
+        },
+        {
+          index: 1,
+          priority: 2,
+        },
+        {
+          index: 2,
+          priority: 1,
+        },
+      ],
+    };
+    await initWallets();
 
     const firstActiveWallet = getActiveWallets()[0];
     const firstWallet = createEthersWallet(
       firstActiveWallet,
       getMockProvider(),
     );
-    expect(firstWallet.address).to.equal(addressForMnemonic(MOCK_MNEMONIC_1));
+    expect(firstWallet.address).to.equal(addressForIndex(0));
     setWalletAvailable(firstActiveWallet, false);
 
     const bestWallet = await getBestMatchWalletForNetwork(
       MOCK_CHAIN_ID,
       BigNumber.from(100),
     );
-    expect(bestWallet.address).to.equal(addressForMnemonic(MOCK_MNEMONIC_3));
+    expect(bestWallet.address).to.equal(addressForIndex(2));
   });
 
   it('Should error if all wallets unavailable', async () => {
-    await setupMockWallets([
-      {
-        mnemonic: MOCK_MNEMONIC_1,
-        priority: 1,
-        isShieldedReceiver: true,
-      },
-    ]);
+    configDefaults.wallet = {
+      mnemonic: MOCK_MNEMONIC,
+      hdWallets: [
+        {
+          index: 0,
+          priority: 1,
+        },
+      ],
+    };
+    await initWallets();
 
     const firstWallet = getActiveWallets()[0];
     setWalletAvailable(firstWallet, false);
@@ -132,13 +140,16 @@ describe('best-match-wallet', () => {
   });
 
   it('Should error if all wallets out of funds', async () => {
-    await setupMockWallets([
-      {
-        mnemonic: MOCK_MNEMONIC_1,
-        priority: 1,
-        isShieldedReceiver: true,
-      },
-    ]);
+    configDefaults.wallet = {
+      mnemonic: MOCK_MNEMONIC,
+      hdWallets: [
+        {
+          index: 0,
+          priority: 1,
+        },
+      ],
+    };
+    await initWallets();
 
     await expect(
       getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(1000)),

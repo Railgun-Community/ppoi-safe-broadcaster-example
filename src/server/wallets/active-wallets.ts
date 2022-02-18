@@ -7,11 +7,10 @@ import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
 import { resetArray } from '../../util/utils';
 import { getLepton } from '../lepton/lepton-init';
-import { getWallets } from './wallet-config';
 
 const activeWallets: ActiveWallet[] = [];
 
-let shieldedReceiverWallet: RailgunWallet;
+let railgunWallet: RailgunWallet;
 
 const RAILGUN_ADDRESS_INDEX = 0;
 
@@ -19,7 +18,11 @@ export const resetWallets = () => {
   resetArray(activeWallets);
 };
 
-const initShieldedReceiverWallet = async (mnemonic: string) => {
+export const derivationPathForIndex = (index: number) => {
+  return `m/44'/60'/0'/0/${index}`;
+};
+
+const initRailgunWallet = async (mnemonic: string) => {
   const lepton = getLepton();
   const encryptionKey = configDefaults.lepton.dbEncryptionKey;
   if (!encryptionKey) {
@@ -31,49 +34,38 @@ const initShieldedReceiverWallet = async (mnemonic: string) => {
     encryptionKey,
     mnemonic,
   );
-  shieldedReceiverWallet = lepton.wallets[walletID];
-};
-
-export const getActiveReceiverWallet = (): ActiveWallet => {
-  const receiverWallets = activeWallets.filter(
-    (wallet) => wallet.isShieldedReceiver,
-  );
-  if (receiverWallets.length !== 1) {
-    throw new Error(
-      'Requires one receiver wallet. Add `isShieldedReceiver` boolean value to one of your configured wallets',
-    );
-  }
-  return receiverWallets[0];
+  railgunWallet = lepton.wallets[walletID];
 };
 
 export const initWallets = async () => {
   resetWallets();
-  getWallets().forEach(({ mnemonic, priority, isShieldedReceiver }) => {
+  const { mnemonic, hdWallets } = configDefaults.wallet;
+  hdWallets.forEach(({ index, priority }) => {
     if (!isValidMnemonic(mnemonic)) {
       throw Error(
         'Invalid or missing MNEMONIC (use docker secret or insecure env-cmdrc for testing)',
       );
     }
-    const wallet = EthersWallet.fromMnemonic(mnemonic);
+    const wallet = EthersWallet.fromMnemonic(
+      mnemonic,
+      derivationPathForIndex(index),
+    );
     activeWallets.push({
       address: wallet.address,
       privateKey: wallet.privateKey,
       mnemonic,
       priority,
-      isShieldedReceiver: isShieldedReceiver === true,
+      index,
     });
   });
-  const activeReceiverWallet = getActiveReceiverWallet();
-  await initShieldedReceiverWallet(activeReceiverWallet.mnemonic);
+  await initRailgunWallet(mnemonic);
 };
 
-export const getShieldedReceiverWallet = (): RailgunWallet => {
-  if (!shieldedReceiverWallet) {
-    throw new Error(
-      'No receiver wallet configured. Please add `isShieldedReceiver` boolean value to one of your configured wallets.',
-    );
+export const getRailgunWallet = (): RailgunWallet => {
+  if (!railgunWallet) {
+    throw new Error('No Railgun wallet initialized.');
   }
-  return shieldedReceiverWallet;
+  return railgunWallet;
 };
 
 export const getRailgunWalletKeypair = (
@@ -85,7 +77,7 @@ export const getRailgunWalletKeypair = (
 } => {
   const index = 0;
   const change = false;
-  return getShieldedReceiverWallet().getKeypair(
+  return getRailgunWallet().getKeypair(
     configDefaults.lepton.dbEncryptionKey,
     index,
     change,
@@ -100,11 +92,7 @@ export const getRailgunWalletPubKey = () => {
 
 export const getRailgunAddress = (chainID?: NetworkChainID) => {
   const change = false;
-  return getShieldedReceiverWallet().getAddress(
-    RAILGUN_ADDRESS_INDEX,
-    change,
-    chainID,
-  );
+  return getRailgunWallet().getAddress(RAILGUN_ADDRESS_INDEX, change, chainID);
 };
 
 export const createEthersWallet = (

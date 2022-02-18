@@ -9,8 +9,8 @@ export default {
       NetworkChainID.Ethereum,
       NetworkChainID.Ropsten,
       NetworkChainID.HardHat,
-      // NetworkChainID.BinanceSmartChain,
-      // NetworkChainID.PolygonPOS,
+      NetworkChainID.BinanceSmartChain,
+      NetworkChainID.PolygonPOS,
     ],
   },
 
@@ -65,6 +65,15 @@ export default {
 
   wallet: {
     mnemonic: secrets.mnemonic,
+
+    // Indeces to configure HD wallets from the same mnemonic.
+    // Each individual wallet needs gas funds, but they reuse the same RAILGUN wallet.
+    hdWallets: [
+      {
+        index: 0,
+        priority: 1,
+      },
+    ],
   },
 
   waku: {

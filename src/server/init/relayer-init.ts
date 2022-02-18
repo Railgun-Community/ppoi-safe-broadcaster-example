@@ -5,10 +5,10 @@ import { initNetworkProviders } from '../providers/active-network-providers';
 import { initPricePoller } from '../tokens/token-price-poller';
 import { logger } from '../../util/logger';
 import { initSettingsDB, closeSettingsDB } from '../db/settings-db';
-import { configOverrides } from '../../MY-CONFIG';
+import { myConfigOverrides } from '../../MY-CONFIG';
 
 export const initRelayerModules = async () => {
-  configOverrides();
+  myConfigOverrides();
   initSettingsDB();
   initLepton(configDefaults.lepton.dbDir);
   await initWallets();

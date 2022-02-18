@@ -15,8 +15,7 @@ export const myConfigOverrides = () => {
   ];
 
   //
-  //  Set other configs, for example:
-  //  configDefaults.debug.logLevel = DebugLevel.None;
-  //  configDefaults.networks.active = [NetworkChainID.Ropsten];
+  //  Set other configs.
+  //  Ex. configDefaults.debug.logLevel = DebugLevel.None;
   //
 };

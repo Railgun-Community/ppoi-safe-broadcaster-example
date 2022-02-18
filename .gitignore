@@ -27,9 +27,8 @@ dist
 .ipfsdata/
 run-dev.sh
 start-relayer.sh
-.tsbuildinfo
 pnpm-lock.yaml
-doc/
+src/MY-CONFIG.ts
 
 # Leveldown database
 *.db/
