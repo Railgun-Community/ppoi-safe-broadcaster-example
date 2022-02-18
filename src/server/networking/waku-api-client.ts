@@ -16,6 +16,8 @@ export type WakuApiClientOptions = {
   url: string;
 };
 
+const MAX_RETRIES = 4;
+
 export class WakuApiClient {
   logger: debug.Debugger;
 
@@ -33,12 +35,16 @@ export class WakuApiClient {
     this.logger('Relaying via ', options.url);
   }
 
-  async request(method: string, params: any) {
+  async request(method: string, params: any, retry = 0): Promise<any> {
     const req = formatJsonRpcRequest(method, params);
     try {
       const response = await this.http.post('/', req);
       return response.data;
     } catch (e: any) {
+      if (retry < MAX_RETRIES) {
+        this.logger('Error posting to relay-api. Retrying.', req, e.message);
+        return this.request(method, params, retry + 1);
+      }
       this.logger('Error posting to relay-api', req, e.message);
       throw Error(e.message);
     }
