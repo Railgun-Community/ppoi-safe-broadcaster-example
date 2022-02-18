@@ -25,6 +25,10 @@ Several environment variables should be set:
 - Build docker image: `docker/build.sh`
 - Run image independently: `docker/run.sh`
 - OR create service: `docker/create.sh`
+- Generate waku `nodekey`: `docker/rand32.sh | docker secret create nodekey -`
+- Pull nim-waku image: `docker pull statusteam/nim-waku:deploy-v2-test`
+
+
 
 ## Run tests
 

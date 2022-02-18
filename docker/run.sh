@@ -1,2 +1,2 @@
 #!/bin/sh
-docker run --name relayer --rm --env-file .env -it relayer:latest
+docker-compose -p railgun -f docker/docker-compose.yml up

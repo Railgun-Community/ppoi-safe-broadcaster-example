@@ -1,0 +1,8 @@
+### install yarn and modules
+FROM statusteam/nim-waku:deploy-v2-test
+
+WORKDIR /app
+COPY ./run-waku.sh /app
+ENTRYPOINT ["/bin/sh"]
+#ENTRYPOINT ["/usr/bin/wakunode"]
+#CMD ["--help"]
