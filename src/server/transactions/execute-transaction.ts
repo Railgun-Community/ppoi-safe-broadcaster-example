@@ -29,6 +29,10 @@ const getCurrentNonce = async (wallet: EthersWallet): Promise<number> => {
   return txCount;
 };
 
+const storeCurrentNonce = async (nonce: number) => {
+  await storeSettingsNumber(LAST_NONCE_KEY, nonce);
+};
+
 export const executeTransaction = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
@@ -41,7 +45,7 @@ export const executeTransaction = async (
   const nonce = await getCurrentNonce(wallet);
   // eslint-disable-next-line no-param-reassign
   populatedTransaction.nonce = nonce;
-  await storeSettingsNumber(LAST_NONCE_KEY, nonce);
+  await storeCurrentNonce(nonce);
   const txWithGas = setGasDetails(populatedTransaction, gasDetails);
   const signedTransaction = await wallet.signTransaction(txWithGas);
   const provider = getProviderForNetwork(chainID);
