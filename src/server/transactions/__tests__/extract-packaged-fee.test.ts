@@ -28,7 +28,6 @@ import {
   initNetworkProviders,
 } from '../../providers/active-network-providers';
 import {
-  getRailgunWalletKeypair,
   getRailgunWalletPubKey,
   getShieldedReceiverWallet,
   initWallets,

@@ -20,6 +20,7 @@ import {
 import { getMockWalletAddress } from '../../../test/mocks.test';
 import { getActiveWallets, initWallets } from '../../wallets/active-wallets';
 import { delay } from '../../../util/promise-utils';
+import { initLepton } from '../../lepton/lepton-init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -31,8 +32,9 @@ const shouldUpdateEthWalletBalance = (address: string) => {
 };
 
 describe('balance-cache', () => {
-  before(() => {
-    initWallets();
+  before(async () => {
+    initLepton('test.db');
+    await initWallets();
     initNetworkProviders();
     resetGasTokenBalanceCache();
     createGasBalanceStub(BigNumber.from(5000));
