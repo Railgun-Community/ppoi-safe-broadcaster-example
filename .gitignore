@@ -29,6 +29,7 @@ run-dev.sh
 start-relayer.sh
 pnpm-lock.yaml
 src/MY-CONFIG.ts
+docker/secret
 
 # Leveldown database
 *.db/
