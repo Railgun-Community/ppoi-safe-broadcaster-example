@@ -11,6 +11,7 @@ import { getLepton } from '../lepton/lepton-init';
 const activeWallets: ActiveWallet[] = [];
 
 let railgunWallet: RailgunWallet;
+let railgunWalletPubKey: string;
 
 const RAILGUN_ADDRESS_INDEX = 0;
 
@@ -35,6 +36,7 @@ const initRailgunWallet = async (mnemonic: string) => {
     mnemonic,
   );
   railgunWallet = lepton.wallets[walletID];
+  railgunWalletPubKey = getRailgunWalletKeypair(0).pubkey;
 };
 
 export const initWallets = async () => {
@@ -86,8 +88,10 @@ export const getRailgunWalletKeypair = (
 };
 
 export const getRailgunWalletPubKey = () => {
-  const chainID = 0;
-  return getRailgunWalletKeypair(chainID).pubkey;
+  if (!railgunWalletPubKey) {
+    throw new Error('No railgun wallet initialized.');
+  }
+  return railgunWalletPubKey;
 };
 
 export const getRailgunAddress = (chainID?: NetworkChainID) => {

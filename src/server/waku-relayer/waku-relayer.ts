@@ -28,7 +28,7 @@ type JsonRPCMessageHandler = (
   params: any,
   id: number,
   logger: debug.Debugger,
-) => Promise<JsonRpcResult<string>>;
+) => Promise<Optional<JsonRpcResult<string>>>;
 
 export type WakuRelayerOptions = {
   topic: string;
@@ -111,8 +111,7 @@ export class WakuRelayer {
         });
       }
     } catch (e) {
-      console.log(e);
-      this.dbg('caught error', e);
+      this.dbg('Caught error', e);
     }
   }
 
