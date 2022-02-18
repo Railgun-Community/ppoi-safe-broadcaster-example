@@ -10,6 +10,6 @@ export const configuredNetworkChainIDs = (): NetworkChainID[] => {
     }),
   );
   return chainIDs
-    .filter((chainID) => configDefaults.useNetworks.includes(chainID))
+    .filter((chainID) => configDefaults.networks.active.includes(chainID))
     .filter((chainID) => configNetworks[chainID] != null);
 };

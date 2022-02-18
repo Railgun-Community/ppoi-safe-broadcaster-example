@@ -58,7 +58,7 @@ export const shouldUpdateCachedGasTokenBalance = (
   const cachedBalance = gasTokenBalanceCache[chainID][walletAddress];
   const cachedBalanceExpired =
     cachedBalance.updatedAt <
-    Date.now() - configDefaults.gasTokenBalanceCacheTTLInMS;
+    Date.now() - configDefaults.balances.gasTokenBalanceCacheTTLInMS;
   return cachedBalanceExpired;
 };
 

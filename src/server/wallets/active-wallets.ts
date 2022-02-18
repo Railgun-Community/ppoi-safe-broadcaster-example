@@ -4,10 +4,10 @@ import { Wallet as EthersWallet } from 'ethers';
 import { isValidMnemonic } from 'ethers/lib/utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
-import configWallets from '../config/config-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
 import { resetArray } from '../../util/utils';
 import { getLepton } from '../lepton/lepton-init';
+import { getWallets } from './wallet-config';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -21,7 +21,7 @@ export const resetWallets = () => {
 
 const initShieldedReceiverWallet = async (mnemonic: string) => {
   const lepton = getLepton();
-  const encryptionKey = configDefaults.leptonDbEncryptionKey;
+  const encryptionKey = configDefaults.lepton.dbEncryptionKey;
   if (!encryptionKey) {
     throw Error(
       'DB_ENCRYPTION_KEY not set (use docker secret, or env-cmdrc for insecure testing)',
@@ -48,23 +48,21 @@ export const getActiveReceiverWallet = (): ActiveWallet => {
 
 export const initWallets = async () => {
   resetWallets();
-  configWallets.wallets.forEach(
-    ({ mnemonic, priority, isShieldedReceiver }) => {
-      if (!isValidMnemonic(mnemonic)) {
-        throw Error(
-          'Invalid or missing MNEMONIC (use docker secret or insecure env-cmdrc for testing)',
-        );
-      }
-      const wallet = EthersWallet.fromMnemonic(mnemonic);
-      activeWallets.push({
-        address: wallet.address,
-        privateKey: wallet.privateKey,
-        mnemonic,
-        priority,
-        isShieldedReceiver: isShieldedReceiver === true,
-      });
-    },
-  );
+  getWallets().forEach(({ mnemonic, priority, isShieldedReceiver }) => {
+    if (!isValidMnemonic(mnemonic)) {
+      throw Error(
+        'Invalid or missing MNEMONIC (use docker secret or insecure env-cmdrc for testing)',
+      );
+    }
+    const wallet = EthersWallet.fromMnemonic(mnemonic);
+    activeWallets.push({
+      address: wallet.address,
+      privateKey: wallet.privateKey,
+      mnemonic,
+      priority,
+      isShieldedReceiver: isShieldedReceiver === true,
+    });
+  });
   const activeReceiverWallet = getActiveReceiverWallet();
   await initShieldedReceiverWallet(activeReceiverWallet.mnemonic);
 };
@@ -88,7 +86,7 @@ export const getRailgunWalletKeypair = (
   const index = 0;
   const change = false;
   return getShieldedReceiverWallet().getKeypair(
-    configDefaults.leptonDbEncryptionKey,
+    configDefaults.lepton.dbEncryptionKey,
     index,
     change,
     chainID,

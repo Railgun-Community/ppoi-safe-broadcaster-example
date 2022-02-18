@@ -66,7 +66,7 @@ describe('balance-cache', () => {
   });
 
   it('Should only refresh balances when necessary', async () => {
-    configDefaults.gasTokenBalanceCacheTTLInMS = 10;
+    configDefaults.balances.gasTokenBalanceCacheTTLInMS = 10;
     expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.true;
     await updateCachedGasTokenBalance(
       NetworkChainID.Ethereum,

@@ -10,10 +10,6 @@ type ChainIDMapType<T> = {
 export type AddressToTokenMap = MapType<TokenConfig>;
 export type NetworkTokensConfig = ChainIDMapType<AddressToTokenMap>;
 
-export type WalletsConfig = {
-  wallets: WalletConfig[];
-};
-
 export type NetworksConfig = ChainIDMapType<Network>;
 
 export type Secrets = {

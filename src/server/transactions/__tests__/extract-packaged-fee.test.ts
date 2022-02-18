@@ -16,7 +16,6 @@ import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configDefaults from '../../config/config-defaults';
-import configWallets from '../../config/config-wallets';
 import {
   getMockRopstenNetwork,
   getMockToken,
@@ -75,7 +74,7 @@ const createRopstenTransaction = (
   return transaction.prove(
     lepton.prover,
     railgunWallet,
-    configDefaults.leptonDbEncryptionKey,
+    configDefaults.lepton.dbEncryptionKey,
   );
 };
 
@@ -84,13 +83,7 @@ describe('extract-packaged-fee', () => {
     initLepton('test.db');
     lepton = getLepton();
 
-    configWallets.wallets = [
-      {
-        mnemonic: MOCK_MNEMONIC_1,
-        priority: 1,
-        isShieldedReceiver: true,
-      },
-    ];
+    configDefaults.wallet.mnemonic = MOCK_MNEMONIC_1;
     await initWallets();
 
     const ropstenNetwork = getMockRopstenNetwork();

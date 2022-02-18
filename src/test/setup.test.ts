@@ -3,7 +3,6 @@ import fs from 'fs';
 import { NetworkChainID } from '../server/config/config-chain-ids';
 import configDefaults from '../server/config/config-defaults';
 import configNetworks from '../server/config/config-networks';
-import configWallets from '../server/config/config-wallets';
 import { DebugLevel } from '../models/debug-models';
 import { Network } from '../models/network-models';
 import { initWallets } from '../server/wallets/active-wallets';
@@ -12,8 +11,8 @@ import { getMockNetwork } from './mocks.test';
 const TEST_DB = 'test.db';
 
 const setupTests = () => {
-  configDefaults.debugLevel = DebugLevel.None;
-  configDefaults.leptonDb = TEST_DB;
+  configDefaults.debug.logLevel = DebugLevel.None;
+  configDefaults.lepton.dbDir = TEST_DB;
 };
 
 before(() => {
@@ -21,13 +20,8 @@ before(() => {
 });
 
 export const setupSingleTestWallet = async () => {
-  configWallets.wallets = [
-    {
-      mnemonic: 'test test test test test test test test test test test junk',
-      priority: 1,
-      isShieldedReceiver: true,
-    },
-  ];
+  configDefaults.wallet.mnemonic =
+    'test test test test test test test test test test test junk';
   await initWallets();
 };
 

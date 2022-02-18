@@ -26,6 +26,7 @@ const MOCK_TOKEN_PRICE_2 = 20.0;
 const mockTokenPriceGetter: TokenPricesGetter = async (
   chainID: NetworkChainID,
   tokenAddresses: string[],
+  // eslint-disable-next-line require-await
 ) => {
   const tokenAddressesToPrice: TokenAddressesToPrice = {};
   if (chainID === NetworkChainID.Ethereum) {
@@ -54,7 +55,7 @@ const mockTokenPriceGetter: TokenPricesGetter = async (
 describe('token-price-poller', () => {
   before(() => {
     configTokenPriceGetter.tokenPriceGetter = mockTokenPriceGetter;
-    configDefaults.tokenPriceRefreshDelayInMS = 3 * 1000; // 3 second refresh.
+    configDefaults.tokenPrices.priceRefreshDelayInMS = 3 * 1000; // 3 second refresh.
     mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1);
     mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2);
   });

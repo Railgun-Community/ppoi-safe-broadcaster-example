@@ -36,15 +36,17 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
   });
 };
 
-const pollPrices = async (tokenPricesGetter: TokenPricesGetter) => {
+const pollPrices = async () => {
   try {
-    await pullAndCacheCurrentPricesForAllNetworks(tokenPricesGetter);
+    await pullAndCacheCurrentPricesForAllNetworks(
+      configTokenPriceGetter.tokenPriceGetter,
+    );
   } catch (err: any) {
     logger.error(err);
   } finally {
-    await delay(configDefaults.tokenPriceRefreshDelayInMS);
+    await delay(configDefaults.tokenPrices.priceRefreshDelayInMS);
     if (shouldPoll) {
-      pollPrices(tokenPricesGetter);
+      pollPrices();
     }
   }
 };
@@ -55,5 +57,5 @@ export const stopPolling = () => {
 
 export const initPricePoller = () => {
   shouldPoll = true;
-  pollPrices(configTokenPriceGetter.tokenPriceGetter);
+  pollPrices();
 };

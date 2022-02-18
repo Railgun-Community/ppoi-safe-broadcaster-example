@@ -1,6 +1,7 @@
 /* globals describe, it, before, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { BigNumber } from 'ethers';
 import configDefaults from '../../config/config-defaults';
 import {
   cacheFeeForTransaction,
@@ -8,7 +9,6 @@ import {
   resetTransactionFeeCache,
 } from '../transaction-fee-cache';
 import { delay } from '../../../util/promise-utils';
-import { BigNumber } from 'ethers';
 import { getMockSerializedTransaction } from '../../../test/mocks.test';
 
 chai.use(chaiAsPromised);
@@ -21,7 +21,7 @@ const MOCK_FEE = BigNumber.from(10);
 describe('transaction-fee-cache', () => {
   before(() => {
     // Set TTL to 50 ms.
-    configDefaults.transactionFeeCacheTTLInMS = 10;
+    configDefaults.transactionFees.cacheTTLInMS = 10;
   });
 
   beforeEach(() => {

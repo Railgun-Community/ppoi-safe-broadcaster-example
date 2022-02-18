@@ -1,6 +1,8 @@
-/* globals describe, before, it, beforeEach, afterEach */
+/* globals describe, before, after, it, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { BigNumber, Wallet as EthersWallet } from 'ethers';
+import sinon, { SinonStub } from 'sinon';
 import { initLepton } from '../../lepton/lepton-init';
 import {
   createEthersWallet,
@@ -8,16 +10,13 @@ import {
   initWallets,
 } from '../active-wallets';
 import { getBestMatchWalletForNetwork } from '../best-match-wallet';
-import configWallets from '../../config/config-wallets';
 import { WalletConfig } from '../../../models/wallet-models';
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import {
   resetAvailableWallets,
   setWalletAvailable,
 } from '../available-wallets';
 import { getMockProvider } from '../../../test/mocks.test';
-import sinon, { SinonStub } from 'sinon';
 import * as BalanceCacheModule from '../../balances/balance-cache';
 
 chai.use(chaiAsPromised);
@@ -34,7 +33,7 @@ const MOCK_MNEMONIC_3 =
 let getCachedGasTokenBalanceStub: SinonStub;
 
 const setupMockWallets = async (wallets: WalletConfig[]) => {
-  configWallets.wallets = wallets;
+  // config.wallets = wallets;
   await initWallets();
 };
 
@@ -44,7 +43,7 @@ const addressForMnemonic = (mnemonic: string): string => {
 };
 
 describe('best-match-wallet', () => {
-  before(async () => {
+  before(() => {
     initLepton('test.db');
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')

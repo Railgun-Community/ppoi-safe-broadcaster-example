@@ -12,7 +12,7 @@ export const initSettingsDB = () => {
   if (db) {
     return;
   }
-  const level = leveldown(configDefaults.settingsDb);
+  const level = leveldown(configDefaults.settings.dbDir);
   db = new Database(level);
 };
 

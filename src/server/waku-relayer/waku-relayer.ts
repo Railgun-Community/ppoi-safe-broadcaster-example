@@ -135,7 +135,7 @@ export class WakuRelayer {
   }
 
   async broadcastFeesOnInterval() {
-    await delay(configDefaults.broadcastFeesDelayInMS);
+    await delay(configDefaults.waku.broadcastFeesDelayInMS);
     const chainIDs = configuredNetworkChainIDs();
     const broadcastPromises: Promise<void>[] = chainIDs.map((chainID) =>
       this.broadcastFeesForChain(chainID),

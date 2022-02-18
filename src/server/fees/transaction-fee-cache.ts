@@ -47,7 +47,7 @@ export const lookUpCachedFee = (
     return undefined;
   }
 
-  const ttl = configDefaults.transactionFeeCacheTTLInMS;
+  const ttl = configDefaults.transactionFees.cacheTTLInMS;
   const feeExpired = cachedFee.updatedAt + ttl < Date.now();
   if (feeExpired) {
     return undefined;

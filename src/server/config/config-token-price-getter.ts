@@ -30,7 +30,7 @@ const testNetworkDefaultPrices = (
   return tokenAddressesToPrice;
 };
 
-export const tokenPriceGetter = async (
+const tokenPriceGetter = async (
   chainID: NetworkChainID,
   tokenAddresses: string[],
 ): Promise<TokenAddressesToPrice> => {

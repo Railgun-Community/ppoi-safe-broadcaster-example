@@ -31,7 +31,7 @@ export const initLepton = (dbName: string, optDebugger?: LeptonDebugger) => {
     levelDB,
     artifactsGetter,
     quickSync,
-    configDefaults.debugLepton ? leptonDebugger : undefined,
+    configDefaults.debug.lepton ? leptonDebugger : undefined,
   );
 };
 

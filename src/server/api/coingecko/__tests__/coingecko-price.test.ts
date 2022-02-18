@@ -2,12 +2,12 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
+import axios from 'axios';
 import { CoingeckoNetworkID } from '../../../../models/api-constants';
 import { CoingeckoApiEndpoint, getCoingeckoData } from '../coingecko-fetch';
 import { coingeckoPriceLookupByAddresses } from '../coingecko-price';
 import * as coingeckoFetchModule from '../coingecko-fetch';
-import { tokenPriceGetter } from '../../../config/config-token-price-getter';
-import axios from 'axios';
+import configTokenPriceGetter from '../../../config/config-token-price-getter';
 import { NetworkChainID } from '../../../config/config-chain-ids';
 import { TokenAddressesToPrice } from '../../../tokens/token-price-cache';
 import configNetworks from '../../../config/config-networks';
@@ -69,7 +69,7 @@ describe('coingecko-price', () => {
     TOKEN_ADDRESSES.forEach((address) => {
       const priceData = coingeckoPriceMap[address];
       expect(priceData).to.be.an('object');
-      expect(priceData['usd']).to.be.a('number');
+      expect(priceData.usd).to.be.a('number');
       expect(priceData.last_updated_at).to.be.a('number');
     });
   }).timeout(20000);
@@ -107,7 +107,7 @@ describe('coingecko-price', () => {
     stubGetCoingeckoData.restore();
   });
 
-  it('Should retry Coingecko API fetch on error', async () => {
+  it('Should retry Coingecko API fetch on error', () => {
     const stubAxiosGet = sinon.stub(axios, 'get').throws();
 
     const params = {
@@ -133,7 +133,7 @@ describe('coingecko-price', () => {
       .stub(coingeckoFetchModule, 'getCoingeckoData')
       .resolves(expectedCoingeckoPriceOutput(nowTimestamp));
 
-    const tokenAddressesToPrice = await tokenPriceGetter(
+    const tokenAddressesToPrice = await configTokenPriceGetter.tokenPriceGetter(
       NetworkChainID.Ethereum,
       TOKEN_ADDRESSES,
     );
@@ -143,7 +143,7 @@ describe('coingecko-price', () => {
   });
 
   it('Should run configured price getter for Ropsten', async () => {
-    const tokenAddressesToPrice = await tokenPriceGetter(
+    const tokenAddressesToPrice = await configTokenPriceGetter.tokenPriceGetter(
       NetworkChainID.Ropsten,
       TOKEN_ADDRESSES,
     );

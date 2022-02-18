@@ -7,12 +7,12 @@ const dbg = debug('relayer:main');
 
 const main = async (): Promise<void> => {
   dbg('Warming up Relayer');
-  dbg(`Connecting to ${config.wakuRpcUrl}`);
+  dbg(`Connecting to ${config.waku.rpcURL}`);
 
   await initRelayerModules();
 
   const wakuRelayer = await WakuRelayer.init({
-    url: config.wakuRpcUrl,
+    url: config.waku.rpcURL,
     topic: WAKU_TOPIC,
     pollFrequency: 10 * 1000,
   });

@@ -51,7 +51,7 @@ export const getCoingeckoData = async (
     logger.warn(`getCoingeckoData error: ${err.message}`);
     if (
       !retryCount ||
-      retryCount < configDefaults.numRetriesCoingeckoPriceLookup
+      retryCount < configDefaults.tokenPrices.priceLookupRetries
     ) {
       logger.log('Retrying getCoingeckoData request...');
       return getCoingeckoData(

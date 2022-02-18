@@ -35,7 +35,7 @@ export const createTransactionGasDetails = async (
   );
 
   const networkConfig = configNetworks[chainID];
-  const precision = configDefaults.transactionFeePrecision;
+  const { precision } = configDefaults.transactionFees;
   const roundedRatio = getRoundedTokenToGasPriceRatio(
     tokenPrice,
     gasTokenPrice,
@@ -61,7 +61,7 @@ export const createTransactionGasDetails = async (
   }
 
   return {
-    gasLimit: gasLimit,
+    gasLimit,
     gasPrice: translatedGasPrice,
   };
 };

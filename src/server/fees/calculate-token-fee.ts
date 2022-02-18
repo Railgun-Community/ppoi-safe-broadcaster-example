@@ -38,7 +38,7 @@ export const calculateTokenFeePerUnitGasToken = (
   chainID: NetworkChainID,
   tokenAddress: string,
 ) => {
-  const precision = configDefaults.transactionFeePrecision;
+  const { precision } = configDefaults.transactionFees;
   const { roundedPriceRatio, decimalRatio } = getTokenRatiosFromCachedPrices(
     chainID,
     tokenAddress,
@@ -63,7 +63,7 @@ export const calculateTokenFeeForTransaction = async (
   serializedTransaction: string,
   tokenAddress: string,
 ): Promise<BigNumber> => {
-  const precision = configDefaults.transactionFeePrecision;
+  const { precision } = configDefaults.transactionFees;
   const { roundedPriceRatio, decimalRatio } = getTokenRatiosFromCachedPrices(
     chainID,
     tokenAddress,
@@ -136,7 +136,7 @@ export const getRoundedTokenToGasPriceRatio = (
   const slippage = priceRatio * fees.slippageBuffer;
   const profit = priceRatio * fees.slippageBuffer;
   const totalFeeRatio = priceRatio + slippage + profit;
-  const ratioMinimum = configDefaults.transactionFeeRatioMinimum;
+  const ratioMinimum = configDefaults.transactionFees.priceRatioMinimum;
 
   const ratio = totalFeeRatio * precision;
   if (ratio < ratioMinimum) {

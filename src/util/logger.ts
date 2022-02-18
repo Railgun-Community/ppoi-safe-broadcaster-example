@@ -16,7 +16,7 @@ export const getDbgInstances = () => {
 };
 
 const hasDebugLevel = (debugLevels: DebugLevel[]): boolean => {
-  return debugLevels.includes(configDefaults.debugLevel);
+  return debugLevels.includes(configDefaults.debug.logLevel);
 };
 
 const loggerImpl = {
