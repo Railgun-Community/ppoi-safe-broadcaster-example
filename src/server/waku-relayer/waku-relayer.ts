@@ -30,6 +30,10 @@ type JsonRPCMessageHandler = (
   logger: debug.Debugger,
 ) => Promise<Optional<JsonRpcResult<string>>>;
 
+export enum WakuMethodNames {
+  Transact = 'transact',
+}
+
 export type WakuRelayerOptions = {
   topic: string;
   pollFrequency: number;
@@ -47,7 +51,7 @@ export class WakuRelayer {
   walletPublicKey: string;
 
   methods: MapType<JsonRPCMessageHandler> = {
-    transact: transactMethod,
+    [WakuMethodNames.Transact]: transactMethod,
   };
 
   constructor(client: WakuApiClient, options: WakuRelayerOptions) {
