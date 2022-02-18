@@ -19,4 +19,5 @@ jobs:
         with:
           node-version: '16.6'
       - run: npm i
+      - run: npm run overwrite-my-config
       - run: npm test
