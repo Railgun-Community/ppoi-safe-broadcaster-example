@@ -18,6 +18,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16.6'
-      - run: npm i
       - run: npm run overwrite-my-config
+      - run: npm i
       - run: npm test
