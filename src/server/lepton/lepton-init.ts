@@ -1,13 +1,13 @@
 import { Lepton } from '@railgun-community/lepton';
-import { logger } from '../../util/logger';
 import level from 'level';
+import { LeptonDebugger } from '@railgun-community/lepton/dist/models/types';
+import { FallbackProvider } from '@ethersproject/providers';
+import { logger } from '../../util/logger';
 import { artifactsGetter } from './artifacts';
 import { quickSync } from '../api/quick-sync/quick-sync';
 import configDefaults from '../config/config-defaults';
-import { LeptonDebugger } from '@railgun-community/lepton/dist/models/types';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
-import { getProviderForNetwork } from '../providers/active-network-providers';
 
 let lepton: Lepton;
 
@@ -35,14 +35,16 @@ export const initLepton = (dbName: string, optDebugger?: LeptonDebugger) => {
   );
 };
 
-export const initLeptonNetwork = (chainID: NetworkChainID) => {
+export const initLeptonNetwork = (
+  chainID: NetworkChainID,
+  provider: FallbackProvider,
+) => {
   if (!lepton) {
     // No Lepton instance (might be in unit test).
     return;
   }
 
   const network = configNetworks[chainID];
-  const provider = getProviderForNetwork(chainID);
   const deploymentBlock = network.deploymentBlock ?? 0;
 
   // Note: This call is async, but we call it synchronously

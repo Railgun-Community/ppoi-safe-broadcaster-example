@@ -37,7 +37,7 @@ export const updateAllActiveWalletsGasTokenBalances = async () => {
   const balanceUpdatePromises: Promise<void>[] = [];
 
   configuredNetworkChainIDs().forEach((chainID) => {
-    activeWallets.forEach(async ({ address }) => {
+    activeWallets.forEach(({ address }) => {
       balanceUpdatePromises.push(updateCachedGasTokenBalance(chainID, address));
     });
   });

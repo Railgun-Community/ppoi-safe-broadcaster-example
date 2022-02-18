@@ -40,8 +40,11 @@ export default {
   // We guard against price ratios under this amount, which are too imprecise.
   transactionFeeRatioMinimum: 10 ** 3,
 
-  // directory in which leveldown db will be stored
+  // Directory in which Lepton leveldown db will be stored
   leptonDb: process.env.LEPTON_DB ?? 'server.db',
+
+  // Directory in which Settings leveldown db will be stored
+  settingsDb: process.env.SETTINGS_DB ?? 'settings.db',
 
   // Key used to encrypt wallets in the Lepton database.
   leptonDbEncryptionKey: secrets.dbEncryptionKey,

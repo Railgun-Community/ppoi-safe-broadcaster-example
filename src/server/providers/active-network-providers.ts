@@ -1,4 +1,4 @@
-import { BaseProvider, FallbackProvider } from '@ethersproject/providers';
+import { FallbackProvider } from '@ethersproject/providers';
 import configNetworks from '../config/config-networks';
 import { createFallbackProviderFromJsonConfig } from './fallback-providers';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
@@ -19,10 +19,11 @@ export const initNetworkProviders = () => {
         `Fallback Provider chain ID ${fallbackProviderConfig.chainId} does not match ID ${chainId} for network: ${name}`,
       );
     }
-    activeNetworkProviders[chainId] = createFallbackProviderFromJsonConfig(
+    const fallbackProvider = createFallbackProviderFromJsonConfig(
       fallbackProviderConfig,
     );
-    initLeptonNetwork(chainId);
+    activeNetworkProviders[chainId] = fallbackProvider;
+    initLeptonNetwork(chainId, fallbackProvider);
   });
 };
 
