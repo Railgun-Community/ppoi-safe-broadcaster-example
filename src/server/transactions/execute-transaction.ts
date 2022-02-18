@@ -1,9 +1,12 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { PopulatedTransaction } from 'ethers';
+import { PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
+import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
+
+const LAST_NONCE_KEY = 'last_nonce_key';
 
 const setGasDetails = (
   populatedTransaction: PopulatedTransaction,
@@ -15,6 +18,17 @@ const setGasDetails = (
   return txWithGas;
 };
 
+const getCurrentNonce = async (wallet: EthersWallet): Promise<number> => {
+  const [txCount, lastTransactionNonce] = await Promise.all([
+    wallet.getTransactionCount(),
+    await getSettingsNumber(LAST_NONCE_KEY),
+  ]);
+  if (lastTransactionNonce) {
+    return Math.max(txCount, lastTransactionNonce + 1);
+  }
+  return txCount;
+};
+
 export const executeTransaction = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
@@ -24,8 +38,10 @@ export const executeTransaction = async (
     chainID,
     gasDetails.gasLimit,
   );
-  const txCount = await wallet.getTransactionCount();
-  populatedTransaction.nonce = txCount;
+  const nonce = await getCurrentNonce(wallet);
+  // eslint-disable-next-line no-param-reassign
+  populatedTransaction.nonce = nonce;
+  await storeSettingsNumber(LAST_NONCE_KEY, nonce);
   const txWithGas = setGasDetails(populatedTransaction, gasDetails);
   const signedTransaction = await wallet.signTransaction(txWithGas);
   const provider = getProviderForNetwork(chainID);
