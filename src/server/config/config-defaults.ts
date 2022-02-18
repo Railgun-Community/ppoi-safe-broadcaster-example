@@ -40,26 +40,21 @@ export default {
   // We guard against price ratios under this amount, which are too imprecise.
   transactionFeeRatioMinimum: 10 ** 3,
 
-  // Directory in which Lepton leveldown db will be stored
+  // Directory in which Lepton leveldown db will be stored.
   leptonDb: process.env.LEPTON_DB ?? 'server.db',
 
-  // Directory in which Settings leveldown db will be stored
+  // Directory in which Settings leveldown db will be stored.
   settingsDb: process.env.SETTINGS_DB ?? 'settings.db',
 
   // Key used to encrypt wallets in the Lepton database.
   leptonDbEncryptionKey: secrets.dbEncryptionKey,
 
-  // secret mnemonic phrase
+  // Secret mnemonic phrase.
   mnemonic: secrets.mnemonic,
 
   // Broadcast fees every 15 seconds.
   broadcastFeesDelayInMS: 15 * 1000,
 
-  // Waku options.
-  //  peers to request waku rpc to connect to
-  directPeers: [
-    '/dns4/relayer.of.holdings/tcp/8000/wss/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg',
-  ],
-  //  url of nim-waku rpc server (eg http://localhost:8546)
+  // URL of nim-waku rpc server (eg http://localhost:8546).
   wakuRpcUrl: process.env.WAKU_RPC_URL ?? 'http://localhost:8546',
 };

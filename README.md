@@ -28,8 +28,6 @@ Several environment variables should be set:
 - Generate waku `nodekey`: `docker/rand32.sh | docker secret create nodekey -`
 - Pull nim-waku image: `docker pull statusteam/nim-waku:deploy-v2-test`
 
-
-
 ## Run tests
 
 - `npm run test`
