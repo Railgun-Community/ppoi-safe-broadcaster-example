@@ -16,7 +16,8 @@ export const initSettingsDB = () => {
   db = new Database(level);
 };
 
-export const uninitSettingsDB = () => {
+export const closeSettingsDB = () => {
+  db?.close();
   db = undefined;
 };
 

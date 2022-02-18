@@ -1,4 +1,4 @@
-/* globals describe, before, it, beforeEach, afterEach */
+/* globals describe, before, after, it, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -10,13 +10,17 @@ import {
   storeSettingsBytes,
   storeSettingsNumber,
   storeSettingsString,
-  uninitSettingsDB,
+  closeSettingsDB,
 } from '../settings-db';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('settings-db', () => {
+  after(() => {
+    closeSettingsDB();
+  });
+
   it('Should test settings db', async () => {
     initSettingsDB();
     await clearSettingsDB();
@@ -32,7 +36,7 @@ describe('settings-db', () => {
   });
 
   it('Should test settings db errors', async () => {
-    uninitSettingsDB();
+    closeSettingsDB();
     await storeSettingsString('str', 'val');
     await storeSettingsBytes('byt', 'val');
     await storeSettingsNumber('str', 12500);

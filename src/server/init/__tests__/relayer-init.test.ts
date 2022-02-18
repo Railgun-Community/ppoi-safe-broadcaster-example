@@ -1,4 +1,4 @@
-/* globals describe, before, it, beforeEach, afterEach */
+/* globals describe, before, after, it, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
@@ -7,11 +7,16 @@ import * as leptonInitModule from '../../lepton/lepton-init';
 import * as activeWalletsModule from '../../wallets/active-wallets';
 import * as activeProvidersModule from '../../providers/active-network-providers';
 import * as activeTokenPricePollerModule from '../../tokens/token-price-poller';
+import { closeSettingsDB } from '../../db/settings-db';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('relayer-init', () => {
+  after(() => {
+    closeSettingsDB();
+  });
+
   it('Should run init scripts', async () => {
     const stubInitLepton = sinon.stub(leptonInitModule, 'initLepton').returns();
     const stubInitWallets = sinon
