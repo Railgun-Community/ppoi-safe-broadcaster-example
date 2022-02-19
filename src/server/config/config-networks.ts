@@ -13,8 +13,8 @@ import { NetworksConfig } from '../../models/config-models';
 import { QuickSyncURL } from '../../models/network-models';
 
 const defaultFees = {
-  slippageBuffer: 0.05,
-  profit: 0.05,
+  slippageBuffer: 0.03,
+  profit: 0.07,
 };
 
 export default {

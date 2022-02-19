@@ -1,5 +1,5 @@
 /// <reference types="../../../global" />
-/* globals describe, it, before, beforeEach, afterEach */
+/* globals describe, it, before, after, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
@@ -22,8 +22,9 @@ import {
   resetTokenPriceCache,
   TokenPrice,
 } from '../../tokens/token-price-cache';
-import { calculateTokenFeeForTransaction } from '../calculate-token-fee';
 import { createTransactionGasDetails } from '../calculate-transaction-gas';
+import { estimateMaximumGas } from '../gas-estimate';
+import { getTokenFee } from '../calculate-token-fee';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -95,11 +96,13 @@ describe('calculate-transaction-gas', () => {
   it('[e2e] Should calculate token fee, then calculate equivalent gas fee', async () => {
     createGasEstimateStubs(MOCK_GAS_ESTIMATE, MOCK_GAS_PRICE);
 
-    const tokenFee = await calculateTokenFeeForTransaction(
+    const populatedTransaction = getMockPopulatedTransaction();
+
+    const maximumGas = await estimateMaximumGas(
       MOCK_CHAIN_ID,
-      getMockSerializedTransaction(),
-      MOCK_TOKEN_ADDRESS,
+      populatedTransaction,
     );
+    const tokenFee = getTokenFee(MOCK_CHAIN_ID, maximumGas, MOCK_TOKEN_ADDRESS);
     const gasDetails = await createTransactionGasDetails(
       MOCK_CHAIN_ID,
       getMockPopulatedTransaction(),

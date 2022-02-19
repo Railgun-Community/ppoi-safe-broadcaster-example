@@ -8,6 +8,7 @@ import { deserializePopulatedTransaction } from './populated-transaction';
 
 export const processTransaction = async (
   chainID: NetworkChainID,
+  feeCacheID: string,
   serializedTransaction: string,
 ): Promise<TransactionResponse> => {
   const populatedTransaction = deserializePopulatedTransaction(
@@ -20,8 +21,9 @@ export const processTransaction = async (
   );
   await validateFee(
     chainID,
-    serializedTransaction,
     tokenAddress,
+    populatedTransaction,
+    feeCacheID,
     packagedFeeAmount,
   );
 

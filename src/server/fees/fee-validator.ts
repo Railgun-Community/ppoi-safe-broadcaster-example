@@ -1,46 +1,61 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { logger } from '../../util/logger';
-import { calculateTokenFeeForTransaction } from './calculate-token-fee';
-import { lookUpCachedFee } from './transaction-fee-cache';
+import { getTokenFee } from './calculate-token-fee';
+import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
+import { estimateMaximumGas } from './gas-estimate';
+import configNetworks from '../config/config-networks';
+
+const comparePackagedFeeToCalculated = (
+  chainID: NetworkChainID,
+  packagedFee: BigNumber,
+  calculatedFee: BigNumber,
+) => {
+  const { slippageBuffer } = configNetworks[chainID].fees;
+  const calculatedFeeWithBuffer = calculatedFee
+    .mul(Math.round(10000 * (1 - slippageBuffer)))
+    .div(10000);
+  return packagedFee.gte(calculatedFeeWithBuffer);
+};
 
 export const validateFee = async (
   chainID: NetworkChainID,
-  serializedTransaction: string,
   tokenAddress: string,
+  populatedTransaction: PopulatedTransaction,
+  feeID: string,
   packagedFee: BigNumber,
 ) => {
   logger.log(`validateFee: ${tokenAddress} (chain ${chainID})`);
+  const maximumGas = await estimateMaximumGas(chainID, populatedTransaction);
 
   // Check packaged fee against cached fee.
-  // Cache expires with TTL setting: transactionFeeCacheTTLInMS.
-  const cachedFee = lookUpCachedFee(serializedTransaction, tokenAddress);
-  if (
-    cachedFee &&
-    packagedFee.gte(BigNumber.from(cachedFee.maximumGasFeeString))
-  ) {
-    return;
+  // Cache expires with TTL setting: transactionFees.feeExpirationInMS.
+  const cachedFee = lookUpCachedUnitTokenFee(chainID, feeID, tokenAddress);
+  if (cachedFee) {
+    if (
+      comparePackagedFeeToCalculated(
+        chainID,
+        packagedFee,
+        cachedFee.mul(maximumGas),
+      )
+    ) {
+      return;
+    }
   }
 
+  // Re-calculate the fee based on current pricing if cache is expired.
   let calculatedFee;
-
   try {
-    // Re-calculate the fee if cache is expired.
-    calculatedFee = await calculateTokenFeeForTransaction(
-      chainID,
-      serializedTransaction,
-      tokenAddress,
-    );
-    if (packagedFee.gte(calculatedFee)) {
+    calculatedFee = getTokenFee(chainID, maximumGas, tokenAddress);
+    if (comparePackagedFeeToCalculated(chainID, packagedFee, calculatedFee)) {
       return;
     }
   } catch (err: any) {
-    logger.error(err);
-    throw new Error(`Unable to refresh Relayer token fee: ${err.message}`);
+    logger.log(`error getting current token fee: ${err.message}`);
   }
 
-  logger.log(`cachedFee: ${cachedFee?.maximumGasFeeString}`);
-  logger.log(`calculatedFee: ${calculatedFee.toString()}`);
+  logger.log(`cachedFee: ${cachedFee?.toString()}`);
+  logger.log(`calculatedFee: ${calculatedFee?.toString()}`);
   logger.log(`tokenFee: ${packagedFee.toString()}`);
 
   throw new Error('Token fee too low. Please refresh and try again.');

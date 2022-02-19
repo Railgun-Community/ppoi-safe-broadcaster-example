@@ -37,7 +37,7 @@ describe('token-price-cache', () => {
 
   it('Should pull price only for correct network and address', () => {
     const tokenPrices: MapType<TokenPrice> = {
-      a123: { price: 10.0, updatedAt: Date.now() },
+      [MOCK_TOKEN_ADDRESS_1]: { price: 10.0, updatedAt: Date.now() },
     };
     cacheTokenPricesForNetwork(NetworkChainID.Ethereum, tokenPrices);
     expect(() =>

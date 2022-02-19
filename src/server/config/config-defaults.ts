@@ -24,15 +24,15 @@ export default {
   },
 
   transactionFees: {
-    // How long to cache the fee sent for a given transaction.
-    cacheTTLInMS: 2 * 60 * 1000,
-
     // Precision for transaction fee ratio calculations.
     precision: 10 ** 8,
 
     // Used when calculating the ratio of token price to gas token price.
     // We guard against price ratios under this amount, which are too imprecise.
     priceRatioMinimum: 10 ** 3,
+
+    // How long to enable the fee sent for a given transaction.
+    feeExpirationInMS: 5 * 60 * 1000,
   },
 
   tokenPrices: {

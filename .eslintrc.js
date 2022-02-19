@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ['airbnb-base', 'plugin:import/typescript'],
+  extends: ['airbnb-base', 'plugin:import/typescript', 'prettier'],
   globals: {
     Optional: 'readonly',
     MapType: 'readonly',
@@ -20,6 +20,7 @@ module.exports = {
     'no-use-before-define': 0,
     'no-unused-expressions': 0,
     'no-shadow': 0,
+    'object-curly-newline': 0,
     'implicit-arrow-linebreak': 0,
     'no-restricted-syntax': 0,
     'import/prefer-default-export': 0,

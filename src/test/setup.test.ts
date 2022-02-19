@@ -36,9 +36,8 @@ export const setupTestNetwork = (): Network => {
 };
 
 after(() => {
-  const { log } = console;
+  const { warn } = console;
   fs.rm(TEST_DB, { recursive: true }, (err) => {
-    log('error removing test db');
+    warn('Error removing test db.');
   });
-  log('removed test db');
 });

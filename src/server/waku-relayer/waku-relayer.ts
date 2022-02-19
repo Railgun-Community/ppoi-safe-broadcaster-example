@@ -7,6 +7,7 @@ import {
   WakuRelayMessage,
 } from 'server/networking/waku-api-client';
 import { WakuMessage } from 'js-waku';
+import { BigNumber } from 'ethers';
 import { transactMethod } from './methods/transact-method';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
@@ -21,7 +22,10 @@ export const RAILGUN_TOPIC = '/railgun/1/relayer/proto';
 
 export type FeeBroadcastData = {
   fees: MapType<string>;
+  feeExpiration: number;
+  feesID: string;
   pubkey: string;
+  encryptedHash: string;
 };
 
 type JsonRPCMessageHandler = (
@@ -119,13 +123,28 @@ export class WakuRelayer {
     }
   }
 
+  private createFeeBroadcastData = (
+    fees: MapType<BigNumber>,
+    feeCacheID: string,
+  ): FeeBroadcastData => {
+    const tokenAddresses = Object.keys(fees);
+    const feesHex: MapType<string> = {};
+    tokenAddresses.forEach((tokenAddress) => {
+      feesHex[tokenAddress] = fees[tokenAddress].toHexString();
+    });
+    return {
+      fees: feesHex,
+      feeExpiration: configDefaults.transactionFees.feeExpirationInMS,
+      feesID: feeCacheID,
+      pubkey: this.walletPublicKey,
+      encryptedHash: '',
+    };
+  };
+
   private async broadcastFeesForChain(chainID: NetworkChainID) {
     // Map from tokenAddress to BigNumber hex string
-    const fees: MapType<string> = getAllUnitTokenFeesForChain(chainID);
-    const feeBroadcastData: FeeBroadcastData = {
-      fees,
-      pubkey: this.walletPublicKey,
-    };
+    const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chainID);
+    const feeBroadcastData = this.createFeeBroadcastData(fees, feeCacheID);
     const message = await WakuMessage.fromUtf8String(
       JSON.stringify(feeBroadcastData),
       contentTopics.fees(chainID),

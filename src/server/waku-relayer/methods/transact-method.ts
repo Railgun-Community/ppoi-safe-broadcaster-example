@@ -9,13 +9,17 @@ export const transactMethod = async (
   id: number,
   logger: debug.Debugger,
 ): Promise<Optional<JsonRpcResult<string>>> => {
-  const { chainID, serializedTransaction, pubkey } = params;
+  const { chainID, feeID, serializedTransaction, pubkey } = params;
   const railgunWalletPubKey = getRailgunWalletPubKey();
   if (railgunWalletPubKey !== pubkey) {
     return undefined;
   }
   try {
-    const txResponse = await processTransaction(chainID, serializedTransaction);
+    const txResponse = await processTransaction(
+      chainID,
+      feeID,
+      serializedTransaction,
+    );
     logger('txResponse');
     logger(txResponse);
     return formatJsonRpcResult(

@@ -44,7 +44,7 @@ export const getTransactionTokens = (
 ): { token: Token; gasToken: GasTokenConfig } => {
   const token = tokenForAddress(chainID, tokenAddress);
   const networkConfig = configNetworks[chainID];
-  const gasToken = networkConfig.gasToken;
+  const { gasToken } = networkConfig;
   return {
     token,
     gasToken,

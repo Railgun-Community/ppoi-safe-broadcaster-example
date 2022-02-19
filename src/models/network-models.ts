@@ -4,10 +4,13 @@ import { FallbackProviderJsonConfig } from './provider-models';
 import { GasTokenConfig } from './token-models';
 
 export type NetworkFeeSettings = {
+  // Slippage is a percentage of the estimated gas fee. Recommended at 0.03 - 0.05.
+  // A low buffer means that your Relayer may cancel execution for proven
+  // transactions, which can cause clients to de-prioritize your Relayer.
+  slippageBuffer: number;
+
   // As a percentage of the estimated gas fee.
-  slippageBuffer: 0.05;
-  // As a percentage of the estimated gas fee.
-  profit: 0.05;
+  profit: number;
 };
 
 export type Network = {
