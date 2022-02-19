@@ -53,7 +53,7 @@ export default {
   },
 
   settings: {
-    // Directory and file in which Settings leveldown db will be stored.
+    // Directory and file where Settings leveldown db will be stored.
     dbDir: process.env.SETTINGS_DB ?? 'settings.db',
   },
 
@@ -61,7 +61,7 @@ export default {
     // Key used to encrypt wallets in the Lepton database.
     dbEncryptionKey: secrets.dbEncryptionKey,
 
-    // Directory in which Lepton leveldown db will be stored.
+    // Directory and file where Lepton leveldown db will be stored.
     dbDir: process.env.LEPTON_DB ?? 'server.db',
   },
 
