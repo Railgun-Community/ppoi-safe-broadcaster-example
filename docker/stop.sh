@@ -1,2 +1,2 @@
 #!/bin/sh
-docker-compose -p railgun -f docker/docker-compose.yml stop 
+docker stack rm --compose-file=docker/docker-stack.yml relayer

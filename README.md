@@ -2,12 +2,12 @@
 
 The RAILGUN relayer network runs on [Waku](https://wakunetwork.com/), a secure and decentralized messaging protocol.
 
-## Config
+## Configuration
 
-Several environment variables should be set:
+Customize your relayer by copying `src/MY-CONFIG.example.ts` to `src/MY_CONFIG.ts`. You should specify the networks you want to run on, @todo etc
 
-- `DB_ENCRYPTION_KEY` and `MNEMONIC` secure your shielded RAILGUN wallet and should be set through `docker secret` rather than via environment variables
-- `WAKU_RPC_URL` locates the RPC URL and port of your nim-waku node, like `http://localhost:8546`
+- `configDefaults.waku.rpcURL` - defaults to http://localhost:8546
+- `configDefaults.networks.active = [3];` - only run on ropsten (network id 3)
 
 ## Run RAILGUN relayer
 
@@ -18,18 +18,16 @@ Several environment variables should be set:
 
 ## Use docker
 
-- Prereqs: Install docker and gnupg
+- Prereqs: Install docker
 - Initialize docker swarm if you don't already have one: `docker swarm init`
 - Generate `DB_ENCRYPTION_KEY` docker secret: `docker/nodekey.sh | docker secret create DB_ENCRYPTION_KEY -`
 - Generate `nodekey` docker secret: `docker/nodekey.sh | docker secret create nodekey -`
 - Register `MNEMONIC` docker secret: `echo "my mnemonic words..." | docker secret create MNEMONIC -`
 - Build `relayer` and `waku` docker images: `docker/build.sh`
 - Deploy stack: `docker/deploy.sh`
-
-## Configuration
-Customize your relayer by copying `src/MY-CONFIG.example.ts` to `src/MY_CONFIG.ts`. You should specify the networks you want to run on, @todo etc
+- Stop stack: `docker/stop.sh`
 
 ## Run tests
 
 - `npm run test`
-- npm run test-coverage` (with code coverage visualizer)
+- `npm run test-coverage` (with code coverage visualizer)
