@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
-import { WakuMessage } from 'js-waku';
 import axiosRetry from 'axios-retry';
 import debug from 'debug';
+import { WakuMessage } from '../waku-relayer/waku-message';
 
 export type WakuRelayMessage = {
   contentTopic: string;
@@ -81,7 +81,7 @@ export class WakuApiClient {
       this.logger('Tried to pubish empty message');
       return false;
     }
-    const timestamp = (message.timestamp as Date).getTime() / 1000;
+    const { timestamp } = message;
     const payload = Buffer.from(message.payload).toString('hex');
     const { contentTopic } = message;
     this.logger('publishing to contentTopic', contentTopic);

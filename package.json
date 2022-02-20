@@ -32,7 +32,6 @@
     "debug": "^4.3.3",
     "docker-secret": "^1.2.4",
     "ethers": "^5.5.3",
-    "js-waku": "^0.16.0",
     "level": "^7.0.1",
     "leveldown": "^6.1.0",
     "railgun-artifacts": "https://npm.railgun.org/railgun-artifacts-0.0.1.tgz"
@@ -40,6 +39,7 @@
   "devDependencies": {
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.4",
+    "@types/debug": "^4.1.7",
     "@types/level": "^6.0.0",
     "@types/leveldown": "^4.0.3",
     "@types/mocha": "^9.1.0",

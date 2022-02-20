@@ -6,7 +6,6 @@ import {
   WakuApiClientOptions,
   WakuRelayMessage,
 } from 'server/networking/waku-api-client';
-import { WakuMessage } from 'js-waku';
 import { BigNumber } from 'ethers';
 import { transactMethod } from './methods/transact-method';
 import { NetworkChainID } from '../config/config-chain-ids';
@@ -16,6 +15,7 @@ import { delay } from '../../util/promise-utils';
 import configDefaults from '../config/config-defaults';
 import { contentTopics } from './topics';
 import { getRailgunWalletPubKey } from '../wallets/active-wallets';
+import { WakuMessage } from './waku-message';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 export const RAILGUN_TOPIC = '/railgun/1/relayer/proto';
@@ -87,7 +87,7 @@ export class WakuRelayer {
     contentTopic = contentTopics.default(),
   ) {
     const payload: JsonRpcPayload = formatJsonRpcRequest(method, params);
-    const msg = await WakuMessage.fromUtf8String(
+    const msg = WakuMessage.fromUtf8String(
       JSON.stringify(payload),
       contentTopic,
     );
@@ -110,7 +110,7 @@ export class WakuRelayer {
         const age = Date.now() / 1000 - timestamp;
         this.dbg(`handling message on ${contentTopic} (${age}s old)`);
         const response = await this.methods[method](params, id, this.dbg);
-        const rpcResult = await WakuMessage.fromUtf8String(
+        const rpcResult = WakuMessage.fromUtf8String(
           JSON.stringify(response),
           contentTopic,
         );
@@ -145,7 +145,7 @@ export class WakuRelayer {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chainID);
     const feeBroadcastData = this.createFeeBroadcastData(fees, feeCacheID);
-    const message = await WakuMessage.fromUtf8String(
+    const message = WakuMessage.fromUtf8String(
       JSON.stringify(feeBroadcastData),
       contentTopics.fees(chainID),
     );
