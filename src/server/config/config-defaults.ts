@@ -79,10 +79,13 @@ export default {
   },
 
   waku: {
-    // Broadcast fees every 15 seconds.
-    broadcastFeesDelayInMS: 15 * 1000,
-
     // URL of nim-waku rpc server (eg http://localhost:8546).
     rpcURL: process.env.WAKU_RPC_URL ?? 'http://localhost:8546',
+
+    // Frequency to poll for new messages.
+    pollFrequencyInMS: 10 * 1000,
+
+    // Frequency to broadcast fees.
+    broadcastFeesDelayInMS: 15 * 1000,
   },
 };

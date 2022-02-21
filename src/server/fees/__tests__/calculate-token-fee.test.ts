@@ -13,6 +13,7 @@ import {
 } from '../../tokens/token-price-cache';
 import {
   calculateTokenFeePerUnitGasToken,
+  getAllUnitTokenFeesForChain,
   getTokenFee,
 } from '../calculate-token-fee';
 import * as estimateMaximumGasModule from '../gas-estimate';
@@ -136,6 +137,20 @@ describe('calculate-token-fee', () => {
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal('12727422');
+  });
+
+  it('Should get all unit token fees for chain', () => {
+    const tokenPrice = 1.067;
+    const gasTokenPrice = 1234.56;
+    setupMocks(MOCK_TOKEN_ADDRESS, tokenPrice, gasTokenPrice);
+
+    const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chainID);
+
+    expect(fees).to.be.an('object');
+    expect(feeCacheID).to.be.a('string');
+    expect(fees[MOCK_TOKEN_ADDRESS].toString()).to.equal(
+      '1272742268040000000000',
+    );
   });
 
   it('Should error when precision not high enough', async () => {

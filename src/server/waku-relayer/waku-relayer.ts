@@ -1,12 +1,12 @@
 import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
 import { JsonRpcPayload, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import debug from 'debug';
+import { BigNumber } from 'ethers';
 import {
   WakuApiClient,
   WakuApiClientOptions,
   WakuRelayMessage,
-} from 'server/networking/waku-api-client';
-import { BigNumber } from 'ethers';
+} from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
@@ -40,7 +40,6 @@ export enum WakuMethodNames {
 
 export type WakuRelayerOptions = {
   topic: string;
-  pollFrequency: number;
 } & WakuApiClientOptions;
 
 export class WakuRelayer {
@@ -76,7 +75,7 @@ export class WakuRelayer {
     const client = new WakuApiClient(options);
     await client.subscribe([options.topic]);
     const relayer = new WakuRelayer(client, options);
-    relayer.poll(options.pollFrequency);
+    relayer.poll(configDefaults.waku.pollFrequencyInMS);
     relayer.broadcastFeesOnInterval();
     return relayer;
   }
@@ -141,7 +140,7 @@ export class WakuRelayer {
     };
   };
 
-  private async broadcastFeesForChain(chainID: NetworkChainID) {
+  async broadcastFeesForChain(chainID: NetworkChainID) {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chainID);
     const feeBroadcastData = this.createFeeBroadcastData(fees, feeCacheID);

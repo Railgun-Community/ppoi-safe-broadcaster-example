@@ -29,7 +29,8 @@ describe('relayer-init', () => {
       .stub(activeTokenPricePollerModule, 'initPricePoller')
       .returns();
 
-    await initRelayerModules();
+    const forTest = true;
+    await initRelayerModules(forTest);
 
     expect(stubInitLepton.calledOnce).to.be.true;
     expect(stubInitWallets.calledOnce).to.be.true;

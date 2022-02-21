@@ -7,8 +7,10 @@ import { logger } from '../../util/logger';
 import { initSettingsDB, closeSettingsDB } from '../db/settings-db';
 import { myConfigOverrides } from '../../MY-CONFIG';
 
-export const initRelayerModules = async () => {
-  myConfigOverrides();
+export const initRelayerModules = async (forTest = false) => {
+  if (!forTest) {
+    myConfigOverrides();
+  }
   initSettingsDB();
   initLepton(configDefaults.lepton.dbDir);
   await initWallets();

@@ -25,7 +25,7 @@ export class WakuMessage implements WakuMessage {
     this.timestamp = opts.timestamp ?? Date.now() / 1000;
   }
 
-  static toJSON(message: WakuMessage): unknown {
+  static toJSON(message: WakuMessage): any {
     const obj: any = {};
     message.payload !== undefined &&
       (obj.payload =
@@ -78,13 +78,11 @@ export class WakuMessage implements WakuMessage {
     const _payload = payload;
     const version = DefaultVersion;
 
-    return new WakuMessage(
-      {
-        payload: _payload,
-        timestamp: timestamp.valueOf() / 1000,
-        version,
-        contentTopic,
-      },
-    );
+    return new WakuMessage({
+      payload: _payload,
+      timestamp: timestamp.valueOf() / 1000,
+      version,
+      contentTopic,
+    });
   }
 }

@@ -54,6 +54,11 @@ describe('active-wallets', () => {
     const pubkeyRopsten = getRailgunWalletKeypair(
       NetworkChainID.Ropsten,
     ).pubkey;
-    expect(pubkeyChain0).to.equal(pubkeyRopsten);
+    expect(pubkeyChain0).to.equal(
+      '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
+    );
+    expect(pubkeyRopsten).to.equal(
+      '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
+    );
   });
 }).timeout(10000);

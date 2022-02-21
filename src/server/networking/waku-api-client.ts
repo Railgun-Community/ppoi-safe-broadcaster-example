@@ -16,6 +16,13 @@ export type WakuApiClientOptions = {
   url: string;
 };
 
+export enum WakuRequestMethods {
+  DebugInfo = 'get_waku_v2_debug_v1_info',
+  PublishSubscription = 'post_waku_v2_relay_v1_subscriptions',
+  PublishMessage = 'post_waku_v2_relay_v1_message',
+  GetMessages = 'get_waku_v2_relay_v1_messages',
+}
+
 const MAX_RETRIES = 4;
 
 export class WakuApiClient {
@@ -51,7 +58,7 @@ export class WakuApiClient {
   }
 
   async getDebug() {
-    const data = await this.request('get_waku_v2_debug_v1_info', []);
+    const data = await this.request(WakuRequestMethods.DebugInfo, []);
     const { result, error } = data;
     if (result) {
       return result.listenAddresses;
@@ -64,7 +71,7 @@ export class WakuApiClient {
 
   async subscribe(topics: string[]) {
     this.logger('subscribing to topics', topics);
-    const data = await this.request('post_waku_v2_relay_v1_subscriptions', [
+    const data = await this.request(WakuRequestMethods.PublishSubscription, [
       topics,
     ]);
 
@@ -85,7 +92,7 @@ export class WakuApiClient {
     const payload = Buffer.from(message.payload).toString('hex');
     const { contentTopic } = message;
     this.logger('publishing to contentTopic', contentTopic);
-    const data = await this.request('post_waku_v2_relay_v1_message', [
+    const data = await this.request(WakuRequestMethods.PublishMessage, [
       topic,
       { payload, timestamp, contentTopic },
     ]);
@@ -102,7 +109,7 @@ export class WakuApiClient {
     topic: string,
     contentTopics: string[] = [],
   ): Promise<WakuRelayMessage[]> {
-    const data = await this.request('get_waku_v2_relay_v1_messages', [topic]);
+    const data = await this.request(WakuRequestMethods.GetMessages, [topic]);
 
     const messages: WakuRelayMessage[] = data.result;
     // if contentTopics given, return only matching messages
