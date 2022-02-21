@@ -45,7 +45,7 @@ describe('transaction-fee-cache', () => {
     expect(cachedFee?.toString()).to.equal(MOCK_FEE.toString());
 
     // Wait for cache to expire.
-    await delay(11);
+    await delay(15);
 
     expect(
       lookUpCachedUnitTokenFee(CHAIN_ID, feeCacheID, MOCK_TOKEN_ADDRESS),
