@@ -10,9 +10,12 @@ import { getMockNetwork } from './mocks.test';
 
 const TEST_DB = 'test.db';
 
+let savedConfigDefaults: any;
+
 const setupTests = () => {
   configDefaults.debug.logLevel = DebugLevel.None;
   configDefaults.lepton.dbDir = TEST_DB;
+  savedConfigDefaults = JSON.parse(JSON.stringify(configDefaults));
 };
 
 before(() => {
@@ -23,6 +26,14 @@ export const setupSingleTestWallet = async () => {
   configDefaults.wallet.mnemonic =
     'test test test test test test test test test test test junk';
   await initWallets();
+};
+
+export const resetConfigDefaults = () => {
+  const keys = Object.keys(savedConfigDefaults);
+  for (const key of keys) {
+    // @ts-ignore
+    configDefaults[key] = savedConfigDefaults[key];
+  }
 };
 
 export const testChainID = (): NetworkChainID => {

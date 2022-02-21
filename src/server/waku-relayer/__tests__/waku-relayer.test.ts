@@ -3,9 +3,10 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonSpy, SinonStub } from 'sinon';
-import { JsonRpcRequest } from '@walletconnect/jsonrpc-types';
+import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
 import { TransactionResponse } from '@ethersproject/providers';
+import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import {
   WakuMethodNames,
   WakuRelayer,
@@ -36,20 +37,27 @@ import * as processTransactionModule from '../../transactions/process-transactio
 import { WakuMessage } from '../waku-message';
 import { contentTopics } from '../topics';
 import { getMockSerializedTransaction } from '../../../test/mocks.test';
-import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-let client: WakuApiClient;
-let wakuRelayer: WakuRelayer;
+let wakuRelayer: Optional<WakuRelayer>;
 
 let clientHTTPStub: SinonStub;
 let processTransactionStub: SinonStub;
 
+let requestData: Optional<JsonRpcRequest>;
+
 const MOCK_TOKEN_ADDRESS = '0x12345';
 let network: Network;
 const chainID = testChainID();
+
+// eslint-disable-next-line require-await
+const handleHTTPPost = async (url: string, data?: unknown) => {
+  expect(url).to.equal('/');
+  requestData = data as JsonRpcRequest;
+  return { data: { result: {} } } as unknown as JsonRpcResult;
+};
 
 describe('waku-relayer', () => {
   before(async () => {
@@ -61,18 +69,19 @@ describe('waku-relayer', () => {
       symbol: 'MOCK1',
       decimals: 18,
     };
-    const url = '';
-    client = new WakuApiClient({
-      url,
-    });
-    clientHTTPStub = sinon.stub(client.http, 'post');
     processTransactionStub = sinon
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
-    wakuRelayer = new WakuRelayer(client, {
-      url,
+
+    const client = new WakuApiClient({ url: '' });
+    clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
+    wakuRelayer = await WakuRelayer.init(client, {
       topic: WAKU_TOPIC,
-    } as WakuRelayerOptions);
+    });
+  });
+
+  beforeEach(() => {
+    requestData = undefined;
   });
 
   afterEach(() => {
@@ -85,6 +94,7 @@ describe('waku-relayer', () => {
     processTransactionStub.restore();
     resetTokenPriceCache();
     resetTransactionFeeCache();
+    wakuRelayer = undefined;
   });
 
   it('Should test fee broadcast', async () => {
@@ -102,18 +112,10 @@ describe('waku-relayer', () => {
     };
     cacheTokenPricesForNetwork(chainID, tokenPrices);
 
-    let requestData: Optional<JsonRpcRequest>;
-    const handleHTTPPost = (url: string, data?: JsonRpcRequest) => {
-      expect(url).to.equal('/');
-      requestData = data;
-      return { result: {} };
-    };
-    clientHTTPStub.callsFake(handleHTTPPost);
-
     const contentTopic = '/railgun/v1/1/fees/json';
     expect(contentTopic).to.equal(contentTopics.fees(chainID));
 
-    await wakuRelayer.broadcastFeesForChain(chainID);
+    await wakuRelayer?.broadcastFeesForChain(chainID);
     expect(requestData?.id).to.be.a('number');
     expect(requestData?.method).to.equal('post_waku_v2_relay_v1_message');
     expect(requestData?.params).to.be.an('array');
@@ -166,7 +168,7 @@ describe('waku-relayer', () => {
       payload: Buffer.from(JSON.stringify(payload)),
       timestamp: Date.now(),
     };
-    await wakuRelayer.handleMessage(relayMessage);
+    await wakuRelayer?.handleMessage(relayMessage);
 
     expect(clientHTTPStub.calledOnce).to.be.true;
     const postCall = clientHTTPStub.getCall(0);

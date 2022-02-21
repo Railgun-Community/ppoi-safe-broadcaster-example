@@ -40,7 +40,7 @@ export enum WakuMethodNames {
 
 export type WakuRelayerOptions = {
   topic: string;
-} & WakuApiClientOptions;
+};
 
 export class WakuRelayer {
   client: WakuApiClient;
@@ -71,8 +71,10 @@ export class WakuRelayer {
     this.dbg(this.allContentTopics);
   }
 
-  static async init(options: WakuRelayerOptions): Promise<WakuRelayer> {
-    const client = new WakuApiClient(options);
+  static async init(
+    client: WakuApiClient,
+    options: WakuRelayerOptions,
+  ): Promise<WakuRelayer> {
     await client.subscribe([options.topic]);
     const relayer = new WakuRelayer(client, options);
     relayer.poll(configDefaults.waku.pollFrequencyInMS);
@@ -80,17 +82,17 @@ export class WakuRelayer {
     return relayer;
   }
 
-  async request(
-    method: string,
-    params: any,
-    contentTopic = contentTopics.default(),
+  async publish(
+    payload: Optional<JsonRpcPayload<string>> | object,
+    contentTopic: string,
   ) {
-    const payload: JsonRpcPayload = formatJsonRpcRequest(method, params);
     const msg = WakuMessage.fromUtf8String(
       JSON.stringify(payload),
       contentTopic,
     );
-    await this.client.publish(msg, this.topic);
+    await this.client.publish(msg, this.topic).catch((e) => {
+      this.dbg('Error publishing message', e.message);
+    });
   }
 
   static decode(payload: Uint8Array): string {
@@ -113,13 +115,7 @@ export class WakuRelayer {
           id,
           this.dbg,
         );
-        const rpcResult = WakuMessage.fromUtf8String(
-          JSON.stringify(rpcResultResponse),
-          contentTopic,
-        );
-        await this.client.publish(rpcResult, this.topic).catch((e) => {
-          this.dbg('Error publishing response', e.message);
-        });
+        await this.publish(rpcResultResponse, contentTopic);
       }
     } catch (e) {
       this.dbg('Caught error', e);
@@ -148,14 +144,9 @@ export class WakuRelayer {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chainID);
     const feeBroadcastData = this.createFeeBroadcastData(fees, feeCacheID);
-    const message = WakuMessage.fromUtf8String(
-      JSON.stringify(feeBroadcastData),
-      contentTopics.fees(chainID),
-    );
-    const result = await this.client
-      .publish(message, this.topic)
-      .catch(this.dbg);
     this.dbg(`Broadcasting fees for chain ${chainID}: `, fees);
+    const contentTopic = contentTopics.fees(chainID);
+    const result = await this.publish(feeBroadcastData, contentTopic);
     this.dbg(`Result: ${result}`);
   }
 

@@ -8,6 +8,9 @@ import * as activeWalletsModule from '../../wallets/active-wallets';
 import * as activeProvidersModule from '../../providers/active-network-providers';
 import * as activeTokenPricePollerModule from '../../tokens/token-price-poller';
 import { closeSettingsDB } from '../../db/settings-db';
+import configDefaults from '../../config/config-defaults';
+import { resetConfigDefaults } from '../../../test/setup.test';
+import { myConfigOverrides } from '../../../MY-CONFIG';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -41,5 +44,10 @@ describe('relayer-init', () => {
     stubInitWallets.restore();
     stubInitNetworkProviders.restore();
     stubInitPricePoller.restore();
+  });
+
+  it('Should test MY-CONFIG loads correctly', () => {
+    myConfigOverrides();
+    resetConfigDefaults();
   });
 }).timeout(10000);
