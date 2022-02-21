@@ -141,7 +141,7 @@ describe('waku-relayer', () => {
     expect(message.encryptedHash).to.equal('');
   });
 
-  it.only('Should test transact method', async () => {
+  it('Should test transact method', async () => {
     const handleHTTPPost = () => {
       return { result: {} };
     };
