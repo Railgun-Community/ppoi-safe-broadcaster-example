@@ -2,11 +2,22 @@
 /* globals describe, before, after, it, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon, { SinonStub } from 'sinon';
+import sinon, { SinonSpy, SinonStub } from 'sinon';
 import { JsonRpcRequest } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
-import { WakuRelayer, WakuRelayerOptions, WAKU_TOPIC } from '../waku-relayer';
-import { WakuApiClient } from '../../networking/waku-api-client';
+import { TransactionResponse } from '@ethersproject/providers';
+import {
+  WakuMethodNames,
+  WakuRelayer,
+  WakuRelayerOptions,
+  WAKU_TOPIC,
+} from '../waku-relayer';
+import {
+  WakuApiClient,
+  WakuRelayMessage,
+  WakuRequestMethods,
+} from '../../networking/waku-api-client';
+import { WakuMethodParamsTransact } from '../methods/transact-method';
 import {
   setupSingleTestWallet,
   setupTestNetwork,
@@ -21,6 +32,11 @@ import {
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
 import { Network } from '../../../models/network-models';
 import configTokens from '../../config/config-tokens';
+import * as processTransactionModule from '../../transactions/process-transaction';
+import { WakuMessage } from '../waku-message';
+import { contentTopics } from '../topics';
+import { getMockSerializedTransaction } from '../../../test/mocks.test';
+import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -29,6 +45,7 @@ let client: WakuApiClient;
 let wakuRelayer: WakuRelayer;
 
 let clientHTTPStub: SinonStub;
+let processTransactionStub: SinonStub;
 
 const MOCK_TOKEN_ADDRESS = '0x12345';
 let network: Network;
@@ -36,6 +53,7 @@ const chainID = testChainID();
 
 describe('waku-relayer', () => {
   before(async () => {
+    configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
     initLepton(configDefaults.lepton.dbDir);
     await setupSingleTestWallet();
     network = setupTestNetwork();
@@ -48,6 +66,9 @@ describe('waku-relayer', () => {
       url,
     });
     clientHTTPStub = sinon.stub(client.http, 'post');
+    processTransactionStub = sinon
+      .stub(processTransactionModule, 'processTransaction')
+      .resolves({ hash: '123' } as TransactionResponse);
     wakuRelayer = new WakuRelayer(client, {
       url,
       topic: WAKU_TOPIC,
@@ -55,11 +76,13 @@ describe('waku-relayer', () => {
   });
 
   afterEach(() => {
-    clientHTTPStub?.resetBehavior();
+    clientHTTPStub.resetBehavior();
+    clientHTTPStub.resetHistory();
   });
 
   after(() => {
-    clientHTTPStub?.restore();
+    clientHTTPStub.restore();
+    processTransactionStub.restore();
     resetTokenPriceCache();
     resetTransactionFeeCache();
   });
@@ -80,15 +103,15 @@ describe('waku-relayer', () => {
     cacheTokenPricesForNetwork(chainID, tokenPrices);
 
     let requestData: Optional<JsonRpcRequest>;
-    const handleHTTPBroadcast = (url: string, data?: JsonRpcRequest) => {
+    const handleHTTPPost = (url: string, data?: JsonRpcRequest) => {
       expect(url).to.equal('/');
       requestData = data;
       return { result: {} };
     };
-    clientHTTPStub.callsFake(handleHTTPBroadcast);
+    clientHTTPStub.callsFake(handleHTTPPost);
 
     const contentTopic = '/railgun/v1/1/fees/json';
-    expect(contentTopic).to.equal(`/railgun/v1/${chainID}/fees/json`);
+    expect(contentTopic).to.equal(contentTopics.fees(chainID));
 
     await wakuRelayer.broadcastFeesForChain(chainID);
     expect(requestData?.id).to.be.a('number');
@@ -116,5 +139,66 @@ describe('waku-relayer', () => {
       '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
     );
     expect(message.encryptedHash).to.equal('');
+  });
+
+  it.only('Should test transact method', async () => {
+    const handleHTTPPost = () => {
+      return { result: {} };
+    };
+    clientHTTPStub.callsFake(handleHTTPPost);
+
+    const contentTopic = contentTopics.transact(chainID);
+
+    const params: WakuMethodParamsTransact = {
+      chainID,
+      feesID: '468abc',
+      serializedTransaction: getMockSerializedTransaction(),
+      pubkey:
+        '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
+    };
+    const payload = {
+      method: WakuMethodNames.Transact,
+      params,
+      id: 123456,
+    };
+    const relayMessage: WakuRelayMessage = {
+      contentTopic,
+      payload: Buffer.from(JSON.stringify(payload)),
+      timestamp: Date.now(),
+    };
+    await wakuRelayer.handleMessage(relayMessage);
+
+    expect(clientHTTPStub.calledOnce).to.be.true;
+    const postCall = clientHTTPStub.getCall(0);
+    expect(postCall.args[0]).to.equal('/');
+    const rpcArgs = postCall.args[1];
+    expect(rpcArgs.id).to.be.a('number');
+    expect(rpcArgs.method).to.equal(WakuRequestMethods.PublishMessage);
+    expect(rpcArgs.params).to.be.an('array');
+    expect(rpcArgs.params[0]).to.equal(WAKU_TOPIC);
+
+    const expectedJsonRpcResult = formatJsonRpcResult(
+      payload.id,
+      JSON.stringify({
+        type: 'txResponse.hash',
+        hash: '123',
+      }),
+    );
+    const expectedWakuMessage = WakuMessage.fromUtf8String(
+      JSON.stringify(expectedJsonRpcResult),
+      contentTopic,
+      { timestamp: relayMessage.timestamp },
+    );
+    expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
+    expect(rpcArgs.params[1].contentTopic).to.equal(relayMessage.contentTopic);
+    expect(rpcArgs.params[1].payload).to.equal(
+      Buffer.from(expectedWakuMessage.payload as Uint8Array).toString('hex'),
+    );
+    expect(rpcArgs.params[1].timestamp).to.be.greaterThanOrEqual(
+      expectedWakuMessage.timestamp ?? 0,
+    );
+    expect(rpcArgs.params[1].timestamp).to.be.lessThan(
+      (expectedWakuMessage.timestamp ?? 0) + 0.1,
+    );
   });
 }).timeout(10000);

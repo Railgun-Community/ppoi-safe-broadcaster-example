@@ -69,10 +69,7 @@ export class WakuMessage implements WakuMessage {
     contentTopic: string,
     opts?: Options,
   ): WakuMessage {
-    const { timestamp } = {
-      timestamp: new Date(),
-      ...(opts || {}),
-    };
+    const timestamp = opts?.timestamp ?? new Date();
 
     // eslint-disable-next-line no-underscore-dangle
     const _payload = payload;

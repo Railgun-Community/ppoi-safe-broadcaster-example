@@ -108,9 +108,13 @@ export class WakuRelayer {
       if (method in this.methods) {
         const age = Date.now() / 1000 - timestamp;
         this.dbg(`handling message on ${contentTopic} (${age}s old)`);
-        const response = await this.methods[method](params, id, this.dbg);
+        const rpcResultResponse = await this.methods[method](
+          params,
+          id,
+          this.dbg,
+        );
         const rpcResult = WakuMessage.fromUtf8String(
-          JSON.stringify(response),
+          JSON.stringify(rpcResultResponse),
           contentTopic,
         );
         await this.client.publish(rpcResult, this.topic).catch((e) => {

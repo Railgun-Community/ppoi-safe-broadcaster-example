@@ -7,9 +7,7 @@ import { WakuMessage } from '../waku-relayer/waku-message';
 export type WakuRelayMessage = {
   contentTopic: string;
   payload: Uint8Array;
-  proof: Uint8Array;
   timestamp: number;
-  version: number;
 };
 
 export type WakuApiClientOptions = {
