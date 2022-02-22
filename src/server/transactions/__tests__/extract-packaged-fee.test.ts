@@ -80,7 +80,7 @@ const createRopstenTransaction = (
 
 describe('extract-packaged-fee', () => {
   before(async () => {
-    initLepton('test.db');
+    initLepton();
     lepton = getLepton();
 
     configDefaults.wallet.mnemonic = MOCK_MNEMONIC_1;

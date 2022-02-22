@@ -31,7 +31,7 @@ const chainID = testChainID();
 describe('waku-api-client', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
-    initLepton(configDefaults.lepton.dbDir);
+    initLepton();
     await setupSingleTestWallet();
     network = setupTestNetwork();
     configTokens[chainID][MOCK_TOKEN_ADDRESS] = {

@@ -6,19 +6,11 @@ import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 
-const LAST_NONCE_KEY = 'last_nonce_key';
+export const LAST_NONCE_KEY = 'last_nonce_key';
 
-const setGasDetails = (
-  populatedTransaction: PopulatedTransaction,
-  gasDetails: TransactionGasDetails,
-): PopulatedTransaction => {
-  const txWithGas = populatedTransaction;
-  txWithGas.gasLimit = gasDetails.gasLimit;
-  txWithGas.gasPrice = gasDetails.gasPrice;
-  return txWithGas;
-};
-
-const getCurrentNonce = async (wallet: EthersWallet): Promise<number> => {
+export const getCurrentNonce = async (
+  wallet: EthersWallet,
+): Promise<number> => {
   const [txCount, lastTransactionNonce] = await Promise.all([
     wallet.getTransactionCount(),
     await getSettingsNumber(LAST_NONCE_KEY),
@@ -29,7 +21,7 @@ const getCurrentNonce = async (wallet: EthersWallet): Promise<number> => {
   return txCount;
 };
 
-const storeCurrentNonce = async (nonce: number) => {
+export const storeCurrentNonce = async (nonce: number) => {
   await storeSettingsNumber(LAST_NONCE_KEY, nonce);
 };
 
@@ -43,12 +35,14 @@ export const executeTransaction = async (
     gasDetails.gasLimit,
   );
   const nonce = await getCurrentNonce(wallet);
-  // eslint-disable-next-line no-param-reassign
-  populatedTransaction.nonce = nonce;
-  await storeCurrentNonce(nonce);
-  const txWithGas = setGasDetails(populatedTransaction, gasDetails);
-  const signedTransaction = await wallet.signTransaction(txWithGas);
+  const finalTransaction: PopulatedTransaction = {
+    ...populatedTransaction,
+    gasLimit: gasDetails.gasLimit,
+    gasPrice: gasDetails.gasPrice,
+    nonce,
+  };
+  const signedTransaction = await wallet.signTransaction(finalTransaction);
   const provider = getProviderForNetwork(chainID);
-  const txResponse = await provider.sendTransaction(signedTransaction);
-  return txResponse;
+  await storeCurrentNonce(nonce);
+  return provider.sendTransaction(signedTransaction);
 };

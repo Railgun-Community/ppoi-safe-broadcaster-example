@@ -4,7 +4,7 @@ import leveldown from 'leveldown';
 import { logger } from '../../util/logger';
 import configDefaults from '../config/config-defaults';
 
-const SETTINGS_DB_PATH = 'relayer:settings';
+const SETTINGS_DB_NAMESPACE = 'relayer:settings';
 
 let db: Optional<Database>;
 
@@ -23,12 +23,12 @@ export const closeSettingsDB = () => {
 
 export const clearSettingsDB = async () => {
   if (db) {
-    await db.clearNamespace([SETTINGS_DB_PATH]);
+    await db.clearNamespace([SETTINGS_DB_NAMESPACE]);
   }
 };
 
 const getPathsForKey = (key: string): BytesData[] => {
-  return [SETTINGS_DB_PATH, key];
+  return [SETTINGS_DB_NAMESPACE, key];
 };
 
 const putDbErrorHandler = (key: string, value: any, err: Error) => {

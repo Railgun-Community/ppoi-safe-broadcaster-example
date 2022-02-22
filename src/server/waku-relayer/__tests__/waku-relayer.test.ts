@@ -62,7 +62,7 @@ const handleHTTPPost = async (url: string, data?: unknown) => {
 describe('waku-relayer', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
-    initLepton(configDefaults.lepton.dbDir);
+    initLepton();
     await setupSingleTestWallet();
     network = setupTestNetwork();
     configTokens[chainID][MOCK_TOKEN_ADDRESS] = {

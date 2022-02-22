@@ -23,7 +23,7 @@ const MOCK_MNEMONIC =
 
 describe('active-wallets', () => {
   before(async () => {
-    initLepton('test.db');
+    initLepton();
     await setupSingleTestWallet();
   });
 

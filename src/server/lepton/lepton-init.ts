@@ -18,11 +18,11 @@ export const getLepton = () => {
   return lepton;
 };
 
-export const initLepton = (dbName: string, optDebugger?: LeptonDebugger) => {
+export const initLepton = (optDebugger?: LeptonDebugger) => {
   if (lepton) {
     return;
   }
-  const levelDB = level(dbName);
+  const levelDB = level(configDefaults.lepton.dbDir);
   const leptonDebugger: LeptonDebugger = optDebugger ?? {
     log: (msg: string) => logger.log(msg),
     error: (error: Error) => logger.error(error),

@@ -12,7 +12,7 @@ export const initRelayerModules = async (forTest = false) => {
     myConfigOverrides();
   }
   initSettingsDB();
-  initLepton(configDefaults.lepton.dbDir);
+  initLepton();
   await initWallets();
   initNetworkProviders();
   initPricePoller();

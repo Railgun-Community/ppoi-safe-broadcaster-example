@@ -33,7 +33,7 @@ const shouldUpdateEthWalletBalance = (address: string) => {
 
 describe('balance-cache', () => {
   before(async () => {
-    initLepton('test.db');
+    initLepton();
     await initWallets();
     initNetworkProviders();
     resetGasTokenBalanceCache();

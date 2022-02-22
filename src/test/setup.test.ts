@@ -8,18 +8,30 @@ import { Network } from '../models/network-models';
 import { initWallets } from '../server/wallets/active-wallets';
 import { getMockNetwork } from './mocks.test';
 
-const TEST_DB = 'test.db';
+export const LEPTON_TEST_DB = 'lepton.test.db';
+const SETTINGS_TEST_DB = 'settings.test.db';
 
 let savedConfigDefaults: any;
 
 const setupTests = () => {
   configDefaults.debug.logLevel = DebugLevel.None;
-  configDefaults.lepton.dbDir = TEST_DB;
+  configDefaults.lepton.dbDir = LEPTON_TEST_DB;
+  configDefaults.settings.dbDir = SETTINGS_TEST_DB;
   savedConfigDefaults = JSON.parse(JSON.stringify(configDefaults));
 };
 
 before(() => {
   setupTests();
+});
+
+after(() => {
+  const { warn } = console;
+  fs.rm(LEPTON_TEST_DB, { recursive: true }, (err) => {
+    warn('Error removing test db.');
+  });
+  fs.rm(SETTINGS_TEST_DB, { recursive: true }, (err) => {
+    warn('Error removing test db.');
+  });
 });
 
 export const setupSingleTestWallet = async () => {
@@ -45,10 +57,3 @@ export const setupTestNetwork = (): Network => {
   configNetworks[testChainID()] = testNetwork;
   return testNetwork;
 };
-
-after(() => {
-  const { warn } = console;
-  fs.rm(TEST_DB, { recursive: true }, (err) => {
-    warn('Error removing test db.');
-  });
-});

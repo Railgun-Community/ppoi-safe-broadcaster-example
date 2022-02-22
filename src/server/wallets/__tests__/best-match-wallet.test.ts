@@ -41,7 +41,7 @@ const addressForIndex = (index: number): string => {
 
 describe('best-match-wallet', () => {
   before(() => {
-    initLepton('test.db');
+    initLepton();
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
       .resolves(BigNumber.from(500));
