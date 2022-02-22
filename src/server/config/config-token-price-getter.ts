@@ -9,7 +9,7 @@ export type TokenPricesGetter = (
   tokenAddresses: string[],
 ) => Promise<TokenAddressesToPrice>;
 
-const testNetworkDefaultPrices = (
+export const getTestNetworkDefaultPrices = (
   chainID: NetworkChainID,
 ): TokenAddressesToPrice => {
   // Assigns simple values for test nets without
@@ -19,12 +19,12 @@ const testNetworkDefaultPrices = (
   const tokenAddressesToPrice: TokenAddressesToPrice = {};
   tokenAddresses.forEach((tokenAddress) => {
     tokenAddressesToPrice[tokenAddress.toLowerCase()] = {
-      price: 2000.0, // Fake token price.
+      price: 2000.0, // Every token price.
       updatedAt: Date.now(),
     };
   });
   tokenAddressesToPrice[network.gasToken.wrappedAddress.toLowerCase()] = {
-    price: 2000.0, // Fake gas price.
+    price: 2000.0, // Gas price.
     updatedAt: Date.now(),
   };
   return tokenAddressesToPrice;
@@ -38,7 +38,7 @@ const tokenPriceGetter = async (
   const { coingeckoId } = network;
   if (!coingeckoId) {
     if (network.isTestNetwork) {
-      return testNetworkDefaultPrices(chainID);
+      return getTestNetworkDefaultPrices(chainID);
     }
     return {};
   }

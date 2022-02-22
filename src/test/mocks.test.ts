@@ -7,7 +7,11 @@ import { CoingeckoNetworkID } from '../models/api-constants';
 import { RailProxyContract } from '../models/contract-constants';
 import { Network, QuickSyncURL } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
-import { GasTokenWrappedAddress, Token } from '../models/token-models';
+import {
+  GasTokenWrappedAddress,
+  Token,
+  TokenConfig,
+} from '../models/token-models';
 
 export const mockTokenConfig = (
   chainID: NetworkChainID,
@@ -98,6 +102,7 @@ export const getMockRopstenNetwork = (): Network => {
     fallbackProviderConfig: getMockRopstenFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
     quickSyncURL: QuickSyncURL.Ropsten,
+    isTestNetwork: true,
   };
 };
 
@@ -107,6 +112,13 @@ export const getMockPopulatedTransaction = (): PopulatedTransaction => {
 
 export const getMockSerializedTransaction = (): string => {
   return JSON.stringify(getMockPopulatedTransaction());
+};
+
+export const getMockTokenConfig = (): TokenConfig => {
+  return {
+    symbol: 'SHIB',
+    decimals: 18,
+  };
 };
 
 export const getMockToken = (): Token => {

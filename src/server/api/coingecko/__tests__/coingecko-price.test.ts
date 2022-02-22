@@ -14,23 +14,26 @@ import configNetworks from '../../../config/config-networks';
 import {
   getMockNetwork,
   getMockRopstenNetwork,
+  getMockTokenConfig,
 } from '../../../../test/mocks.test';
+import configTokens from '../../../config/config-tokens';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const TOKEN_ADDRESSES = [
-  '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
-  '0xe76c6c83af64e4c60245d8c7de953df673a7a33d', // RAIL
-];
+const TOKEN_ADDRESS_1 = '0x013573';
+const TOKEN_ADDRESS_2 = '0x73829';
+const TOKEN_ADDRESSES = [TOKEN_ADDRESS_1, TOKEN_ADDRESS_2];
+
+const ropstenNetwork = getMockRopstenNetwork();
 
 const expectedCoingeckoPriceOutput = (nowTimestamp: number) => {
   return {
-    '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {
+    [TOKEN_ADDRESS_1]: {
       usd: 1000.0,
       last_updated_at: nowTimestamp / 1000 - 30,
     },
-    '0xe76c6c83af64e4c60245d8c7de953df673a7a33d': {
+    [TOKEN_ADDRESS_2]: {
       usd: 3.0,
       last_updated_at: nowTimestamp / 1000 - 30,
     },
@@ -52,12 +55,24 @@ const validatePriceGetterOutput = (
 describe('coingecko-price', () => {
   before(() => {
     configNetworks[NetworkChainID.Ethereum] = getMockNetwork();
-    configNetworks[NetworkChainID.Ropsten] = getMockRopstenNetwork();
+    configNetworks[NetworkChainID.Ropsten] = ropstenNetwork;
+
+    const tokenConfigs = {
+      [TOKEN_ADDRESS_1]: getMockTokenConfig(),
+      [TOKEN_ADDRESS_2]: getMockTokenConfig(),
+    };
+
+    configTokens[NetworkChainID.Ethereum] = tokenConfigs;
+    configTokens[NetworkChainID.Ropsten] = tokenConfigs;
   });
 
   it('Should run live Coingecko API fetch for Ethereum tokens', async () => {
+    const liveTokenAddresses = [
+      '0xe76c6c83af64e4c60245d8c7de953df673a7a33d', // RAIL
+      '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
+    ];
     const params = {
-      contract_addresses: TOKEN_ADDRESSES.join(','),
+      contract_addresses: liveTokenAddresses.join(','),
       vs_currencies: 'usd',
       include_last_updated_at: true,
     };
@@ -66,7 +81,7 @@ describe('coingecko-price', () => {
       CoingeckoNetworkID.Ethereum,
       params,
     );
-    TOKEN_ADDRESSES.forEach((address) => {
+    liveTokenAddresses.forEach((address) => {
       const priceData = coingeckoPriceMap[address];
       expect(priceData).to.be.an('object');
       expect(priceData.usd).to.be.a('number');
@@ -147,6 +162,9 @@ describe('coingecko-price', () => {
       NetworkChainID.Ropsten,
       TOKEN_ADDRESSES,
     );
-    expect(tokenAddressesToPrice).to.deep.equal({});
+    expect(Object.keys(tokenAddressesToPrice).length).to.equal(3);
+    expect(
+      tokenAddressesToPrice[ropstenNetwork.gasToken.wrappedAddress]?.price,
+    ).to.equal(2000);
   });
 }).timeout(30000);
