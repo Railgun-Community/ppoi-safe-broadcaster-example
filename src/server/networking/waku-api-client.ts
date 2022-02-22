@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
 import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
-import axiosRetry from 'axios-retry';
 import debug from 'debug';
 import { WakuMessage } from '../waku-relayer/waku-message';
 
@@ -36,7 +35,6 @@ export class WakuApiClient {
       headers: { 'Content-Type': 'application/json' },
     };
     this.http = axios.create(httpConfig);
-    axiosRetry(this.http, { retries: 4 });
     this.logger('Relaying via ', options.url);
   }
 
@@ -55,7 +53,7 @@ export class WakuApiClient {
     }
   }
 
-  async getDebug() {
+  async getDebug(): Promise<string[]> {
     const data = await this.request(WakuRequestMethods.DebugInfo, []);
     const { result, error } = data;
     if (result) {

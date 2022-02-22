@@ -28,7 +28,6 @@
     "@walletconnect/jsonrpc-types": "^1.0.0",
     "@walletconnect/jsonrpc-utils": "^1.0.0",
     "axios": "^0.24",
-    "axios-retry": "^3.2.4",
     "debug": "^4.3.3",
     "docker-secret": "^1.2.4",
     "ethers": "^5.5.3",
