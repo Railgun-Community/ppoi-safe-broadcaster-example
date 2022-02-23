@@ -1,5 +1,6 @@
 /* eslint-disable no-redeclare */
 // copied from js-waku 0.17
+// removed toJSON because typescript handles this
 
 const DefaultVersion = 0;
 
@@ -17,27 +18,12 @@ export interface Options {
   timestamp?: number;
 }
 
-export class WakuMessage implements WakuMessage {
+export class WakuMessage {
   constructor(opts: Options) {
     this.payload = opts.payload;
     this.contentTopic = opts.contentTopic;
     this.version = opts.version ?? DefaultVersion;
     this.timestamp = opts.timestamp ?? Date.now() / 1000;
-  }
-
-  static toJSON(message: WakuMessage): any {
-    const obj: any = {};
-    message.payload !== undefined &&
-      (obj.payload =
-        message.payload !== undefined
-          ? Buffer.from(message.payload).toString('base64')
-          : undefined);
-    message.contentTopic !== undefined &&
-      (obj.contentTopic = message.contentTopic);
-    message.version !== undefined &&
-      (obj.version = Math.round(message.version));
-    message.timestamp !== undefined && (obj.timestamp = message.timestamp);
-    return obj;
   }
 
   /**
