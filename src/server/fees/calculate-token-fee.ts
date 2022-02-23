@@ -46,7 +46,7 @@ export const calculateTokenFeePerUnitGasToken = (
 
 export const getTokenFee = (
   chainID: NetworkChainID,
-  gas: BigNumber,
+  maximumGas: BigNumber,
   tokenAddress: string,
 ) => {
   const { precision } = configDefaults.transactionFees;
@@ -55,7 +55,7 @@ export const getTokenFee = (
     tokenAddress,
     precision,
   );
-  return gas
+  return maximumGas
     .mul(roundedPriceRatio)
     .div(decimalRatio)
     .div(BigNumber.from(precision));
