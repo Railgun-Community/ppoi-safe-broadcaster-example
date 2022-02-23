@@ -21,14 +21,14 @@ export const validateFee = (
   chainID: NetworkChainID,
   tokenAddress: string,
   maximumGas: BigNumber,
-  feeID: string,
+  feeCacheID: string,
   packagedFee: BigNumber,
 ) => {
   logger.log(`validateFee: ${tokenAddress} (chain ${chainID})`);
 
   // Check packaged fee against cached fee.
   // Cache expires with TTL setting: transactionFees.feeExpirationInMS.
-  const cachedFee = lookUpCachedUnitTokenFee(chainID, feeID, tokenAddress);
+  const cachedFee = lookUpCachedUnitTokenFee(chainID, feeCacheID, tokenAddress);
   if (cachedFee) {
     if (
       comparePackagedFeeToCalculated(
