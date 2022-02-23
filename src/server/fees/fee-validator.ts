@@ -1,9 +1,8 @@
-import { BigNumber, PopulatedTransaction } from 'ethers';
+import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { logger } from '../../util/logger';
 import { getTokenFee } from './calculate-token-fee';
 import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
-import { estimateMaximumGas } from './gas-estimate';
 import configNetworks from '../config/config-networks';
 
 const comparePackagedFeeToCalculated = (
@@ -18,15 +17,14 @@ const comparePackagedFeeToCalculated = (
   return packagedFee.gte(calculatedFeeWithBuffer);
 };
 
-export const validateFee = async (
+export const validateFee = (
   chainID: NetworkChainID,
   tokenAddress: string,
-  populatedTransaction: PopulatedTransaction,
+  maximumGas: BigNumber,
   feeID: string,
   packagedFee: BigNumber,
 ) => {
   logger.log(`validateFee: ${tokenAddress} (chain ${chainID})`);
-  const maximumGas = await estimateMaximumGas(chainID, populatedTransaction);
 
   // Check packaged fee against cached fee.
   // Cache expires with TTL setting: transactionFees.feeExpirationInMS.

@@ -23,8 +23,8 @@ import {
   TokenPrice,
 } from '../../tokens/token-price-cache';
 import { createTransactionGasDetails } from '../calculate-transaction-gas';
-import { estimateMaximumGas } from '../gas-estimate';
 import { getTokenFee } from '../calculate-token-fee';
+import { getEstimateGasDetails, getMaximumGas } from '../gas-estimate';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -63,13 +63,13 @@ describe('calculate-transaction-gas', () => {
     resetTokenPriceCache();
   });
 
-  it('Should create gas details from token fee', async () => {
+  it('Should create gas details from token fee', () => {
     createGasEstimateStubs(MOCK_GAS_ESTIMATE, MOCK_GAS_PRICE);
 
     const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(18)); // $390 "USDC" (0.12 ETH) + 10% profit/buffer fee.
-    const gasDetails = await createTransactionGasDetails(
+    const gasDetails = createTransactionGasDetails(
       MOCK_CHAIN_ID,
-      getMockPopulatedTransaction(),
+      MOCK_GAS_ESTIMATE,
       MOCK_TOKEN_ADDRESS,
       tokenFee,
     );
@@ -78,13 +78,13 @@ describe('calculate-transaction-gas', () => {
     expect(gasDetails.gasPrice.toString()).to.equal('250000');
   });
 
-  it('Should create gas details from token fee (6 decimals)', async () => {
+  it('Should create gas details from token fee (6 decimals)', () => {
     createGasEstimateStubs(MOCK_GAS_ESTIMATE, MOCK_GAS_PRICE);
 
     const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(6)); // $390 "USDT" (0.12 ETH) + 10% profit/buffer fee.
-    const gasDetails = await createTransactionGasDetails(
+    const gasDetails = createTransactionGasDetails(
       MOCK_CHAIN_ID,
-      getMockPopulatedTransaction(),
+      MOCK_GAS_ESTIMATE,
       MOCK_TOKEN_ADDRESS_6_DECIMALS,
       tokenFee,
     );
@@ -98,33 +98,20 @@ describe('calculate-transaction-gas', () => {
 
     const populatedTransaction = getMockPopulatedTransaction();
 
-    const maximumGas = await estimateMaximumGas(
+    const estimateGasDetails = await getEstimateGasDetails(
       MOCK_CHAIN_ID,
       populatedTransaction,
     );
+    const maximumGas = getMaximumGas(estimateGasDetails);
     const tokenFee = getTokenFee(MOCK_CHAIN_ID, maximumGas, MOCK_TOKEN_ADDRESS);
-    const gasDetails = await createTransactionGasDetails(
+    const gasDetails = createTransactionGasDetails(
       MOCK_CHAIN_ID,
-      getMockPopulatedTransaction(),
+      MOCK_GAS_ESTIMATE,
       MOCK_TOKEN_ADDRESS,
       tokenFee,
     );
 
     expect(gasDetails.gasLimit.toString()).to.equal('480000000000');
     expect(gasDetails.gasPrice.toString()).to.equal('250000');
-  });
-
-  it('Should error when token fee (and translated gas price) too low', async () => {
-    createGasEstimateStubs(MOCK_GAS_ESTIMATE, MOCK_GAS_PRICE);
-
-    const tokenFee = BigNumber.from(390).mul(BigNumber.from(10).pow(18)); // $390 "USDC" (without 10% fee).
-    await expect(
-      createTransactionGasDetails(
-        MOCK_CHAIN_ID,
-        getMockPopulatedTransaction(),
-        MOCK_TOKEN_ADDRESS,
-        tokenFee,
-      ),
-    ).to.be.rejected;
   });
 }).timeout(10000);

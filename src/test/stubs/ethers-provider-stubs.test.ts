@@ -1,5 +1,6 @@
 import { BaseProvider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
 
 let estimateGasStub: SinonStub;

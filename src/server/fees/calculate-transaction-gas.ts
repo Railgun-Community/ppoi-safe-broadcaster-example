@@ -8,25 +8,20 @@ import {
   getRoundedTokenToGasPriceRatio,
   getTransactionTokenToGasDecimalRatio,
 } from './calculate-token-fee';
-import { calculateGasLimit, getGasDetails } from './gas-estimate';
+import { calculateGasLimit } from './gas-estimate';
 
 export type TransactionGasDetails = {
   gasLimit: BigNumber;
   gasPrice: BigNumber;
 };
 
-export const createTransactionGasDetails = async (
+export const createTransactionGasDetails = (
   chainID: NetworkChainID,
-  populatedTransaction: PopulatedTransaction,
+  gasEstimate: BigNumber,
   tokenAddress: string,
   tokenFee: BigNumber,
-): Promise<TransactionGasDetails> => {
-  const { gasEstimate, gasPrice: gasPriceEstimate } = await getGasDetails(
-    chainID,
-    populatedTransaction,
-  );
+): TransactionGasDetails => {
   const gasLimit = calculateGasLimit(gasEstimate);
-
   const { token, gasToken } = getTransactionTokens(chainID, tokenAddress);
   const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
     chainID,
@@ -51,14 +46,6 @@ export const createTransactionGasDetails = async (
     .div(roundedRatio);
 
   const translatedGasPrice = translatedTotalGas.div(gasLimit);
-
-  // TODO: Add a stronger mechanism for predicting low gas price.
-  // If translated gas price is >5% lower than the estimated gas price, error out.
-  if (translatedGasPrice.lt(gasPriceEstimate.mul(95).div(100))) {
-    throw new Error(
-      `Gas price too low (${translatedGasPrice.toString()} vs ${gasPriceEstimate.toString()}). Please refresh your token transaction fee and try again.`,
-    );
-  }
 
   return {
     gasLimit,

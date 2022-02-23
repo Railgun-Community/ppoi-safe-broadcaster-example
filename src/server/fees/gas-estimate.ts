@@ -2,7 +2,7 @@ import { BigNumber, PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 
-export type EstimateGasDetails = {
+export type GasEstimateDetails = {
   gasEstimate: BigNumber;
   gasPrice: BigNumber;
 };
@@ -12,10 +12,10 @@ export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
   return gasEstimate.mul(12).div(10);
 };
 
-export const getGasDetails = async (
+export const getEstimateGasDetails = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
-): Promise<EstimateGasDetails> => {
+): Promise<GasEstimateDetails> => {
   const provider = getProviderForNetwork(chainID);
   const [gasEstimate, gasPrice] = await Promise.all([
     provider.estimateGas(populatedTransaction),
@@ -24,14 +24,9 @@ export const getGasDetails = async (
   return { gasEstimate, gasPrice };
 };
 
-export const estimateMaximumGas = async (
-  chainID: NetworkChainID,
-  populatedTransaction: PopulatedTransaction,
-): Promise<BigNumber> => {
-  const { gasEstimate, gasPrice } = await getGasDetails(
-    chainID,
-    populatedTransaction,
-  );
-  const gasLimit = calculateGasLimit(gasEstimate);
-  return gasLimit.mul(gasPrice);
+export const getMaximumGas = (
+  gasEstimateDetails: GasEstimateDetails,
+): BigNumber => {
+  const gasLimit = calculateGasLimit(gasEstimateDetails.gasEstimate);
+  return gasLimit.mul(gasEstimateDetails.gasPrice);
 };

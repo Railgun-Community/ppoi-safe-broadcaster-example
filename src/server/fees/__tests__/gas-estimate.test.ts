@@ -1,8 +1,9 @@
 /* globals describe, it, before, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
-import { estimateMaximumGas } from '../gas-estimate';
+import { getEstimateGasDetails, getMaximumGas } from '../gas-estimate';
 import {
   getMockNetwork,
   getMockPopulatedTransaction,
@@ -11,7 +12,6 @@ import {
   createGasEstimateStubs,
   restoreGasEstimateStubs,
 } from '../../../test/stubs/ethers-provider-stubs.test';
-import { BigNumber } from 'ethers';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 
@@ -33,10 +33,11 @@ describe('gas-estimate', () => {
     const gasPrice = BigNumber.from(100);
     createGasEstimateStubs(gasEstimate, gasPrice);
 
-    const maximumGas = await estimateMaximumGas(
+    const estimateGasDetails = await getEstimateGasDetails(
       NetworkChainID.Ethereum,
       getMockPopulatedTransaction(),
     );
+    const maximumGas = getMaximumGas(estimateGasDetails);
 
     // (Gas estimate + 20%) * gas price.
     expect(maximumGas.toNumber()).to.equal(120000);

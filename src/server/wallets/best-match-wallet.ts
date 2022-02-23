@@ -1,14 +1,14 @@
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
+import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
-import { getProviderForNetwork } from '../providers/active-network-providers';
-import { createEthersWallet, getActiveWallets } from './active-wallets';
+import { getActiveWallets } from './active-wallets';
 import { isWalletAvailable } from './available-wallets';
+import { ActiveWallet } from '../../models/wallet-models';
 
 export const getBestMatchWalletForNetwork = async (
   chainID: NetworkChainID,
   gasLimit: BigNumber,
-): Promise<EthersWallet> => {
+): Promise<ActiveWallet> => {
   const gasTokenBalanceMap = await getActiveWalletGasTokenBalanceMapForChain(
     chainID,
   );
@@ -31,6 +31,5 @@ export const getBestMatchWalletForNetwork = async (
   }
 
   const bestWallet = sortedAvailableWallets[0];
-  const provider = getProviderForNetwork(chainID);
-  return createEthersWallet(bestWallet, provider);
+  return bestWallet;
 };

@@ -1,9 +1,12 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
+import { ActiveWallet } from '../../models/wallet-models';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { getProviderForNetwork } from '../providers/active-network-providers';
+import { createEthersWallet } from '../wallets/active-wallets';
+import { setWalletAvailable } from '../wallets/available-wallets';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 
 export const LAST_NONCE_KEY = 'last_nonce_key';
@@ -30,19 +33,39 @@ export const executeTransaction = async (
   populatedTransaction: PopulatedTransaction,
   gasDetails: TransactionGasDetails,
 ): Promise<TransactionResponse> => {
-  const wallet = await getBestMatchWalletForNetwork(
+  const activeWallet = await getBestMatchWalletForNetwork(
     chainID,
     gasDetails.gasLimit,
   );
-  const nonce = await getCurrentNonce(wallet);
+  const provider = getProviderForNetwork(chainID);
+  const ethersWallet = createEthersWallet(activeWallet, provider);
+  const nonce = await getCurrentNonce(ethersWallet);
   const finalTransaction: PopulatedTransaction = {
     ...populatedTransaction,
     gasLimit: gasDetails.gasLimit,
     gasPrice: gasDetails.gasPrice,
     nonce,
   };
-  const signedTransaction = await wallet.signTransaction(finalTransaction);
-  const provider = getProviderForNetwork(chainID);
+  const signedTransaction = await ethersWallet.signTransaction(
+    finalTransaction,
+  );
   await storeCurrentNonce(nonce);
-  return provider.sendTransaction(signedTransaction);
+  const txResponse = await provider.sendTransaction(signedTransaction);
+  // Call wait synchronously. This will set wallet unavailable until the tx is finished.
+  waitForTx(activeWallet, txResponse);
+  return txResponse;
+};
+
+export const waitForTx = async (
+  activeWallet: ActiveWallet,
+  txResponse: TransactionResponse,
+) => {
+  setWalletAvailable(activeWallet, false);
+  await waitTx(txResponse);
+  setWalletAvailable(activeWallet, true);
+};
+
+// Separated so it can be stubbed for tests.
+export const waitTx = async (txResponse: TransactionResponse) => {
+  await txResponse.wait();
 };

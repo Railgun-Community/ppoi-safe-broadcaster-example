@@ -16,8 +16,8 @@ import {
   getAllUnitTokenFeesForChain,
   getTokenFee,
 } from '../calculate-token-fee';
-import * as estimateMaximumGasModule from '../gas-estimate';
-import { estimateMaximumGas } from '../gas-estimate';
+import * as estimateGasModule from '../gas-estimate';
+import { getEstimateGasDetails, getMaximumGas } from '../gas-estimate';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -29,17 +29,21 @@ const MOCK_TOKEN_ADDRESS = '0x12345';
 const MOCK_TOKEN_ADDRESS_FEWER_DECIMALS = '0x46890';
 const MOCK_TRANSACTION = getMockPopulatedTransaction();
 
-const stubEstimateMaximumGas = (maximumGas: BigNumber) => {
+const stubEstimateGasDetails = (
+  gasEstimate: BigNumber,
+  gasPrice: BigNumber,
+) => {
   estimateMaximumGasStub = sinon
-    .stub(estimateMaximumGasModule, 'estimateMaximumGas')
-    .resolves(maximumGas);
+    .stub(estimateGasModule, 'getEstimateGasDetails')
+    .resolves({ gasEstimate, gasPrice });
 };
 
 const setupMocks = (
   tokenAddress: string,
   tokenPrice: number,
   gasTokenPrice: number,
-  maximumGas?: BigNumber,
+  gasEstimate?: BigNumber,
+  gasPrice?: BigNumber,
 ) => {
   const gasTokenAddress = network.gasToken.wrappedAddress ?? '';
   const tokenPrices = {
@@ -53,8 +57,8 @@ const setupMocks = (
     },
   };
   cacheTokenPricesForNetwork(chainID, tokenPrices);
-  if (maximumGas) {
-    stubEstimateMaximumGas(maximumGas);
+  if (gasEstimate && gasPrice) {
+    stubEstimateGasDetails(gasEstimate, gasPrice);
   }
 };
 
@@ -105,38 +109,57 @@ describe('calculate-token-fee', () => {
   it('Should calculate token fee for transaction with precision', async () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
-    const maximumGas = utils.parseEther('0.01');
-    setupMocks(MOCK_TOKEN_ADDRESS, tokenPrice, gasTokenPrice, maximumGas);
+    const gasEstimate = utils.parseEther('0.001');
+    const gasPrice = BigNumber.from('100000');
+    setupMocks(
+      MOCK_TOKEN_ADDRESS,
+      tokenPrice,
+      gasTokenPrice,
+      gasEstimate,
+      gasPrice,
+    );
 
-    const gasEstimate = await estimateMaximumGas(chainID, MOCK_TRANSACTION);
+    const gasEstimateDetails = await getEstimateGasDetails(
+      chainID,
+      MOCK_TRANSACTION,
+    );
+    const maximumGas = getMaximumGas(gasEstimateDetails);
     const maximumGasFeeForToken = getTokenFee(
       chainID,
-      gasEstimate,
+      maximumGas,
       MOCK_TOKEN_ADDRESS,
     );
 
-    expect(maximumGasFeeForToken.toString()).to.equal('12727422680400000000');
+    expect(maximumGasFeeForToken.toString()).to.equal(
+      '152729072164800000000000',
+    );
   });
 
   it('Should calculate token fee for transaction with different decimal amounts', async () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
-    const maximumGas = utils.parseEther('0.01');
+    const gasEstimate = utils.parseEther('0.001');
+    const gasPrice = BigNumber.from('100000');
     setupMocks(
       MOCK_TOKEN_ADDRESS_FEWER_DECIMALS,
       tokenPrice,
       gasTokenPrice,
-      maximumGas,
+      gasEstimate,
+      gasPrice,
     );
 
-    const gasEstimate = await estimateMaximumGas(chainID, MOCK_TRANSACTION);
+    const gasEstimateDetails = await getEstimateGasDetails(
+      chainID,
+      MOCK_TRANSACTION,
+    );
+    const maximumGas = getMaximumGas(gasEstimateDetails);
     const maximumGasFeeForToken = getTokenFee(
       chainID,
-      gasEstimate,
+      maximumGas,
       MOCK_TOKEN_ADDRESS_FEWER_DECIMALS,
     );
 
-    expect(maximumGasFeeForToken.toString()).to.equal('12727422');
+    expect(maximumGasFeeForToken.toString()).to.equal('152729072164');
   });
 
   it('Should get all unit token fees for chain', () => {
@@ -156,12 +179,23 @@ describe('calculate-token-fee', () => {
   it('Should error when precision not high enough', async () => {
     const tokenPrice = 0.00000106;
     const gasTokenPrice = 1234.56;
-    const maximumGas = utils.parseEther('0.01');
-    setupMocks(MOCK_TOKEN_ADDRESS, tokenPrice, gasTokenPrice, maximumGas);
+    const gasEstimate = utils.parseEther('0.001');
+    const gasPrice = BigNumber.from('100000');
+    setupMocks(
+      MOCK_TOKEN_ADDRESS,
+      tokenPrice,
+      gasTokenPrice,
+      gasEstimate,
+      gasPrice,
+    );
 
-    const gasEstimate = await estimateMaximumGas(chainID, MOCK_TRANSACTION);
+    const gasEstimateDetails = await getEstimateGasDetails(
+      chainID,
+      MOCK_TRANSACTION,
+    );
+    const maximumGas = getMaximumGas(gasEstimateDetails);
     expect(() =>
-      getTokenFee(chainID, gasEstimate, MOCK_TOKEN_ADDRESS),
+      getTokenFee(chainID, maximumGas, MOCK_TOKEN_ADDRESS),
     ).to.throw();
   });
 }).timeout(10000);
