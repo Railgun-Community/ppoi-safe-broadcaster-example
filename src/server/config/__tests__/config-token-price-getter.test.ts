@@ -1,4 +1,3 @@
-/* globals describe, it, before, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getMockRopstenNetwork } from '../../../test/mocks.test';

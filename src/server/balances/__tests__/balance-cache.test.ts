@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* globals describe, it, before, after, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';

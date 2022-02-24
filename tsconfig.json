@@ -14,10 +14,9 @@
     "outDir": "dist",
     "lib": ["es2020", "dom"],
     "types": ["node", "mocha"],
-    "typeRoots": ["node_modules/@types", "src/types"]
+    "typeRoots": ["node_modules/@types", "src/global.d.ts"]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/**/__tests__", "test"],
+  "exclude": ["src/**/__tests__", "test", "dist"],
   "compileOnSave": false,
   "ts-node": {
     "files": true

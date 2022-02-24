@@ -1,4 +1,3 @@
-/* globals describe, it, before, beforeEach, afterEach, after */
 import fs from 'fs';
 import { NetworkChainID } from '../server/config/config-chain-ids';
 import configDefaults from '../server/config/config-defaults';

@@ -1,4 +1,3 @@
-/* globals describe, before, after, it, beforeEach, afterEach */
 import { FallbackProvider } from '@ethersproject/providers';
 import { ERC20Note, Lepton } from '@railgun-community/lepton';
 import { ERC20RailgunContract } from '@railgun-community/lepton/dist/contract';

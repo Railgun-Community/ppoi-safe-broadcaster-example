@@ -1,5 +1,3 @@
-/// <reference types="../../../global" />
-/* globals describe, before, after, it, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonSpy, SinonStub } from 'sinon';

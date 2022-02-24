@@ -1,5 +1,4 @@
 /// <reference types="../../../global" />
-/* globals describe, it, before, after, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
@@ -9,7 +8,6 @@ import { GasTokenWrappedAddress } from '../../../models/token-models';
 import {
   getMockNetwork,
   getMockPopulatedTransaction,
-  getMockSerializedTransaction,
   mockTokenConfig,
 } from '../../../test/mocks.test';
 import {

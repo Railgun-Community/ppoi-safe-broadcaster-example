@@ -1,9 +1,6 @@
-/// <reference types="../../../global" />
-/* globals describe, before, after, it, beforeEach, afterEach */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
-import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import { WakuApiClient, WakuRelayMessage } from '../waku-api-client';
 import {
   setupSingleTestWallet,
