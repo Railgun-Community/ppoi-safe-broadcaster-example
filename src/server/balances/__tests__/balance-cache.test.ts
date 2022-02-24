@@ -72,7 +72,7 @@ describe('balance-cache', () => {
     );
     expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.false;
 
-    await delay(11);
+    await delay(15);
     expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.true;
 
     await getCachedGasTokenBalance(
