@@ -15,8 +15,8 @@
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
     "test": "npm run compile-test && env-cmd -e all,test mocha 'src/**/__tests__/*.test.ts'",
     "test-coverage": "npm run compile-test && env-cmd -e all,test nyc mocha 'src/**/__tests__/*.test.ts'",
-    "overwrite-my-config": "cp ./src/MY-CONFIG.example.ts ./src/MY-CONFIG.ts",
-    "prepare": "npm run overwrite-my-config && npm run compile"
+    "copy-my-config": "cp -n ./src/MY-CONFIG.example.ts ./src/MY-CONFIG.ts",
+    "prepare": "npm run copy-my-config && npm run compile"
   },
   "keywords": [],
   "author": "",
