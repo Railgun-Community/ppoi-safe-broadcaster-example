@@ -1,4 +1,5 @@
 import { BigNumber, PopulatedTransaction } from 'ethers';
+import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 
@@ -18,8 +19,8 @@ export const getEstimateGasDetails = async (
 ): Promise<GasEstimateDetails> => {
   const provider = getProviderForNetwork(chainID);
   const [gasEstimate, gasPrice] = await Promise.all([
-    provider.estimateGas(populatedTransaction),
-    provider.getGasPrice(),
+    provider.estimateGas(populatedTransaction).catch(throwErr),
+    provider.getGasPrice().catch(throwErr),
   ]);
   return { gasEstimate, gasPrice };
 };

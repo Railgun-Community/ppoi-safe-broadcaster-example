@@ -4,3 +4,7 @@ export const delay = (delayInMS: number): Promise<void> => {
     return setTimeout(resolve, delayInMS);
   });
 };
+
+export const throwErr = (err: any) => {
+  throw err;
+};

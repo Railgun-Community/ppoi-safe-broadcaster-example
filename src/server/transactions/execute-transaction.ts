@@ -1,6 +1,7 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
+import { logger, PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
 import { ActiveWallet } from '../../models/wallet-models';
+import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
@@ -15,7 +16,7 @@ export const getCurrentNonce = async (
   wallet: EthersWallet,
 ): Promise<number> => {
   const [txCount, lastTransactionNonce] = await Promise.all([
-    wallet.getTransactionCount(),
+    wallet.getTransactionCount().catch(throwErr),
     await getSettingsNumber(LAST_NONCE_KEY),
   ]);
   if (lastTransactionNonce) {
@@ -50,7 +51,9 @@ export const executeTransaction = async (
     finalTransaction,
   );
   await storeCurrentNonce(nonce);
-  const txResponse = await provider.sendTransaction(signedTransaction);
+  const txResponse = await provider
+    .sendTransaction(signedTransaction)
+    .catch(throwErr);
   // Call wait synchronously. This will set wallet unavailable until the tx is finished.
   waitForTx(activeWallet, txResponse);
   return txResponse;
@@ -67,5 +70,5 @@ export const waitForTx = async (
 
 // Separated so it can be stubbed for tests.
 export const waitTx = async (txResponse: TransactionResponse) => {
-  await txResponse.wait();
+  await txResponse.wait().catch(throwErr);
 };

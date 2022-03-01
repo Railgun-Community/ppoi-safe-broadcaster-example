@@ -36,7 +36,7 @@ export default {
       symbol: 'TESTERC20',
     },
   },
-  [NetworkChainID.BNBChain]: {
+  [NetworkChainID.BNBSmartChain]: {
     [TokenAddressBSC.WBNB]: {
       symbol: 'WBNB',
     },

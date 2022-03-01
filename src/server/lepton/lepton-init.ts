@@ -8,6 +8,7 @@ import { quickSync } from '../api/quick-sync/quick-sync';
 import configDefaults from '../config/config-defaults';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
+import { throwErr } from '../../util/promise-utils';
 
 let lepton: Lepton;
 
@@ -47,7 +48,16 @@ export const initLeptonNetwork = (
   const network = configNetworks[chainID];
   const deploymentBlock = network.deploymentBlock ?? 0;
 
-  // Note: This call is async, but we call it synchronously
-  // so it runs the slow scan in the background.
-  lepton.loadNetwork(chainID, network.proxyContract, provider, deploymentBlock);
+  try {
+    // Note: This call is async, but we call it synchronously
+    // so it runs the slow scan in the background.
+    lepton.loadNetwork(
+      chainID,
+      network.proxyContract,
+      provider,
+      deploymentBlock,
+    );
+  } catch (err: any) {
+    logger.warn(`Could not load network ${chainID} in Lepton: ${err.message}.`);
+  }
 };

@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { logger } from '../../util/logger';
 import { getProviderForNetwork } from '../providers/active-network-providers';
+import { throwErr } from '../../util/promise-utils';
 
 export const getGasTokenBalance = async (
   chainID: NetworkChainID,
@@ -9,7 +10,7 @@ export const getGasTokenBalance = async (
 ): Promise<BigNumber> => {
   try {
     const provider = getProviderForNetwork(chainID);
-    const balance = await provider.getBalance(walletAddress);
+    const balance = await provider.getBalance(walletAddress).catch(throwErr);
     return balance;
   } catch (err: any) {
     logger.warn(`Could not get gas token balance: ${err.message}`);

@@ -3,7 +3,7 @@ import { GasTokenWrappedAddress } from '../../models/token-models';
 // Fallback Provider configs
 import fallbackProvidersEthereum from './fallback-providers/1-ethereum';
 import fallbackProvidersRopsten from './fallback-providers/3-ropsten';
-import fallbackProvidersBNBChain from './fallback-providers/56-binance-smart-chain';
+import fallbackProvidersBNBSmartChain from './fallback-providers/56-binance-smart-chain';
 import fallbackProvidersPolygon from './fallback-providers/137-polygon';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
 import { CoingeckoNetworkID } from '../../models/api-constants';
@@ -44,16 +44,16 @@ export default {
     quickSyncURL: QuickSyncURL.Ropsten,
     isTestNetwork: true,
   },
-  [NetworkChainID.BNBChain]: {
+  [NetworkChainID.BNBSmartChain]: {
     name: 'Binance Smart Chain',
     gasToken: {
       symbol: 'BNB',
       wrappedAddress: GasTokenWrappedAddress.BinanceWBNB,
     },
     fees: defaultFees,
-    proxyContract: RailProxyContract.BNBChain,
-    coingeckoId: CoingeckoNetworkID.BNBChain,
-    fallbackProviderConfig: fallbackProvidersBNBChain,
+    proxyContract: RailProxyContract.BNBSmartChain,
+    coingeckoId: CoingeckoNetworkID.BNBSmartChain,
+    fallbackProviderConfig: fallbackProvidersBNBSmartChain,
     priceTTLInMS: 5 * 60 * 1000,
   },
   [NetworkChainID.PolygonPOS]: {
