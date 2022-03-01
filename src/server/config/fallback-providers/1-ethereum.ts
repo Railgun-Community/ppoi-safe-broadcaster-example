@@ -18,11 +18,6 @@ const config: FallbackProviderJsonConfig = {
       priority: 1,
       weight: 1,
     },
-    {
-      provider: 'https://cloudflare-eth.com',
-      priority: 2,
-      weight: 1,
-    },
   ],
 };
 
