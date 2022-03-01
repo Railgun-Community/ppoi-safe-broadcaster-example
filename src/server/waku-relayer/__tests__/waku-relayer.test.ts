@@ -1,16 +1,11 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon, { SinonSpy, SinonStub } from 'sinon';
+import sinon, { SinonStub } from 'sinon';
 import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
 import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
-import {
-  WakuMethodNames,
-  WakuRelayer,
-  WakuRelayerOptions,
-  WAKU_TOPIC,
-} from '../waku-relayer';
+import { WakuMethodNames, WakuRelayer, WAKU_TOPIC } from '../waku-relayer';
 import {
   WakuApiClient,
   WakuRelayMessage,
@@ -35,6 +30,7 @@ import * as processTransactionModule from '../../transactions/process-transactio
 import { WakuMessage } from '../waku-message';
 import { contentTopics } from '../topics';
 import { getMockSerializedTransaction } from '../../../test/mocks.test';
+import { initTokens } from '../../tokens/network-tokens';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -65,8 +61,8 @@ describe('waku-relayer', () => {
     network = setupTestNetwork();
     configTokens[chainID][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',
-      decimals: 18,
     };
+    await initTokens();
     processTransactionStub = sinon
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);

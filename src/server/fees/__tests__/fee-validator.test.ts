@@ -15,6 +15,7 @@ import {
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import configTokens from '../../config/config-tokens';
+import { initTokens } from '../../tokens/network-tokens';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -39,15 +40,15 @@ const validatePackagedFee = (
 const CHAIN_ID = 1;
 
 describe('fee-validator', () => {
-  before(() => {
+  before(async () => {
     const network = getMockNetwork();
     configNetworks[CHAIN_ID] = network;
     gasTokenAddress = network.gasToken.wrappedAddress;
     initNetworkProviders();
     configTokens[CHAIN_ID][MOCK_TOKEN_ADDRESS] = {
       symbol: 'TOKEN',
-      decimals: 18,
     };
+    await initTokens();
   });
 
   beforeEach(() => {

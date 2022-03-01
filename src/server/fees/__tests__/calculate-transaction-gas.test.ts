@@ -9,6 +9,7 @@ import {
   getMockNetwork,
   getMockPopulatedTransaction,
   mockTokenConfig,
+  MOCK_TOKEN_6_DECIMALS,
 } from '../../../test/mocks.test';
 import {
   createGasEstimateStubs,
@@ -23,6 +24,7 @@ import {
 import { createTransactionGasDetails } from '../calculate-transaction-gas';
 import { getTokenFee } from '../calculate-token-fee';
 import { getEstimateGasDetails, getMaximumGas } from '../gas-estimate';
+import { initTokens } from '../../tokens/network-tokens';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -30,17 +32,17 @@ const { expect } = chai;
 const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
 const MOCK_GAS_TOKEN = GasTokenWrappedAddress.EthereumWETH;
 const MOCK_TOKEN_ADDRESS = '0x001';
-const MOCK_TOKEN_ADDRESS_6_DECIMALS = '0x002';
 
 // 0.10 estimate (est * price), 0.12 ETH total (gas limit).
 const MOCK_GAS_ESTIMATE = BigNumber.from('400000000000');
 const MOCK_GAS_PRICE = BigNumber.from('250000');
 
 describe('calculate-transaction-gas', () => {
-  before(() => {
+  before(async () => {
     resetTokenPriceCache();
     mockTokenConfig(MOCK_CHAIN_ID, MOCK_TOKEN_ADDRESS);
-    mockTokenConfig(MOCK_CHAIN_ID, MOCK_TOKEN_ADDRESS_6_DECIMALS, 6);
+    mockTokenConfig(MOCK_CHAIN_ID, MOCK_TOKEN_6_DECIMALS);
+    await initTokens();
     configNetworks[MOCK_CHAIN_ID] = getMockNetwork();
     configNetworks[MOCK_CHAIN_ID].fees.slippageBuffer = 0.05;
     configNetworks[MOCK_CHAIN_ID].fees.profit = 0.05;
@@ -48,7 +50,7 @@ describe('calculate-transaction-gas', () => {
     const tokenPrices: MapType<TokenPrice> = {
       [MOCK_GAS_TOKEN]: { price: 3250.0, updatedAt: Date.now() },
       [MOCK_TOKEN_ADDRESS]: { price: 1.0, updatedAt: Date.now() },
-      [MOCK_TOKEN_ADDRESS_6_DECIMALS]: { price: 1.0, updatedAt: Date.now() },
+      [MOCK_TOKEN_6_DECIMALS]: { price: 1.0, updatedAt: Date.now() },
     };
     cacheTokenPricesForNetwork(MOCK_CHAIN_ID, tokenPrices);
   });
@@ -83,7 +85,7 @@ describe('calculate-transaction-gas', () => {
     const gasDetails = createTransactionGasDetails(
       MOCK_CHAIN_ID,
       MOCK_GAS_ESTIMATE,
-      MOCK_TOKEN_ADDRESS_6_DECIMALS,
+      MOCK_TOKEN_6_DECIMALS,
       tokenFee,
     );
 

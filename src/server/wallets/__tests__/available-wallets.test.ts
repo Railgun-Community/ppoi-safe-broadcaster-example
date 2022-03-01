@@ -3,13 +3,10 @@ import chaiAsPromised from 'chai-as-promised';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import { isWalletAvailable, setWalletAvailable } from '../available-wallets';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import { getActiveWallets } from '../active-wallets';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
-
-const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
 
 describe('available-wallets', () => {
   before(async () => {

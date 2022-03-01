@@ -20,43 +20,35 @@ export default {
   [NetworkChainID.Ethereum]: {
     [TokenAddressEth.WETH]: {
       symbol: 'WETH',
-      decimals: 18,
     },
     [TokenAddressEth.USDT]: {
       symbol: 'USDT',
-      decimals: 6,
     },
     [TokenAddressEth.WBTC]: {
       symbol: 'WBTC',
-      decimals: 18,
     },
   },
   [NetworkChainID.Ropsten]: {
     [TokenAddressRopsten.WETH]: {
       symbol: 'WETH',
-      decimals: 18,
     },
     '0xAa753fb4e77ea8Adb16200865839ffB1d86BAE5E': {
       symbol: 'TESTERC20',
-      decimals: 18,
     },
   },
   [NetworkChainID.BinanceSmartChain]: {
     [TokenAddressBSC.WBNB]: {
       symbol: 'WBNB',
-      decimals: 18,
     },
   },
   [NetworkChainID.PolygonPOS]: {
     [TokenAddressPoly.WMATIC]: {
       symbol: 'WMATIC',
-      decimals: 18,
     },
   },
   [NetworkChainID.HardHat]: {
     '0x5FbDB2315678afecb367f032d93F642f64180aa3': {
       symbol: 'TESTERC20',
-      decimals: 18,
     },
   },
 } as NetworkTokensConfig;

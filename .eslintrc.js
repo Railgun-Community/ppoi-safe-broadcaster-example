@@ -30,6 +30,7 @@ module.exports = {
     'operator-linebreak': 0,
     'function-paren-newline': 0,
     'require-await': 'error',
+    'no-continue': 0,
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
   },
   ignorePatterns: ['dist'],

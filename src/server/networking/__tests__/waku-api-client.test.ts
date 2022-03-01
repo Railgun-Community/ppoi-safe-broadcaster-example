@@ -2,17 +2,13 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
 import { WakuApiClient, WakuRelayMessage } from '../waku-api-client';
-import {
-  setupSingleTestWallet,
-  setupTestNetwork,
-  testChainID,
-} from '../../../test/setup.test';
+import { setupSingleTestWallet, testChainID } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import configDefaults from '../../config/config-defaults';
 import { resetTokenPriceCache } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
-import { Network } from '../../../models/network-models';
 import configTokens from '../../config/config-tokens';
+import { initTokens } from '../../tokens/network-tokens';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -22,7 +18,6 @@ let client: WakuApiClient;
 let clientHTTPStub: SinonStub;
 
 const MOCK_TOKEN_ADDRESS = '0x12345';
-let network: Network;
 const chainID = testChainID();
 
 describe('waku-api-client', () => {
@@ -30,11 +25,10 @@ describe('waku-api-client', () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
     initLepton();
     await setupSingleTestWallet();
-    network = setupTestNetwork();
     configTokens[chainID][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',
-      decimals: 18,
     };
+    await initTokens();
 
     client = new WakuApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post');

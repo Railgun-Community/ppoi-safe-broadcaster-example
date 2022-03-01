@@ -4,7 +4,10 @@ import { BigNumber, utils } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import configTokens from '../../config/config-tokens';
 import { Network } from '../../../models/network-models';
-import { getMockPopulatedTransaction } from '../../../test/mocks.test';
+import {
+  getMockPopulatedTransaction,
+  MOCK_TOKEN_6_DECIMALS,
+} from '../../../test/mocks.test';
 import { setupTestNetwork, testChainID } from '../../../test/setup.test';
 import {
   cacheTokenPricesForNetwork,
@@ -17,6 +20,7 @@ import {
 } from '../calculate-token-fee';
 import * as estimateGasModule from '../gas-estimate';
 import { getEstimateGasDetails, getMaximumGas } from '../gas-estimate';
+import { initTokens } from '../../tokens/network-tokens';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -25,7 +29,6 @@ let estimateMaximumGasStub: SinonStub;
 let network: Network;
 const chainID = testChainID();
 const MOCK_TOKEN_ADDRESS = '0x12345';
-const MOCK_TOKEN_ADDRESS_FEWER_DECIMALS = '0x46890';
 const MOCK_TRANSACTION = getMockPopulatedTransaction();
 
 const stubEstimateGasDetails = (
@@ -62,16 +65,15 @@ const setupMocks = (
 };
 
 describe('calculate-token-fee', () => {
-  before(() => {
+  before(async () => {
     network = setupTestNetwork();
     configTokens[chainID][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',
-      decimals: 18,
     };
-    configTokens[chainID][MOCK_TOKEN_ADDRESS_FEWER_DECIMALS] = {
+    configTokens[chainID][MOCK_TOKEN_6_DECIMALS] = {
       symbol: 'MOCK2',
-      decimals: 6,
     };
+    await initTokens();
   });
 
   afterEach(() => {
@@ -95,11 +97,11 @@ describe('calculate-token-fee', () => {
   it('Should calculate token fee per unit gas with different decimal amounts', () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
-    setupMocks(MOCK_TOKEN_ADDRESS_FEWER_DECIMALS, tokenPrice, gasTokenPrice);
+    setupMocks(MOCK_TOKEN_6_DECIMALS, tokenPrice, gasTokenPrice);
 
     const maximumGasFeeForToken = calculateTokenFeePerUnitGasToken(
       chainID,
-      MOCK_TOKEN_ADDRESS_FEWER_DECIMALS,
+      MOCK_TOKEN_6_DECIMALS,
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal('1272742268');
@@ -140,7 +142,7 @@ describe('calculate-token-fee', () => {
     const gasEstimate = utils.parseEther('0.001');
     const gasPrice = BigNumber.from('100000');
     setupMocks(
-      MOCK_TOKEN_ADDRESS_FEWER_DECIMALS,
+      MOCK_TOKEN_6_DECIMALS,
       tokenPrice,
       gasTokenPrice,
       gasEstimate,
@@ -155,7 +157,7 @@ describe('calculate-token-fee', () => {
     const maximumGasFeeForToken = getTokenFee(
       chainID,
       maximumGas,
-      MOCK_TOKEN_ADDRESS_FEWER_DECIMALS,
+      MOCK_TOKEN_6_DECIMALS,
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal('152729072164');

@@ -6,11 +6,11 @@ export default {
   networks: {
     // Blockchain networks to activate.
     active: [
-      NetworkChainID.Ethereum,
+      // NetworkChainID.Ethereum,
       NetworkChainID.Ropsten,
-      NetworkChainID.HardHat,
       NetworkChainID.BinanceSmartChain,
-      NetworkChainID.PolygonPOS,
+      // NetworkChainID.PolygonPOS,
+      // NetworkChainID.HardHat,
     ],
   },
 

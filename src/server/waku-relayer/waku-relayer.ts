@@ -1,12 +1,7 @@
-import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
 import { JsonRpcPayload, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import debug from 'debug';
 import { BigNumber } from 'ethers';
-import {
-  WakuApiClient,
-  WakuApiClientOptions,
-  WakuRelayMessage,
-} from '../networking/waku-api-client';
+import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';

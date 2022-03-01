@@ -23,7 +23,6 @@ export default {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
-      decimals: 18,
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.Ethereum,
@@ -36,7 +35,6 @@ export default {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: GasTokenWrappedAddress.RopstenWETH,
-      decimals: 18,
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.Ropsten,
@@ -51,7 +49,6 @@ export default {
     gasToken: {
       symbol: 'BNB',
       wrappedAddress: GasTokenWrappedAddress.BinanceWBNB,
-      decimals: 18,
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.BinanceSmartChain,
@@ -64,7 +61,6 @@ export default {
     gasToken: {
       symbol: 'MATIC',
       wrappedAddress: GasTokenWrappedAddress.PolygonWMATIC,
-      decimals: 18,
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.PolygonPOS,
@@ -77,7 +73,6 @@ export default {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: GasTokenWrappedAddress.None,
-      decimals: 18,
     },
     fees: defaultFees,
     proxyContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',

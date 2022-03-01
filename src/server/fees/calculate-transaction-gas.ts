@@ -1,4 +1,4 @@
-import { BigNumber, PopulatedTransaction } from 'ethers';
+import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';

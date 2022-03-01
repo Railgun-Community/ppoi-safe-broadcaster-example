@@ -16,6 +16,8 @@ import {
   getMockTokenConfig,
 } from '../../../../test/mocks.test';
 import configTokens from '../../../config/config-tokens';
+import { initTokens } from '../../../tokens/network-tokens';
+import { initNetworkProviders } from '../../../providers/active-network-providers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -52,9 +54,10 @@ const validatePriceGetterOutput = (
 };
 
 describe('coingecko-price', () => {
-  before(() => {
+  before(async () => {
     configNetworks[NetworkChainID.Ethereum] = getMockNetwork();
     configNetworks[NetworkChainID.Ropsten] = ropstenNetwork;
+    initNetworkProviders();
 
     const tokenConfigs = {
       [TOKEN_ADDRESS_1]: getMockTokenConfig(),
@@ -63,6 +66,7 @@ describe('coingecko-price', () => {
 
     configTokens[NetworkChainID.Ethereum] = tokenConfigs;
     configTokens[NetworkChainID.Ropsten] = tokenConfigs;
+    await initTokens();
   });
 
   it('Should run live Coingecko API fetch for Ethereum tokens', async () => {

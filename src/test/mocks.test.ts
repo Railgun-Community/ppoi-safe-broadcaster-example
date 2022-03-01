@@ -12,17 +12,18 @@ import {
   Token,
   TokenConfig,
 } from '../models/token-models';
+import { initTokens } from '../server/tokens/network-tokens';
 
 export const mockTokenConfig = (
   chainID: NetworkChainID,
   tokenAddress: string,
-  decimals = 18,
 ) => {
   configTokens[chainID][tokenAddress] = {
     symbol: tokenAddress.toUpperCase(),
-    decimals,
   };
 };
+
+export const MOCK_TOKEN_6_DECIMALS = '0x03738239';
 
 export const getMockFallbackProviderConfig = (): FallbackProviderJsonConfig => {
   return {
@@ -73,7 +74,6 @@ export const getMockNetwork = (): Network => {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
-      decimals: 18,
     },
     fees: {
       slippageBuffer: 0.05,
@@ -92,7 +92,6 @@ export const getMockRopstenNetwork = (): Network => {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: '0x00',
-      decimals: 18,
     },
     fees: {
       slippageBuffer: 0.05,
@@ -117,7 +116,6 @@ export const getMockSerializedTransaction = (): string => {
 export const getMockTokenConfig = (): TokenConfig => {
   return {
     symbol: 'SHIB',
-    decimals: 18,
   };
 };
 

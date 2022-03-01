@@ -6,7 +6,7 @@ export const abiForProxyContract = () => {
   return ABI_RAILGUN;
 };
 
-export const abiForChainToken = (chainID: NetworkChainID) => {
+export const abiForChainToken = (chainID: NetworkChainID): Array<any> => {
   switch (chainID) {
     case NetworkChainID.Ethereum: {
       return ABI_ERC20;

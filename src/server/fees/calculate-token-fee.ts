@@ -3,7 +3,11 @@ import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { NetworkFeeSettings } from '../../models/network-models';
-import { GasTokenConfig, Token } from '../../models/token-models';
+import {
+  GasTokenConfig,
+  GAS_TOKEN_DECIMALS,
+  Token,
+} from '../../models/token-models';
 import {
   allTokenAddressesForNetwork,
   getTransactionTokens,
@@ -37,10 +41,7 @@ export const calculateTokenFeePerUnitGasToken = (
   chainID: NetworkChainID,
   tokenAddress: string,
 ) => {
-  const networkConfig = configNetworks[chainID];
-  const { gasToken } = networkConfig;
-  const oneUnitGas = BigNumber.from(10).pow(BigNumber.from(gasToken.decimals));
-
+  const oneUnitGas = BigNumber.from(10).pow(BigNumber.from(GAS_TOKEN_DECIMALS));
   return getTokenFee(chainID, oneUnitGas, tokenAddress);
 };
 
@@ -113,6 +114,6 @@ export const getTransactionTokenToGasDecimalRatio = (
   token: Token,
   gasToken: GasTokenConfig,
 ): BigNumber => {
-  const decimalDifference = gasToken.decimals - token.decimals;
+  const decimalDifference = GAS_TOKEN_DECIMALS - token.decimals;
   return BigNumber.from(10).pow(BigNumber.from(decimalDifference));
 };

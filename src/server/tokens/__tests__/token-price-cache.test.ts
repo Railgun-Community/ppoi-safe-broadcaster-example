@@ -9,6 +9,7 @@ import {
   TokenPrice,
 } from '../token-price-cache';
 import { mockTokenConfig } from '../../../test/mocks.test';
+import { initTokens } from '../network-tokens';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -17,10 +18,11 @@ const MOCK_TOKEN_ADDRESS_1 = 'a123';
 const MOCK_TOKEN_ADDRESS_2 = 'b456';
 
 describe('token-price-cache', () => {
-  before(() => {
+  before(async () => {
     mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1);
     mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2);
     mockTokenConfig(NetworkChainID.Ropsten, MOCK_TOKEN_ADDRESS_1);
+    await initTokens();
   });
 
   beforeEach(() => {

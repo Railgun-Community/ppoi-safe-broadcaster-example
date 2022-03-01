@@ -8,19 +8,20 @@ export enum GasTokenWrappedAddress {
   PolygonWMATIC = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270', // WMATIC
 }
 
+export const GAS_TOKEN_DECIMALS = 18;
+
 export type GasTokenConfig = {
   wrappedAddress: GasTokenWrappedAddress | string;
   symbol: string;
-  decimals: number;
 };
 
 export type TokenConfig = {
   symbol: string;
-  decimals: number;
 };
 
 export type Token = TokenConfig & {
   address: string;
+  decimals: number;
 };
 
 export type TokenAmount = {

@@ -13,6 +13,7 @@ import configTokenPriceGetter, {
 } from '../../config/config-token-price-getter';
 import { initPricePoller, stopPolling } from '../token-price-poller';
 import { delay } from '../../../util/promise-utils';
+import { initTokens } from '../network-tokens';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -52,11 +53,12 @@ const mockTokenPriceGetter: TokenPricesGetter = async (
 };
 
 describe('token-price-poller', () => {
-  before(() => {
+  before(async () => {
     configTokenPriceGetter.tokenPriceGetter = mockTokenPriceGetter;
     configDefaults.tokenPrices.priceRefreshDelayInMS = 3 * 1000; // 3 second refresh.
     mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1);
     mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2);
+    await initTokens();
   });
 
   beforeEach(() => {

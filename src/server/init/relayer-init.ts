@@ -5,6 +5,7 @@ import { initPricePoller } from '../tokens/token-price-poller';
 import { logger } from '../../util/logger';
 import { initSettingsDB, closeSettingsDB } from '../db/settings-db';
 import { myConfigOverrides } from '../../MY-CONFIG';
+import { initTokens } from '../tokens/network-tokens';
 
 export const initRelayerModules = async (forTest = false) => {
   if (!forTest) {
@@ -12,8 +13,8 @@ export const initRelayerModules = async (forTest = false) => {
   }
   initSettingsDB();
   initLepton();
-  await initWallets();
   initNetworkProviders();
+  await Promise.all([initWallets(), initTokens()]);
   initPricePoller();
   logger.log('Relayer ready.');
 };

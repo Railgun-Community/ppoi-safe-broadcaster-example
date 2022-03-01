@@ -1,6 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getMockRopstenNetwork } from '../../../test/mocks.test';
+import { initTokens } from '../../tokens/network-tokens';
 import { NetworkChainID } from '../config-chain-ids';
 import configNetworks from '../config-networks';
 import configTokenPriceGetter from '../config-token-price-getter';
@@ -13,12 +14,12 @@ const testNetwork = getMockRopstenNetwork();
 const MOCK_TOKEN_ADDRESS = '0x123';
 
 describe('config-token-price-getter', () => {
-  before(() => {
+  before(async () => {
     configNetworks[NetworkChainID.Ropsten] = testNetwork;
     configTokens[NetworkChainID.Ropsten][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK',
-      decimals: 18,
     };
+    await initTokens();
   });
 
   it('Should get test network prices', async () => {
