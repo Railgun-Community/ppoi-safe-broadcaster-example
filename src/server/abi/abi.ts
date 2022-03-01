@@ -11,7 +11,7 @@ export const abiForChainToken = (chainID: NetworkChainID): Array<any> => {
     case NetworkChainID.Ethereum: {
       return ABI_ERC20;
     }
-    case NetworkChainID.BinanceSmartChain: {
+    case NetworkChainID.BNBChain: {
       return ABI_ERC20;
     }
     case NetworkChainID.PolygonPOS: {

@@ -8,7 +8,7 @@ export default {
     active: [
       // NetworkChainID.Ethereum,
       NetworkChainID.Ropsten,
-      NetworkChainID.BinanceSmartChain,
+      NetworkChainID.BNBChain,
       // NetworkChainID.PolygonPOS,
       // NetworkChainID.HardHat,
     ],
