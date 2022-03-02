@@ -24,17 +24,17 @@ describe('quick-sync', () => {
     expect(eventLog.nullifierEvents.length).to.be.at.least(2);
   }).timeout(10000);
 
-  it('Should retry Railgun Event Log API fetch on error', () => {
+  it('Should retry Railgun Event Log API fetch on error', async () => {
     const stubAxiosGet = sinon.stub(axios, 'get').throws();
-    expect(quickSync(NetworkChainID.Ropsten, 0)).to.be.rejected;
+    await expect(quickSync(NetworkChainID.Ropsten, 0)).to.be.rejected;
     expect(stubAxiosGet.callCount).to.equal(3);
     stubAxiosGet.restore();
   });
 
-  it('Should error if invalid type', () => {
+  it('Should error if invalid type', async () => {
     let stubAxiosGet: SinonStub;
     stubAxiosGet = sinon.stub(axios, 'get').resolves({ data: null });
-    expect(quickSync(NetworkChainID.Ropsten, 0)).to.be.rejectedWith(
+    await expect(quickSync(NetworkChainID.Ropsten, 0)).to.be.rejectedWith(
       'Expected object `eventLog` response.',
     );
     stubAxiosGet.restore();
@@ -42,7 +42,7 @@ describe('quick-sync', () => {
     stubAxiosGet = sinon
       .stub(axios, 'get')
       .resolves({ data: { nullifierEvents: [] } });
-    expect(quickSync(NetworkChainID.Ropsten, 0)).to.be.rejectedWith(
+    await expect(quickSync(NetworkChainID.Ropsten, 0)).to.be.rejectedWith(
       'Expected object `commitmentEvents` response.',
     );
     stubAxiosGet.restore();
@@ -50,7 +50,7 @@ describe('quick-sync', () => {
     stubAxiosGet = sinon
       .stub(axios, 'get')
       .resolves({ data: { commitmentEvents: [] } });
-    expect(quickSync(NetworkChainID.Ropsten, 0)).to.be.rejectedWith(
+    await expect(quickSync(NetworkChainID.Ropsten, 0)).to.be.rejectedWith(
       'Expected object `nullifierEvents` response.',
     );
     stubAxiosGet.restore();

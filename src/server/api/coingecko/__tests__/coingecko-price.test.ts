@@ -125,7 +125,7 @@ describe('coingecko-price', () => {
     stubGetCoingeckoData.restore();
   });
 
-  it('Should retry Coingecko API fetch on error', () => {
+  it('Should retry Coingecko API fetch on error', async () => {
     const stubAxiosGet = sinon.stub(axios, 'get').throws();
 
     const params = {
@@ -133,7 +133,7 @@ describe('coingecko-price', () => {
       vs_currencies: 'usd',
       include_last_updated_at: true,
     };
-    expect(
+    await expect(
       getCoingeckoData(
         CoingeckoApiEndpoint.PriceLookup,
         CoingeckoNetworkID.Ethereum,

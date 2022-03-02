@@ -18,7 +18,7 @@ export const getRailgunEventLog = async (
   }
 
   const eventLog = await fetchEventLog(quickSyncURL);
-  if (typeof eventLog !== 'object') {
+  if (eventLog == null) {
     throw new Error('Expected object `eventLog` response.');
   }
   if (typeof eventLog.commitmentEvents !== 'object') {

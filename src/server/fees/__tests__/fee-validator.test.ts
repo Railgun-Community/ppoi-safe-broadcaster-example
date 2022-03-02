@@ -45,6 +45,7 @@ describe('fee-validator', () => {
     configNetworks[CHAIN_ID] = network;
     gasTokenAddress = network.gasToken.wrappedAddress;
     initNetworkProviders();
+    configTokens[CHAIN_ID] = {};
     configTokens[CHAIN_ID][MOCK_TOKEN_ADDRESS] = {
       symbol: 'TOKEN',
     };
