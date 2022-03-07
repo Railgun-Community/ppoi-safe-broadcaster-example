@@ -1,3 +1,4 @@
+/// <reference types="../../../global" />
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
