@@ -1,7 +1,9 @@
 import { ERC20Note } from '@railgun-community/lepton';
 import { Prover } from '@railgun-community/lepton/dist/prover';
 import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import BN from 'bn.js';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
 
 let balancesStub: SinonStub;
@@ -16,7 +18,7 @@ export const createLeptonWalletBalancesStub = (
       balance: new BN('1000000000000000000000'),
       utxos: [
         {
-          tree: tree,
+          tree,
           position: 0,
           index: 0,
           change: false,
