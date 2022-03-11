@@ -17,6 +17,7 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   rules: {
+    'no-return-await': 0,
     'no-unused-vars': 0,
     'no-use-before-define': 0,
     'no-unused-expressions': 0,

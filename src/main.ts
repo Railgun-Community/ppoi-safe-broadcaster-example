@@ -1,7 +1,8 @@
 import debug from 'debug';
 import { initRelayerModules } from 'server/init/relayer-init';
-import { WakuRelayer, WAKU_TOPIC } from 'server/waku-relayer/waku-relayer';
-import configDefaults from './server/config/config-defaults';
+import { WakuRelayer, WakuRelayerOptions, WAKU_TOPIC } from 'server/waku-relayer/waku-relayer';
+import { getRailgunWallet } from 'server/wallets/active-wallets';
+import config from './server/config/config-defaults';
 import { WakuApiClient } from './server/networking/waku-api-client';
 
 const dbg = debug('relayer:main');
@@ -12,15 +13,21 @@ const main = async (): Promise<void> => {
   await initRelayerModules();
 
   // Note that this default can be overridden in initRelayerModules().
-  const { rpcURL } = configDefaults.waku;
+  const { rpcURL } = config.waku;
   dbg(`Connecting to ${rpcURL}`);
 
   const client = new WakuApiClient({ url: rpcURL });
-  const wakuRelayer = await WakuRelayer.init(client, {
+  const wallet = getRailgunWallet();
+  const options: WakuRelayerOptions = {
     topic: WAKU_TOPIC,
-  });
+    feeExpiration: config.transactionFees.feeExpirationInMS,
+  };
+  const relayer = await WakuRelayer.init(client, wallet, options);
+  relayer.poll(config.waku.pollFrequencyInMS);
+  relayer.broadcastFeesOnInterval(config.waku.broadcastFeesDelayInMS);
+
   // print multiaddress of nim-waku instance
-  dbg(await wakuRelayer.client.getDebug());
+  dbg(await relayer.client.getDebug());
 };
 
 main();

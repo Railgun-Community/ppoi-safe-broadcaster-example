@@ -5,23 +5,22 @@ import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
 import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
-import { WakuMethodNames, WakuRelayer, WAKU_TOPIC } from '../waku-relayer';
+import { bytes } from '@railgun-community/lepton/dist/utils';
+import { verify } from '@railgun-community/lepton/dist/keyderivation/bip32-ed25519';
 import {
-  WakuApiClient,
-  WakuRelayMessage,
-  WakuRequestMethods,
+  FeeMessage, FeeMessageData, WakuMethodNames, WakuRelayer, WAKU_TOPIC,
+} from '../waku-relayer';
+import {
+  WakuApiClient, WakuRelayMessage, WakuRequestMethods,
 } from '../../networking/waku-api-client';
 import { WakuMethodParamsTransact } from '../methods/transact-method';
 import {
-  setupSingleTestWallet,
-  setupTestNetwork,
-  testChainID,
+  setupSingleTestWallet, setupTestNetwork, testChainID,
 } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import configDefaults from '../../config/config-defaults';
 import {
-  cacheTokenPricesForNetwork,
-  resetTokenPriceCache,
+  cacheTokenPricesForNetwork, resetTokenPriceCache,
 } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
 import { Network } from '../../../models/network-models';
@@ -31,6 +30,7 @@ import { WakuMessage } from '../waku-message';
 import { contentTopics } from '../topics';
 import { getMockSerializedTransaction } from '../../../test/mocks.test';
 import { initTokens } from '../../tokens/network-tokens';
+import { getRailgunWallet } from '../../wallets/active-wallets';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -69,8 +69,10 @@ describe('waku-relayer', () => {
 
     const client = new WakuApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
-    wakuRelayer = await WakuRelayer.init(client, {
+    const wallet = getRailgunWallet();
+    wakuRelayer = await WakuRelayer.init(client, wallet, {
       topic: WAKU_TOPIC,
+      feeExpiration: configDefaults.transactionFees.feeExpirationInMS,
     });
   });
 
@@ -121,20 +123,23 @@ describe('waku-relayer', () => {
     expect(requestParams?.payload).to.be.a('string');
 
     const utf8 = Buffer.from(requestParams.payload, 'hex').toString('utf8');
-    const message = JSON.parse(utf8);
-    expect(message.fees).to.be.an('object');
-    expect(message.fees[MOCK_TOKEN_ADDRESS]).to.be.a(
+    const message = JSON.parse(utf8) as FeeMessage;
+    const data = JSON.parse(bytes.toUTF8String(message.data)) as FeeMessageData;
+    const { signature } = message;
+    expect(data).to.be.an('object');
+    expect(data.fees[MOCK_TOKEN_ADDRESS]).to.be.a(
       'string',
       'No fee for token in broadcast data',
     );
     expect(
-      BigNumber.from(message.fees[MOCK_TOKEN_ADDRESS]).toString(),
+      BigNumber.from(data.fees[MOCK_TOKEN_ADDRESS]).toString(),
     ).to.equal('1272742268040000000000');
-    expect(message.feeExpiration).to.equal(300000);
-    expect(message.pubkey).to.equal(
+    expect(data.feeExpiration).to.be.a('number');
+    expect(data.pubkey).to.equal(
       '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
     );
-    expect(message.encryptedHash).to.equal('');
+    const isValid = await verify(signature, message.data, data.signingKey);
+    expect(isValid).to.be.true;
   });
 
   it('Should test transact method', async () => {

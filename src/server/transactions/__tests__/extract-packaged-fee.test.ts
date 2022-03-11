@@ -52,7 +52,7 @@ const ROPSTEN_CHAIN_ID = NetworkChainID.Ropsten;
 const MOCK_MNEMONIC_1 =
   'hint profit virus forest angry puzzle index same feel behind grant repair';
 
-const createRopstenTransaction = (
+const createRopstenTransaction = async (
   receiverWalletPublicKey: string,
   fee: BigNumber,
   tokenAddress: string,
@@ -70,7 +70,7 @@ const createRopstenTransaction = (
       tokenAddress,
     ),
   ];
-  return transaction.prove(
+  return await transaction.prove(
     lepton.prover,
     railgunWallet,
     configDefaults.lepton.dbEncryptionKey,

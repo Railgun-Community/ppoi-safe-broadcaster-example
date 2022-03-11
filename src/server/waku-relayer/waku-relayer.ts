@@ -1,6 +1,8 @@
 import { JsonRpcPayload, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import debug from 'debug';
 import { BigNumber } from 'ethers';
+import { Wallet } from '@railgun-community/lepton/dist/wallet';
+import { bytes } from '@railgun-community/lepton/dist/utils';
 import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
 import { NetworkChainID } from '../config/config-chain-ids';
@@ -15,12 +17,17 @@ import { WakuMessage } from './waku-message';
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 export const RAILGUN_TOPIC = '/railgun/1/relayer/proto';
 
-export type FeeBroadcastData = {
+export type FeeMessageData = {
   fees: MapType<string>;
   feeExpiration: number;
   feesID: string;
   pubkey: string;
-  encryptedHash: string;
+  signingKey: string;
+};
+
+export type FeeMessage = {
+  data: string, // hex encoded FeeMessageData
+  signature: string; // hex encoded signature
 };
 
 type JsonRPCMessageHandler = (
@@ -35,6 +42,7 @@ export enum WakuMethodNames {
 
 export type WakuRelayerOptions = {
   topic: string;
+  feeExpiration: number;
 };
 
 export class WakuRelayer {
@@ -48,13 +56,18 @@ export class WakuRelayer {
 
   walletPublicKey: string;
 
+  options: WakuRelayerOptions;
+
+  wallet: Wallet;
+
   methods: MapType<JsonRPCMessageHandler> = {
     [WakuMethodNames.Transact]: transactMethod,
   };
 
-  constructor(client: WakuApiClient, options: WakuRelayerOptions) {
+  constructor(client: WakuApiClient, wallet: Wallet, options: WakuRelayerOptions) {
     const chainIDs = configuredNetworkChainIDs();
     this.client = client;
+    this.options = options;
     this.dbg = debug('relayer:waku:relayer');
     this.topic = options.topic;
     this.allContentTopics = [
@@ -62,18 +75,18 @@ export class WakuRelayer {
       ...chainIDs.map((chainID) => contentTopics.fees(chainID)),
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
+    this.wallet = wallet;
     this.walletPublicKey = getRailgunWalletPubKey();
     this.dbg(this.allContentTopics);
   }
 
   static async init(
     client: WakuApiClient,
+    wallet: Wallet,
     options: WakuRelayerOptions,
   ): Promise<WakuRelayer> {
-    await client.subscribe([options.topic]);
-    const relayer = new WakuRelayer(client, options);
-    relayer.poll(configDefaults.waku.pollFrequencyInMS);
-    relayer.broadcastFeesOnInterval();
+    const relayer = new WakuRelayer(client, wallet, options);
+    await relayer.client.subscribe([options.topic]);
     return relayer;
   }
 
@@ -81,10 +94,7 @@ export class WakuRelayer {
     payload: Optional<JsonRpcPayload<string>> | object,
     contentTopic: string,
   ) {
-    const msg = WakuMessage.fromUtf8String(
-      JSON.stringify(payload),
-      contentTopic,
-    );
+    const msg = WakuMessage.fromUtf8String(JSON.stringify(payload), contentTopic);
     await this.client.publish(msg, this.topic).catch((e) => {
       this.dbg('Error publishing message', e.message);
     });
@@ -117,42 +127,49 @@ export class WakuRelayer {
     }
   }
 
-  private createFeeBroadcastData = (
+  private createFeeBroadcastData = async (
     fees: MapType<BigNumber>,
     feeCacheID: string,
-  ): FeeBroadcastData => {
+  ): Promise<FeeMessage> => {
     const tokenAddresses = Object.keys(fees);
     const feesHex: MapType<string> = {};
     tokenAddresses.forEach((tokenAddress) => {
       feesHex[tokenAddress] = fees[tokenAddress].toHexString();
     });
-    return {
+    const data: FeeMessageData = {
       fees: feesHex,
-      feeExpiration: configDefaults.transactionFees.feeExpirationInMS,
+      // client can't rely on message timestamp to calculate expiration
+      feeExpiration: Date.now() + this.options.feeExpiration,
       feesID: feeCacheID,
       pubkey: this.walletPublicKey,
-      encryptedHash: '',
+      signingKey: await this.wallet.edNode.getPublicKey(),
+    };
+    const message = bytes.fromUTF8String(JSON.stringify(data));
+    const signature = bytes.hexlify(await this.wallet.edNode.sign(message));
+    return {
+      data: message,
+      signature,
     };
   };
 
   async broadcastFeesForChain(chainID: NetworkChainID) {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chainID);
-    const feeBroadcastData = this.createFeeBroadcastData(fees, feeCacheID);
+    const feeBroadcastData = await this.createFeeBroadcastData(fees, feeCacheID);
     this.dbg(`Broadcasting fees for chain ${chainID}: `, fees);
     const contentTopic = contentTopics.fees(chainID);
     const result = await this.publish(feeBroadcastData, contentTopic);
     this.dbg(`Result: ${result}`);
   }
 
-  async broadcastFeesOnInterval() {
-    await delay(configDefaults.waku.broadcastFeesDelayInMS);
+  async broadcastFeesOnInterval(interval: number = 1000 * 30) {
+    await delay(interval);
     const chainIDs = configuredNetworkChainIDs();
     const broadcastPromises: Promise<void>[] = chainIDs.map((chainID) =>
       this.broadcastFeesForChain(chainID),
     );
     await Promise.all(broadcastPromises);
-    this.broadcastFeesOnInterval();
+    this.broadcastFeesOnInterval(interval);
   }
 
   async poll(frequency: number = 5000) {
