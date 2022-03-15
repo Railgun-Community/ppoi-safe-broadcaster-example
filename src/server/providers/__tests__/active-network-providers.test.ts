@@ -23,4 +23,4 @@ describe('active-network-providers', () => {
     const block = await provider.getBlockNumber();
     expect(block).to.be.greaterThan(14000000);
   });
-}).timeout(10000);
+}).timeout(20000);

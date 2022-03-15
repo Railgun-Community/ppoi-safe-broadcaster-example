@@ -195,11 +195,5 @@ describe('waku-relayer', () => {
     expect(rpcArgs.params[1].payload).to.equal(
       Buffer.from(expectedWakuMessage.payload as Uint8Array).toString('hex'),
     );
-    expect(rpcArgs.params[1].timestamp).to.be.greaterThanOrEqual(
-      expectedWakuMessage.timestamp ?? 0,
-    );
-    expect(rpcArgs.params[1].timestamp).to.be.lessThan(
-      (expectedWakuMessage.timestamp ?? 0) + 0.1,
-    );
   });
 }).timeout(10000);

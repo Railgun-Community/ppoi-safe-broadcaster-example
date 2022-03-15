@@ -6,6 +6,11 @@
   "engines": {
     "node": ">=16.6.2"
   },
+  "files": [
+    "dist",
+    "src",
+    "*.md"
+  ],
   "scripts": {
     "clean": "rm -rf dist",
     "lint": "eslint . --ext .ts",
@@ -24,8 +29,8 @@
   "dependencies": {
     "@ethersproject/providers": "^5.5.2",
     "@ethersproject/shims": "^5.5.0",
-    "@railgun-community/lepton": "https://npm.railgun.org/ci/0.0.7/railgun-community-lepton-0.0.7.tgz",
     "@noble/ed25519": "^1.6.0",
+    "@railgun-community/lepton": "https://npm.railgun.org/ci/0.0.10/railgun-community-lepton-0.0.10.tgz",
     "@walletconnect/jsonrpc-types": "^1.0.0",
     "@walletconnect/jsonrpc-utils": "^1.0.0",
     "axios": "^0.24",
@@ -37,6 +42,7 @@
     "railgun-artifacts": "https://npm.railgun.org/railgun-artifacts-0.0.1.tgz"
   },
   "devDependencies": {
+    "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.4",
     "@types/debug": "^4.1.7",

@@ -9,7 +9,6 @@ import { NetworkChainID } from '../config/config-chain-ids';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
-import configDefaults from '../config/config-defaults';
 import { contentTopics } from './topics';
 import { getRailgunWalletPubKey } from '../wallets/active-wallets';
 import { WakuMessage } from './waku-message';
@@ -95,7 +94,7 @@ export class WakuRelayer {
     contentTopic: string,
   ) {
     const msg = WakuMessage.fromUtf8String(JSON.stringify(payload), contentTopic);
-    await this.client.publish(msg, this.topic).catch((e) => {
+    return await this.client.publish(msg, this.topic).catch((e) => {
       this.dbg('Error publishing message', e.message);
     });
   }
@@ -130,6 +129,7 @@ export class WakuRelayer {
   private createFeeBroadcastData = async (
     fees: MapType<BigNumber>,
     feeCacheID: string,
+    chainID: NetworkChainID
   ): Promise<FeeMessage> => {
     const tokenAddresses = Object.keys(fees);
     const feesHex: MapType<string> = {};
@@ -142,10 +142,11 @@ export class WakuRelayer {
       feeExpiration: Date.now() + this.options.feeExpiration,
       feesID: feeCacheID,
       pubkey: this.walletPublicKey,
-      signingKey: await this.wallet.edNode.getPublicKey(),
+      signingKey: await this.wallet.getSigningPublicKey(),
     };
     const message = bytes.fromUTF8String(JSON.stringify(data));
-    const signature = bytes.hexlify(await this.wallet.edNode.sign(message));
+    const signature = bytes.hexlify(await this.wallet.sign(message));
+    this.dbg(`Broadcasting fees for chain ${chainID}: `, data);
     return {
       data: message,
       signature,
@@ -155,11 +156,9 @@ export class WakuRelayer {
   async broadcastFeesForChain(chainID: NetworkChainID) {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chainID);
-    const feeBroadcastData = await this.createFeeBroadcastData(fees, feeCacheID);
-    this.dbg(`Broadcasting fees for chain ${chainID}: `, fees);
+    const feeBroadcastData = await this.createFeeBroadcastData(fees, feeCacheID, chainID);
     const contentTopic = contentTopics.fees(chainID);
     const result = await this.publish(feeBroadcastData, contentTopic);
-    this.dbg(`Result: ${result}`);
   }
 
   async broadcastFeesOnInterval(interval: number = 1000 * 30) {

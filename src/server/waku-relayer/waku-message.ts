@@ -23,7 +23,7 @@ export class WakuMessage {
     this.payload = opts.payload;
     this.contentTopic = opts.contentTopic;
     this.version = opts.version ?? DefaultVersion;
-    this.timestamp = opts.timestamp ?? Date.now() / 1000;
+    this.timestamp = opts.timestamp ?? Date.now();
   }
 
   /**
@@ -63,7 +63,7 @@ export class WakuMessage {
 
     return new WakuMessage({
       payload: _payload,
-      timestamp: timestamp.valueOf() / 1000,
+      timestamp: timestamp.valueOf(),
       version,
       contentTopic,
     });
