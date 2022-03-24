@@ -21,5 +21,5 @@ describe('gas-token-balance', () => {
     await expect(
       getGasTokenBalance(NetworkChainID.Ethereum, MOCK_WALLET_ADDRESS),
     ).to.not.be.rejected;
-  }).timeout(10000);
+  }).timeout(20000);
 }).timeout(30000);

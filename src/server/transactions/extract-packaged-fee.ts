@@ -1,5 +1,5 @@
 import { ERC20Note } from '@railgun-community/lepton';
-import { babyjubjub } from '@railgun-community/lepton/dist/utils';
+import { babyjubjub, bytes } from '@railgun-community/lepton/dist/utils';
 import { hexlify, trim } from '@railgun-community/lepton/dist/utils/bytes';
 import { BigNumber, Contract, PopulatedTransaction } from 'ethers';
 import { NetworkChainID } from '../config/config-chain-ids';
@@ -116,7 +116,8 @@ const extractFeesFromRailgunTransactions = (
       // eslint-disable-next-line no-param-reassign
       tokenPaymentAmounts[decryptedNote.token] = tokenPaymentAmounts[
         decryptedNote.token
-      ].add(BigNumber.from(decryptedNote.amount));
+        // ].add(BigNumber.from(decryptedNote.amount));
+      ].add(BigNumber.from(bytes.numberify(decryptedNote.amount).toString()));
     }
   });
 };

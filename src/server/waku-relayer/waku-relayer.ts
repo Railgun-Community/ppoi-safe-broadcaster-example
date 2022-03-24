@@ -67,18 +67,21 @@ export class WakuRelayer {
     [WakuMethodNames.Transact]: transactMethod,
   };
 
+  stopping: boolean = false;
+
   constructor(
     client: WakuApiClient,
     wallet: Wallet,
     options: WakuRelayerOptions,
   ) {
+
     const chainIDs = configuredNetworkChainIDs();
     this.client = client;
     this.options = options;
     this.dbg = debug('relayer:waku:relayer');
     this.topic = options.topic;
     this.allContentTopics = [
-      contentTopics.default(),
+      // contentTopics.default(),
       ...chainIDs.map((chainID) => contentTopics.fees(chainID)),
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
@@ -95,6 +98,11 @@ export class WakuRelayer {
     const relayer = new WakuRelayer(client, wallet, options);
     await relayer.client.subscribe([options.topic]);
     return relayer;
+  }
+
+  async stop() {
+    this.stopping = true;
+    await this.client.unsubscribe(this.allContentTopics);
   }
 
   async publish(
@@ -123,7 +131,7 @@ export class WakuRelayer {
       const { method, params, id } = request;
 
       if (method in this.methods) {
-        const age = Date.now() / 1000 - timestamp;
+        const age = Date.now() - timestamp;
         this.dbg(`handling message on ${contentTopic} (${age}s old)`);
         const rpcResultResponse = await this.methods[method](
           params,
@@ -159,7 +167,7 @@ export class WakuRelayer {
     };
     const message = bytes.fromUTF8String(JSON.stringify(data));
     const signature = bytes.hexlify(await this.wallet.sign(message));
-    this.dbg(`Broadcasting fees for chain ${chainID}: `, data);
+    this.dbg(`Broadcasting fees for chain ${chainID}: `); // , data);
     return {
       data: message,
       signature,
@@ -179,6 +187,7 @@ export class WakuRelayer {
   }
 
   async broadcastFeesOnInterval(interval: number = 1000 * 30) {
+    if (this.stopping) return;
     await delay(interval);
     const chainIDs = configuredNetworkChainIDs();
     const broadcastPromises: Promise<void>[] = chainIDs.map((chainID) =>
@@ -189,6 +198,7 @@ export class WakuRelayer {
   }
 
   async poll(frequency: number = 5000) {
+    if (this.stopping) return;
     const messages = await this.client
       .getMessages(this.topic, this.allContentTopics)
       .catch((e) => {

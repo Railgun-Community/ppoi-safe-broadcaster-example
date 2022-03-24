@@ -18,6 +18,7 @@ export enum WakuRequestMethods {
   PublishSubscription = 'post_waku_v2_relay_v1_subscriptions',
   PublishMessage = 'post_waku_v2_relay_v1_message',
   GetMessages = 'get_waku_v2_relay_v1_messages',
+  DeleteSubscriptions = 'delete_waku_v2_relay_v1_subscriptions'
 }
 
 const MAX_RETRIES = 4;
@@ -63,6 +64,13 @@ export class WakuApiClient {
       this.logger(error.message);
     }
     return [];
+  }
+
+  async unsubscribe(topics: string[]) {
+    this.logger('unsubscribing from topics', topics);
+    const data = await this.request(WakuRequestMethods.DeleteSubscriptions, [topics]);
+    const { result } = data;
+    return result;
   }
 
   async subscribe(topics: string[]) {

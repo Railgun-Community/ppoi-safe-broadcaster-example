@@ -1,6 +1,6 @@
 {
   "name": "relayer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "dist/main.js",
   "engines": {
@@ -16,7 +16,7 @@
     "lint": "eslint . --ext .ts && tsc",
     "compile": "npm run clean && tsc && tsc-alias",
     "start": "npm run compile && node dist/main.js",
-    "debug": "env DEBUG=relayer*,waku:jsonrpc-api env-cmd -e all,debug npm start",
+    "debug": "env-cmd --no-override -e all,debug npm start",
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
     "test": "npm run compile-test && env-cmd -e all,test mocha 'src/**/__tests__/*.test.ts'",
     "test-coverage": "npm run compile-test && env-cmd -e all,test nyc mocha 'src/**/__tests__/*.test.ts'",

@@ -63,7 +63,7 @@ export class WakuMessage {
 
     return new WakuMessage({
       payload: _payload,
-      timestamp: timestamp.valueOf(),
+      timestamp: timestamp.valueOf() * 1000,
       version,
       contentTopic,
     });
