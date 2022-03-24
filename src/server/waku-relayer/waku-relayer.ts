@@ -102,7 +102,7 @@ export class WakuRelayer {
 
   async stop() {
     this.stopping = true;
-    await this.client.unsubscribe(this.allContentTopics);
+    await this.client.unsubscribe([this.topic]);
   }
 
   async publish(
