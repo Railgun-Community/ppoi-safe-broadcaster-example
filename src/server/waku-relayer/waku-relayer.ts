@@ -10,7 +10,10 @@ import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
 import { contentTopics } from './topics';
-import { getRailgunWalletPubKey } from '../wallets/active-wallets';
+import {
+  getRailgunWalletPubKey,
+  numAvailableWallets,
+} from '../wallets/active-wallets';
 import { WakuMessage } from './waku-message';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
@@ -22,10 +25,11 @@ export type FeeMessageData = {
   feesID: string;
   pubkey: string;
   signingKey: string;
+  availableWallets: number;
 };
 
 export type FeeMessage = {
-  data: string, // hex encoded FeeMessageData
+  data: string; // hex encoded FeeMessageData
   signature: string; // hex encoded signature
 };
 
@@ -63,7 +67,11 @@ export class WakuRelayer {
     [WakuMethodNames.Transact]: transactMethod,
   };
 
-  constructor(client: WakuApiClient, wallet: Wallet, options: WakuRelayerOptions) {
+  constructor(
+    client: WakuApiClient,
+    wallet: Wallet,
+    options: WakuRelayerOptions,
+  ) {
     const chainIDs = configuredNetworkChainIDs();
     this.client = client;
     this.options = options;
@@ -93,7 +101,10 @@ export class WakuRelayer {
     payload: Optional<JsonRpcPayload<string>> | object,
     contentTopic: string,
   ) {
-    const msg = WakuMessage.fromUtf8String(JSON.stringify(payload), contentTopic);
+    const msg = WakuMessage.fromUtf8String(
+      JSON.stringify(payload),
+      contentTopic,
+    );
     return await this.client.publish(msg, this.topic).catch((e) => {
       this.dbg('Error publishing message', e.message);
     });
@@ -129,7 +140,7 @@ export class WakuRelayer {
   private createFeeBroadcastData = async (
     fees: MapType<BigNumber>,
     feeCacheID: string,
-    chainID: NetworkChainID
+    chainID: NetworkChainID,
   ): Promise<FeeMessage> => {
     const tokenAddresses = Object.keys(fees);
     const feesHex: MapType<string> = {};
@@ -143,6 +154,8 @@ export class WakuRelayer {
       feesID: feeCacheID,
       pubkey: this.walletPublicKey,
       signingKey: await this.wallet.getSigningPublicKey(),
+      // Availability must be accurate or Relayer risks automatic blocking by clients.
+      availableWallets: numAvailableWallets(),
     };
     const message = bytes.fromUTF8String(JSON.stringify(data));
     const signature = bytes.hexlify(await this.wallet.sign(message));
@@ -156,7 +169,11 @@ export class WakuRelayer {
   async broadcastFeesForChain(chainID: NetworkChainID) {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chainID);
-    const feeBroadcastData = await this.createFeeBroadcastData(fees, feeCacheID, chainID);
+    const feeBroadcastData = await this.createFeeBroadcastData(
+      fees,
+      feeCacheID,
+      chainID,
+    );
     const contentTopic = contentTopics.fees(chainID);
     const result = await this.publish(feeBroadcastData, contentTopic);
   }

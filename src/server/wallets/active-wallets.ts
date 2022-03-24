@@ -7,6 +7,7 @@ import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
 import { resetArray } from '../../util/utils';
 import { getLepton } from '../lepton/lepton-init';
+import { isWalletAvailable } from './available-wallets';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -111,4 +112,9 @@ export const getActiveWallets = (): ActiveWallet[] => {
     throw new Error('No wallets initialized.');
   }
   return activeWallets;
+};
+
+export const numAvailableWallets = (): number => {
+  return getActiveWallets().filter((wallet) => isWalletAvailable(wallet))
+    .length;
 };
