@@ -66,7 +66,7 @@ const createRopstenTransaction = async (
     new ERC20Note(
       receiverWalletPublicKey,
       RANDOM,
-      fee.toString(),
+      fee.toHexString(),
       tokenAddress,
     ),
   ];
