@@ -191,7 +191,7 @@ export class WakuRelayer {
     this.broadcastFeesOnInterval(interval);
   }
 
-  async poll(frequency: number = 5000) {
+  async poll(frequency: number = 3000) {
     if (this.stopping) return;
     const messages = await this.client
       .getMessages(WAKU_TOPIC, this.subscribedContentTopics)

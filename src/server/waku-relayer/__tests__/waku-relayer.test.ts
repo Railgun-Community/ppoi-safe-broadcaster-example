@@ -198,9 +198,7 @@ describe('waku-relayer', () => {
     const expectedJsonRpcResult = formatJsonRpcResult(
       payload.id,
       JSON.stringify({
-        result: {
-          txHash: '123',
-        },
+        txHash: '123',
       }),
     );
     const expectedWakuMessage = WakuMessage.fromUtf8String(

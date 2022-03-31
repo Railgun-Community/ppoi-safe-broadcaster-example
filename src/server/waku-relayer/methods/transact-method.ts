@@ -60,9 +60,7 @@ const resultResponse = (
   const rpcResult = formatJsonRpcResult(
     id,
     JSON.stringify({
-      result: {
-        txHash: txResponse.hash,
-      },
+      txHash: txResponse.hash,
     }),
   );
   return {
