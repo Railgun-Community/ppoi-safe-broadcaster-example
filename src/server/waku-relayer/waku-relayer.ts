@@ -1,5 +1,5 @@
-import { JsonRpcPayload, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import debug from 'debug';
+import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
 import { Wallet } from '@railgun-community/lepton/dist/wallet';
 import { bytes } from '@railgun-community/lepton/dist/utils';
@@ -15,9 +15,9 @@ import {
   numAvailableWallets,
 } from '../wallets/active-wallets';
 import { WakuMessage } from './waku-message';
+import { WakuMethodResponse } from './waku-response';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
-export const RAILGUN_TOPIC = '/railgun/1/relayer/proto';
 
 export type FeeMessageData = {
   fees: MapType<string>;
@@ -37,7 +37,7 @@ type JsonRPCMessageHandler = (
   params: any,
   id: number,
   logger: debug.Debugger,
-) => Promise<Optional<JsonRpcResult<string>>>;
+) => Promise<Optional<WakuMethodResponse>>;
 
 export enum WakuMethodNames {
   Transact = 'transact',
@@ -53,9 +53,7 @@ export class WakuRelayer {
 
   dbg: debug.Debugger;
 
-  topic: string;
-
-  allContentTopics: string[];
+  subscribedContentTopics: string[];
 
   walletPublicKey: string;
 
@@ -74,20 +72,16 @@ export class WakuRelayer {
     wallet: Wallet,
     options: WakuRelayerOptions,
   ) {
-
     const chainIDs = configuredNetworkChainIDs();
     this.client = client;
     this.options = options;
     this.dbg = debug('relayer:waku:relayer');
-    this.topic = options.topic;
-    this.allContentTopics = [
-      // contentTopics.default(),
-      ...chainIDs.map((chainID) => contentTopics.fees(chainID)),
+    this.subscribedContentTopics = [
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
     this.wallet = wallet;
     this.walletPublicKey = getRailgunWalletPubKey();
-    this.dbg(this.allContentTopics);
+    this.dbg(this.subscribedContentTopics);
   }
 
   static async init(
@@ -102,7 +96,7 @@ export class WakuRelayer {
 
   async stop() {
     this.stopping = true;
-    await this.client.unsubscribe([this.topic]);
+    await this.client.unsubscribe([WAKU_TOPIC]);
   }
 
   async publish(
@@ -113,7 +107,7 @@ export class WakuRelayer {
       JSON.stringify(payload),
       contentTopic,
     );
-    return await this.client.publish(msg, this.topic).catch((e) => {
+    return await this.client.publish(msg, WAKU_TOPIC).catch((e) => {
       this.dbg('Error publishing message', e.message);
     });
   }
@@ -129,16 +123,15 @@ export class WakuRelayer {
       const decoded = WakuRelayer.decode(payload);
       const request = JSON.parse(decoded);
       const { method, params, id } = request;
+      this.dbg(request);
 
       if (method in this.methods) {
         const age = Date.now() - timestamp;
-        this.dbg(`handling message on ${contentTopic} (${age}s old)`);
-        const rpcResultResponse = await this.methods[method](
-          params,
-          id,
-          this.dbg,
-        );
-        await this.publish(rpcResultResponse, contentTopic);
+        this.dbg(`handling message on ${contentTopic} (${age}ms old)`);
+        const response = await this.methods[method](params, id, this.dbg);
+        if (response) {
+          await this.publish(response.rpcResult, response.contentTopic);
+        }
       }
     } catch (e) {
       this.dbg('Caught error', e);
@@ -200,7 +193,7 @@ export class WakuRelayer {
   async poll(frequency: number = 5000) {
     if (this.stopping) return;
     const messages = await this.client
-      .getMessages(this.topic, this.allContentTopics)
+      .getMessages(WAKU_TOPIC, this.subscribedContentTopics)
       .catch((e) => {
         this.dbg(e.message);
         return [];

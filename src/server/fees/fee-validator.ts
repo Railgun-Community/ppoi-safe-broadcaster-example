@@ -56,5 +56,5 @@ export const validateFee = (
   logger.log(`calculatedFee: ${calculatedFee?.toString()}`);
   logger.log(`tokenFee: ${packagedFee.toString()}`);
 
-  throw new Error('Token fee too low. Please refresh and try again.');
+  throw new Error('Bad token fee.');
 };
