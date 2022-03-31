@@ -73,13 +73,13 @@ describe('fee-validator', () => {
     });
     expect(() =>
       validatePackagedFee(feeCacheID, BigNumber.from(50), BigNumber.from(10)),
-    ).to.throw('Token fee too low. Please refresh and try again.');
+    ).to.throw('Bad token fee.');
   });
 
   it('Should invalidate without a cached or calculated fee', () => {
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(15), BigNumber.from(10)),
-    ).to.throw('Token fee too low. Please refresh and try again.');
+    ).to.throw('Bad token fee.');
   });
 
   it('Should validate if packaged fee > calculated fee', () => {
@@ -109,6 +109,6 @@ describe('fee-validator', () => {
   it('Should invalidate if packaged fee < calculated fee', () => {
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(5), BigNumber.from(10)),
-    ).to.throw('Token fee too low. Please refresh and try again.');
+    ).to.throw('Bad token fee.');
   });
 }).timeout(10000);

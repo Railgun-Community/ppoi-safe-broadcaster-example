@@ -130,6 +130,7 @@ export class WakuRelayer {
         this.dbg(`handling message on ${contentTopic} (${age}ms old)`);
         const response = await this.methods[method](params, id, this.dbg);
         if (response) {
+          this.dbg(response);
           await this.publish(response.rpcResult, response.contentTopic);
         }
       }

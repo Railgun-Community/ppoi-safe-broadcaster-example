@@ -8,19 +8,28 @@ import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import { bytes } from '@railgun-community/lepton/dist/utils';
 import { verify } from '@railgun-community/lepton/dist/keyderivation/bip32-ed25519';
 import {
-  FeeMessage, FeeMessageData, WakuMethodNames, WakuRelayer, WAKU_TOPIC,
+  FeeMessage,
+  FeeMessageData,
+  WakuMethodNames,
+  WakuRelayer,
+  WAKU_TOPIC,
 } from '../waku-relayer';
 import {
-  WakuApiClient, WakuRelayMessage, WakuRequestMethods,
+  WakuApiClient,
+  WakuRelayMessage,
+  WakuRequestMethods,
 } from '../../networking/waku-api-client';
 import { WakuMethodParamsTransact } from '../methods/transact-method';
 import {
-  setupSingleTestWallet, setupTestNetwork, testChainID,
+  setupSingleTestWallet,
+  setupTestNetwork,
+  testChainID,
 } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import configDefaults from '../../config/config-defaults';
 import {
-  cacheTokenPricesForNetwork, resetTokenPriceCache,
+  cacheTokenPricesForNetwork,
+  resetTokenPriceCache,
 } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
 import { Network } from '../../../models/network-models';
@@ -28,9 +37,14 @@ import configTokens from '../../config/config-tokens';
 import * as processTransactionModule from '../../transactions/process-transaction';
 import { WakuMessage } from '../waku-message';
 import { contentTopics } from '../topics';
-import { getMockSerializedTransaction } from '../../../test/mocks.test';
+import {
+  getMockNetwork,
+  getMockSerializedTransaction,
+} from '../../../test/mocks.test';
 import { initTokens } from '../../tokens/network-tokens';
 import { getRailgunWallet } from '../../wallets/active-wallets';
+import configNetworks from '../../config/config-networks';
+import { initNetworkProviders } from '../../providers/active-network-providers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -59,6 +73,9 @@ describe('waku-relayer', () => {
     initLepton();
     await setupSingleTestWallet();
     network = setupTestNetwork();
+    configNetworks[chainID] = getMockNetwork();
+    initNetworkProviders();
+    configTokens[chainID] = {};
     configTokens[chainID][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',
     };
@@ -131,9 +148,9 @@ describe('waku-relayer', () => {
       'string',
       'No fee for token in broadcast data',
     );
-    expect(
-      BigNumber.from(data.fees[MOCK_TOKEN_ADDRESS]).toString(),
-    ).to.equal('1272742268040000000000');
+    expect(BigNumber.from(data.fees[MOCK_TOKEN_ADDRESS]).toString()).to.equal(
+      '1272742268040000000000',
+    );
     expect(data.feeExpiration).to.be.a('number');
     expect(data.pubkey).to.equal(
       '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
@@ -181,8 +198,9 @@ describe('waku-relayer', () => {
     const expectedJsonRpcResult = formatJsonRpcResult(
       payload.id,
       JSON.stringify({
-        type: 'txResponse.hash',
-        hash: '123',
+        result: {
+          txHash: '123',
+        },
       }),
     );
     const expectedWakuMessage = WakuMessage.fromUtf8String(
@@ -191,7 +209,9 @@ describe('waku-relayer', () => {
       { timestamp: relayMessage.timestamp },
     );
     expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
-    expect(rpcArgs.params[1].contentTopic).to.equal(relayMessage.contentTopic);
+    expect(rpcArgs.params[1].contentTopic).to.equal(
+      contentTopics.transactResponse(chainID),
+    );
     expect(rpcArgs.params[1].payload).to.equal(
       Buffer.from(expectedWakuMessage.payload as Uint8Array).toString('hex'),
     );
