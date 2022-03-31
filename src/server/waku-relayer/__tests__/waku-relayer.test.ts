@@ -195,12 +195,9 @@ describe('waku-relayer', () => {
     expect(rpcArgs.params).to.be.an('array');
     expect(rpcArgs.params[0]).to.equal(WAKU_TOPIC);
 
-    const expectedJsonRpcResult = formatJsonRpcResult(
-      payload.id,
-      JSON.stringify({
-        txHash: '123',
-      }),
-    );
+    const expectedJsonRpcResult = formatJsonRpcResult(payload.id, {
+      txHash: '123',
+    });
     const expectedWakuMessage = WakuMessage.fromUtf8String(
       JSON.stringify(expectedJsonRpcResult),
       contentTopic,

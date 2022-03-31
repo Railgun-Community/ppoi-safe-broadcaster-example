@@ -57,12 +57,7 @@ const resultResponse = (
   chainID: NetworkChainID,
   txResponse: TransactionResponse,
 ): WakuMethodResponse => {
-  const rpcResult = formatJsonRpcResult(
-    id,
-    JSON.stringify({
-      txHash: txResponse.hash,
-    }),
-  );
+  const rpcResult = formatJsonRpcResult(id, { txHash: txResponse.hash });
   return {
     rpcResult,
     contentTopic: contentTopics.transactResponse(chainID),
@@ -83,14 +78,7 @@ const errorResponse = (
       sanitizedErrorMessage = 'Unknown error.';
       break;
   }
-  const rpcResult = formatJsonRpcResult(
-    id,
-    JSON.stringify({
-      result: {
-        error: sanitizedErrorMessage,
-      },
-    }),
-  );
+  const rpcResult = formatJsonRpcResult(id, { error: sanitizedErrorMessage });
   return {
     rpcResult,
     contentTopic: contentTopics.transactResponse(chainID),
