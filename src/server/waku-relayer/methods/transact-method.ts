@@ -23,6 +23,8 @@ export type RawParamsTransact = {
   responseKey: string;
 };
 
+let handledClientPubKeys: string[] = [];
+
 export const transactMethod = async (
   params: WakuMethodParamsTransact,
   id: number,
@@ -35,6 +37,12 @@ export const transactMethod = async (
     // Incorrect key. Skipping transact message.
     return undefined;
   }
+
+  if (handledClientPubKeys.includes(clientPubKey)) {
+    // Client sent a repeated message. Ignore because we've already handled it.
+    return undefined;
+  }
+  handledClientPubKeys.push(clientPubKey);
 
   const {
     chainID,
