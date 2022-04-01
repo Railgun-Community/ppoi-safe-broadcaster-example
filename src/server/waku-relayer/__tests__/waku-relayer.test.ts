@@ -19,7 +19,10 @@ import {
   WakuRelayMessage,
   WakuRequestMethods,
 } from '../../networking/waku-api-client';
-import { WakuMethodParamsTransact } from '../methods/transact-method';
+import {
+  RawParamsTransact,
+  WakuMethodParamsTransact,
+} from '../methods/transact-method';
 import {
   setupSingleTestWallet,
   setupTestNetwork,
@@ -167,12 +170,15 @@ describe('waku-relayer', () => {
 
     const contentTopic = contentTopics.transact(chainID);
 
-    const params: WakuMethodParamsTransact = {
+    const data: RawParamsTransact = {
       chainID,
       feesID: '468abc',
       serializedTransaction: getMockSerializedTransaction(),
-      pubkey:
-        '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
+      responseKey: '456',
+    };
+    const params: WakuMethodParamsTransact = {
+      encryptedData: JSON.stringify(data),
+      pubkey: '123',
     };
     const payload = {
       method: WakuMethodNames.Transact,
@@ -195,9 +201,13 @@ describe('waku-relayer', () => {
     expect(rpcArgs.params).to.be.an('array');
     expect(rpcArgs.params[0]).to.equal(WAKU_TOPIC);
 
-    const expectedJsonRpcResult = formatJsonRpcResult(payload.id, {
+    const encryptedResponse = JSON.stringify({
       txHash: '123',
     });
+    const expectedJsonRpcResult = formatJsonRpcResult(
+      payload.id,
+      encryptedResponse,
+    );
     const expectedWakuMessage = WakuMessage.fromUtf8String(
       JSON.stringify(expectedJsonRpcResult),
       contentTopic,

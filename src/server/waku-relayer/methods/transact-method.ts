@@ -1,17 +1,26 @@
+import * as ed from '@noble/ed25519';
 import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import { processTransaction } from '../../transactions/process-transaction';
-import { getRailgunWalletPubKey } from '../../wallets/active-wallets';
+import {
+  getRailgunWalletKeypair,
+  getRailgunWalletPubKey,
+} from '../../wallets/active-wallets';
 import { contentTopics } from '../topics';
 import { WakuMethodResponse } from '../waku-response';
 
 export type WakuMethodParamsTransact = {
-  serializedTransaction: string;
   pubkey: string;
-  chainID: NetworkChainID;
+  encryptedData: string;
+};
+
+export type RawParamsTransact = {
+  serializedTransaction: string;
+  chainID: number;
   feesID: string;
+  responseKey: string;
 };
 
 export const transactMethod = async (
@@ -19,21 +28,29 @@ export const transactMethod = async (
   id: number,
   logger: debug.Debugger,
 ): Promise<Optional<WakuMethodResponse>> => {
-  const { chainID, feesID: feeCacheID, serializedTransaction, pubkey } = params;
+  const { pubkey: clientPubKey, encryptedData } = params;
 
-  const railgunWalletPubKey = getRailgunWalletPubKey();
-  if (railgunWalletPubKey !== pubkey) {
+  const decrypted = tryDecryptData(encryptedData, clientPubKey);
+  if (decrypted === null) {
+    // Incorrect key. Skipping transact message.
     return undefined;
   }
 
+  const {
+    chainID,
+    feesID: feeCacheID,
+    serializedTransaction,
+    responseKey,
+  } = decrypted as RawParamsTransact;
+
   // TODO: Remove these for production release.
   if (serializedTransaction === 'demo-result') {
-    return resultResponse(id, chainID, {
+    return resultResponse(id, chainID, responseKey, {
       hash: '12345',
     } as TransactionResponse);
   }
   if (serializedTransaction === 'demo-error') {
-    return errorResponse(id, chainID, new Error('Bad token fee.'));
+    return errorResponse(id, chainID, responseKey, new Error('Bad token fee.'));
   }
 
   try {
@@ -45,19 +62,45 @@ export const transactMethod = async (
     logger('txResponse');
     logger(txResponse);
 
-    return resultResponse(id, chainID, txResponse);
+    return resultResponse(id, chainID, responseKey, txResponse);
   } catch (err: any) {
     logger(err);
-    return errorResponse(id, chainID, err);
+    return errorResponse(id, chainID, responseKey, err);
+  }
+};
+
+const tryDecryptData = (encryptedData: string, clientPubKey: string) => {
+  const chainID = 0;
+  const railgunWalletPrivKey = getRailgunWalletKeypair(chainID).privateKey;
+
+  try {
+    // TODO: Add AES GCM decryption when implemented in Lepton.
+    // const sharedKey = ed.curve25519.scalarMult(
+    //   railgunWalletPrivKey,
+    //   clientPubKey,
+    // );
+    //
+    // const data = aes.gcm.256.decrypt(encryptedData, sharedKey);
+    const data = JSON.parse(encryptedData);
+
+    return data;
+  } catch (err) {
+    // Data is not addressed to Relayer.
+    return null;
   }
 };
 
 const resultResponse = (
   id: number,
   chainID: NetworkChainID,
+  responseKey: string,
   txResponse: TransactionResponse,
 ): WakuMethodResponse => {
-  const rpcResult = formatJsonRpcResult(id, { txHash: txResponse.hash });
+  const encryptedResponse = encryptResponseData(
+    { txHash: txResponse.hash },
+    responseKey,
+  );
+  const rpcResult = formatJsonRpcResult(id, encryptedResponse);
   return {
     rpcResult,
     contentTopic: contentTopics.transactResponse(chainID),
@@ -67,6 +110,7 @@ const resultResponse = (
 const errorResponse = (
   id: number,
   chainID: NetworkChainID,
+  responseKey: string,
   err: Error,
 ): WakuMethodResponse => {
   let sanitizedErrorMessage: string;
@@ -78,9 +122,20 @@ const errorResponse = (
       sanitizedErrorMessage = 'Unknown error.';
       break;
   }
-  const rpcResult = formatJsonRpcResult(id, { error: sanitizedErrorMessage });
+  const encryptedResponse = encryptResponseData(
+    {
+      error: sanitizedErrorMessage,
+    },
+    responseKey,
+  );
+  const rpcResult = formatJsonRpcResult(id, encryptedResponse);
   return {
     rpcResult,
     contentTopic: contentTopics.transactResponse(chainID),
   };
+};
+
+const encryptResponseData = (data: object, responseKey: string): string => {
+  // TODO: Add AES GCM encryption when implemented in Lepton.
+  return JSON.stringify(data);
 };
