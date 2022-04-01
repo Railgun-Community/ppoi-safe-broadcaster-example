@@ -1,13 +1,10 @@
-import * as ed from '@noble/ed25519';
+// import * as ed from '@noble/ed25519';
 import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import { processTransaction } from '../../transactions/process-transaction';
-import {
-  getRailgunWalletKeypair,
-  getRailgunWalletPubKey,
-} from '../../wallets/active-wallets';
+import { getRailgunWalletKeypair } from '../../wallets/active-wallets';
 import { contentTopics } from '../topics';
 import { WakuMethodResponse } from '../waku-response';
 
@@ -23,7 +20,7 @@ export type RawParamsTransact = {
   responseKey: string;
 };
 
-let handledClientPubKeys: string[] = [];
+const handledClientPubKeys: string[] = [];
 
 export const transactMethod = async (
   params: WakuMethodParamsTransact,
