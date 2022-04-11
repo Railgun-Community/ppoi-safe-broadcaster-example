@@ -18,6 +18,7 @@ export type RawParamsTransact = {
   chainID: number;
   feesID: string;
   responseKey: string;
+  pubkey: string;
 };
 
 const handledClientPubKeys: string[] = [];
@@ -29,27 +30,33 @@ export const transactMethod = async (
 ): Promise<Optional<WakuMethodResponse>> => {
   const { pubkey: clientPubKey, encryptedData } = params;
 
-  const decrypted = tryDecryptData(encryptedData, clientPubKey);
-  if (decrypted === null) {
-    // Incorrect key. Skipping transact message.
-    return undefined;
-  }
-
   if (handledClientPubKeys.includes(clientPubKey)) {
     // Client sent a repeated message. Ignore because we've already handled it.
     return undefined;
   }
   handledClientPubKeys.push(clientPubKey);
 
+  const decrypted = tryDecryptData(encryptedData, clientPubKey);
+  if (decrypted === null) {
+    // Incorrect key. Skipping transact message.
+    return undefined;
+  }
+
   const {
     chainID,
     feesID: feeCacheID,
     serializedTransaction,
     responseKey,
+    pubkey,
   } = decrypted as RawParamsTransact;
 
-  // TODO: Remove these for production release.
+  const railgunWalletPubKey = getRailgunWalletKeypair(0).pubkey;
+  if (pubkey !== railgunWalletPubKey) {
+    return undefined;
+  }
+
   if (serializedTransaction === 'demo-result') {
+    // TODO: Remove these for production release.
     return resultResponse(id, chainID, responseKey, {
       hash: '12345',
     } as TransactionResponse);

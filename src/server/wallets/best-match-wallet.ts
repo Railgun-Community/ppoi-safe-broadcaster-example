@@ -4,6 +4,7 @@ import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-c
 import { getActiveWallets } from './active-wallets';
 import { isWalletAvailable } from './available-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
+import { logger } from '../../util/logger';
 
 export const getBestMatchWalletForNetwork = async (
   chainID: NetworkChainID,
@@ -13,12 +14,14 @@ export const getBestMatchWalletForNetwork = async (
     chainID,
   );
 
+  const activeWallets = getActiveWallets();
+
   // Simple filters:
   // - Availability.
   // - Amount of (gas token) available.
   // Simple sort:
   // - Priority.
-  const sortedAvailableWallets = getActiveWallets()
+  const sortedAvailableWallets = activeWallets
     .filter((wallet) => isWalletAvailable(wallet))
     .filter((wallet) => gasTokenBalanceMap[wallet.address].gte(gasLimit))
     .sort((a, b) => {
@@ -27,7 +30,18 @@ export const getBestMatchWalletForNetwork = async (
     });
 
   if (sortedAvailableWallets.length < 1) {
-    throw new Error('All wallets busy or out of funds.');
+    const avWallets = activeWallets.filter((wallet) =>
+      isWalletAvailable(wallet),
+    );
+    const outofFundsWallets = activeWallets.filter((wallet) =>
+      gasTokenBalanceMap[wallet.address].gte(gasLimit),
+    );
+    logger.warn(
+      `${avWallets.length} wallets available. ${
+        outofFundsWallets.length
+      } wallets have enough gas funds. (Need gas: ${gasLimit.toHexString()})`,
+    );
+    throw new Error(`All wallets busy or out of funds.`);
   }
 
   const bestWallet = sortedAvailableWallets[0];
