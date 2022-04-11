@@ -120,8 +120,9 @@ const errorResponse = (
 ): WakuMethodResponse => {
   let sanitizedErrorMessage: string;
   switch (err.message) {
+    case 'No Relayer payment included in transaction.':
     case 'Bad token fee.':
-      sanitizedErrorMessage = err.message;
+      sanitizedErrorMessage = 'Bad token fee.';
       break;
     default:
       sanitizedErrorMessage = 'Unknown error.';
