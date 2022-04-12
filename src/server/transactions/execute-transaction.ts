@@ -1,12 +1,15 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { logger, PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
+import { PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
 import { ActiveWallet } from '../../models/wallet-models';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { createEthersWallet } from '../wallets/active-wallets';
+import {
+  createEthersWallet,
+  getRailgunWalletKeypair,
+} from '../wallets/active-wallets';
 import { setWalletAvailable } from '../wallets/available-wallets';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 
@@ -15,9 +18,10 @@ export const LAST_NONCE_KEY = 'last_nonce_key';
 export const getCurrentNonce = async (
   wallet: EthersWallet,
 ): Promise<number> => {
+  const railgunWalletPubKey = getRailgunWalletKeypair(0).pubkey;
   const [txCount, lastTransactionNonce] = await Promise.all([
     wallet.getTransactionCount().catch(throwErr),
-    await getSettingsNumber(LAST_NONCE_KEY),
+    await getSettingsNumber(`${LAST_NONCE_KEY}|${railgunWalletPubKey}`),
   ]);
   if (lastTransactionNonce) {
     return Math.max(txCount, lastTransactionNonce + 1);
