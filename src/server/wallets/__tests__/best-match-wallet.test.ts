@@ -136,7 +136,7 @@ describe('best-match-wallet', () => {
     await expect(
       getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(100)),
     ).to.be.rejectedWith('All wallets busy or out of funds.');
-  });
+  }).timeout(10000);
 
   it('Should error if all wallets out of funds', async () => {
     configDefaults.wallet = {
@@ -153,5 +153,5 @@ describe('best-match-wallet', () => {
     await expect(
       getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(1000)),
     ).to.be.rejectedWith('All wallets busy or out of funds.');
-  });
-}).timeout(10000);
+  }).timeout(10000);
+}).timeout(20000);

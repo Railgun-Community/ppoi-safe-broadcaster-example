@@ -30,7 +30,8 @@ export const getCurrentNonce = async (
 };
 
 export const storeCurrentNonce = async (nonce: number) => {
-  await storeSettingsNumber(LAST_NONCE_KEY, nonce);
+  const railgunWalletPubKey = getRailgunWalletKeypair(0).pubkey;
+  await storeSettingsNumber(`${LAST_NONCE_KEY}|${railgunWalletPubKey}`, nonce);
 };
 
 export const executeTransaction = async (

@@ -9,6 +9,7 @@ import {
 import {
   createEthersWallet,
   getActiveWallets,
+  getRailgunWalletKeypair,
 } from '../../wallets/active-wallets';
 import {
   executeTransaction,
@@ -84,14 +85,18 @@ describe('execute-transaction', () => {
   });
 
   it('Should get and store nonce values', async () => {
-    expect(await getSettingsNumber(LAST_NONCE_KEY)).to.be.undefined;
+    const railgunWalletPubKey = getRailgunWalletKeypair(0).pubkey;
+    expect(await getSettingsNumber(`${LAST_NONCE_KEY}|${railgunWalletPubKey}`))
+      .to.be.undefined;
 
     let currentNonce: number;
     currentNonce = await getCurrentNonce(ethersWallet);
     expect(currentNonce).to.equal(3);
 
     await storeCurrentNonce(24);
-    expect(await getSettingsNumber(LAST_NONCE_KEY)).to.equal(24);
+    expect(
+      await getSettingsNumber(`${LAST_NONCE_KEY}|${railgunWalletPubKey}`),
+    ).to.equal(24);
     currentNonce = await getCurrentNonce(ethersWallet);
     expect(currentNonce).to.equal(25); // 24 + 1
   });
