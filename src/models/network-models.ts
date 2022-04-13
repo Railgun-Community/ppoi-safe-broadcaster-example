@@ -1,5 +1,8 @@
 import { CoingeckoNetworkID } from './api-constants';
-import { RailProxyContract } from './contract-constants';
+import {
+  RailProxyContract,
+  RailProxyDeploymentBlock,
+} from './contract-constants';
 import { FallbackProviderJsonConfig } from './provider-models';
 import { GasTokenConfig } from './token-models';
 
@@ -16,7 +19,7 @@ export type NetworkFeeSettings = {
 export type Network = {
   name: string;
   proxyContract: RailProxyContract;
-  deploymentBlock?: number;
+  deploymentBlock?: RailProxyDeploymentBlock;
   fallbackProviderConfig: FallbackProviderJsonConfig;
   gasToken: GasTokenConfig;
   coingeckoId?: CoingeckoNetworkID;

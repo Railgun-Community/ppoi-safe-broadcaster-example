@@ -5,3 +5,11 @@ export enum RailProxyContract {
   PolygonPOS = '0x61ca7a0346a10cea849910C29617ac316461AD76', // TODO will need update
   HardHat = '0x0165878A594ca255338adfa4d48449f69242Eb8F',
 }
+
+export enum RailProxyDeploymentBlock {
+  Ethereum = 0, // TODO will need update
+  Ropsten = 12190000, // TODO will need update
+  BNBSmartChain = 0, // TODO will need update
+  PolygonPOS = 0, // TODO will need update
+  HardHat = 0,
+}

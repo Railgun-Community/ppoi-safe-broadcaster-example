@@ -7,7 +7,10 @@ import fallbackProvidersBNBSmartChain from './fallback-providers/56-binance-smar
 import fallbackProvidersPolygon from './fallback-providers/137-polygon';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
 import { CoingeckoNetworkID } from '../../models/api-constants';
-import { RailProxyContract } from '../../models/contract-constants';
+import {
+  RailProxyContract,
+  RailProxyDeploymentBlock,
+} from '../../models/contract-constants';
 import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../../models/config-models';
 import { QuickSyncURL } from '../../models/network-models';
@@ -38,7 +41,7 @@ export default {
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.Ropsten,
-    deploymentBlock: 11952675,
+    deploymentBlock: RailProxyDeploymentBlock.Ropsten,
     fallbackProviderConfig: fallbackProvidersRopsten,
     priceTTLInMS: 5 * 60 * 1000,
     quickSyncURL: QuickSyncURL.Ropsten,

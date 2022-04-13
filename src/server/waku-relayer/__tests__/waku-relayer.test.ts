@@ -175,6 +175,8 @@ describe('waku-relayer', () => {
       feesID: '468abc',
       serializedTransaction: getMockSerializedTransaction(),
       responseKey: '456',
+      pubkey:
+        '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
     };
     const params: WakuMethodParamsTransact = {
       encryptedData: JSON.stringify(data),
