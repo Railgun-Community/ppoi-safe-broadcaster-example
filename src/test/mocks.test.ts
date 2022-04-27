@@ -1,18 +1,17 @@
 import { BaseProvider } from '@ethersproject/providers';
-import { babyjubjub } from '@railgun-community/lepton/dist/utils';
 import { PopulatedTransaction } from 'ethers';
+import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import { NetworkChainID } from '../server/config/config-chain-ids';
 import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import { RailProxyContract } from '../models/contract-constants';
-import { Network, QuickSyncURL } from '../models/network-models';
+import { Network } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 import {
   GasTokenWrappedAddress,
   Token,
   TokenConfig,
 } from '../models/token-models';
-import { initTokens } from '../server/tokens/network-tokens';
 
 export const mockTokenConfig = (
   chainID: NetworkChainID,
@@ -100,7 +99,6 @@ export const getMockRopstenNetwork = (): Network => {
     proxyContract: RailProxyContract.Ropsten,
     fallbackProviderConfig: getMockRopstenFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
-    quickSyncURL: QuickSyncURL.Ropsten,
     isTestNetwork: true,
   };
 };
@@ -132,8 +130,6 @@ export const getMockWalletAddress = (): string => {
   return '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B';
 };
 
-export const getMockWalletPubKey = (): string => {
-  const privateKey =
-    '0f75f0f0f1e2d1021b1d7f839bea176d24c87e089ee959c6fb9c0e650473d684';
-  return babyjubjub.privateKeyToPubKey(privateKey);
+export const getMockWalletViewingPublicKey = (): Uint8Array => {
+  return decode(getMockWalletAddress()).viewingPublicKey;
 };

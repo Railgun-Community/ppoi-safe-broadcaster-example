@@ -25,10 +25,5 @@ export type Network = {
   coingeckoId?: CoingeckoNetworkID;
   priceTTLInMS: number;
   fees: NetworkFeeSettings;
-  quickSyncURL?: QuickSyncURL;
   isTestNetwork?: boolean;
 };
-
-export enum QuickSyncURL {
-  Ropsten = 'https://relayer.railgun.ch/events/3',
-}

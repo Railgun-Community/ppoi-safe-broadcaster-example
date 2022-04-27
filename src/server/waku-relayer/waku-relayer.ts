@@ -3,6 +3,7 @@ import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
 import { Wallet } from '@railgun-community/lepton/dist/wallet';
 import { bytes } from '@railgun-community/lepton/dist/utils';
+import { hexStringToBytes } from '@railgun-community/lepton/dist/utils/bytes';
 import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
 import { NetworkChainID } from '../config/config-chain-ids';
@@ -10,10 +11,7 @@ import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
 import { contentTopics } from './topics';
-import {
-  getRailgunWalletPubKey,
-  numAvailableWallets,
-} from '../wallets/active-wallets';
+import { numAvailableWallets } from '../wallets/active-wallets';
 import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
 
@@ -23,8 +21,7 @@ export type FeeMessageData = {
   fees: MapType<string>;
   feeExpiration: number;
   feesID: string;
-  pubkey: string;
-  signingKey: string;
+  railAddress: string;
   availableWallets: number;
 };
 
@@ -55,7 +52,7 @@ export class WakuRelayer {
 
   subscribedContentTopics: string[];
 
-  walletPublicKey: string;
+  walletRailAddress: string;
 
   options: WakuRelayerOptions;
 
@@ -80,7 +77,8 @@ export class WakuRelayer {
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
     this.wallet = wallet;
-    this.walletPublicKey = getRailgunWalletPubKey();
+    const anyChainID = 0; // Use "any" 0-index chain ID for broadcasted wallet.
+    this.walletRailAddress = wallet.getAddress(anyChainID);
     this.dbg(this.subscribedContentTopics);
   }
 
@@ -139,6 +137,7 @@ export class WakuRelayer {
     }
   }
 
+  // eslint-disable-next-line require-await
   private createFeeBroadcastData = async (
     fees: MapType<BigNumber>,
     feeCacheID: string,
@@ -154,13 +153,14 @@ export class WakuRelayer {
       // client can't rely on message timestamp to calculate expiration
       feeExpiration: Date.now() + this.options.feeExpiration,
       feesID: feeCacheID,
-      pubkey: this.walletPublicKey,
-      signingKey: await this.wallet.getSigningPublicKey(),
+      railAddress: this.walletRailAddress,
       // Availability must be accurate or Relayer risks automatic blocking by clients.
       availableWallets: numAvailableWallets(),
     };
     const message = bytes.fromUTF8String(JSON.stringify(data));
-    const signature = bytes.hexlify(await this.wallet.sign(message));
+    const signature = bytes.hexlify(
+      await this.wallet.signWithViewingKey(hexStringToBytes(message)),
+    );
     this.dbg(`Broadcasting fees for chain ${chainID}: `); // , data);
     return {
       data: message,
@@ -177,7 +177,7 @@ export class WakuRelayer {
       chainID,
     );
     const contentTopic = contentTopics.fees(chainID);
-    const result = await this.publish(feeBroadcastData, contentTopic);
+    await this.publish(feeBroadcastData, contentTopic);
   }
 
   async broadcastFeesOnInterval(interval: number = 1000 * 30) {

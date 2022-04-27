@@ -1,12 +1,11 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import { getMockProvider } from '../../../test/mocks.test';
 import {
   createEthersWallet,
   getActiveWallets,
-  getRailgunAddress,
-  getRailgunWalletKeypair,
-  getRailgunWalletPubKey,
+  getRailgunAnyAddress,
 } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
@@ -37,22 +36,23 @@ describe('active-wallets', () => {
   });
 
   it('Should have Railgun wallet with valid address', () => {
-    const railgunAddress = getRailgunAddress();
+    const railgunAddress = getRailgunAnyAddress();
     expect(railgunAddress).to.equal(
-      'rgany1qyglk9smgj240x2xmj2laj7p5hexw0a30vvdqnv9gk020nsd7yzgw8ypm04',
+      '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53l7ktt8n4t7h2khfvceh5kgy36uajg4xxf8aq7xj5cfn62tczprhj2n2s479',
     );
   });
 
   it('Should check pubkey value matches across networks', () => {
-    const pubkeyChain0 = getRailgunWalletPubKey();
-    const pubkeyRopsten = getRailgunWalletKeypair(
-      NetworkChainID.Ropsten,
-    ).pubkey;
-    expect(pubkeyChain0).to.equal(
-      '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
+    const viewingPublicKeyAll = decode(getRailgunAnyAddress()).viewingPublicKey;
+    const viewingPublicKeyRopsten = decode(
+      getRailgunAnyAddress(NetworkChainID.Ropsten),
+    ).viewingPublicKey;
+    expect(viewingPublicKeyAll).to.deep.equal(
+      new Uint8Array([
+        172, 181, 158, 117, 95, 174, 171, 93, 44, 198, 111, 75, 32, 145, 215,
+        59, 36, 84, 198, 73, 250, 15, 26, 84, 194, 103, 165, 47, 2, 8, 239, 37,
+      ]),
     );
-    expect(pubkeyRopsten).to.equal(
-      '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
-    );
+    expect(viewingPublicKeyRopsten).to.deep.equal(viewingPublicKeyAll);
   });
 }).timeout(10000);

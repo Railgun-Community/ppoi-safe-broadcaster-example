@@ -1,10 +1,9 @@
-import { ERC20Note } from '@railgun-community/lepton';
+import { Note } from '@railgun-community/lepton';
 import { Prover } from '@railgun-community/lepton/dist/prover';
 import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import BN from 'bn.js';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
+import { getRailgunAddressData } from '../../server/wallets/active-wallets';
 
 let balancesStub: SinonStub;
 let verifyProofStub: SinonStub;
@@ -13,19 +12,19 @@ export const createLeptonWalletBalancesStub = (
   tokenAddressHexlify: string,
   tree: number,
 ) => {
+  const addressData = getRailgunAddressData();
   balancesStub = sinon.stub(RailgunWallet.prototype, 'balances').resolves({
     [tokenAddressHexlify]: {
-      balance: new BN('1000000000000000000000'),
+      balance: BigInt('1000000000000000000000'),
       utxos: [
         {
           tree,
           position: 0,
           index: 0,
-          change: false,
           txid: '123',
           spendtxid: '123',
-          note: new ERC20Note(
-            '123',
+          note: new Note(
+            addressData,
             '123',
             '1000000000000000000000',
             tokenAddressHexlify,

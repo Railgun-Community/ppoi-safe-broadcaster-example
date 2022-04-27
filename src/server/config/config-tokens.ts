@@ -35,6 +35,9 @@ export default {
     '0xAa753fb4e77ea8Adb16200865839ffB1d86BAE5E': {
       symbol: 'TESTERC20',
     },
+    '0x784dbb737703225a6d5defffc7b395d59e348e3d': {
+      symbol: 'RAILLEGACY',
+    },
   },
   [NetworkChainID.BNBSmartChain]: {
     [TokenAddressBSC.WBNB]: {

@@ -1,12 +1,19 @@
-import { ERC20Note } from '@railgun-community/lepton';
-import { babyjubjub, bytes } from '@railgun-community/lepton/dist/utils';
-import { hexlify, trim } from '@railgun-community/lepton/dist/utils/bytes';
+import { bytes } from '@railgun-community/lepton/dist/utils';
+import {
+  hexStringToBytes,
+  trim,
+} from '@railgun-community/lepton/dist/utils/bytes';
 import { BigNumber, Contract, PopulatedTransaction } from 'ethers';
+import { Note } from '@railgun-community/lepton';
+import { getSharedSymmetricKey } from '@railgun-community/lepton/dist/utils/keys-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
 import { abiForProxyContract } from '../abi/abi';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { getRailgunWalletKeypair } from '../wallets/active-wallets';
+import {
+  getRailgunAddressData,
+  getRailgunWallet,
+} from '../wallets/active-wallets';
 
 const parseFormattedTokenAddress = (formattedTokenAddress: string) => {
   return `0x${trim(formattedTokenAddress, 20)}`;
@@ -15,6 +22,30 @@ const parseFormattedTokenAddress = (formattedTokenAddress: string) => {
 type PackagedFee = {
   tokenAddress: string;
   packagedFeeAmount: BigNumber;
+};
+
+type CommitmentCiphertext = {
+  ciphertext: BigNumber[];
+  ephemeralKeys: BigNumber[];
+  memo: BigNumber;
+};
+
+type BoundParams = {
+  // uint16 treeNumber;
+  // WithdrawType withdraw;
+  // address adaptContract;
+  // bytes32 adaptParams;
+  commitmentCiphertext: CommitmentCiphertext[];
+};
+
+type TransactionData = {
+  // SnarkProof proof;
+  // uint256 merkleRoot;
+  // uint256[] nullifiers;
+  commitments: BigNumber[];
+  boundParams: BoundParams;
+  // CommitmentPreimage withdrawPreimage;
+  // address overrideOutput;
 };
 
 export const extractPackagedFeeFromTransaction = (
@@ -38,9 +69,9 @@ export const extractPackagedFeeFromTransaction = (
     throw new Error('Contract method invalid');
   }
 
-  const keypair = getRailgunWalletKeypair(chainID);
-  const walletPrivateKey = keypair.privateKey;
-  const walletPublicKey = keypair.pubkey;
+  const viewingKeys = getRailgunWallet().getViewingKeyPair();
+  const viewingPrivateKey = viewingKeys.privateKey;
+  const { masterPublicKey } = getRailgunAddressData();
 
   const tokenPaymentAmounts: MapType<BigNumber> = {};
 
@@ -52,8 +83,8 @@ export const extractPackagedFeeFromTransaction = (
     extractFeesFromRailgunTransactions(
       railgunTx,
       tokenPaymentAmounts,
-      walletPrivateKey,
-      walletPublicKey,
+      viewingPrivateKey,
+      masterPublicKey,
     ),
   );
 
@@ -69,55 +100,53 @@ export const extractPackagedFeeFromTransaction = (
   };
 };
 
-const extractFeesFromRailgunTransactions = (
-  railgunTx: any,
+const extractFeesFromRailgunTransactions = async (
+  railgunTx: TransactionData,
   tokenPaymentAmounts: MapType<BigNumber>,
-  walletPrivateKey: string,
-  walletPublicKey: string,
+  viewingPrivateKey: Uint8Array,
+  masterPublicKey: bigint,
 ) => {
-  // TODO: Confirm these types. (Build into Lepton).
-  const commitmentsOut = railgunTx.commitmentsOut as {
-    hash: BigNumber;
-    ciphertext: BigNumber[];
-    senderPubKey: BigNumber[];
-    revealKey: BigNumber[];
-  }[];
+  const { commitments } = railgunTx;
 
-  commitmentsOut.forEach((commitment) => {
-    const sharedKey = babyjubjub.ecdh(
-      hexlify(walletPrivateKey),
-      babyjubjub.packPoint(
-        commitment.senderPubKey.map((el) => el.toHexString()),
-      ),
-    );
+  await Promise.all(
+    commitments.map(async (commitment, index) => {
+      const hash = commitment;
+      const ciphertext = railgunTx.boundParams.commitmentCiphertext[index];
 
-    const ciphertexthexlified = commitment.ciphertext.map((el) =>
-      el.toHexString(),
-    );
-    const decryptedNote = ERC20Note.decrypt(
-      {
-        iv: ciphertexthexlified[0],
-        data: ciphertexthexlified.slice(1),
-      },
-      sharedKey,
-    );
+      const sharedKey = await getSharedSymmetricKey(
+        viewingPrivateKey,
+        hexStringToBytes(ciphertext.ephemeralKeys[0].toHexString()),
+      );
 
-    if (decryptedNote.pubkey === walletPublicKey) {
-      if (`0x${decryptedNote.hash}` !== commitment.hash.toHexString()) {
-        throw new Error(
-          'Client attempted to steal from relayer via invalid ciphertext.',
-        );
-      }
+      const ciphertextHexlified = ciphertext.ciphertext.map((el) =>
+        el.toHexString(),
+      );
+      const ivTag = ciphertextHexlified[0];
+      const decryptedNote = Note.decrypt(
+        {
+          iv: ivTag.substring(0, 16),
+          tag: ivTag.substring(16),
+          data: ciphertextHexlified.slice(1),
+        },
+        sharedKey,
+      );
 
-      if (!tokenPaymentAmounts[decryptedNote.token]) {
+      if (decryptedNote.masterPublicKey === masterPublicKey) {
+        if (`0x${decryptedNote.hash}` !== hash.toHexString()) {
+          throw new Error(
+            'Client attempted to steal from relayer via invalid ciphertext.',
+          );
+        }
+
+        if (!tokenPaymentAmounts[decryptedNote.token]) {
+          // eslint-disable-next-line no-param-reassign
+          tokenPaymentAmounts[decryptedNote.token] = BigNumber.from(0);
+        }
         // eslint-disable-next-line no-param-reassign
-        tokenPaymentAmounts[decryptedNote.token] = BigNumber.from(0);
+        tokenPaymentAmounts[decryptedNote.token] = tokenPaymentAmounts[
+          decryptedNote.token
+        ].add(BigNumber.from(decryptedNote.value).toString());
       }
-      // eslint-disable-next-line no-param-reassign
-      tokenPaymentAmounts[decryptedNote.token] = tokenPaymentAmounts[
-        decryptedNote.token
-        // ].add(BigNumber.from(decryptedNote.amount));
-      ].add(BigNumber.from(bytes.numberify(decryptedNote.amount).toString()));
-    }
-  });
+    }),
+  );
 };

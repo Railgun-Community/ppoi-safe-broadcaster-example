@@ -1,24 +1,32 @@
-// import * as ed from '@noble/ed25519';
+import * as ed from '@noble/ed25519';
 import { TransactionResponse } from '@ethersproject/providers';
+import { hexlify } from '@railgun-community/lepton/dist/utils/bytes';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
+import { EncryptedData } from '@railgun-community/lepton/dist/models/transaction-types';
+import {
+  encryptJSONDataWithSharedKey,
+  tryDecryptJSONDataWithSharedKey,
+} from '@railgun-community/lepton/dist/utils/ecies';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import { processTransaction } from '../../transactions/process-transaction';
-import { getRailgunWalletKeypair } from '../../wallets/active-wallets';
+import {
+  getRailgunAddressData,
+  getRailgunPrivateViewingKey,
+} from '../../wallets/active-wallets';
 import { contentTopics } from '../topics';
 import { WakuMethodResponse } from '../waku-response';
 
 export type WakuMethodParamsTransact = {
   pubkey: string;
-  encryptedData: string;
+  encryptedData: [string, string];
 };
 
 export type RawParamsTransact = {
   serializedTransaction: string;
   chainID: number;
   feesID: string;
-  responseKey: string;
-  pubkey: string;
+  relayerViewingKey: string;
 };
 
 const handledClientPubKeys: string[] = [];
@@ -36,7 +44,10 @@ export const transactMethod = async (
   }
   handledClientPubKeys.push(clientPubKey);
 
-  const decrypted = tryDecryptData(encryptedData, clientPubKey);
+  const viewingPrivateKey = getRailgunPrivateViewingKey();
+  const sharedKey = await ed.getSharedSecret(viewingPrivateKey, clientPubKey);
+
+  const decrypted = await tryDecryptData(encryptedData, sharedKey);
   if (decrypted === null) {
     // Incorrect key. Skipping transact message.
     return undefined;
@@ -46,23 +57,12 @@ export const transactMethod = async (
     chainID,
     feesID: feeCacheID,
     serializedTransaction,
-    responseKey,
-    pubkey,
+    relayerViewingKey,
   } = decrypted as RawParamsTransact;
 
-  const railgunWalletPubKey = getRailgunWalletKeypair(0).pubkey;
-  if (pubkey !== railgunWalletPubKey) {
+  const { viewingPublicKey } = getRailgunAddressData();
+  if (relayerViewingKey !== hexlify(viewingPublicKey)) {
     return undefined;
-  }
-
-  if (serializedTransaction === 'demo-result') {
-    // TODO: Remove these for production release.
-    return resultResponse(id, chainID, responseKey, {
-      hash: '12345',
-    } as TransactionResponse);
-  }
-  if (serializedTransaction === 'demo-error') {
-    return errorResponse(id, chainID, responseKey, new Error('Bad token fee.'));
   }
 
   try {
@@ -74,43 +74,22 @@ export const transactMethod = async (
     logger('txResponse');
     logger(txResponse);
 
-    return resultResponse(id, chainID, responseKey, txResponse);
+    return resultResponse(id, chainID, sharedKey, txResponse);
   } catch (err: any) {
     logger(err);
-    return errorResponse(id, chainID, responseKey, err);
-  }
-};
-
-const tryDecryptData = (encryptedData: string, clientPubKey: string) => {
-  const chainID = 0;
-  const railgunWalletPrivKey = getRailgunWalletKeypair(chainID).privateKey;
-
-  try {
-    // TODO: Add AES GCM decryption when implemented in Lepton.
-    // const sharedKey = ed.curve25519.scalarMult(
-    //   railgunWalletPrivKey,
-    //   clientPubKey,
-    // );
-    //
-    // const data = aes.gcm.256.decrypt(encryptedData, sharedKey);
-    const data = JSON.parse(encryptedData);
-
-    return data;
-  } catch (err) {
-    // Data is not addressed to Relayer.
-    return null;
+    return errorResponse(id, chainID, sharedKey, err);
   }
 };
 
 const resultResponse = (
   id: number,
   chainID: NetworkChainID,
-  responseKey: string,
+  sharedKey: Uint8Array,
   txResponse: TransactionResponse,
 ): WakuMethodResponse => {
   const encryptedResponse = encryptResponseData(
     { txHash: txResponse.hash },
-    responseKey,
+    sharedKey,
   );
   const rpcResult = formatJsonRpcResult(id, encryptedResponse);
   return {
@@ -122,7 +101,7 @@ const resultResponse = (
 const errorResponse = (
   id: number,
   chainID: NetworkChainID,
-  responseKey: string,
+  sharedKey: Uint8Array,
   err: Error,
 ): WakuMethodResponse => {
   let sanitizedErrorMessage: string;
@@ -139,7 +118,7 @@ const errorResponse = (
     {
       error: sanitizedErrorMessage,
     },
-    responseKey,
+    sharedKey,
   );
   const rpcResult = formatJsonRpcResult(id, encryptedResponse);
   return {
@@ -148,7 +127,17 @@ const errorResponse = (
   };
 };
 
-const encryptResponseData = (data: object, responseKey: string): string => {
-  // TODO: Add AES GCM encryption when implemented in Lepton.
-  return JSON.stringify(data);
+export const tryDecryptData = async (
+  encryptedData: EncryptedData,
+  sharedKey: Uint8Array,
+  // eslint-disable-next-line require-await
+): Promise<object | null> => {
+  return tryDecryptJSONDataWithSharedKey(encryptedData, sharedKey);
+};
+
+export const encryptResponseData = (
+  data: object,
+  sharedKey: Uint8Array,
+): EncryptedData => {
+  return encryptJSONDataWithSharedKey(data, hexlify(sharedKey));
 };

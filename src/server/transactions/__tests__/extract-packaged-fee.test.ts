@@ -1,10 +1,7 @@
 import { FallbackProvider } from '@ethersproject/providers';
-import { ERC20Note, Lepton } from '@railgun-community/lepton';
+import { Note, Lepton } from '@railgun-community/lepton';
 import { ERC20RailgunContract } from '@railgun-community/lepton/dist/contract';
-import {
-  ERC20Transaction,
-  ERC20TransactionSerialized,
-} from '@railgun-community/lepton/dist/transaction/erc20';
+import { Transaction } from '@railgun-community/lepton/dist/transaction';
 import {
   hexlify,
   padToLength,
@@ -13,21 +10,19 @@ import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
+import { AddressData } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
+import { SerializedTransaction } from '@railgun-community/lepton/dist/models/transaction-types';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configDefaults from '../../config/config-defaults';
-import {
-  getMockRopstenNetwork,
-  getMockToken,
-  getMockWalletPubKey,
-} from '../../../test/mocks.test';
+import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
 import { getLepton, initLepton } from '../../lepton/lepton-init';
 import {
   getProviderForNetwork,
   initNetworkProviders,
 } from '../../providers/active-network-providers';
 import {
+  getRailgunAddressData,
   getRailgunWallet,
-  getRailgunWalletPubKey,
   initWallets,
 } from '../../wallets/active-wallets';
 import { extractPackagedFeeFromTransaction } from '../extract-packaged-fee';
@@ -53,22 +48,13 @@ const MOCK_MNEMONIC_1 =
   'hint profit virus forest angry puzzle index same feel behind grant repair';
 
 const createRopstenTransaction = async (
-  receiverWalletPublicKey: string,
+  addressData: AddressData,
   fee: BigNumber,
   tokenAddress: string,
-): Promise<ERC20TransactionSerialized> => {
-  const transaction = new ERC20Transaction(
-    tokenAddress,
-    ROPSTEN_CHAIN_ID,
-    TREE,
-  );
+): Promise<SerializedTransaction> => {
+  const transaction = new Transaction(tokenAddress, ROPSTEN_CHAIN_ID, TREE);
   transaction.outputs = [
-    new ERC20Note(
-      receiverWalletPublicKey,
-      RANDOM,
-      fee.toHexString(),
-      tokenAddress,
-    ),
+    new Note(addressData, RANDOM, fee.toHexString(), tokenAddress),
   ];
   return await transaction.prove(
     lepton.prover,
@@ -112,9 +98,9 @@ describe('extract-packaged-fee', () => {
 
   it('Should extract fee correctly', async () => {
     const fee = BigNumber.from('1000');
-    const walletPublicKey = getRailgunWalletPubKey();
+    const addressData = getRailgunAddressData();
     const transactions = await Promise.all([
-      createRopstenTransaction(walletPublicKey, fee, MOCK_TOKEN_ADDRESS),
+      createRopstenTransaction(addressData, fee, MOCK_TOKEN_ADDRESS),
     ]);
     const populatedTransaction = await contract.transact(transactions);
     const packagedFee = extractPackagedFeeFromTransaction(
@@ -127,8 +113,9 @@ describe('extract-packaged-fee', () => {
 
   it('Should fail for incorrect pubkey', async () => {
     const fee = BigNumber.from('1000');
+    const addressData = getRailgunAddressData();
     const transactions = await Promise.all([
-      createRopstenTransaction(getMockWalletPubKey(), fee, MOCK_TOKEN_ADDRESS),
+      createRopstenTransaction(addressData, fee, MOCK_TOKEN_ADDRESS),
     ]);
     const populatedTransaction = await contract.transact(transactions);
     expect(() =>

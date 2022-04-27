@@ -2,6 +2,10 @@ import { BaseProvider } from '@ethersproject/providers';
 import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
 import { Wallet as EthersWallet } from 'ethers';
 import { isValidMnemonic } from 'ethers/lib/utils';
+import {
+  AddressData,
+  decode,
+} from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
@@ -12,9 +16,7 @@ import { isWalletAvailable } from './available-wallets';
 const activeWallets: ActiveWallet[] = [];
 
 let railgunWallet: RailgunWallet;
-let railgunWalletPubKey: string;
-
-const RAILGUN_ADDRESS_INDEX = 0;
+let railgunWalletAnyAddress: string;
 
 export const resetWallets = () => {
   resetArray(activeWallets);
@@ -37,7 +39,8 @@ const initRailgunWallet = async (mnemonic: string) => {
     mnemonic,
   );
   railgunWallet = lepton.wallets[walletID];
-  railgunWalletPubKey = getRailgunWalletKeypair(0).pubkey;
+  const anyChainID = 0;
+  railgunWalletAnyAddress = railgunWallet.getAddress(anyChainID);
 };
 
 export const initWallets = async () => {
@@ -71,33 +74,16 @@ export const getRailgunWallet = (): RailgunWallet => {
   return railgunWallet;
 };
 
-export const getRailgunWalletKeypair = (
-  chainID: NetworkChainID,
-): {
-  privateKey: string;
-  pubkey: string;
-  address: string;
-} => {
-  const index = 0;
-  const change = false;
-  return getRailgunWallet().getKeypair(
-    configDefaults.lepton.dbEncryptionKey,
-    index,
-    change,
-    chainID,
-  );
+export const getRailgunAnyAddress = (chainID: NetworkChainID = 0) => {
+  return railgunWalletAnyAddress;
 };
 
-export const getRailgunWalletPubKey = () => {
-  if (!railgunWalletPubKey) {
-    throw new Error('No railgun wallet initialized.');
-  }
-  return railgunWalletPubKey;
+export const getRailgunAddressData = (): AddressData => {
+  return decode(getRailgunAnyAddress());
 };
 
-export const getRailgunAddress = (chainID?: NetworkChainID) => {
-  const change = false;
-  return getRailgunWallet().getAddress(RAILGUN_ADDRESS_INDEX, change, chainID);
+export const getRailgunPrivateViewingKey = () => {
+  return getRailgunWallet().getViewingKeyPair().privateKey;
 };
 
 export const createEthersWallet = (

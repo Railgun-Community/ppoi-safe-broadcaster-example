@@ -1,5 +1,5 @@
 import { Lepton } from '@railgun-community/lepton';
-import level from 'level';
+import leveldown from 'leveldown';
 import { LeptonDebugger } from '@railgun-community/lepton/dist/models/types';
 import { FallbackProvider } from '@ethersproject/providers';
 import { logger } from '../../util/logger';
@@ -8,7 +8,6 @@ import { quickSync } from '../api/quick-sync/quick-sync';
 import configDefaults from '../config/config-defaults';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
-import { throwErr } from '../../util/promise-utils';
 
 let lepton: Lepton;
 
@@ -23,7 +22,7 @@ export const initLepton = (optDebugger?: LeptonDebugger) => {
   if (lepton) {
     return;
   }
-  const levelDB = level(configDefaults.lepton.dbDir);
+  const levelDB = leveldown(configDefaults.lepton.dbDir);
   const leptonDebugger: LeptonDebugger = optDebugger ?? {
     log: (msg: string) => logger.log(msg),
     error: (error: Error) => logger.error(error),

@@ -1,3 +1,4 @@
+import * as ed from '@noble/ed25519';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
@@ -6,7 +7,12 @@ import { BigNumber } from 'ethers';
 import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import { bytes } from '@railgun-community/lepton/dist/utils';
-import { verify } from '@railgun-community/lepton/dist/keyderivation/bip32-ed25519';
+import { verifyED25519 } from '@railgun-community/lepton/dist/utils/keys-utils';
+import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
+import {
+  hexlify,
+  hexToBytes,
+} from '@railgun-community/lepton/dist/utils/bytes';
 import {
   FeeMessage,
   FeeMessageData,
@@ -20,7 +26,9 @@ import {
   WakuRequestMethods,
 } from '../../networking/waku-api-client';
 import {
+  encryptResponseData,
   RawParamsTransact,
+  tryDecryptData,
   WakuMethodParamsTransact,
 } from '../methods/transact-method';
 import {
@@ -45,18 +53,25 @@ import {
   getMockSerializedTransaction,
 } from '../../../test/mocks.test';
 import { initTokens } from '../../tokens/network-tokens';
-import { getRailgunWallet } from '../../wallets/active-wallets';
+import {
+  getRailgunAddressData,
+  getRailgunPrivateViewingKey,
+  getRailgunWallet,
+} from '../../wallets/active-wallets';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
+import { tryDecryptJSONDataWithSharedKey } from '@railgun-community/lepton/dist/utils/ecies';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
+// @ts-ignore
 let wakuRelayer: Optional<WakuRelayer>;
 
 let clientHTTPStub: SinonStub;
 let processTransactionStub: SinonStub;
 
+// @ts-ignore
 let requestData: Optional<JsonRpcRequest>;
 
 const MOCK_TOKEN_ADDRESS = '0x12345';
@@ -94,6 +109,7 @@ describe('waku-relayer', () => {
       topic: WAKU_TOPIC,
       feeExpiration: configDefaults.transactionFees.feeExpirationInMS,
     });
+    clientHTTPStub.resetHistory();
   });
 
   beforeEach(() => {
@@ -133,7 +149,7 @@ describe('waku-relayer', () => {
 
     await wakuRelayer?.broadcastFeesForChain(chainID);
     expect(requestData?.id).to.be.a('number');
-    expect(requestData?.method).to.equal('post_waku_v2_relay_v1_message');
+    expect(requestData?.method).to.equal(WakuRequestMethods.PublishMessage);
     expect(requestData?.params).to.be.an('array');
     expect(requestData?.params[0]).to.equal(WAKU_TOPIC);
     expect(requestData?.params[1]).to.be.an('object');
@@ -155,14 +171,44 @@ describe('waku-relayer', () => {
       '1272742268040000000000',
     );
     expect(data.feeExpiration).to.be.a('number');
-    expect(data.pubkey).to.equal(
-      '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
+    expect(data.railAddress).to.equal(
+      '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53l7ktt8n4t7h2khfvceh5kgy36uajg4xxf8aq7xj5cfn62tczprhj2n2s479',
     );
-    const isValid = await verify(signature, message.data, data.signingKey);
+    const decodedRailAddress = decode(data.railAddress);
+    const isValid = await verifyED25519(
+      hexToBytes(signature),
+      hexToBytes(message.data),
+      decodedRailAddress.viewingPublicKey,
+    );
     expect(isValid).to.be.true;
   });
 
-  it('Should test transact method', async () => {
+  it('Should encrypt and decrypt data using shared keys', async () => {
+    const relayerPrivateKey = getRailgunPrivateViewingKey();
+    const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
+    const { viewingPublicKey } = getRailgunAddressData();
+
+    const data: RawParamsTransact = {
+      chainID,
+      feesID: '468abc',
+      serializedTransaction: getMockSerializedTransaction(),
+      relayerViewingKey: hexlify(viewingPublicKey),
+    };
+    const randomPrivKey = bytes.random(32);
+    const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
+    const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
+    const encryptedData = encryptResponseData(data, sharedKey);
+
+    const sharedKeyAlternate = await ed.getSharedSecret(
+      relayerPrivateKey,
+      randomPubKeyUint8Array,
+    );
+    expect(sharedKeyAlternate).to.deep.equal(sharedKey);
+
+    expect(await tryDecryptData(encryptedData, sharedKey)).to.deep.equal(data);
+  });
+
+  it.only('Should test transact method', async () => {
     const handleHTTPPost = () => {
       return { result: {} };
     };
@@ -170,18 +216,26 @@ describe('waku-relayer', () => {
 
     const contentTopic = contentTopics.transact(chainID);
 
+    const relayerPrivateKey = getRailgunPrivateViewingKey();
+    const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
+    const { viewingPublicKey } = getRailgunAddressData();
+
     const data: RawParamsTransact = {
       chainID,
       feesID: '468abc',
       serializedTransaction: getMockSerializedTransaction(),
-      responseKey: '456',
-      pubkey:
-        '11fb161b4495579946dc95fecbc1a5f2673fb17b18d04d85459ea7ce0df10487',
+      relayerViewingKey: hexlify(viewingPublicKey),
     };
+    const randomPrivKey = bytes.random(32);
+    const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
+    const clientPubKey = hexlify(randomPubKeyUint8Array);
+    const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
+    const encryptedData = encryptResponseData(data, sharedKey);
     const params: WakuMethodParamsTransact = {
-      encryptedData: JSON.stringify(data),
-      pubkey: '123',
+      encryptedData,
+      pubkey: clientPubKey,
     };
+
     const payload = {
       method: WakuMethodNames.Transact,
       params,
@@ -194,6 +248,7 @@ describe('waku-relayer', () => {
     };
     await wakuRelayer?.handleMessage(relayMessage);
 
+    // After transact-response sent.
     expect(clientHTTPStub.calledOnce).to.be.true;
     const postCall = clientHTTPStub.getCall(0);
     expect(postCall.args[0]).to.equal('/');
@@ -203,24 +258,40 @@ describe('waku-relayer', () => {
     expect(rpcArgs.params).to.be.an('array');
     expect(rpcArgs.params[0]).to.equal(WAKU_TOPIC);
 
-    const encryptedResponse = JSON.stringify({
-      txHash: '123',
-    });
+    const encryptedResponse = encryptResponseData(
+      {
+        txHash: '123',
+      },
+      sharedKey,
+    );
     const expectedJsonRpcResult = formatJsonRpcResult(
       payload.id,
       encryptedResponse,
     );
     const expectedWakuMessage = WakuMessage.fromUtf8String(
       JSON.stringify(expectedJsonRpcResult),
-      contentTopic,
-      { timestamp: relayMessage.timestamp },
+      contentTopics.transactResponse(chainID),
+      // { timestamp: relayMessage.timestamp },
     );
     expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
     expect(rpcArgs.params[1].contentTopic).to.equal(
       contentTopics.transactResponse(chainID),
     );
-    expect(rpcArgs.params[1].payload).to.equal(
-      Buffer.from(expectedWakuMessage.payload as Uint8Array).toString('hex'),
+
+    const decoded = JSON.parse(
+      WakuRelayer.decode(Buffer.from(rpcArgs.params[1].payload, 'hex')),
     );
+    const decodedExpected = JSON.parse(
+      WakuRelayer.decode(expectedWakuMessage.payload as Uint8Array),
+    );
+    const resultData = await tryDecryptJSONDataWithSharedKey(
+      decoded.result,
+      sharedKey,
+    );
+    const expectedResultData = await tryDecryptJSONDataWithSharedKey(
+      decodedExpected.result,
+      sharedKey,
+    );
+    expect(resultData).to.deep.equal(expectedResultData);
   });
 }).timeout(10000);

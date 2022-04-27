@@ -13,7 +13,6 @@ import {
 } from '../../models/contract-constants';
 import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../../models/config-models';
-import { QuickSyncURL } from '../../models/network-models';
 
 const defaultFees = {
   slippageBuffer: 0.03,
@@ -44,7 +43,6 @@ export default {
     deploymentBlock: RailProxyDeploymentBlock.Ropsten,
     fallbackProviderConfig: fallbackProvidersRopsten,
     priceTTLInMS: 5 * 60 * 1000,
-    quickSyncURL: QuickSyncURL.Ropsten,
     isTestNetwork: true,
   },
   [NetworkChainID.BNBSmartChain]: {
