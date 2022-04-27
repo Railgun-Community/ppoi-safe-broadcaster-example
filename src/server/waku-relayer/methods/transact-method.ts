@@ -139,5 +139,5 @@ export const encryptResponseData = (
   data: object,
   sharedKey: Uint8Array,
 ): EncryptedData => {
-  return encryptJSONDataWithSharedKey(data, hexlify(sharedKey));
+  return encryptJSONDataWithSharedKey(data, sharedKey);
 };
