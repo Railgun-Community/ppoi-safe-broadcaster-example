@@ -11,8 +11,9 @@ import { verifyED25519 } from '@railgun-community/lepton/dist/utils/keys-utils';
 import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import {
   hexlify,
-  hexToBytes,
+  hexStringToBytes,
 } from '@railgun-community/lepton/dist/utils/bytes';
+import { tryDecryptJSONDataWithSharedKey } from '@railgun-community/lepton/dist/utils/ecies';
 import {
   FeeMessage,
   FeeMessageData,
@@ -60,7 +61,6 @@ import {
 } from '../../wallets/active-wallets';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
-import { tryDecryptJSONDataWithSharedKey } from '@railgun-community/lepton/dist/utils/ecies';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -172,12 +172,12 @@ describe('waku-relayer', () => {
     );
     expect(data.feeExpiration).to.be.a('number');
     expect(data.railAddress).to.equal(
-      '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53l7ktt8n4t7h2khfvceh5kgy36uajg4xxf8aq7xj5cfn62tczprhj2n2s479',
+      '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53lama02nutwtcqc979wnce0qwly4y7w4rls5cq040g7z8eagshxrw5ajy990',
     );
     const decodedRailAddress = decode(data.railAddress);
     const isValid = await verifyED25519(
-      hexToBytes(signature),
-      hexToBytes(message.data),
+      hexStringToBytes(message.data),
+      hexStringToBytes(signature),
       decodedRailAddress.viewingPublicKey,
     );
     expect(isValid).to.be.true;

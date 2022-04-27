@@ -38,7 +38,7 @@ describe('active-wallets', () => {
   it('Should have Railgun wallet with valid address', () => {
     const railgunAddress = getRailgunAnyAddress();
     expect(railgunAddress).to.equal(
-      '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53l7ktt8n4t7h2khfvceh5kgy36uajg4xxf8aq7xj5cfn62tczprhj2n2s479',
+      '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53lama02nutwtcqc979wnce0qwly4y7w4rls5cq040g7z8eagshxrw5ajy990',
     );
   });
 
@@ -49,8 +49,9 @@ describe('active-wallets', () => {
     ).viewingPublicKey;
     expect(viewingPublicKeyAll).to.deep.equal(
       new Uint8Array([
-        172, 181, 158, 117, 95, 174, 171, 93, 44, 198, 111, 75, 32, 145, 215,
-        59, 36, 84, 198, 73, 250, 15, 26, 84, 194, 103, 165, 47, 2, 8, 239, 37,
+        119, 215, 170, 124, 91, 151, 128, 96, 190, 43, 167, 140, 188, 14, 249,
+        42, 79, 58, 163, 252, 41, 128, 62, 175, 71, 132, 124, 245, 16, 185, 134,
+        234,
       ]),
     );
     expect(viewingPublicKeyRopsten).to.deep.equal(viewingPublicKeyAll);
