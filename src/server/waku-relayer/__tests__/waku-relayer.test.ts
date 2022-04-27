@@ -208,7 +208,7 @@ describe('waku-relayer', () => {
     expect(await tryDecryptData(encryptedData, sharedKey)).to.deep.equal(data);
   });
 
-  it.only('Should test transact method', async () => {
+  it('Should test transact method', async () => {
     const handleHTTPPost = () => {
       return { result: {} };
     };
