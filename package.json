@@ -37,6 +37,7 @@
     "debug": "^4.3.4",
     "docker-secret": "^1.2.4",
     "ethers": "^5.6.4",
+    "lepton-clients-shared-private": "github:Railgun-Privacy/lepton-clients-shared-private",
     "leveldown": "^6.1.1",
     "railgun-artifacts-node": "https://npm.railgun.org/railgun-artifacts-node-0.1.0.tgz"
   },

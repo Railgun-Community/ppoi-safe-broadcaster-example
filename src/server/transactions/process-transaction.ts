@@ -22,10 +22,8 @@ export const processTransaction = async (
   );
   const maximumGas = getMaximumGas(gasEstimateDetails);
 
-  const { tokenAddress, packagedFeeAmount } = extractPackagedFeeFromTransaction(
-    chainID,
-    populatedTransaction,
-  );
+  const { tokenAddress, packagedFeeAmount } =
+    await extractPackagedFeeFromTransaction(chainID, populatedTransaction);
   validateFee(chainID, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
 
   const transactionGasDetails = createTransactionGasDetails(

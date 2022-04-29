@@ -1,11 +1,13 @@
-import { bytes } from '@railgun-community/lepton/dist/utils';
 import {
-  hexStringToBytes,
+  ByteLength,
+  hexlify,
+  nToBytes,
   trim,
 } from '@railgun-community/lepton/dist/utils/bytes';
 import { BigNumber, Contract, PopulatedTransaction } from 'ethers';
 import { Note } from '@railgun-community/lepton';
 import { getSharedSymmetricKey } from '@railgun-community/lepton/dist/utils/keys-utils';
+import { Ciphertext } from '@railgun-community/lepton/dist/models/transaction-types';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
 import { abiForProxyContract } from '../abi/abi';
@@ -48,10 +50,10 @@ type TransactionData = {
   // address overrideOutput;
 };
 
-export const extractPackagedFeeFromTransaction = (
+export const extractPackagedFeeFromTransaction = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
-): PackagedFee => {
+): Promise<PackagedFee> => {
   const network = configNetworks[chainID];
   if (populatedTransaction.to !== network.proxyContract) {
     throw new Error('Invalid contract address.');
@@ -79,12 +81,14 @@ export const extractPackagedFeeFromTransaction = (
   // eslint-disable-next-line no-underscore-dangle
   const railgunTxs = parsedTransaction.args._transactions as any;
 
-  railgunTxs.forEach((railgunTx: any) =>
-    extractFeesFromRailgunTransactions(
-      railgunTx,
-      tokenPaymentAmounts,
-      viewingPrivateKey,
-      masterPublicKey,
+  await Promise.all(
+    railgunTxs.map((railgunTx: any) =>
+      extractFeesFromRailgunTransactions(
+        railgunTx,
+        tokenPaymentAmounts,
+        viewingPrivateKey,
+        masterPublicKey,
+      ),
     ),
   );
 
@@ -100,6 +104,25 @@ export const extractPackagedFeeFromTransaction = (
   };
 };
 
+const getSharedKeySafe = (
+  viewingPrivateKey: Uint8Array,
+  ephemeralKey: Uint8Array,
+) => {
+  try {
+    return getSharedSymmetricKey(viewingPrivateKey, ephemeralKey);
+  } catch (err) {
+    return null;
+  }
+};
+
+const decryptNoteSafe = (encryptedNote: Ciphertext, sharedKey: Uint8Array) => {
+  try {
+    return Note.decrypt(encryptedNote, sharedKey);
+  } catch (err) {
+    return null;
+  }
+};
+
 const extractFeesFromRailgunTransactions = async (
   railgunTx: TransactionData,
   tokenPaymentAmounts: MapType<BigNumber>,
@@ -113,26 +136,39 @@ const extractFeesFromRailgunTransactions = async (
       const hash = commitment;
       const ciphertext = railgunTx.boundParams.commitmentCiphertext[index];
 
-      const sharedKey = await getSharedSymmetricKey(
-        viewingPrivateKey,
-        hexStringToBytes(ciphertext.ephemeralKeys[0].toHexString()),
+      const ephemeralKeyBytes = nToBytes(
+        BigInt(ciphertext.ephemeralKeys[0].toHexString()),
+        ByteLength.UINT_256,
       );
+
+      const sharedKey = await getSharedKeySafe(
+        viewingPrivateKey,
+        ephemeralKeyBytes,
+      );
+      if (sharedKey == null) {
+        // Not addressed to us.
+        return;
+      }
 
       const ciphertextHexlified = ciphertext.ciphertext.map((el) =>
-        el.toHexString(),
+        hexlify(el.toHexString()),
       );
       const ivTag = ciphertextHexlified[0];
-      const decryptedNote = Note.decrypt(
-        {
-          iv: ivTag.substring(0, 16),
-          tag: ivTag.substring(16),
-          data: ciphertextHexlified.slice(1),
-        },
-        sharedKey,
-      );
+      const encryptedNote: Ciphertext = {
+        iv: ivTag.substring(0, 32),
+        tag: ivTag.substring(32),
+        data: ciphertextHexlified.slice(1),
+      };
+      const decryptedNote = decryptNoteSafe(encryptedNote, sharedKey);
+      if (decryptedNote == null) {
+        // Addressed to us, but different note than fee.
+        return;
+      }
 
       if (decryptedNote.masterPublicKey === masterPublicKey) {
-        if (`0x${decryptedNote.hash}` !== hash.toHexString()) {
+        const noteHash = `0x${decryptedNote.hash.toString(16)}`;
+        const commitHash = hash.toHexString();
+        if (noteHash !== commitHash) {
           throw new Error(
             'Client attempted to steal from relayer via invalid ciphertext.',
           );
@@ -145,7 +181,7 @@ const extractFeesFromRailgunTransactions = async (
         // eslint-disable-next-line no-param-reassign
         tokenPaymentAmounts[decryptedNote.token] = tokenPaymentAmounts[
           decryptedNote.token
-        ].add(BigNumber.from(decryptedNote.value).toString());
+        ].add(decryptedNote.value.toString());
       }
     }),
   );
