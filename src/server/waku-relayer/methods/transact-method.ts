@@ -111,7 +111,7 @@ const errorResponse = (
       sanitizedErrorMessage = 'Bad token fee.';
       break;
     default:
-      sanitizedErrorMessage = 'Unknown error.';
+      sanitizedErrorMessage = 'Unknown Relayer error.';
       break;
   }
   const encryptedResponse = encryptResponseData(

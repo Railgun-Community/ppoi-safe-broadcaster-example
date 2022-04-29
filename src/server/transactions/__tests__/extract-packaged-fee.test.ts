@@ -141,22 +141,24 @@ describe('extract-packaged-fee', () => {
       populatedTransaction,
     );
     expect(packagedFee.packagedFeeAmount.toHexString()).to.equal(
-      '0x1a2490312932b16e042a',
+      '0x053b1e906e042a',
     );
     expect(packagedFee.tokenAddress).to.equal(
       '0x5fbdb2315678afecb367f032d93f642f64180aa3',
     );
   });
 
-  it('Should fail for incorrect pubkey', async () => {
+  it('Should fail for incorrect receiver address', async () => {
     const fee = BigNumber.from('1000');
-    const addressData = getRailgunAddressData();
+    const addressData = Lepton.decodeAddress(
+      '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
+    );
     const transactions = await Promise.all([
       createRopstenTransaction(addressData, fee, MOCK_TOKEN_ADDRESS),
     ]);
     const populatedTransaction = await contract.transact(transactions);
-    expect(() =>
+    await expect(
       extractPackagedFeeFromTransaction(ROPSTEN_CHAIN_ID, populatedTransaction),
-    ).to.throw('No Relayer payment included in transaction.');
+    ).to.be.rejectedWith('No Relayer payment included in transaction.');
   }).timeout(60000);
 }).timeout(120000);

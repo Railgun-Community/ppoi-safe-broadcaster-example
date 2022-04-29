@@ -2,6 +2,7 @@ import {
   ByteLength,
   hexlify,
   nToBytes,
+  nToHex,
   trim,
 } from '@railgun-community/lepton/dist/utils/bytes';
 import { BigNumber, Contract, PopulatedTransaction } from 'ethers';
@@ -77,7 +78,6 @@ export const extractPackagedFeeFromTransaction = async (
 
   const tokenPaymentAmounts: MapType<BigNumber> = {};
 
-  // TODO: Fix the any's with a real type from Lepton.
   // eslint-disable-next-line no-underscore-dangle
   const railgunTxs = parsedTransaction.args._transactions as any;
 
@@ -131,58 +131,56 @@ const extractFeesFromRailgunTransactions = async (
 ) => {
   const { commitments } = railgunTx;
 
-  await Promise.all(
-    commitments.map(async (commitment, index) => {
-      const hash = commitment;
-      const ciphertext = railgunTx.boundParams.commitmentCiphertext[index];
+  // First commitment should always be the fee.
+  const index = 0;
+  const hash = commitments[index];
+  const ciphertext = railgunTx.boundParams.commitmentCiphertext[index];
 
-      const ephemeralKeyBytes = nToBytes(
-        BigInt(ciphertext.ephemeralKeys[0].toHexString()),
-        ByteLength.UINT_256,
-      );
-
-      const sharedKey = await getSharedKeySafe(
-        viewingPrivateKey,
-        ephemeralKeyBytes,
-      );
-      if (sharedKey == null) {
-        // Not addressed to us.
-        return;
-      }
-
-      const ciphertextHexlified = ciphertext.ciphertext.map((el) =>
-        hexlify(el.toHexString()),
-      );
-      const ivTag = ciphertextHexlified[0];
-      const encryptedNote: Ciphertext = {
-        iv: ivTag.substring(0, 32),
-        tag: ivTag.substring(32),
-        data: ciphertextHexlified.slice(1),
-      };
-      const decryptedNote = decryptNoteSafe(encryptedNote, sharedKey);
-      if (decryptedNote == null) {
-        // Addressed to us, but different note than fee.
-        return;
-      }
-
-      if (decryptedNote.masterPublicKey === masterPublicKey) {
-        const noteHash = `0x${decryptedNote.hash.toString(16)}`;
-        const commitHash = hash.toHexString();
-        if (noteHash !== commitHash) {
-          throw new Error(
-            'Client attempted to steal from relayer via invalid ciphertext.',
-          );
-        }
-
-        if (!tokenPaymentAmounts[decryptedNote.token]) {
-          // eslint-disable-next-line no-param-reassign
-          tokenPaymentAmounts[decryptedNote.token] = BigNumber.from(0);
-        }
-        // eslint-disable-next-line no-param-reassign
-        tokenPaymentAmounts[decryptedNote.token] = tokenPaymentAmounts[
-          decryptedNote.token
-        ].add(decryptedNote.value.toString());
-      }
-    }),
+  const ephemeralKeyBytes = nToBytes(
+    BigInt(ciphertext.ephemeralKeys[0].toHexString()),
+    ByteLength.UINT_256,
   );
+
+  const sharedKey = await getSharedKeySafe(
+    viewingPrivateKey,
+    ephemeralKeyBytes,
+  );
+  if (sharedKey == null) {
+    // Not addressed to us.
+    return;
+  }
+
+  const ciphertextHexlified = ciphertext.ciphertext.map((el) =>
+    hexlify(el.toHexString()),
+  );
+  const ivTag = ciphertextHexlified[0];
+  const encryptedNote: Ciphertext = {
+    iv: ivTag.substring(0, 32),
+    tag: ivTag.substring(32),
+    data: ciphertextHexlified.slice(1),
+  };
+  const decryptedNote = decryptNoteSafe(encryptedNote, sharedKey);
+  if (decryptedNote == null) {
+    // Addressed to us, but different note than fee.
+    return;
+  }
+
+  if (decryptedNote.masterPublicKey === masterPublicKey) {
+    const noteHash = `0x${nToHex(decryptedNote.hash, ByteLength.UINT_256)}`;
+    const commitHash = hash.toHexString();
+    if (noteHash !== commitHash) {
+      throw new Error(
+        'Client attempted to steal from relayer via invalid ciphertext.',
+      );
+    }
+
+    if (!tokenPaymentAmounts[decryptedNote.token]) {
+      // eslint-disable-next-line no-param-reassign
+      tokenPaymentAmounts[decryptedNote.token] = BigNumber.from(0);
+    }
+    // eslint-disable-next-line no-param-reassign
+    tokenPaymentAmounts[decryptedNote.token] = tokenPaymentAmounts[
+      decryptedNote.token
+    ].add(decryptedNote.value.toString());
+  }
 };

@@ -5,6 +5,7 @@ import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
+import { getMaximumGasFromTransactionGasDetails } from '../fees/gas-estimate';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
 import { setWalletAvailable } from '../wallets/available-wallets';
@@ -41,10 +42,8 @@ export const executeTransaction = async (
   populatedTransaction: PopulatedTransaction,
   gasDetails: TransactionGasDetails,
 ): Promise<TransactionResponse> => {
-  const activeWallet = await getBestMatchWalletForNetwork(
-    chainID,
-    gasDetails.gasLimit,
-  );
+  const maximumGas = getMaximumGasFromTransactionGasDetails(gasDetails);
+  const activeWallet = await getBestMatchWalletForNetwork(chainID, maximumGas);
   const provider = getProviderForNetwork(chainID);
   const ethersWallet = createEthersWallet(activeWallet, provider);
   const nonce = await getCurrentNonce(ethersWallet);
@@ -57,21 +56,23 @@ export const executeTransaction = async (
   const signedTransaction = await ethersWallet.signTransaction(
     finalTransaction,
   );
-  await storeCurrentNonce(nonce, ethersWallet);
   const txResponse = await provider
     .sendTransaction(signedTransaction)
     .catch(throwErr);
   // Call wait synchronously. This will set wallet unavailable until the tx is finished.
-  waitForTx(activeWallet, txResponse);
+  waitForTx(activeWallet, ethersWallet, txResponse, nonce);
   return txResponse;
 };
 
 export const waitForTx = async (
   activeWallet: ActiveWallet,
+  ethersWallet: EthersWallet,
   txResponse: TransactionResponse,
+  nonce: number,
 ) => {
   setWalletAvailable(activeWallet, false);
   await waitTx(txResponse);
+  await storeCurrentNonce(nonce, ethersWallet);
   setWalletAvailable(activeWallet, true);
 };
 

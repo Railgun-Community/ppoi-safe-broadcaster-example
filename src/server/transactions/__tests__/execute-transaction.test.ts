@@ -113,7 +113,7 @@ describe('execute-transaction', () => {
 
   it('Should set wallet unavailable while processing tx', async () => {
     expect(isWalletAvailable(activeWallet)).to.be.true;
-    waitForTx(activeWallet, {} as TransactionResponse);
+    waitForTx(activeWallet, ethersWallet, {} as TransactionResponse, 0);
     expect(isWalletAvailable(activeWallet)).to.be.false;
     // Delay of 10 set in waitTxStub
     await delay(15);

@@ -2,6 +2,7 @@ import { BigNumber, PopulatedTransaction } from 'ethers';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
+import { TransactionGasDetails } from './calculate-transaction-gas';
 
 export type GasEstimateDetails = {
   gasEstimate: BigNumber;
@@ -30,4 +31,11 @@ export const getMaximumGas = (
 ): BigNumber => {
   const gasLimit = calculateGasLimit(gasEstimateDetails.gasEstimate);
   return gasLimit.mul(gasEstimateDetails.gasPrice);
+};
+
+export const getMaximumGasFromTransactionGasDetails = ({
+  gasLimit,
+  gasPrice,
+}: TransactionGasDetails) => {
+  return gasLimit.mul(gasPrice);
 };
