@@ -26,4 +26,5 @@ export type Network = {
   priceTTLInMS: number;
   fees: NetworkFeeSettings;
   isTestNetwork?: boolean;
+  skipQuickScan?: boolean;
 };

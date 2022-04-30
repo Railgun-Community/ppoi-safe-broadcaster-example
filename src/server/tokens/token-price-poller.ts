@@ -42,6 +42,7 @@ const pollPrices = async () => {
       configTokenPriceGetter.tokenPriceGetter,
     );
   } catch (err: any) {
+    logger.warn('pollPrices error');
     logger.error(err);
   } finally {
     await delay(configDefaults.tokenPrices.priceRefreshDelayInMS);

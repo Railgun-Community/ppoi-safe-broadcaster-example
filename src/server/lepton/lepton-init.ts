@@ -25,7 +25,10 @@ export const initLepton = (optDebugger?: LeptonDebugger) => {
   const levelDB = leveldown(configDefaults.lepton.dbDir);
   const leptonDebugger: LeptonDebugger = optDebugger ?? {
     log: (msg: string) => logger.log(msg),
-    error: (error: Error) => logger.error(error),
+    error: (error: Error) => {
+      logger.warn('leptonDebugger error');
+      logger.error(error);
+    },
   };
   lepton = new Lepton(
     levelDB,

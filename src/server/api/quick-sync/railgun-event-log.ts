@@ -1,5 +1,5 @@
 import { CommitmentEvent } from '@railgun-community/lepton/dist/contract/erc20';
-import { Nullifier } from '@railgun-community/lepton/dist/merkletree';
+import { Nullifier } from '@railgun-community/lepton/dist/models/transaction-types';
 import axios from 'axios';
 import { logger } from '../../../util/logger';
 
@@ -48,6 +48,7 @@ export const fetchEventLog = async (
     if (retryCount < NUM_RETRIES) {
       return fetchEventLog(url, retryCount + 1);
     }
+    logger.warn('fetchEventLog error');
     logger.error(error);
     throw new Error(
       'Could not pull historical transactions. Please try again.',

@@ -80,5 +80,6 @@ export default {
     fallbackProviderConfig: fallbackProvidersHardhat,
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,
+    skipQuickScan: true,
   },
 } as NetworksConfig;

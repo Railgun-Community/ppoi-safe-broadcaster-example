@@ -20,7 +20,7 @@
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
     "test": "npm run compile-test && env-cmd --no-override -e all,test mocha 'src/**/__tests__/*.test.ts'",
     "test-coverage": "npm run compile-test && env-cmd --no-override -e all,test nyc mocha 'src/**/__tests__/*.test.ts'",
-    "copy-my-config": "cp -nf ./src/MY-CONFIG.example.ts ./src/MY-CONFIG.ts",
+    "copy-my-config": "cp -n ./src/MY-CONFIG.example.ts ./src/MY-CONFIG.ts",
     "prepare": "npm run copy-my-config && npm run compile"
   },
   "keywords": [],
@@ -30,7 +30,7 @@
     "@ethersproject/providers": "^5.6.4",
     "@ethersproject/shims": "^5.6.0",
     "@noble/ed25519": "^1.6.0",
-    "@railgun-community/lepton": "https://npm.railgun.org/ci/0.0.39/railgun-community-lepton-0.0.39.tgz",
+    "@railgun-community/lepton": "https://npm.railgun.org/ci/0.0.48/railgun-community-lepton-0.0.48.tgz",
     "@walletconnect/jsonrpc-types": "^1.0.0",
     "@walletconnect/jsonrpc-utils": "^1.0.0",
     "axios": "^0.27",

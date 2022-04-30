@@ -20,7 +20,6 @@ export const createLeptonWalletBalancesStub = (
         {
           tree,
           position: 0,
-          index: 0,
           txid: '123',
           spendtxid: '123',
           note: new Note(

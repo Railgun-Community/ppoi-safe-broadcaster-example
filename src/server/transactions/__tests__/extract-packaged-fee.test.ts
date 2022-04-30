@@ -12,7 +12,10 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { AddressData } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
-import { SerializedTransaction } from '@railgun-community/lepton/dist/models/transaction-types';
+import {
+  SerializedTransaction,
+  TokenType,
+} from '@railgun-community/lepton/dist/models/transaction-types';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configDefaults from '../../config/config-defaults';
 import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
@@ -60,7 +63,11 @@ const createRopstenTransaction = async (
   fee: BigNumber,
   tokenAddress: string,
 ): Promise<SerializedTransaction> => {
-  const transaction = new Transaction(tokenAddress, ROPSTEN_CHAIN_ID);
+  const transaction = new Transaction(
+    tokenAddress,
+    TokenType.ERC20,
+    ROPSTEN_CHAIN_ID,
+  );
   transaction.outputs = [
     new Note(addressData, RANDOM, fee.toHexString(), tokenAddress),
   ];
