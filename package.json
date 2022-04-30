@@ -8,7 +8,6 @@
   },
   "files": [
     "dist",
-    "src",
     "*.md"
   ],
   "scripts": {
@@ -21,7 +20,7 @@
     "test": "npm run compile-test && env-cmd --no-override -e all,test mocha 'src/**/__tests__/*.test.ts'",
     "test-coverage": "npm run compile-test && env-cmd --no-override -e all,test nyc mocha 'src/**/__tests__/*.test.ts'",
     "copy-my-config": "cp -n ./src/MY-CONFIG.example.ts ./src/MY-CONFIG.ts",
-    "postinstall": "npm run copy-my-config && npm run compile"
+    "prepare": "npm run compile"
   },
   "keywords": [],
   "author": "",
