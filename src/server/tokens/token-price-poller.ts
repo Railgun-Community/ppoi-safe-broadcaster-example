@@ -22,6 +22,7 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
   const chainIDs = configuredNetworkChainIDs();
   chainIDs.forEach((chainID) => {
     const tokenAddresses = allTokenAddressesForNetwork(chainID);
+    console.log(tokenAddresses);
     const gasTokenAddress = configNetworks[chainID].gasToken.wrappedAddress;
     if (gasTokenAddress) {
       tokenAddresses.push(gasTokenAddress);

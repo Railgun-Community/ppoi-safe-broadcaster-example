@@ -13,8 +13,8 @@ import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../../models/config-models';
 
 const defaultFees = {
-  slippageBuffer: 0.03,
-  profit: 0.07,
+  slippageBuffer: 0.05,
+  profit: 0.1,
 };
 
 export default {

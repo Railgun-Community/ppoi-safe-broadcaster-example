@@ -18,6 +18,5 @@ export const createFallbackProviderFromJsonConfig = (
       provider,
     };
   });
-  const quorum = 1;
-  return new FallbackProvider(providers, quorum);
+  return new FallbackProvider(providers);
 };
