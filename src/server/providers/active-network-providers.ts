@@ -8,8 +8,9 @@ import { logger } from '../../util/logger';
 
 const activeNetworkProviders: NumMapType<FallbackProvider> = {};
 
-export const initNetworkProviders = () => {
-  configuredNetworkChainIDs().forEach((chainID) => {
+export const initNetworkProviders = (chainIDs?: NetworkChainID[]) => {
+  const initChainIDs = chainIDs ?? configuredNetworkChainIDs();
+  initChainIDs.forEach((chainID) => {
     try {
       initNetworkProvider(chainID);
     } catch (err: any) {
