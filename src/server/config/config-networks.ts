@@ -1,6 +1,4 @@
 import { GasTokenWrappedAddress } from '../../models/token-models';
-
-// Fallback Provider configs
 import fallbackProvidersEthereum from './fallback-providers/1-ethereum';
 import fallbackProvidersRopsten from './fallback-providers/3-ropsten';
 import fallbackProvidersBNBSmartChain from './fallback-providers/56-binance-smart-chain';
