@@ -159,7 +159,7 @@ export class WakuRelayer {
     const signature = bytes.hexlify(
       await this.wallet.signWithViewingKey(hexStringToBytes(message)),
     );
-    this.dbg(`Broadcasting fees for chain ${chainID}: `); // , data);
+    this.dbg(`Broadcasting fees for chain ${chainID}:`, fees);
     return {
       data: message,
       signature,
@@ -178,18 +178,18 @@ export class WakuRelayer {
     await this.publish(feeBroadcastData, contentTopic);
   }
 
-  async broadcastFeesOnInterval(interval: number = 1000 * 30) {
+  async broadcastFeesOnInterval(interval: number) {
     if (this.stopping) return;
-    await delay(interval);
     const chainIDs = configuredNetworkChainIDs();
     const broadcastPromises: Promise<void>[] = chainIDs.map((chainID) =>
       this.broadcastFeesForChain(chainID),
     );
     await Promise.all(broadcastPromises);
+    await delay(interval);
     this.broadcastFeesOnInterval(interval);
   }
 
-  async poll(frequency: number = 3000) {
+  async poll(frequency: number) {
     if (this.stopping) return;
     const messages = await this.client
       .getMessages(WAKU_TOPIC, this.subscribedContentTopics)

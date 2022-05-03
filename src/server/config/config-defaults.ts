@@ -83,9 +83,9 @@ export default {
     rpcURL: process.env.WAKU_RPC_URL ?? 'http://localhost:8546',
 
     // Frequency to poll for new messages.
-    pollFrequencyInMS: 10 * 1000,
+    pollFrequencyInMS: 2 * 1000,
 
     // Frequency to broadcast fees.
-    broadcastFeesDelayInMS: 15 * 1000,
+    broadcastFeesDelayInMS: 30 * 1000,
   },
 };

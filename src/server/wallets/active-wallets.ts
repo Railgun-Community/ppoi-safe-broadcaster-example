@@ -56,6 +56,7 @@ export const initWallets = async () => {
       mnemonic,
       derivationPathForIndex(index),
     );
+    // TODO: determine whether wallet is currently busy, set available(false) if so.
     activeWallets.push({
       address: wallet.address,
       pkey: wallet.privateKey,

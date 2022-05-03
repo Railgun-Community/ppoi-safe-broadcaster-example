@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
-import { validateFee } from '../fee-validator';
+import { BAD_TOKEN_FEE_ERROR_MESSAGE, validateFee } from '../fee-validator';
 import {
   cacheUnitFeesForTokens,
   resetTransactionFeeCache,
@@ -73,13 +73,13 @@ describe('fee-validator', () => {
     });
     expect(() =>
       validatePackagedFee(feeCacheID, BigNumber.from(50), BigNumber.from(10)),
-    ).to.throw('Bad token fee.');
+    ).to.throw(BAD_TOKEN_FEE_ERROR_MESSAGE);
   });
 
   it('Should invalidate without a cached or calculated fee', () => {
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(15), BigNumber.from(10)),
-    ).to.throw('Bad token fee.');
+    ).to.throw(BAD_TOKEN_FEE_ERROR_MESSAGE);
   });
 
   it('Should validate if packaged fee > calculated fee', () => {
@@ -109,6 +109,6 @@ describe('fee-validator', () => {
   it('Should invalidate if packaged fee < calculated fee', () => {
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(5), BigNumber.from(10)),
-    ).to.throw('Bad token fee.');
+    ).to.throw(BAD_TOKEN_FEE_ERROR_MESSAGE);
   });
 }).timeout(10000);

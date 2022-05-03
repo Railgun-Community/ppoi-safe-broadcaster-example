@@ -2,6 +2,7 @@ import { BigNumber, PopulatedTransaction } from 'ethers';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
+import { BAD_TOKEN_FEE_ERROR_MESSAGE } from './fee-validator';
 
 export type GasEstimateDetails = {
   gasEstimate: BigNumber;
@@ -22,12 +23,19 @@ export const getEstimateGasDetails = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
 ): Promise<GasEstimateDetails> => {
-  const provider = getProviderForNetwork(chainID);
-  const [gasEstimate, gasPrice] = await Promise.all([
-    provider.estimateGas(populatedTransaction).catch(throwErr),
-    provider.getGasPrice().catch(throwErr),
-  ]);
-  return { gasEstimate, gasPrice };
+  try {
+    const provider = getProviderForNetwork(chainID);
+    const [gasEstimate, gasPrice] = await Promise.all([
+      provider.estimateGas(populatedTransaction).catch(throwErr),
+      provider.getGasPrice().catch(throwErr),
+    ]);
+    return { gasEstimate, gasPrice };
+  } catch (err) {
+    if (err.message && err.message.includes('failed to meet quorum')) {
+      throw new Error(BAD_TOKEN_FEE_ERROR_MESSAGE);
+    }
+    throw err;
+  }
 };
 
 export const getMaximumGas = (
