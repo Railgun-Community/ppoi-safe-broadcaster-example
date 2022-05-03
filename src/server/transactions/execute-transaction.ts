@@ -4,8 +4,10 @@ import { ActiveWallet } from '../../models/wallet-models';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
-import { TransactionGasDetails } from '../fees/calculate-transaction-gas';
-import { getMaximumGasFromTransactionGasDetails } from '../fees/gas-estimate';
+import {
+  getMaximumGasFromTransactionGasDetails,
+  TransactionGasDetails,
+} from '../fees/gas-estimate';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
 import { setWalletAvailable } from '../wallets/available-wallets';

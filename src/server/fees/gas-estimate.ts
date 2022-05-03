@@ -2,10 +2,14 @@ import { BigNumber, PopulatedTransaction } from 'ethers';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { TransactionGasDetails } from './calculate-transaction-gas';
 
 export type GasEstimateDetails = {
   gasEstimate: BigNumber;
+  gasPrice: BigNumber;
+};
+
+export type TransactionGasDetails = {
+  gasLimit: BigNumber;
   gasPrice: BigNumber;
 };
 

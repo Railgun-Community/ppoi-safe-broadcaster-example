@@ -8,12 +8,7 @@ import {
   getRoundedTokenToGasPriceRatio,
   getTransactionTokenToGasDecimalRatio,
 } from './calculate-token-fee';
-import { calculateGasLimit } from './gas-estimate';
-
-export type TransactionGasDetails = {
-  gasLimit: BigNumber;
-  gasPrice: BigNumber;
-};
+import { calculateGasLimit, TransactionGasDetails } from './gas-estimate';
 
 export const createTransactionGasDetails = (
   chainID: NetworkChainID,
