@@ -29,7 +29,7 @@
     "@ethersproject/providers": "^5.6.4",
     "@ethersproject/shims": "^5.6.0",
     "@noble/ed25519": "^1.6.0",
-    "@railgun-community/lepton": "https://npm.railgun.org/ci/0.0.48/railgun-community-lepton-0.0.48.tgz",
+    "@railgun-community/lepton": "https://npm.railgun.org/ci/1.0.0/railgun-community-lepton-1.0.0.tgz",
     "@walletconnect/jsonrpc-types": "^1.0.0",
     "@walletconnect/jsonrpc-utils": "^1.0.0",
     "axios": "^0.27",
