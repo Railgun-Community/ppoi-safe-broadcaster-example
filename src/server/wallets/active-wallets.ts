@@ -58,8 +58,7 @@ export const initWallets = async () => {
     );
     activeWallets.push({
       address: wallet.address,
-      privateKey: wallet.privateKey,
-      mnemonic,
+      pkey: wallet.privateKey,
       priority,
       index,
     });
@@ -90,7 +89,7 @@ export const createEthersWallet = (
   activeWallet: ActiveWallet,
   provider: BaseProvider,
 ): EthersWallet => {
-  return new EthersWallet(activeWallet.privateKey, provider);
+  return new EthersWallet(activeWallet.pkey, provider);
 };
 
 export const getActiveWallets = (): ActiveWallet[] => {
