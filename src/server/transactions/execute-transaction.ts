@@ -1,4 +1,5 @@
 import { TransactionResponse } from '@ethersproject/providers';
+import debug from 'debug';
 import { PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
 import { ActiveWallet } from '../../models/wallet-models';
 import { throwErr } from '../../util/promise-utils';
@@ -12,6 +13,8 @@ import { getProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
 import { setWalletAvailable } from '../wallets/available-wallets';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
+
+const dbg = debug('relayer:transact:execute');
 
 const LAST_NONCE_KEY = 'last_nonce_key';
 
@@ -44,11 +47,15 @@ export const executeTransaction = async (
   populatedTransaction: PopulatedTransaction,
   gasDetails: TransactionGasDetails,
 ): Promise<TransactionResponse> => {
+  dbg('Execute transaction');
+
   const maximumGas = getMaximumGasFromTransactionGasDetails(gasDetails);
   const activeWallet = await getBestMatchWalletForNetwork(chainID, maximumGas);
   const provider = getProviderForNetwork(chainID);
   const ethersWallet = createEthersWallet(activeWallet, provider);
   const nonce = await getCurrentNonce(ethersWallet);
+  dbg('Nonce', nonce);
+
   const finalTransaction: PopulatedTransaction = {
     ...populatedTransaction,
     gasLimit: gasDetails.gasLimit,
@@ -58,9 +65,13 @@ export const executeTransaction = async (
   const signedTransaction = await ethersWallet.signTransaction(
     finalTransaction,
   );
+  dbg('Signed transaction');
+
   const txResponse = await provider
     .sendTransaction(signedTransaction)
     .catch(throwErr);
+  dbg(`Submitted transaction: ${txResponse.hash}`);
+
   // Call wait synchronously. This will set wallet unavailable until the tx is finished.
   waitForTx(activeWallet, ethersWallet, txResponse, nonce);
   return txResponse;
@@ -74,6 +85,7 @@ export const waitForTx = async (
 ) => {
   setWalletAvailable(activeWallet, false);
   await waitTx(txResponse);
+  dbg(`Transaction completed/mined: ${txResponse.hash}`);
   await storeCurrentNonce(nonce, ethersWallet);
   setWalletAvailable(activeWallet, true);
 };

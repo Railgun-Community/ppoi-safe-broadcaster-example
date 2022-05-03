@@ -31,7 +31,7 @@ export type RawParamsTransact = {
 
 const handledClientPubKeys: string[] = [];
 
-const dbg = debug('relayer:waku:transact');
+const dbg = debug('relayer:transact');
 
 export const transactMethod = async (
   params: WakuMethodParamsTransact,
