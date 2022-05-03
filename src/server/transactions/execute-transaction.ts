@@ -84,11 +84,15 @@ export const waitForTx = async (
   txResponse: TransactionResponse,
   nonce: number,
 ) => {
-  setWalletAvailable(activeWallet, chainID, false);
-  await waitTx(txResponse);
-  dbg(`Transaction completed/mined: ${txResponse.hash}`);
-  await storeCurrentNonce(nonce, ethersWallet);
-  setWalletAvailable(activeWallet, chainID, true);
+  try {
+    setWalletAvailable(activeWallet, chainID, false);
+    await waitTx(txResponse);
+    dbg(`Transaction completed/mined: ${txResponse.hash}`);
+    await storeCurrentNonce(nonce, ethersWallet);
+    setWalletAvailable(activeWallet, chainID, true);
+  } catch (err) {
+    dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
+  }
 };
 
 // Separated so it can be stubbed for tests.
