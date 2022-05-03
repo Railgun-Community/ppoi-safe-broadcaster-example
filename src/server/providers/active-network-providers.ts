@@ -8,18 +8,23 @@ import { logger } from '../../util/logger';
 
 const activeNetworkProviders: NumMapType<FallbackProvider> = {};
 
-export const initNetworkProviders = (chainIDs?: NetworkChainID[]) => {
+export const initNetworkProviders = async (chainIDs?: NetworkChainID[]) => {
   const initChainIDs = chainIDs ?? configuredNetworkChainIDs();
-  initChainIDs.forEach((chainID) => {
+  for (const chainID of initChainIDs) {
     try {
-      initNetworkProvider(chainID);
+      // eslint-disable-next-line no-await-in-loop
+      await initNetworkProvider(chainID);
     } catch (err: any) {
       logger.warn(`Could not init network ${chainID}. ${err.message}`);
     }
-  });
+  }
 };
 
-const initNetworkProvider = (chainID: NetworkChainID) => {
+/**
+ * Note: This call is async, but you may call it synchronously
+ * so it will run the slow scan in the background.
+ */
+const initNetworkProvider = async (chainID: NetworkChainID) => {
   const network = configNetworks[chainID];
   if (!network) {
     return;
@@ -34,7 +39,7 @@ const initNetworkProvider = (chainID: NetworkChainID) => {
     fallbackProviderConfig,
   );
   activeNetworkProviders[chainID] = fallbackProvider;
-  initLeptonNetwork(chainID, fallbackProvider);
+  await initLeptonNetwork(chainID, fallbackProvider);
   logger.log(`Loaded network ${chainID}`);
 };
 

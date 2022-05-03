@@ -38,7 +38,11 @@ export const initLepton = (optDebugger?: LeptonDebugger) => {
   );
 };
 
-export const initLeptonNetwork = (
+/**
+ * Note: This call is async, but you may call it synchronously
+ * so it will run the slow scan in the background.
+ */
+export const initLeptonNetwork = async (
   chainID: NetworkChainID,
   provider: FallbackProvider,
 ) => {
@@ -51,9 +55,7 @@ export const initLeptonNetwork = (
   const deploymentBlock = network.deploymentBlock ?? 0;
 
   try {
-    // Note: This call is async, but we call it synchronously
-    // so it runs the slow scan in the background.
-    lepton.loadNetwork(
+    await lepton.loadNetwork(
       chainID,
       network.proxyContract,
       provider,

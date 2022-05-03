@@ -14,7 +14,7 @@ export const initRelayerModules = async (forTest = false) => {
   }
   initSettingsDB();
   initLepton();
-  initNetworkProviders();
+  await initNetworkProviders();
   await Promise.all([initWallets(), initTokens()]);
   initPricePoller();
   logger.log('Relayer ready.');
