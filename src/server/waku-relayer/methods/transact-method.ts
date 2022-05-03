@@ -31,15 +31,17 @@ export type RawParamsTransact = {
 
 const handledClientPubKeys: string[] = [];
 
+const dbg = debug('relayer:waku:transact');
+
 export const transactMethod = async (
   params: WakuMethodParamsTransact,
   id: number,
-  logger: debug.Debugger,
 ): Promise<Optional<WakuMethodResponse>> => {
   const { pubkey: clientPubKey, encryptedData } = params;
 
   if (handledClientPubKeys.includes(clientPubKey)) {
     // Client sent a repeated message. Ignore because we've already handled it.
+    dbg('Repeat message - already handled');
     return undefined;
   }
   handledClientPubKeys.push(clientPubKey);
@@ -50,6 +52,7 @@ export const transactMethod = async (
   const decrypted = await tryDecryptData(encryptedData, sharedKey);
   if (decrypted === null) {
     // Incorrect key. Skipping transact message.
+    dbg('Cannot decrypt - Not intended receiver');
     return undefined;
   }
 
@@ -59,6 +62,8 @@ export const transactMethod = async (
     serializedTransaction,
     relayerViewingKey,
   } = decrypted as RawParamsTransact;
+
+  dbg('Decrypted - attempting to transact');
 
   const { viewingPublicKey } = getRailgunAddressData();
   if (relayerViewingKey !== hexlify(viewingPublicKey)) {
@@ -71,12 +76,10 @@ export const transactMethod = async (
       feeCacheID,
       serializedTransaction,
     );
-    logger('txResponse');
-    logger(txResponse);
-
+    dbg(txResponse);
     return resultResponse(id, chainID, sharedKey, txResponse);
   } catch (err: any) {
-    logger(err);
+    dbg(err);
     return errorResponse(id, chainID, sharedKey, err);
   }
 };

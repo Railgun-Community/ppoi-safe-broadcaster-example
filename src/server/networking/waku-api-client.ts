@@ -18,25 +18,25 @@ export enum WakuRequestMethods {
   PublishSubscription = 'post_waku_v2_relay_v1_subscriptions',
   PublishMessage = 'post_waku_v2_relay_v1_message',
   GetMessages = 'get_waku_v2_relay_v1_messages',
-  DeleteSubscriptions = 'delete_waku_v2_relay_v1_subscriptions'
+  DeleteSubscriptions = 'delete_waku_v2_relay_v1_subscriptions',
 }
 
 const MAX_RETRIES = 4;
 
 export class WakuApiClient {
-  logger: debug.Debugger;
+  dbg: debug.Debugger;
 
   http: AxiosInstance;
 
   constructor(options: WakuApiClientOptions) {
-    this.logger = debug('waku:jsonrpc-api');
+    this.dbg = debug('waku:jsonrpc-api');
     const httpConfig = {
       timeout: 10000,
       baseURL: options.url,
       headers: { 'Content-Type': 'application/json' },
     };
     this.http = axios.create(httpConfig);
-    this.logger('Relaying via ', options.url);
+    this.dbg('Relaying via ', options.url);
   }
 
   async request(method: string, params: any, retry = 0): Promise<any> {
@@ -46,10 +46,10 @@ export class WakuApiClient {
       return response.data;
     } catch (e: any) {
       if (retry < MAX_RETRIES) {
-        this.logger('Error posting to relay-api. Retrying.', req, e.message);
+        this.dbg('Error posting to relay-api. Retrying.', req, e.message);
         return this.request(method, params, retry + 1);
       }
-      this.logger('Error posting to relay-api', req, e.message);
+      this.dbg('Error posting to relay-api', req, e.message);
       throw Error(e.message);
     }
   }
@@ -61,20 +61,22 @@ export class WakuApiClient {
       return result.listenAddresses;
     }
     if (error) {
-      this.logger(error.message);
+      this.dbg(error.message);
     }
     return [];
   }
 
   async unsubscribe(topics: string[]) {
-    this.logger('unsubscribing from topics', topics);
-    const data = await this.request(WakuRequestMethods.DeleteSubscriptions, [topics]);
+    this.dbg('unsubscribing from topics', topics);
+    const data = await this.request(WakuRequestMethods.DeleteSubscriptions, [
+      topics,
+    ]);
     const { result } = data;
     return result;
   }
 
   async subscribe(topics: string[]) {
-    this.logger('subscribing to topics', topics);
+    this.dbg('subscribing to topics', topics);
     const data = await this.request(WakuRequestMethods.PublishSubscription, [
       topics,
     ]);
@@ -89,13 +91,13 @@ export class WakuApiClient {
    */
   async publish(message: WakuMessage, topic: string) {
     if (!message.payload) {
-      this.logger('Tried to pubish empty message');
+      this.dbg('Tried to pubish empty message');
       return false;
     }
     const { timestamp } = message;
     const payload = Buffer.from(message.payload).toString('hex');
     const { contentTopic } = message;
-    this.logger('publishing to contentTopic', contentTopic);
+    this.dbg('publishing to contentTopic', contentTopic);
     const data = await this.request(WakuRequestMethods.PublishMessage, [
       topic,
       { payload, timestamp, contentTopic },

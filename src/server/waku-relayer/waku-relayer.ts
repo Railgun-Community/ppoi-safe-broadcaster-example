@@ -33,7 +33,6 @@ export type FeeMessage = {
 type JsonRPCMessageHandler = (
   params: any,
   id: number,
-  logger: debug.Debugger,
 ) => Promise<Optional<WakuMethodResponse>>;
 
 export enum WakuMethodNames {
@@ -121,12 +120,11 @@ export class WakuRelayer {
       const decoded = WakuRelayer.decode(payload);
       const request = JSON.parse(decoded);
       const { method, params, id } = request;
-      this.dbg(request);
 
       if (method in this.methods) {
         const age = Date.now() - timestamp;
-        this.dbg(`handling message on ${contentTopic} (${age}ms old)`);
-        const response = await this.methods[method](params, id, this.dbg);
+        this.dbg(`Received message on ${contentTopic}`);
+        const response = await this.methods[method](params, id);
         if (response) {
           this.dbg(response);
           await this.publish(response.rpcResult, response.contentTopic);
