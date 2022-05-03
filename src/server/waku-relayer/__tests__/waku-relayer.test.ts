@@ -61,6 +61,11 @@ import {
 } from '../../wallets/active-wallets';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
+import {
+  createGasBalanceStub,
+  restoreGasBalanceStub,
+} from '../../../test/stubs/ethers-provider-stubs.test';
+import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -110,6 +115,7 @@ describe('waku-relayer', () => {
       feeExpiration: configDefaults.transactionFees.feeExpirationInMS,
     });
     clientHTTPStub.resetHistory();
+    createGasBalanceStub(BigNumber.from(10).pow(18));
   });
 
   beforeEach(() => {
@@ -127,6 +133,8 @@ describe('waku-relayer', () => {
     resetTokenPriceCache();
     resetTransactionFeeCache();
     wakuRelayer = undefined;
+    resetGasTokenBalanceCache();
+    restoreGasBalanceStub();
   });
 
   it('Should test fee broadcast', async () => {
@@ -181,7 +189,7 @@ describe('waku-relayer', () => {
       decodedRailAddress.viewingPublicKey,
     );
     expect(isValid).to.be.true;
-  });
+  }).timeout(5000);
 
   it('Should encrypt and decrypt data using shared keys', async () => {
     const relayerPrivateKey = getRailgunPrivateViewingKey();
@@ -293,5 +301,5 @@ describe('waku-relayer', () => {
       sharedKey,
     );
     expect(resultData).to.deep.equal(expectedResultData);
-  });
+  }).timeout(5000);
 }).timeout(10000);

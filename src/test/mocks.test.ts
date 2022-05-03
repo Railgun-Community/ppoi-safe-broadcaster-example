@@ -73,6 +73,7 @@ export const getMockNetwork = (): Network => {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
+      minimumBalanceForAvailability: 0.1,
     },
     fees: {
       slippageBuffer: 0.05,
@@ -91,6 +92,7 @@ export const getMockRopstenNetwork = (): Network => {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: '0x00',
+      minimumBalanceForAvailability: 0.1,
     },
     fees: {
       slippageBuffer: 0.05,

@@ -23,6 +23,7 @@ export default {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
+      minimumBalanceForAvailability: 0.1,
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.Ethereum,
@@ -35,6 +36,7 @@ export default {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: GasTokenWrappedAddress.RopstenWETH,
+      minimumBalanceForAvailability: 0.1,
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.Ropsten,
@@ -48,6 +50,7 @@ export default {
     gasToken: {
       symbol: 'BNB',
       wrappedAddress: GasTokenWrappedAddress.BinanceWBNB,
+      minimumBalanceForAvailability: 0.1,
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.BNBSmartChain,
@@ -60,6 +63,7 @@ export default {
     gasToken: {
       symbol: 'MATIC',
       wrappedAddress: GasTokenWrappedAddress.PolygonWMATIC,
+      minimumBalanceForAvailability: 0.1,
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.PolygonPOS,
@@ -72,6 +76,7 @@ export default {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: GasTokenWrappedAddress.None,
+      minimumBalanceForAvailability: 0.1,
     },
     fees: defaultFees,
     proxyContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',

@@ -13,6 +13,7 @@ export const GAS_TOKEN_DECIMALS = 18;
 export type GasTokenConfig = {
   wrappedAddress: GasTokenWrappedAddress | string;
   symbol: string;
+  minimumBalanceForAvailability: number;
 };
 
 export type TokenConfig = {

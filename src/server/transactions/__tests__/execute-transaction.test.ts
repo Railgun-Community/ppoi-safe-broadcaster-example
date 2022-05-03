@@ -38,6 +38,11 @@ import { isWalletAvailable } from '../../wallets/available-wallets';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import configNetworks from '../../config/config-networks';
 import { TransactionGasDetails } from '../../fees/gas-estimate';
+import {
+  createGasBalanceStub,
+  restoreGasBalanceStub,
+} from '../../../test/stubs/ethers-provider-stubs.test';
+import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -76,6 +81,11 @@ describe('execute-transaction', () => {
       .resolves(activeWallet);
   });
 
+  afterEach(() => {
+    resetGasTokenBalanceCache();
+    restoreGasBalanceStub();
+  });
+
   after(() => {
     walletGetTransactionCountStub.restore();
     sendTransactionStub.restore();
@@ -112,11 +122,21 @@ describe('execute-transaction', () => {
   });
 
   it('Should set wallet unavailable while processing tx', async () => {
-    expect(isWalletAvailable(activeWallet)).to.be.true;
-    waitForTx(activeWallet, ethersWallet, {} as TransactionResponse, 0);
-    expect(isWalletAvailable(activeWallet)).to.be.false;
+    createGasBalanceStub(BigNumber.from(10).pow(18));
+    expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
+      .true;
+    waitForTx(
+      activeWallet,
+      ethersWallet,
+      NetworkChainID.Ropsten,
+      {} as TransactionResponse,
+      0,
+    );
+    expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
+      .false;
     // Delay of 10 set in waitTxStub
     await delay(15);
-    expect(isWalletAvailable(activeWallet)).to.be.true;
+    expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
+      .true;
   });
 }).timeout(120000);

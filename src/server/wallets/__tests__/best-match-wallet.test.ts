@@ -43,13 +43,13 @@ describe('best-match-wallet', () => {
     initLepton();
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
-      .resolves(BigNumber.from(500));
+      .resolves(BigNumber.from(10).pow(18));
     configNetworks[NetworkChainID.Ethereum] = getMockNetwork();
     initNetworkProviders();
   });
 
   afterEach(() => {
-    resetAvailableWallets();
+    resetAvailableWallets(MOCK_CHAIN_ID);
   });
 
   after(() => {
@@ -109,7 +109,7 @@ describe('best-match-wallet', () => {
       getMockProvider(),
     );
     expect(firstWallet.address).to.equal(addressForIndex(0));
-    setWalletAvailable(firstActiveWallet, false);
+    setWalletAvailable(firstActiveWallet, MOCK_CHAIN_ID, false);
 
     const bestWallet = await getBestMatchWalletForNetwork(
       MOCK_CHAIN_ID,
@@ -131,7 +131,7 @@ describe('best-match-wallet', () => {
     await initWallets();
 
     const firstWallet = getActiveWallets()[0];
-    setWalletAvailable(firstWallet, false);
+    setWalletAvailable(firstWallet, MOCK_CHAIN_ID, false);
 
     await expect(
       getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(100)),
@@ -151,7 +151,7 @@ describe('best-match-wallet', () => {
     await initWallets();
 
     await expect(
-      getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(1000)),
+      getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(10).pow(19)),
     ).to.be.rejectedWith('All wallets busy or out of funds.');
   }).timeout(10000);
 }).timeout(20000);

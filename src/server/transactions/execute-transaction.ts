@@ -73,21 +73,22 @@ export const executeTransaction = async (
   dbg(`Submitted transaction: ${txResponse.hash}`);
 
   // Call wait synchronously. This will set wallet unavailable until the tx is finished.
-  waitForTx(activeWallet, ethersWallet, txResponse, nonce);
+  waitForTx(activeWallet, ethersWallet, chainID, txResponse, nonce);
   return txResponse;
 };
 
 export const waitForTx = async (
   activeWallet: ActiveWallet,
   ethersWallet: EthersWallet,
+  chainID: NetworkChainID,
   txResponse: TransactionResponse,
   nonce: number,
 ) => {
-  setWalletAvailable(activeWallet, false);
+  setWalletAvailable(activeWallet, chainID, false);
   await waitTx(txResponse);
   dbg(`Transaction completed/mined: ${txResponse.hash}`);
   await storeCurrentNonce(nonce, ethersWallet);
-  setWalletAvailable(activeWallet, true);
+  setWalletAvailable(activeWallet, chainID, true);
 };
 
 // Separated so it can be stubbed for tests.

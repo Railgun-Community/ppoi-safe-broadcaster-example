@@ -1,10 +1,11 @@
 import { BigNumber } from 'ethers';
+import { formatUnits } from '@ethersproject/units';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
-import { getActiveWallets } from '../wallets/active-wallets';
 import { getGasTokenBalance } from './gas-token-balance';
+import { ActiveWallet } from '../../models/wallet-models';
 
 type CachedBalance = {
   balance: BigNumber;
@@ -21,8 +22,11 @@ export const resetGasTokenBalanceCache = () => {
 export const updateCachedGasTokenBalance = async (
   chainID: NetworkChainID,
   walletAddress: string,
-) => {
+): Promise<void> => {
   const balance = await getGasTokenBalance(chainID, walletAddress);
+  if (balance == null) {
+    return;
+  }
   if (!gasTokenBalanceCache[chainID]) {
     gasTokenBalanceCache[chainID] = {};
   }
@@ -32,8 +36,9 @@ export const updateCachedGasTokenBalance = async (
   };
 };
 
-export const updateAllActiveWalletsGasTokenBalances = async () => {
-  const activeWallets = getActiveWallets();
+export const updateAllActiveWalletsGasTokenBalances = async (
+  activeWallets: ActiveWallet[],
+) => {
   const balanceUpdatePromises: Promise<void>[] = [];
 
   configuredNetworkChainIDs().forEach((chainID) => {
@@ -74,9 +79,8 @@ export const getCachedGasTokenBalance = async (
 
 export const getActiveWalletGasTokenBalanceMapForChain = async (
   chainID: NetworkChainID,
+  activeWallets: ActiveWallet[],
 ): Promise<MapType<BigNumber>> => {
-  const activeWallets = getActiveWallets();
-
   const getBalancePromises: Promise<BigNumber>[] = [];
   activeWallets.forEach(({ address }) => {
     getBalancePromises.push(getCachedGasTokenBalance(chainID, address));
@@ -84,9 +88,21 @@ export const getActiveWalletGasTokenBalanceMapForChain = async (
   const balances = await Promise.all(getBalancePromises);
 
   const balanceMap: MapType<BigNumber> = {};
-  activeWallets.forEach(({ address }, index) => {
-    balanceMap[address] = balances[index];
+  activeWallets.forEach((activeWallet, index) => {
+    balanceMap[activeWallet.address] = balances[index];
   });
 
   return balanceMap;
+};
+
+export const convertToReadableGasTokenBalanceMap = (
+  gasTokenBalanceMap: MapType<BigNumber>,
+) => {
+  const addresses = Object.keys(gasTokenBalanceMap);
+  const readableMap: MapType<string> = {};
+  const decimals = 18;
+  addresses.forEach((address) => {
+    readableMap[address] = formatUnits(gasTokenBalanceMap[address], decimals);
+  });
+  return readableMap;
 };

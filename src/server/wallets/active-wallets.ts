@@ -6,17 +6,26 @@ import {
   AddressData,
   decode,
 } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
+import debug from 'debug';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
 import { resetArray } from '../../util/utils';
 import { getLepton } from '../lepton/lepton-init';
 import { isWalletAvailable } from './available-wallets';
+import {
+  convertToReadableGasTokenBalanceMap,
+  getActiveWalletGasTokenBalanceMapForChain,
+} from '../balances/balance-cache';
+import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
+import configNetworks from '../config/config-networks';
 
 const activeWallets: ActiveWallet[] = [];
 
 let railgunWallet: RailgunWallet;
 let railgunWalletAnyAddress: string;
+
+const dbg = debug('relayer:wallets');
 
 export const resetWallets = () => {
   resetArray(activeWallets);
@@ -65,6 +74,26 @@ export const initWallets = async () => {
     });
   });
   await initRailgunWallet(mnemonic);
+  printDebugWalletData();
+};
+
+const printDebugWalletData = () => {
+  dbg(
+    'Loaded public wallets:',
+    activeWallets.map((w) => w.address),
+  );
+  dbg('Loaded private wallet:', railgunWalletAnyAddress);
+
+  configuredNetworkChainIDs().forEach(async (chainID) => {
+    const gasTokenBalanceMap = await getActiveWalletGasTokenBalanceMapForChain(
+      chainID,
+      activeWallets,
+    );
+    const gasToken = configNetworks[chainID].gasToken.symbol;
+    const gasTokenBalanceMapReadable =
+      convertToReadableGasTokenBalanceMap(gasTokenBalanceMap);
+    dbg(`Chain ${chainID}, ${gasToken} balances:`, gasTokenBalanceMapReadable);
+  });
 };
 
 export const getRailgunWallet = (): RailgunWallet => {
@@ -100,7 +129,11 @@ export const getActiveWallets = (): ActiveWallet[] => {
   return activeWallets;
 };
 
-export const numAvailableWallets = (): number => {
-  return getActiveWallets().filter((wallet) => isWalletAvailable(wallet))
-    .length;
+export const numAvailableWallets = async (
+  chainID: NetworkChainID,
+): Promise<number> => {
+  const walletAvailability = await Promise.all(
+    getActiveWallets().map((wallet) => isWalletAvailable(wallet, chainID)),
+  );
+  return walletAvailability.filter((available) => available).length;
 };

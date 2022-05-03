@@ -7,13 +7,13 @@ import { throwErr } from '../../util/promise-utils';
 export const getGasTokenBalance = async (
   chainID: NetworkChainID,
   walletAddress: string,
-): Promise<BigNumber> => {
+): Promise<Optional<BigNumber>> => {
   try {
     const provider = getProviderForNetwork(chainID);
     const balance = await provider.getBalance(walletAddress).catch(throwErr);
     return balance;
   } catch (err: any) {
-    logger.warn(`Could not get gas token balance: ${err.message}`);
-    return BigNumber.from(0);
+    logger.error(new Error(`Could not get gas token balance: ${err.message}`));
+    return undefined;
   }
 };

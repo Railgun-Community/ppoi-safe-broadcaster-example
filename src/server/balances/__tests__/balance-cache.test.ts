@@ -47,9 +47,9 @@ describe('balance-cache', () => {
   });
 
   it('Should update gas token balance cache for all chains', async () => {
-    const firstWalletAddress = getActiveWallets()[0].address;
-
-    await updateAllActiveWalletsGasTokenBalances();
+    const activeWallets = getActiveWallets();
+    const firstWalletAddress = activeWallets[0].address;
+    await updateAllActiveWalletsGasTokenBalances(activeWallets);
     expect(shouldUpdateEthWalletBalance(firstWalletAddress)).to.be.false;
     const ethBalance = await getCachedGasTokenBalance(
       NetworkChainID.Ethereum,

@@ -146,14 +146,17 @@ export class WakuRelayer {
     tokenAddresses.forEach((tokenAddress) => {
       feesHex[tokenAddress] = fees[tokenAddress].toHexString();
     });
+
+    // Availability must be accurate or Relayer risks automatic blocking by clients.
+    const availableWallets = await numAvailableWallets(chainID);
+
     const data: FeeMessageData = {
       fees: feesHex,
       // client can't rely on message timestamp to calculate expiration
       feeExpiration: Date.now() + this.options.feeExpiration,
       feesID: feeCacheID,
       railAddress: this.walletRailAddress,
-      // Availability must be accurate or Relayer risks automatic blocking by clients.
-      availableWallets: numAvailableWallets(),
+      availableWallets,
     };
     const message = bytes.fromUTF8String(JSON.stringify(data));
     const signature = bytes.hexlify(
