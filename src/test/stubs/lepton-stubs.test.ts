@@ -24,7 +24,7 @@ export const createLeptonWalletBalancesStub = (
           spendtxid: '123',
           note: new Note(
             addressData,
-            '123',
+            '12345678901234561234567890123456',
             '1000000000000000000000',
             tokenAddressHexlify,
           ),

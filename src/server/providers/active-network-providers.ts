@@ -8,16 +8,17 @@ import { logger } from '../../util/logger';
 
 const activeNetworkProviders: NumMapType<FallbackProvider> = {};
 
+// eslint-disable-next-line require-await
 export const initNetworkProviders = async (chainIDs?: NetworkChainID[]) => {
   const initChainIDs = chainIDs ?? configuredNetworkChainIDs();
-  for (const chainID of initChainIDs) {
+  initChainIDs.forEach(async (chainID) => {
     try {
       // eslint-disable-next-line no-await-in-loop
       await initNetworkProvider(chainID);
     } catch (err: any) {
       logger.warn(`Could not init network ${chainID}. ${err.message}`);
     }
-  }
+  });
 };
 
 /**

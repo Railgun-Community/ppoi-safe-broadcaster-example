@@ -76,7 +76,6 @@ export const transactMethod = async (
       feeCacheID,
       serializedTransaction,
     );
-    dbg(txResponse);
     return resultResponse(id, chainID, sharedKey, txResponse);
   } catch (err: any) {
     dbg(err);
@@ -90,15 +89,8 @@ const resultResponse = (
   sharedKey: Uint8Array,
   txResponse: TransactionResponse,
 ): WakuMethodResponse => {
-  const encryptedResponse = encryptResponseData(
-    { txHash: txResponse.hash },
-    sharedKey,
-  );
-  const rpcResult = formatJsonRpcResult(id, encryptedResponse);
-  return {
-    rpcResult,
-    contentTopic: contentTopics.transactResponse(chainID),
-  };
+  const response = { txHash: txResponse.hash };
+  return encryptedRPCResponse(response, id, chainID, sharedKey);
 };
 
 const errorResponse = (
@@ -117,12 +109,20 @@ const errorResponse = (
       sanitizedErrorMessage = 'Unknown Relayer error.';
       break;
   }
-  const encryptedResponse = encryptResponseData(
-    {
-      error: sanitizedErrorMessage,
-    },
-    sharedKey,
-  );
+  const response = {
+    error: sanitizedErrorMessage,
+  };
+  return encryptedRPCResponse(response, id, chainID, sharedKey);
+};
+
+const encryptedRPCResponse = (
+  response: object,
+  id: number,
+  chainID: NetworkChainID,
+  sharedKey: Uint8Array,
+) => {
+  dbg('Response:', response);
+  const encryptedResponse = encryptResponseData(response, sharedKey);
   const rpcResult = formatJsonRpcResult(id, encryptedResponse);
   return {
     rpcResult,

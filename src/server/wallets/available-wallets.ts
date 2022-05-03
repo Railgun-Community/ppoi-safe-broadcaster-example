@@ -11,7 +11,7 @@ export const setWalletAvailable = (
   available: boolean,
 ) => {
   unavailableWalletMap[wallet.address] = !available;
-  dbg(`Update wallet ${wallet.address} availability:`, available);
+  dbg(`Set wallet ${wallet.address}:`, available ? 'AVAILABLE' : 'BUSY');
 };
 
 export const isWalletAvailable = (wallet: ActiveWallet) => {

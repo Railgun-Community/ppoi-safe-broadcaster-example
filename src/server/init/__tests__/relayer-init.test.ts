@@ -25,7 +25,7 @@ describe('relayer-init', () => {
       .resolves();
     const stubInitNetworkProviders = sinon
       .stub(activeProvidersModule, 'initNetworkProviders')
-      .returns();
+      .resolves();
     const stubInitPricePoller = sinon
       .stub(activeTokenPricePollerModule, 'initPricePoller')
       .returns();

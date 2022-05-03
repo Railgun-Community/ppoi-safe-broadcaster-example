@@ -6,6 +6,7 @@ import { Transaction } from '@railgun-community/lepton/dist/transaction';
 import {
   hexlify,
   padToLength,
+  random,
 } from '@railgun-community/lepton/dist/utils/bytes';
 import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
 import chai from 'chai';
@@ -49,12 +50,12 @@ const { expect } = chai;
 let lepton: Lepton;
 let contract: ERC20RailgunContract;
 let railgunWallet: RailgunWallet;
-const RANDOM =
-  '1e686e7506b0f4f21d6991b4cb58d39e77c31ed0577a986750c8dce8804af5b9';
+const RANDOM = random(16);
 const MOCK_TOKEN_ADDRESS = getMockToken().address;
 
 const TREE = 0;
 const ROPSTEN_CHAIN_ID = NetworkChainID.Ropsten;
+const HARDHAT_CHAIN_ID = NetworkChainID.HardHat;
 const MOCK_MNEMONIC_1 =
   'tag net body theory divert appear trip topple valve wall dog whisper';
 
@@ -87,7 +88,8 @@ describe('extract-packaged-fee', () => {
 
     const ropstenNetwork = getMockRopstenNetwork();
     const { proxyContract } = ropstenNetwork;
-    initNetworkProviders();
+    // Async call - run sync
+    initNetworkProviders([ROPSTEN_CHAIN_ID, HARDHAT_CHAIN_ID]);
     const provider = getProviderForNetwork(ROPSTEN_CHAIN_ID);
 
     // Note: this call is typically async but we won't wait for the full call.

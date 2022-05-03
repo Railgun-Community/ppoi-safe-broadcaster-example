@@ -30,7 +30,6 @@ import {
   initSettingsDB,
 } from '../../db/settings-db';
 import { NetworkChainID } from '../../config/config-chain-ids';
-import { TransactionGasDetails } from '../../fees/calculate-transaction-gas';
 import { delay } from '../../../util/promise-utils';
 import * as ExecuteTransactionModule from '../execute-transaction';
 import * as BestWalletMatchModule from '../../wallets/best-match-wallet';
@@ -38,6 +37,7 @@ import { ActiveWallet } from '../../../models/wallet-models';
 import { isWalletAvailable } from '../../wallets/available-wallets';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import configNetworks from '../../config/config-networks';
+import { TransactionGasDetails } from '../../fees/gas-estimate';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

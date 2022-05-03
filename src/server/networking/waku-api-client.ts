@@ -97,7 +97,7 @@ export class WakuApiClient {
     const { timestamp } = message;
     const payload = Buffer.from(message.payload).toString('hex');
     const { contentTopic } = message;
-    this.dbg('publishing to contentTopic', contentTopic);
+    // this.dbg('publishing to contentTopic', contentTopic);
     const data = await this.request(WakuRequestMethods.PublishMessage, [
       topic,
       { payload, timestamp, contentTopic },
