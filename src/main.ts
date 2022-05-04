@@ -1,6 +1,13 @@
 import debug from 'debug';
-import { initRelayerModules, uninitRelayerModules } from 'server/init/relayer-init';
-import { WakuRelayer, WakuRelayerOptions, WAKU_TOPIC } from 'server/waku-relayer/waku-relayer';
+import {
+  initRelayerModules,
+  uninitRelayerModules,
+} from 'server/init/relayer-init';
+import {
+  WakuRelayer,
+  WakuRelayerOptions,
+  WAKU_TOPIC,
+} from 'server/waku-relayer/waku-relayer';
 import { getRailgunWallet } from 'server/wallets/active-wallets';
 import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
