@@ -52,7 +52,7 @@ export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
   return gasEstimate.mul(12000).div(10000);
 };
 
-export const calculateGasPrice = ({
+const calculateGasPrice = ({
   maxFeePerGas,
   maxPriorityFeePerGas,
 }: TransactionGasDetails) => {

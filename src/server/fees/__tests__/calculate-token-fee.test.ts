@@ -5,7 +5,6 @@ import sinon, { SinonStub } from 'sinon';
 import configTokens from '../../config/config-tokens';
 import { Network } from '../../../models/network-models';
 import {
-  getMockNetwork,
   getMockPopulatedTransaction,
   MOCK_TOKEN_6_DECIMALS,
 } from '../../../test/mocks.test';
@@ -119,13 +118,15 @@ describe('calculate-token-fee', () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
     const gasEstimate = utils.parseEther('0.001');
-    const gasPrice = BigNumber.from('100000');
+    const maxFeePerGas = BigNumber.from('90000');
+    const maxPriorityFeePerGas = BigNumber.from('10000');
     setupMocks(
       MOCK_TOKEN_ADDRESS,
       tokenPrice,
       gasTokenPrice,
       gasEstimate,
-      gasPrice,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
     );
 
     const gasEstimateDetails = await getEstimateGasDetails(
@@ -148,13 +149,15 @@ describe('calculate-token-fee', () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
     const gasEstimate = utils.parseEther('0.001');
-    const gasPrice = BigNumber.from('100000');
+    const maxFeePerGas = BigNumber.from('90000');
+    const maxPriorityFeePerGas = BigNumber.from('10000');
     setupMocks(
       MOCK_TOKEN_6_DECIMALS,
       tokenPrice,
       gasTokenPrice,
       gasEstimate,
-      gasPrice,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
     );
 
     const gasEstimateDetails = await getEstimateGasDetails(
@@ -189,13 +192,15 @@ describe('calculate-token-fee', () => {
     const tokenPrice = 0.00000106;
     const gasTokenPrice = 1234.56;
     const gasEstimate = utils.parseEther('0.001');
-    const gasPrice = BigNumber.from('100000');
+    const maxFeePerGas = BigNumber.from('90000');
+    const maxPriorityFeePerGas = BigNumber.from('10000');
     setupMocks(
       MOCK_TOKEN_ADDRESS,
       tokenPrice,
       gasTokenPrice,
       gasEstimate,
-      gasPrice,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
     );
 
     const gasEstimateDetails = await getEstimateGasDetails(
