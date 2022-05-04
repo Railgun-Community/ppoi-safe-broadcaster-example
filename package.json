@@ -16,7 +16,7 @@
     "compile": "npm run clean && tsc && tsc-alias",
     "start": "npm run compile && node dist/main.js",
     "debug": "env-cmd -e all,debug npm start",
-    "debug-pm2": "env-cmd -e all,debug pm2 start dist/main.js -f && pm2 logs",
+    "debug-pm2": "pm2 stop all && env-cmd -e all,debug pm2 start dist/main.js -f && pm2 save",
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
     "test": "npm run compile-test && env-cmd --no-override -e all,test mocha 'src/**/__tests__/*.test.ts'",
     "test-coverage": "npm run compile-test && env-cmd --no-override -e all,test nyc mocha 'src/**/__tests__/*.test.ts'",
