@@ -42,10 +42,20 @@ const tokenPriceGetter = async (
     }
     return {};
   }
-  const tokenAddressesToPrice = await coingeckoPriceLookupByAddresses(
-    coingeckoId,
-    tokenAddresses,
-  );
+
+  const tokenAddressesToPrice: TokenAddressesToPrice = {};
+
+  const batchSize = 10;
+  for (let i = 0; i < tokenAddresses.length; i += batchSize) {
+    const batch = tokenAddresses.slice(i, i + batchSize);
+    // eslint-disable-next-line no-await-in-loop
+    const batchTokenAddressesToPrice = await coingeckoPriceLookupByAddresses(
+      coingeckoId,
+      batch,
+    );
+    Object.assign(tokenAddressesToPrice, batchTokenAddressesToPrice);
+  }
+
   return tokenAddressesToPrice;
 };
 

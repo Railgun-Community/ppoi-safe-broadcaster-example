@@ -162,7 +162,10 @@ export class WakuRelayer {
     const signature = bytes.hexlify(
       await this.wallet.signWithViewingKey(hexStringToBytes(message)),
     );
-    this.dbg(`Broadcasting fees for chain ${chainID}`);
+    this.dbg(
+      `Broadcasting fees for chain ${chainID}:`,
+      Object.keys(fees).length,
+    );
     return {
       data: message,
       signature,
