@@ -3,6 +3,7 @@ import debug from 'debug';
 import { PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
 import { ActiveWallet } from '../../models/wallet-models';
 import { throwErr } from '../../util/promise-utils';
+import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import {
@@ -90,6 +91,7 @@ export const waitForTx = async (
     dbg(`Transaction completed/mined: ${txResponse.hash}`);
     await storeCurrentNonce(nonce, ethersWallet);
     setWalletAvailable(activeWallet, chainID, true);
+    await updateCachedGasTokenBalance(chainID, activeWallet.address);
   } catch (err) {
     dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
   }

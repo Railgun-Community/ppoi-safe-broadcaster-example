@@ -28,6 +28,7 @@ export const createGasBalanceStub = (balance: BigNumber) => {
   gasBalanceStub = sinon
     .stub(BaseProvider.prototype, 'getBalance')
     .resolves(balance);
+  gasBalanceStub.calledOnceWithExactly;
 };
 
 export const restoreGasBalanceStub = () => {

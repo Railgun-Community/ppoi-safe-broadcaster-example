@@ -32,9 +32,9 @@ export default {
     priceRatioMinimum: 10 ** 3,
 
     // How long to enable the fee sent for a given transaction.
-    // Note that clients will have to prove a transaction before sending, which can take up to 3 minutes.
-    // We recommend an expiration of 5 minutes.
-    feeExpirationInMS: 5 * 60 * 1000,
+    // Note that clients will have to prove a transaction before sending, which can take up to 20-30 seconds.
+    // We recommend an expiration of 2+ minutes.
+    feeExpirationInMS: 2 * 60 * 1000,
   },
 
   tokenPrices: {
