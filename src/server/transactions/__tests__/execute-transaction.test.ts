@@ -79,6 +79,7 @@ describe('execute-transaction', () => {
     getBestMatchWalletForNetwork = sinon
       .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')
       .resolves(activeWallet);
+    createGasBalanceStub(BigNumber.from(1000));
   });
 
   afterEach(() => {
@@ -108,8 +109,9 @@ describe('execute-transaction', () => {
     const populatedTransaction = getMockPopulatedTransaction();
 
     const gasDetails: TransactionGasDetails = {
-      gasLimit: BigNumber.from(10),
-      gasPrice: BigNumber.from(10),
+      gasEstimate: BigNumber.from(10),
+      maxFeePerGas: BigNumber.from(20),
+      maxPriorityFeePerGas: BigNumber.from(30),
     };
     const txResponse = await executeTransaction(
       NetworkChainID.Ropsten,

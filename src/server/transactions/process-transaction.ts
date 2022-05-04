@@ -3,7 +3,10 @@ import debug from 'debug';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { createTransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { validateFee } from '../fees/fee-validator';
-import { getEstimateGasDetails, getMaximumGas } from '../fees/gas-estimate';
+import {
+  getEstimateGasDetails,
+  calculateMaximumGas,
+} from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
 import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
 import { deserializePopulatedTransaction } from './populated-transaction';
@@ -24,7 +27,7 @@ export const processTransaction = async (
     populatedTransaction,
   );
 
-  const maximumGas = getMaximumGas(gasEstimateDetails);
+  const maximumGas = calculateMaximumGas(gasEstimateDetails);
   dbg('Maximum gas:', maximumGas);
 
   const { tokenAddress, packagedFeeAmount } =
@@ -34,7 +37,7 @@ export const processTransaction = async (
 
   const transactionGasDetails = createTransactionGasDetails(
     chainID,
-    gasEstimateDetails.gasEstimate,
+    gasEstimateDetails,
     tokenAddress,
     packagedFeeAmount,
   );

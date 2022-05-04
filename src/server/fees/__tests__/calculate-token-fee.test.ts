@@ -5,6 +5,7 @@ import sinon, { SinonStub } from 'sinon';
 import configTokens from '../../config/config-tokens';
 import { Network } from '../../../models/network-models';
 import {
+  getMockNetwork,
   getMockPopulatedTransaction,
   MOCK_TOKEN_6_DECIMALS,
 } from '../../../test/mocks.test';
@@ -19,8 +20,10 @@ import {
   getTokenFee,
 } from '../calculate-token-fee';
 import * as estimateGasModule from '../gas-estimate';
-import { getEstimateGasDetails, getMaximumGas } from '../gas-estimate';
+import { getEstimateGasDetails, calculateMaximumGas } from '../gas-estimate';
 import { initTokens } from '../../tokens/network-tokens';
+import { initNetworkProviders } from '../../providers/active-network-providers';
+import configNetworks from '../../config/config-networks';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -33,11 +36,12 @@ const MOCK_TRANSACTION = getMockPopulatedTransaction();
 
 const stubEstimateGasDetails = (
   gasEstimate: BigNumber,
-  gasPrice: BigNumber,
+  maxFeePerGas: BigNumber,
+  maxPriorityFeePerGas: BigNumber,
 ) => {
   estimateMaximumGasStub = sinon
     .stub(estimateGasModule, 'getEstimateGasDetails')
-    .resolves({ gasEstimate, gasPrice });
+    .resolves({ gasEstimate, maxFeePerGas, maxPriorityFeePerGas });
 };
 
 const setupMocks = (
@@ -45,7 +49,8 @@ const setupMocks = (
   tokenPrice: number,
   gasTokenPrice: number,
   gasEstimate?: BigNumber,
-  gasPrice?: BigNumber,
+  maxFeePerGas?: BigNumber,
+  maxPriorityFeePerGas?: BigNumber,
 ) => {
   const gasTokenAddress = network.gasToken.wrappedAddress ?? '';
   const tokenPrices = {
@@ -59,19 +64,22 @@ const setupMocks = (
     },
   };
   cacheTokenPricesForNetwork(chainID, tokenPrices);
-  if (gasEstimate && gasPrice) {
-    stubEstimateGasDetails(gasEstimate, gasPrice);
+  if (gasEstimate && maxFeePerGas && maxPriorityFeePerGas) {
+    stubEstimateGasDetails(gasEstimate, maxFeePerGas, maxPriorityFeePerGas);
   }
 };
 
 describe('calculate-token-fee', () => {
   before(async () => {
     network = setupTestNetwork();
-    configTokens[chainID][MOCK_TOKEN_ADDRESS] = {
-      symbol: 'MOCK1',
-    };
-    configTokens[chainID][MOCK_TOKEN_6_DECIMALS] = {
-      symbol: 'MOCK2',
+    initNetworkProviders([chainID]);
+    configTokens[chainID] = {
+      [MOCK_TOKEN_ADDRESS]: {
+        symbol: 'MOCK1',
+      },
+      [MOCK_TOKEN_6_DECIMALS]: {
+        symbol: 'MOCK2',
+      },
     };
     await initTokens();
   });
@@ -124,7 +132,7 @@ describe('calculate-token-fee', () => {
       chainID,
       MOCK_TRANSACTION,
     );
-    const maximumGas = getMaximumGas(gasEstimateDetails);
+    const maximumGas = calculateMaximumGas(gasEstimateDetails);
     const maximumGasFeeForToken = getTokenFee(
       chainID,
       maximumGas,
@@ -153,7 +161,7 @@ describe('calculate-token-fee', () => {
       chainID,
       MOCK_TRANSACTION,
     );
-    const maximumGas = getMaximumGas(gasEstimateDetails);
+    const maximumGas = calculateMaximumGas(gasEstimateDetails);
     const maximumGasFeeForToken = getTokenFee(
       chainID,
       maximumGas,
@@ -194,7 +202,7 @@ describe('calculate-token-fee', () => {
       chainID,
       MOCK_TRANSACTION,
     );
-    const maximumGas = getMaximumGas(gasEstimateDetails);
+    const maximumGas = calculateMaximumGas(gasEstimateDetails);
     expect(() =>
       getTokenFee(chainID, maximumGas, MOCK_TOKEN_ADDRESS),
     ).to.throw();

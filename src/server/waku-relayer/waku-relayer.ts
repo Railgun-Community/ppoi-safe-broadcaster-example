@@ -126,7 +126,6 @@ export class WakuRelayer {
         this.dbg(`Received message on ${contentTopic}`);
         const response = await this.methods[method](params, id);
         if (response) {
-          this.dbg(response);
           await this.publish(response.rpcResult, response.contentTopic);
         }
       }

@@ -12,10 +12,11 @@ import { calculateGasLimit, TransactionGasDetails } from './gas-estimate';
 
 export const createTransactionGasDetails = (
   chainID: NetworkChainID,
-  gasEstimate: BigNumber,
+  gasEstimateDetails: TransactionGasDetails,
   tokenAddress: string,
   tokenFee: BigNumber,
 ): TransactionGasDetails => {
+  const { maxPriorityFeePerGas, gasEstimate } = gasEstimateDetails;
   const gasLimit = calculateGasLimit(gasEstimate);
   const { token, gasToken } = getTransactionTokens(chainID, tokenAddress);
   const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
@@ -41,9 +42,14 @@ export const createTransactionGasDetails = (
     .div(roundedRatio);
 
   const translatedGasPrice = translatedTotalGas.div(gasLimit);
+  const maxFeePerGas = translatedGasPrice.sub(maxPriorityFeePerGas);
+  if (maxFeePerGas.isNegative()) {
+    throw new Error('Max fee cannot be negative.');
+  }
 
   return {
-    gasLimit,
-    gasPrice: translatedGasPrice,
+    gasEstimate,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
   };
 };

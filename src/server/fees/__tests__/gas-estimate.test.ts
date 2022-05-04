@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { NetworkChainID } from '../../config/config-chain-ids';
-import { getEstimateGasDetails, getMaximumGas } from '../gas-estimate';
+import { getEstimateGasDetails, calculateMaximumGas } from '../gas-estimate';
 import {
   getMockNetwork,
   getMockPopulatedTransaction,
@@ -29,14 +29,15 @@ describe('gas-estimate', () => {
 
   it('Should calculate maximum gas based on gas estimate', async () => {
     const gasEstimate = BigNumber.from(1000);
-    const gasPrice = BigNumber.from(100);
-    createGasEstimateStubs(gasEstimate, gasPrice);
+    const maxFeePerGas = BigNumber.from(90);
+    const maxPriorityFeePerGas = BigNumber.from(10);
+    createGasEstimateStubs(gasEstimate, maxFeePerGas, maxPriorityFeePerGas);
 
     const estimateGasDetails = await getEstimateGasDetails(
       NetworkChainID.Ethereum,
       getMockPopulatedTransaction(),
     );
-    const maximumGas = getMaximumGas(estimateGasDetails);
+    const maximumGas = calculateMaximumGas(estimateGasDetails);
 
     // (Gas estimate + 20%) * gas price.
     expect(maximumGas.toNumber()).to.equal(120000);

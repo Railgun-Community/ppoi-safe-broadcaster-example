@@ -4,24 +4,27 @@ import { BigNumber } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 
 let estimateGasStub: SinonStub;
-let getGasPriceStub: SinonStub;
+let getFeeDataStub: SinonStub;
 let gasBalanceStub: SinonStub;
 
 export const createGasEstimateStubs = (
   estimateGas: BigNumber,
-  getGasPrice: BigNumber,
+  maxFeePerGas: BigNumber,
+  maxPriorityFeePerGas: BigNumber,
 ) => {
   estimateGasStub = sinon
     .stub(BaseProvider.prototype, 'estimateGas')
     .resolves(estimateGas);
-  getGasPriceStub = sinon
-    .stub(BaseProvider.prototype, 'getGasPrice')
-    .resolves(getGasPrice);
+  getFeeDataStub = sinon.stub(BaseProvider.prototype, 'getFeeData').resolves({
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    gasPrice: null,
+  });
 };
 
 export const restoreGasEstimateStubs = () => {
   estimateGasStub?.restore();
-  getGasPriceStub?.restore();
+  getFeeDataStub?.restore();
 };
 
 export const createGasBalanceStub = (balance: BigNumber) => {

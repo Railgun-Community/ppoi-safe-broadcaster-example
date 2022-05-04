@@ -7,7 +7,7 @@ import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import {
-  getMaximumGasFromTransactionGasDetails,
+  calculateMaximumGas,
   TransactionGasDetails,
 } from '../fees/gas-estimate';
 import { getProviderForNetwork } from '../providers/active-network-providers';
@@ -50,7 +50,7 @@ export const executeTransaction = async (
 ): Promise<TransactionResponse> => {
   dbg('Execute transaction');
 
-  const maximumGas = getMaximumGasFromTransactionGasDetails(gasDetails);
+  const maximumGas = calculateMaximumGas(gasDetails);
   const activeWallet = await getBestMatchWalletForNetwork(chainID, maximumGas);
   const provider = getProviderForNetwork(chainID);
   const ethersWallet = createEthersWallet(activeWallet, provider);
@@ -59,8 +59,10 @@ export const executeTransaction = async (
 
   const finalTransaction: PopulatedTransaction = {
     ...populatedTransaction,
-    gasLimit: gasDetails.gasLimit,
-    gasPrice: gasDetails.gasPrice,
+    type: 2,
+    chainId: chainID,
+    maxFeePerGas: gasDetails.maxFeePerGas,
+    maxPriorityFeePerGas: gasDetails.maxPriorityFeePerGas,
     nonce,
   };
   const signedTransaction = await ethersWallet.signTransaction(
@@ -93,8 +95,8 @@ export const waitForTx = async (
   } catch (err) {
     dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
   } finally {
-    await updateCachedGasTokenBalance(chainID, activeWallet.address);
     setWalletAvailable(activeWallet, chainID, true);
+    await updateCachedGasTokenBalance(chainID, activeWallet.address);
   }
 };
 
