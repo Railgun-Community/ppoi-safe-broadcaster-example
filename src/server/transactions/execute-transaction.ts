@@ -90,10 +90,11 @@ export const waitForTx = async (
     await waitTx(txResponse);
     dbg(`Transaction completed/mined: ${txResponse.hash}`);
     await storeCurrentNonce(nonce, ethersWallet);
-    setWalletAvailable(activeWallet, chainID, true);
-    await updateCachedGasTokenBalance(chainID, activeWallet.address);
   } catch (err) {
     dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
+  } finally {
+    await updateCachedGasTokenBalance(chainID, activeWallet.address);
+    setWalletAvailable(activeWallet, chainID, true);
   }
 };
 
