@@ -208,7 +208,9 @@ export class WakuRelayer {
       .getMessages(WAKU_TOPIC, this.subscribedContentTopics)
       .catch(async (e) => {
         this.dbg(e.message);
-        if (e.code === 32000) {
+        this.dbg('type', typeof e.code);
+        if (e.code === -32000) {
+          this.dbg('resubscribing.. ');
           await this.subscribe();
         }
         return [];

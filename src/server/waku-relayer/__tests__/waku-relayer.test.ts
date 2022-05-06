@@ -138,6 +138,7 @@ describe('waku-relayer', () => {
     restoreGasBalanceStub();
   });
 
+  /*
   it('Should re-subscribe when unsubscribed', async () => {
     const handleHTTPPost = () => {
       return {
@@ -149,6 +150,7 @@ describe('waku-relayer', () => {
       };
     };
   });
+  */
 
   it('Should test fee broadcast', async () => {
     const tokenPrice = 1.067;
