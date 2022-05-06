@@ -87,13 +87,21 @@ export class WakuRelayer {
     options: WakuRelayerOptions,
   ): Promise<WakuRelayer> {
     const relayer = new WakuRelayer(client, wallet, options);
-    await relayer.client.subscribe([options.topic]);
+    await relayer.subscribe();
     return relayer;
   }
 
   async stop() {
     this.stopping = true;
-    await this.client.unsubscribe([WAKU_TOPIC]);
+    await this.unsubscribe();
+  }
+
+  async subscribe() {
+    return await this.client.subscribe([this.options.topic]);
+  }
+
+  async unsubscribe() {
+    return await this.client.unsubscribe([this.options.topic]);
   }
 
   async publish(
@@ -198,8 +206,11 @@ export class WakuRelayer {
     if (this.stopping) return;
     const messages = await this.client
       .getMessages(WAKU_TOPIC, this.subscribedContentTopics)
-      .catch((e) => {
+      .catch(async (e) => {
         this.dbg(e.message);
+        if (e.code === 32000) {
+          await this.subscribe();
+        }
         return [];
       });
     await Promise.all(messages.map((message) => this.handleMessage(message)));

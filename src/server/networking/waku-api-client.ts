@@ -118,6 +118,9 @@ export class WakuApiClient {
 
     const messages: WakuRelayMessage[] = data.result;
     // if contentTopics given, return only matching messages
+    if (data.error) {
+      throw data.error;
+    }
     if (!messages) {
       this.dbg('No messages, got data:', data);
       return [];

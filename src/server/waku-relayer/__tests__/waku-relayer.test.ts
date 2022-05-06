@@ -14,6 +14,7 @@ import {
   hexStringToBytes,
 } from '@railgun-community/lepton/dist/utils/bytes';
 import { tryDecryptJSONDataWithSharedKey } from '@railgun-community/lepton/dist/utils/ecies';
+import assert from 'assert';
 import {
   FeeMessage,
   FeeMessageData,
@@ -70,8 +71,8 @@ import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-// @ts-ignore
-let wakuRelayer: Optional<WakuRelayer>;
+let wakuRelayer: WakuRelayer;
+let client: WakuApiClient;
 
 let clientHTTPStub: SinonStub;
 let processTransactionStub: SinonStub;
@@ -107,7 +108,7 @@ describe('waku-relayer', () => {
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
 
-    const client = new WakuApiClient({ url: '' });
+    client = new WakuApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
     const wallet = getRailgunWallet();
     wakuRelayer = await WakuRelayer.init(client, wallet, {
@@ -135,6 +136,18 @@ describe('waku-relayer', () => {
     wakuRelayer = undefined;
     resetGasTokenBalanceCache();
     restoreGasBalanceStub();
+  });
+
+  it('Should re-subscribe when unsubscribed', async () => {
+    const handleHTTPPost = () => {
+      return {
+        error: {
+          code: -32000,
+          message: 'get_waku_v2_relay_v1_messsages raised an exception',
+          data: 'not subscribed to topic: /waku/2/default-waku/proto',
+        },
+      };
+    };
   });
 
   it('Should test fee broadcast', async () => {
