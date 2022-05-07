@@ -57,14 +57,17 @@ export const executeTransaction = async (
   const nonce = await getCurrentNonce(ethersWallet);
   dbg('Nonce', nonce);
 
+  const { maxFeePerGas, maxPriorityFeePerGas } = gasDetails;
+
   const finalTransaction: PopulatedTransaction = {
     ...populatedTransaction,
     type: 2,
     chainId: chainID,
-    maxFeePerGas: gasDetails.maxFeePerGas,
-    maxPriorityFeePerGas: gasDetails.maxPriorityFeePerGas,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
     nonce,
   };
+
   const signedTransaction = await ethersWallet.signTransaction(
     finalTransaction,
   );
