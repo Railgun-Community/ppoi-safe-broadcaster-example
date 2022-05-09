@@ -23,6 +23,7 @@ export type FeeMessageData = {
   feesID: string;
   railAddress: string;
   availableWallets: number;
+  version: string;
 };
 
 export type FeeMessage = {
@@ -164,6 +165,7 @@ export class WakuRelayer {
       feesID: feeCacheID,
       railAddress: this.walletRailAddress,
       availableWallets,
+      version: process.env.npm_package_version ?? '0.0.0',
     };
     const message = bytes.fromUTF8String(JSON.stringify(data));
     const signature = bytes.hexlify(

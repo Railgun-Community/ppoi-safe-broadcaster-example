@@ -27,7 +27,8 @@
   },
   "exclude": ["src/**/__tests__", "test", "dist"],
   "typeAcquisition": {
-    "exclude": ["mocha"] },
+    "exclude": ["mocha"]
+  },
   "compileOnSave": false,
   "ts-node": {
     "files": true
