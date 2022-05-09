@@ -22,7 +22,6 @@ import * as estimateGasModule from '../gas-estimate';
 import { getEstimateGasDetails, calculateMaximumGas } from '../gas-estimate';
 import { initTokens } from '../../tokens/network-tokens';
 import { initNetworkProviders } from '../../providers/active-network-providers';
-import configNetworks from '../../config/config-networks';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

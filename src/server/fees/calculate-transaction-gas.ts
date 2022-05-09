@@ -9,11 +9,7 @@ import {
   getRoundedTokenToGasPriceRatio,
   getTransactionTokenToGasDecimalRatio,
 } from './calculate-token-fee';
-import {
-  calculateGasLimit,
-  TransactionGasDetails,
-  TransactionGasDetailsType2,
-} from './gas-estimate';
+import { calculateGasLimit, TransactionGasDetails } from './gas-estimate';
 
 export const createTransactionGasDetails = (
   chainID: NetworkChainID,
@@ -38,7 +34,7 @@ export const createTransactionGasDetails = (
     networkConfig.fees,
     precision,
   );
-  const decimalRatio = getTransactionTokenToGasDecimalRatio(token, gasToken);
+  const decimalRatio = getTransactionTokenToGasDecimalRatio(token);
 
   // This is the inverse of the fee calculation in calculate-token-fee.ts.
   const translatedTotalGas = tokenFee

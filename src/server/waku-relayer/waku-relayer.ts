@@ -62,7 +62,7 @@ export class WakuRelayer {
     [WakuMethodNames.Transact]: transactMethod,
   };
 
-  stopping: boolean = false;
+  stopping = false;
 
   constructor(
     client: WakuApiClient,
@@ -123,7 +123,7 @@ export class WakuRelayer {
   }
 
   async handleMessage(message: WakuRelayMessage) {
-    const { payload, contentTopic, timestamp } = message;
+    const { payload, contentTopic } = message;
 
     try {
       const decoded = WakuRelayer.decode(payload);
@@ -131,7 +131,6 @@ export class WakuRelayer {
       const { method, params, id } = request;
 
       if (method in this.methods) {
-        const age = Date.now() - timestamp;
         this.dbg(`Received message on ${contentTopic}`);
         const response = await this.methods[method](params, id);
         if (response) {

@@ -46,10 +46,10 @@ before(() => {
 
 after(() => {
   const { warn } = console;
-  fs.rm(LEPTON_TEST_DB, { recursive: true }, (err) => {
+  fs.rm(LEPTON_TEST_DB, { recursive: true }, () => {
     warn('Error removing test db.');
   });
-  fs.rm(SETTINGS_TEST_DB, { recursive: true }, (err) => {
+  fs.rm(SETTINGS_TEST_DB, { recursive: true }, () => {
     warn('Error removing test db.');
   });
   stubERC20Decimals.restore();

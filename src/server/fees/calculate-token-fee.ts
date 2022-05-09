@@ -3,11 +3,7 @@ import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { NetworkFeeSettings } from '../../models/network-models';
-import {
-  GasTokenConfig,
-  GAS_TOKEN_DECIMALS,
-  Token,
-} from '../../models/token-models';
+import { GAS_TOKEN_DECIMALS, Token } from '../../models/token-models';
 import {
   allTokenAddressesForNetwork,
   getTransactionTokens,
@@ -81,7 +77,7 @@ const getTokenRatiosFromCachedPrices = (
     networkConfig.fees,
     precision,
   );
-  const decimalRatio = getTransactionTokenToGasDecimalRatio(token, gasToken);
+  const decimalRatio = getTransactionTokenToGasDecimalRatio(token);
 
   return { roundedPriceRatio, decimalRatio };
 };
@@ -112,7 +108,6 @@ export const getRoundedTokenToGasPriceRatio = (
 
 export const getTransactionTokenToGasDecimalRatio = (
   token: Token,
-  gasToken: GasTokenConfig,
 ): BigNumber => {
   const decimalDifference = GAS_TOKEN_DECIMALS - token.decimals;
   return BigNumber.from(10).pow(BigNumber.from(decimalDifference));

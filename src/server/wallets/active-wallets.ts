@@ -103,7 +103,7 @@ export const getRailgunWallet = (): RailgunWallet => {
   return railgunWallet;
 };
 
-export const getRailgunAnyAddress = (chainID: NetworkChainID = 0) => {
+export const getRailgunAnyAddress = () => {
   return railgunWalletAnyAddress;
 };
 

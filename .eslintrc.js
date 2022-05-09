@@ -4,7 +4,12 @@ module.exports = {
     es2021: true,
     mocha: true,
   },
-  extends: ['airbnb-base', 'plugin:import/typescript', 'prettier'],
+  extends: [
+    'airbnb-base',
+    'plugin:import/typescript',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+  ],
   globals: {
     Optional: 'readonly',
     MapType: 'readonly',
@@ -34,6 +39,8 @@ module.exports = {
     'no-continue': 0,
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
     'default-case': 0,
+    '@typescript-eslint/ban-ts-comment': 0,
+    '@typescript-eslint/no-explicit-any': 0,
   },
   ignorePatterns: ['dist'],
 };

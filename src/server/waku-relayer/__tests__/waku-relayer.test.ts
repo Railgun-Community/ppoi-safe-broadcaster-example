@@ -14,7 +14,6 @@ import {
   hexStringToBytes,
 } from '@railgun-community/lepton/dist/utils/bytes';
 import { tryDecryptJSONDataWithSharedKey } from '@railgun-community/lepton/dist/utils/ecies';
-import assert from 'assert';
 import {
   FeeMessage,
   FeeMessageData,
