@@ -60,7 +60,7 @@ export default {
     coingeckoId: CoingeckoNetworkID.BNBSmartChain,
     fallbackProviderConfig: fallbackProvidersBNBSmartChain,
     priceTTLInMS: 5 * 60 * 1000,
-    evmGasType: EVMGasType.Type1,
+    evmGasType: EVMGasType.Type0,
   },
   [NetworkChainID.PolygonPOS]: {
     name: 'Polygon PoS',

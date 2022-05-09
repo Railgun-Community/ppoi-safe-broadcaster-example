@@ -45,7 +45,7 @@ export const createTransactionGasDetails = (
   const translatedGasPrice = translatedTotalGas.div(gasLimit);
 
   switch (evmGasType) {
-    case EVMGasType.Type1: {
+    case EVMGasType.Type0: {
       return {
         evmGasType,
         gasEstimate,

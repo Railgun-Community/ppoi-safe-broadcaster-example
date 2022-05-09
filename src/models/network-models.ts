@@ -7,7 +7,7 @@ import { FallbackProviderJsonConfig } from './provider-models';
 import { GasTokenConfig } from './token-models';
 
 export enum EVMGasType {
-  Type1 = 'Type1',
+  Type0 = 'Type0',
   Type2 = 'Type2',
 }
 

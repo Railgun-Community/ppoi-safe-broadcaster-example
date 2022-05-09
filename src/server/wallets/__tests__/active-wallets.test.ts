@@ -9,7 +9,6 @@ import {
 } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
-import { NetworkChainID } from '../../config/config-chain-ids';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

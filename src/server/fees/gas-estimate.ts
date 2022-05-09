@@ -8,11 +8,11 @@ import { getProviderForNetwork } from '../providers/active-network-providers';
 import { BAD_TOKEN_FEE_ERROR_MESSAGE } from './fee-validator';
 
 export type TransactionGasDetails =
-  | TransactionGasDetailsType1
+  | TransactionGasDetailsType0
   | TransactionGasDetailsType2;
 
-export type TransactionGasDetailsType1 = {
-  evmGasType: EVMGasType.Type1;
+export type TransactionGasDetailsType0 = {
+  evmGasType: EVMGasType.Type0;
   gasEstimate: BigNumber;
   gasPrice: BigNumber;
 };
@@ -53,7 +53,7 @@ export const getProviderFeeData = async (
   chainID: NetworkChainID,
   provider: BaseProvider,
 ): Promise<
-  | { evmGasType: EVMGasType.Type1; gasPrice: BigNumber }
+  | { evmGasType: EVMGasType.Type0; gasPrice: BigNumber }
   | {
       evmGasType: EVMGasType.Type2;
       maxFeePerGas: BigNumber;
@@ -66,7 +66,7 @@ export const getProviderFeeData = async (
   const evmGasType = getEVMGasType(chainID);
 
   switch (evmGasType) {
-    case EVMGasType.Type1: {
+    case EVMGasType.Type0: {
       if (gasPrice == null) {
         throw new Error(
           'Could not fetch EVM Type 1 fee data for this transaction.',
@@ -93,7 +93,7 @@ export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
 
 const calculateGasPrice = (gasDetails: TransactionGasDetails) => {
   switch (gasDetails.evmGasType) {
-    case EVMGasType.Type1: {
+    case EVMGasType.Type0: {
       return gasDetails.gasPrice;
     }
     case EVMGasType.Type2: {

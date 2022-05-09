@@ -67,9 +67,9 @@ export const executeTransaction = async (
   };
 
   switch (gasDetails.evmGasType) {
-    case EVMGasType.Type1: {
+    case EVMGasType.Type0: {
       const { gasPrice } = gasDetails;
-      finalTransaction.type = 1;
+      finalTransaction.type = 0;
       finalTransaction.gasPrice = gasPrice;
       break;
     }
