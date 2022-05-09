@@ -19,6 +19,12 @@ const config: FallbackProviderJsonConfig = {
       weight: 1,
     },
     {
+      provider:
+        'https://polygon-mainnet.g.alchemy.com/v2/mjJ4r5yqS3ouvBBKUbcAZGFYIrcyguVE',
+      priority: 2,
+      weight: 1,
+    },
+    {
       provider: 'https://rpc-mainnet.matic.quiknode.pro',
       priority: 2,
       weight: 1,
@@ -29,18 +35,14 @@ const config: FallbackProviderJsonConfig = {
       weight: 1,
     },
     {
-      provider: 'https://matic-mainnet-full-rpc.bwarelabs.com',
+      provider:
+        'https://polygon-mainnet.infura.io/v3/84842078b09946638c03157f83405213',
       priority: 2,
       weight: 1,
     },
     {
       provider: 'https://matic-mainnet-archive-rpc.bwarelabs.com',
       priority: 2,
-      weight: 1,
-    },
-    {
-      provider: 'https://rpc-mainnet.matic.network',
-      priority: 1,
       weight: 1,
     },
   ],
