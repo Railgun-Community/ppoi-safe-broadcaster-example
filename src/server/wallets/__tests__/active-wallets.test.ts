@@ -45,7 +45,7 @@ describe('active-wallets', () => {
   it('Should check pubkey value matches across networks', () => {
     const viewingPublicKeyAll = decode(getRailgunAnyAddress()).viewingPublicKey;
     const viewingPublicKeyRopsten = decode(
-      getRailgunAnyAddress(NetworkChainID.Ropsten),
+      getRailgunAnyAddress(),
     ).viewingPublicKey;
     expect(viewingPublicKeyAll).to.deep.equal(
       new Uint8Array([
