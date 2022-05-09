@@ -35,12 +35,6 @@ const config: FallbackProviderJsonConfig = {
       weight: 1,
     },
     {
-      provider:
-        'https://polygon-mainnet.infura.io/v3/84842078b09946638c03157f83405213',
-      priority: 2,
-      weight: 1,
-    },
-    {
       provider: 'https://matic-mainnet-archive-rpc.bwarelabs.com',
       priority: 2,
       weight: 1,
