@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
+import { assert } from 'console';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import { GasTokenWrappedAddress } from '../../../models/token-models';
@@ -23,8 +24,13 @@ import {
 } from '../../tokens/token-price-cache';
 import { createTransactionGasDetails } from '../calculate-transaction-gas';
 import { getTokenFee } from '../calculate-token-fee';
-import { getEstimateGasDetails, calculateMaximumGas } from '../gas-estimate';
+import {
+  getEstimateGasDetails,
+  calculateMaximumGas,
+  TransactionGasDetails,
+} from '../gas-estimate';
 import { initTokens } from '../../tokens/network-tokens';
+import { EVMGasType } from '../../../models/network-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -37,7 +43,8 @@ const MOCK_TOKEN_ADDRESS = '0x001';
 const MOCK_GAS_ESTIMATE = BigNumber.from('400000000000');
 const MOCK_MAX_FEE_PER_GAS = BigNumber.from('240000');
 const MOCK_MAX_PRIORITY_FEE_PER_GAS = BigNumber.from('10000');
-const mockGasDetails = {
+const mockGasDetails: TransactionGasDetails = {
+  evmGasType: EVMGasType.Type2,
   gasEstimate: MOCK_GAS_ESTIMATE,
   maxFeePerGas: MOCK_MAX_FEE_PER_GAS,
   maxPriorityFeePerGas: MOCK_MAX_PRIORITY_FEE_PER_GAS,
@@ -84,6 +91,11 @@ describe('calculate-transaction-gas', () => {
       tokenFee,
     );
 
+    if (gasDetails.evmGasType !== EVMGasType.Type2) {
+      assert(false, 'gas details must be type 2 for test');
+      return;
+    }
+
     expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
     expect(gasDetails.maxFeePerGas.toString()).to.equal('240000');
     expect(gasDetails.maxPriorityFeePerGas.toString()).to.equal('10000');
@@ -103,6 +115,11 @@ describe('calculate-transaction-gas', () => {
       MOCK_TOKEN_6_DECIMALS,
       tokenFee,
     );
+
+    if (gasDetails.evmGasType !== EVMGasType.Type2) {
+      assert(false, 'gas details must be type 2 for test');
+      return;
+    }
 
     expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
     expect(gasDetails.maxFeePerGas.toString()).to.equal('240000');
@@ -130,6 +147,11 @@ describe('calculate-transaction-gas', () => {
       MOCK_TOKEN_ADDRESS,
       tokenFee,
     );
+
+    if (gasDetails.evmGasType !== EVMGasType.Type2) {
+      assert(false, 'gas details must be type 2 for test');
+      return;
+    }
 
     expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
     expect(gasDetails.maxFeePerGas.toString()).to.equal('240000');

@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { BigNumber, utils } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import configTokens from '../../config/config-tokens';
-import { Network } from '../../../models/network-models';
+import { EVMGasType, Network } from '../../../models/network-models';
 import {
   getMockPopulatedTransaction,
   MOCK_TOKEN_6_DECIMALS,
@@ -40,7 +40,12 @@ const stubEstimateGasDetails = (
 ) => {
   estimateMaximumGasStub = sinon
     .stub(estimateGasModule, 'getEstimateGasDetails')
-    .resolves({ gasEstimate, maxFeePerGas, maxPriorityFeePerGas });
+    .resolves({
+      evmGasType: EVMGasType.Type2,
+      gasEstimate,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+    });
 };
 
 const setupMocks = (

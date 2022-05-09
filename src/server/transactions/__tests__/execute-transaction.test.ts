@@ -43,6 +43,7 @@ import {
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { EVMGasType } from '../../../models/network-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -109,6 +110,7 @@ describe('execute-transaction', () => {
     const populatedTransaction = getMockPopulatedTransaction();
 
     const gasDetails: TransactionGasDetails = {
+      evmGasType: EVMGasType.Type2,
       gasEstimate: BigNumber.from(10),
       maxFeePerGas: BigNumber.from(20),
       maxPriorityFeePerGas: BigNumber.from(30),

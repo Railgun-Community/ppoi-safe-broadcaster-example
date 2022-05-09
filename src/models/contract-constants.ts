@@ -10,6 +10,6 @@ export enum RailProxyDeploymentBlock {
   Ethereum = 14693013,
   Ropsten = 12226000,
   BNBSmartChain = 17431925,
-  PolygonPOS = 28000000, // needs update
+  PolygonPOS = 27803253,
   HardHat = 0,
 }

@@ -5,7 +5,7 @@ import { NetworkChainID } from '../server/config/config-chain-ids';
 import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import { RailProxyContract } from '../models/contract-constants';
-import { Network } from '../models/network-models';
+import { EVMGasType, Network } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 import {
   GasTokenWrappedAddress,
@@ -83,6 +83,7 @@ export const getMockNetwork = (): Network => {
     coingeckoId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: getMockFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
+    evmGasType: EVMGasType.Type2,
   };
 };
 
@@ -102,6 +103,7 @@ export const getMockRopstenNetwork = (): Network => {
     fallbackProviderConfig: getMockRopstenFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,
+    evmGasType: EVMGasType.Type2,
   };
 };
 

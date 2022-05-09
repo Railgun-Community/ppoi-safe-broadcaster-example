@@ -1,12 +1,14 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import debug from 'debug';
 import { PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
+import { EVMGasType } from '../../models/network-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { throwErr } from '../../util/promise-utils';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import {
+  calculateGasLimit,
   calculateMaximumGas,
   TransactionGasDetails,
 } from '../fees/gas-estimate';
@@ -57,16 +59,28 @@ export const executeTransaction = async (
   const nonce = await getCurrentNonce(ethersWallet);
   dbg('Nonce', nonce);
 
-  const { maxFeePerGas, maxPriorityFeePerGas } = gasDetails;
-
   const finalTransaction: PopulatedTransaction = {
     ...populatedTransaction,
-    type: 2,
     chainId: chainID,
-    maxFeePerGas,
-    maxPriorityFeePerGas,
     nonce,
+    gasLimit: calculateGasLimit(gasDetails.gasEstimate),
   };
+
+  switch (gasDetails.evmGasType) {
+    case EVMGasType.Type1: {
+      const { gasPrice } = gasDetails;
+      finalTransaction.type = 1;
+      finalTransaction.gasPrice = gasPrice;
+      break;
+    }
+    case EVMGasType.Type2: {
+      const { maxFeePerGas, maxPriorityFeePerGas } = gasDetails;
+      finalTransaction.type = 2;
+      finalTransaction.maxFeePerGas = maxFeePerGas;
+      finalTransaction.maxPriorityFeePerGas = maxPriorityFeePerGas;
+      break;
+    }
+  }
 
   const signedTransaction = await ethersWallet.signTransaction(
     finalTransaction,

@@ -33,6 +33,7 @@ module.exports = {
     'require-await': 'error',
     'no-continue': 0,
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
+    'default-case': 0,
   },
   ignorePatterns: ['dist'],
 };

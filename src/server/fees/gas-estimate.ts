@@ -1,14 +1,32 @@
 import { BaseProvider } from '@ethersproject/providers';
 import { BigNumber, PopulatedTransaction } from 'ethers';
+import { EVMGasType } from '../../models/network-models';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
+import configNetworks from '../config/config-networks';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { BAD_TOKEN_FEE_ERROR_MESSAGE } from './fee-validator';
 
-export type TransactionGasDetails = {
+export type TransactionGasDetails =
+  | TransactionGasDetailsType1
+  | TransactionGasDetailsType2;
+
+export type TransactionGasDetailsType1 = {
+  evmGasType: EVMGasType.Type1;
+  gasEstimate: BigNumber;
+  gasPrice: BigNumber;
+};
+
+export type TransactionGasDetailsType2 = {
+  evmGasType: EVMGasType.Type2;
   gasEstimate: BigNumber;
   maxFeePerGas: BigNumber;
   maxPriorityFeePerGas: BigNumber;
+};
+
+const getEVMGasType = (chainID: NetworkChainID): EVMGasType => {
+  const network = configNetworks[chainID];
+  return network.evmGasType;
 };
 
 export const getEstimateGasDetails = async (
@@ -17,12 +35,12 @@ export const getEstimateGasDetails = async (
 ): Promise<TransactionGasDetails> => {
   try {
     const provider = getProviderForNetwork(chainID);
-    const [gasEstimate, { maxFeePerGas, maxPriorityFeePerGas }] =
-      await Promise.all([
-        provider.estimateGas(populatedTransaction).catch(throwErr),
-        getProviderFeeData(provider),
-      ]);
-    return { gasEstimate, maxFeePerGas, maxPriorityFeePerGas };
+    const [gasEstimate, feeData] = await Promise.all([
+      provider.estimateGas(populatedTransaction).catch(throwErr),
+      getProviderFeeData(chainID, provider),
+    ]);
+
+    return { gasEstimate, ...feeData };
   } catch (err) {
     if (err.message && err.message.includes('failed to meet quorum')) {
       throw new Error(BAD_TOKEN_FEE_ERROR_MESSAGE);
@@ -32,19 +50,40 @@ export const getEstimateGasDetails = async (
 };
 
 export const getProviderFeeData = async (
+  chainID: NetworkChainID,
   provider: BaseProvider,
-): Promise<{
-  maxFeePerGas: BigNumber;
-  maxPriorityFeePerGas: BigNumber;
-}> => {
-  const { maxFeePerGas, maxPriorityFeePerGas } = await provider.getFeeData();
-  if (maxFeePerGas == null || maxPriorityFeePerGas == null) {
-    throw new Error('Could not fetch fee data for this transaction.');
+): Promise<
+  | { evmGasType: EVMGasType.Type1; gasPrice: BigNumber }
+  | {
+      evmGasType: EVMGasType.Type2;
+      maxFeePerGas: BigNumber;
+      maxPriorityFeePerGas: BigNumber;
+    }
+> => {
+  const { maxFeePerGas, maxPriorityFeePerGas, gasPrice } =
+    await provider.getFeeData();
+
+  const evmGasType = getEVMGasType(chainID);
+
+  switch (evmGasType) {
+    case EVMGasType.Type1: {
+      if (gasPrice == null) {
+        throw new Error(
+          'Could not fetch EVM Type 1 fee data for this transaction.',
+        );
+      }
+      return { evmGasType, gasPrice };
+    }
+    case EVMGasType.Type2: {
+      if (maxFeePerGas == null || maxPriorityFeePerGas == null) {
+        throw new Error(
+          'Could not fetch EVM Type 2 fee data for this transaction.',
+        );
+      }
+      return { evmGasType, maxFeePerGas, maxPriorityFeePerGas };
+    }
   }
-  return {
-    maxFeePerGas,
-    maxPriorityFeePerGas,
-  };
+  throw new Error('Unrecognized gas type.');
 };
 
 export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
@@ -52,11 +91,17 @@ export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
   return gasEstimate.mul(12000).div(10000);
 };
 
-const calculateGasPrice = ({
-  maxFeePerGas,
-  maxPriorityFeePerGas,
-}: TransactionGasDetails) => {
-  return maxFeePerGas.add(maxPriorityFeePerGas);
+const calculateGasPrice = (gasDetails: TransactionGasDetails) => {
+  switch (gasDetails.evmGasType) {
+    case EVMGasType.Type1: {
+      return gasDetails.gasPrice;
+    }
+    case EVMGasType.Type2: {
+      const { maxFeePerGas, maxPriorityFeePerGas } = gasDetails;
+      return maxFeePerGas.add(maxPriorityFeePerGas);
+    }
+  }
+  throw new Error('Unrecognized gas type.');
 };
 
 export const calculateTotalGas = (

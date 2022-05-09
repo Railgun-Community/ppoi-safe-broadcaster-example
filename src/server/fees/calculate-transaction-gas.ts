@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers';
+import { EVMGasType } from '../../models/network-models';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
@@ -8,7 +9,11 @@ import {
   getRoundedTokenToGasPriceRatio,
   getTransactionTokenToGasDecimalRatio,
 } from './calculate-token-fee';
-import { calculateGasLimit, TransactionGasDetails } from './gas-estimate';
+import {
+  calculateGasLimit,
+  TransactionGasDetails,
+  TransactionGasDetailsType2,
+} from './gas-estimate';
 
 export const createTransactionGasDetails = (
   chainID: NetworkChainID,
@@ -16,7 +21,7 @@ export const createTransactionGasDetails = (
   tokenAddress: string,
   tokenFee: BigNumber,
 ): TransactionGasDetails => {
-  const { maxPriorityFeePerGas, gasEstimate } = gasEstimateDetails;
+  const { evmGasType, gasEstimate } = gasEstimateDetails;
   const gasLimit = calculateGasLimit(gasEstimate);
   const { token, gasToken } = getTransactionTokens(chainID, tokenAddress);
   const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
@@ -42,14 +47,29 @@ export const createTransactionGasDetails = (
     .div(roundedRatio);
 
   const translatedGasPrice = translatedTotalGas.div(gasLimit);
-  const maxFeePerGas = translatedGasPrice.sub(maxPriorityFeePerGas);
-  if (maxFeePerGas.isNegative()) {
-    throw new Error('Max fee cannot be negative.');
+
+  switch (evmGasType) {
+    case EVMGasType.Type1: {
+      return {
+        evmGasType,
+        gasEstimate,
+        gasPrice: translatedGasPrice,
+      };
+    }
+    case EVMGasType.Type2: {
+      const { maxPriorityFeePerGas } = gasEstimateDetails;
+      const maxFeePerGas = translatedGasPrice.sub(maxPriorityFeePerGas);
+      if (maxFeePerGas.isNegative()) {
+        throw new Error('Max fee cannot be negative.');
+      }
+      return {
+        evmGasType,
+        gasEstimate,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+      };
+    }
   }
 
-  return {
-    gasEstimate,
-    maxFeePerGas,
-    maxPriorityFeePerGas,
-  };
+  throw new Error('Unrecognized gas type.');
 };

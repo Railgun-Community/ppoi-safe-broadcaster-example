@@ -71,7 +71,7 @@ import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-let wakuRelayer: WakuRelayer;
+let wakuRelayer: Optional<WakuRelayer>;
 let client: WakuApiClient;
 
 let clientHTTPStub: SinonStub;

@@ -11,6 +11,7 @@ import {
 } from '../../models/contract-constants';
 import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../../models/config-models';
+import { EVMGasType } from '../../models/network-models';
 
 const defaultFees = {
   slippageBuffer: 0.05,
@@ -30,6 +31,7 @@ export default {
     coingeckoId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
     priceTTLInMS: 5 * 60 * 1000,
+    evmGasType: EVMGasType.Type2,
   },
   [NetworkChainID.Ropsten]: {
     name: 'Ropsten Test Network',
@@ -44,6 +46,7 @@ export default {
     fallbackProviderConfig: fallbackProvidersRopsten,
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,
+    evmGasType: EVMGasType.Type2,
   },
   [NetworkChainID.BNBSmartChain]: {
     name: 'Binance Smart Chain',
@@ -57,6 +60,7 @@ export default {
     coingeckoId: CoingeckoNetworkID.BNBSmartChain,
     fallbackProviderConfig: fallbackProvidersBNBSmartChain,
     priceTTLInMS: 5 * 60 * 1000,
+    evmGasType: EVMGasType.Type1,
   },
   [NetworkChainID.PolygonPOS]: {
     name: 'Polygon PoS',
@@ -70,6 +74,7 @@ export default {
     coingeckoId: CoingeckoNetworkID.PolygonPOS,
     fallbackProviderConfig: fallbackProvidersPolygon,
     priceTTLInMS: 5 * 60 * 1000,
+    evmGasType: EVMGasType.Type2,
   },
   [NetworkChainID.HardHat]: {
     name: 'HardHat Test Network',
@@ -84,5 +89,6 @@ export default {
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,
     skipQuickScan: true,
+    evmGasType: EVMGasType.Type2,
   },
 } as NetworksConfig;
