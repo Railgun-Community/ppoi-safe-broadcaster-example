@@ -97,7 +97,7 @@ describe('calculate-transaction-gas', () => {
     }
 
     expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
-    expect(gasDetails.maxFeePerGas.toString()).to.equal('240000');
+    expect(gasDetails.maxFeePerGas.toString()).to.equal('250000');
     expect(gasDetails.maxPriorityFeePerGas.toString()).to.equal('10000');
   });
 
@@ -122,7 +122,7 @@ describe('calculate-transaction-gas', () => {
     }
 
     expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
-    expect(gasDetails.maxFeePerGas.toString()).to.equal('240000');
+    expect(gasDetails.maxFeePerGas.toString()).to.equal('250000');
     expect(gasDetails.maxPriorityFeePerGas.toString()).to.equal('10000');
   });
 
@@ -154,7 +154,7 @@ describe('calculate-transaction-gas', () => {
     }
 
     expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
-    expect(gasDetails.maxFeePerGas.toString()).to.equal('240000');
+    expect(gasDetails.maxFeePerGas.toString()).to.equal('250000');
     expect(gasDetails.maxPriorityFeePerGas.toString()).to.equal('10000');
   });
 }).timeout(10000);
