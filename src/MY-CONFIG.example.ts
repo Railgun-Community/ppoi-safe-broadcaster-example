@@ -15,8 +15,18 @@ export const myConfigOverrides = () => {
   ];
 
   //
-  //  Set other configs, for example:
-  //  configDefaults.debug.logLevel = DebugLevel.None;
-  //  configDefaults.networks.active = [NetworkChainID.Ropsten];
+  // Set other configs, for example:
   //
+  // configDefaults.debug.logLevel = DebugLevel.None;
+  //
+  // configDefaults.networks.active = [
+  //   NetworkChainID.Ropsten,
+  //   NetworkChainID.BNBSmartChain,
+  // ];
+  //
+  // configTokens[NetworkChainID.Ethereum] = {
+  //   '0x_token_address': {
+  //     symbol: 'TOKEN1',
+  //   },
+  // };
 };
