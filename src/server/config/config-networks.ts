@@ -18,6 +18,8 @@ const defaultFees = {
   profit: 0.1,
 };
 
+const defaultTokenPriceTTL = 10 * 60 * 1000;
+
 export default {
   [NetworkChainID.Ethereum]: {
     name: 'Ethereum',
@@ -30,7 +32,7 @@ export default {
     proxyContract: RailProxyContract.Ethereum,
     coingeckoId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
-    priceTTLInMS: 5 * 60 * 1000,
+    priceTTLInMS: defaultTokenPriceTTL,
     evmGasType: EVMGasType.Type2,
   },
   [NetworkChainID.Ropsten]: {
@@ -44,7 +46,7 @@ export default {
     proxyContract: RailProxyContract.Ropsten,
     deploymentBlock: RailProxyDeploymentBlock.Ropsten,
     fallbackProviderConfig: fallbackProvidersRopsten,
-    priceTTLInMS: 5 * 60 * 1000,
+    priceTTLInMS: defaultTokenPriceTTL,
     isTestNetwork: true,
     evmGasType: EVMGasType.Type2,
   },
@@ -59,7 +61,7 @@ export default {
     proxyContract: RailProxyContract.BNBSmartChain,
     coingeckoId: CoingeckoNetworkID.BNBSmartChain,
     fallbackProviderConfig: fallbackProvidersBNBSmartChain,
-    priceTTLInMS: 5 * 60 * 1000,
+    priceTTLInMS: defaultTokenPriceTTL,
     evmGasType: EVMGasType.Type0,
   },
   [NetworkChainID.PolygonPOS]: {
@@ -73,7 +75,7 @@ export default {
     proxyContract: RailProxyContract.PolygonPOS,
     coingeckoId: CoingeckoNetworkID.PolygonPOS,
     fallbackProviderConfig: fallbackProvidersPolygon,
-    priceTTLInMS: 5 * 60 * 1000,
+    priceTTLInMS: defaultTokenPriceTTL,
     evmGasType: EVMGasType.Type2,
   },
   [NetworkChainID.HardHat]: {
@@ -86,7 +88,7 @@ export default {
     fees: defaultFees,
     proxyContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
     fallbackProviderConfig: fallbackProvidersHardhat,
-    priceTTLInMS: 5 * 60 * 1000,
+    priceTTLInMS: defaultTokenPriceTTL,
     isTestNetwork: true,
     skipQuickScan: true,
     evmGasType: EVMGasType.Type2,

@@ -56,8 +56,14 @@ export const extractPackagedFeeFromTransaction = async (
   populatedTransaction: PopulatedTransaction,
 ): Promise<PackagedFee> => {
   const network = configNetworks[chainID];
-  if (populatedTransaction.to !== network.proxyContract) {
-    throw new Error('Invalid contract address.');
+  if (
+    !populatedTransaction.to ||
+    populatedTransaction.to.toLowerCase() !==
+      network.proxyContract.toLowerCase()
+  ) {
+    throw new Error(
+      `Invalid contract address: got ${populatedTransaction.to}, expected ${network.proxyContract} for chain ${chainID}`,
+    );
   }
 
   const provider = getProviderForNetwork(chainID);

@@ -27,20 +27,13 @@ export const getEstimateGasDetails = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
 ): Promise<TransactionGasDetails> => {
-  try {
-    const provider = getProviderForNetwork(chainID);
-    const [gasEstimate, feeData] = await Promise.all([
-      provider.estimateGas(populatedTransaction).catch(throwErr),
-      getStandardHistoricalFeeData(chainID),
-    ]);
+  const provider = getProviderForNetwork(chainID);
+  const [gasEstimate, feeData] = await Promise.all([
+    provider.estimateGas(populatedTransaction).catch(throwErr),
+    getStandardHistoricalFeeData(chainID),
+  ]);
 
-    return { gasEstimate, ...feeData };
-  } catch (err) {
-    if (err.message && err.message.includes('failed to meet quorum')) {
-      throw new Error(BAD_TOKEN_FEE_ERROR_MESSAGE);
-    }
-    throw err;
-  }
+  return { gasEstimate, ...feeData };
 };
 
 export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
