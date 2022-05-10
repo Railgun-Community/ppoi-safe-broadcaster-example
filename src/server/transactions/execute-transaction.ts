@@ -71,6 +71,7 @@ export const executeTransaction = async (
       const { gasPrice } = gasDetails;
       finalTransaction.type = 0;
       finalTransaction.gasPrice = gasPrice;
+      dbg(`Gas price: ${gasPrice.toString()}`);
       break;
     }
     case EVMGasType.Type2: {
@@ -78,6 +79,8 @@ export const executeTransaction = async (
       finalTransaction.type = 2;
       finalTransaction.maxFeePerGas = maxFeePerGas;
       finalTransaction.maxPriorityFeePerGas = maxPriorityFeePerGas;
+      dbg(`Max fee per gas: ${maxFeePerGas.toString()}`);
+      dbg(`Max priority fee: ${maxPriorityFeePerGas.toString()}`);
       break;
     }
   }
