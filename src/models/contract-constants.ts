@@ -7,9 +7,9 @@ export enum RailProxyContract {
 }
 
 export enum RailProxyDeploymentBlock {
-  Ethereum = 14693013,
+  Ethereum = 14737691,
   Ropsten = 12226000,
-  BNBSmartChain = 17431925,
-  PolygonPOS = 27803253,
+  BNBSmartChain = 17633701,
+  PolygonPOS = 28083766,
   HardHat = 0,
 }
