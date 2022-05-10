@@ -3,7 +3,6 @@ import { EVMGasType } from '../../models/network-models';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { BAD_TOKEN_FEE_ERROR_MESSAGE } from './fee-validator';
 import { getStandardHistoricalFeeData } from './gas-history';
 
 export type TransactionGasDetails =

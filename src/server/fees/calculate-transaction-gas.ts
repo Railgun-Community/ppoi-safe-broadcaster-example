@@ -54,7 +54,7 @@ export const createTransactionGasDetails = (
     }
     case EVMGasType.Type2: {
       const { maxPriorityFeePerGas } = gasEstimateDetails;
-      const maxFeePerGas = translatedGasPrice.sub(maxPriorityFeePerGas);
+      const maxFeePerGas = translatedGasPrice;
       if (maxFeePerGas.isNegative()) {
         throw new Error('Max fee cannot be negative.');
       }
