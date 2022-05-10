@@ -1,6 +1,6 @@
 {
   "name": "@railgun-community/relayer",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "",
   "main": "dist/main.js",
   "engines": {
@@ -27,6 +27,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ethersproject/bignumber": "^5.6.0",
     "@ethersproject/providers": "^5.6.4",
     "@ethersproject/shims": "^5.6.0",
     "@ethersproject/units": "^5.6.0",
@@ -40,7 +41,8 @@
     "ethers": "^5.6.4",
     "leveldown": "^6.1.1",
     "prompt-sync": "^4.2.0",
-    "railgun-artifacts-node": "https://npm.railgun.org/railgun-artifacts-node-0.1.0.tgz"
+    "railgun-artifacts-node": "https://npm.railgun.org/railgun-artifacts-node-0.1.0.tgz",
+    "web3-eth": "^1.7.3"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.0",

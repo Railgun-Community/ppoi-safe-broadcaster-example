@@ -1,11 +1,10 @@
-import { BaseProvider } from '@ethersproject/providers';
 import { BigNumber, PopulatedTransaction } from 'ethers';
 import { EVMGasType } from '../../models/network-models';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
-import configNetworks from '../config/config-networks';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { BAD_TOKEN_FEE_ERROR_MESSAGE } from './fee-validator';
+import { getStandardHistoricalFeeData } from './gas-history';
 
 export type TransactionGasDetails =
   | TransactionGasDetailsType0
@@ -24,11 +23,6 @@ export type TransactionGasDetailsType2 = {
   maxPriorityFeePerGas: BigNumber;
 };
 
-const getEVMGasType = (chainID: NetworkChainID): EVMGasType => {
-  const network = configNetworks[chainID];
-  return network.evmGasType;
-};
-
 export const getEstimateGasDetails = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
@@ -37,7 +31,7 @@ export const getEstimateGasDetails = async (
     const provider = getProviderForNetwork(chainID);
     const [gasEstimate, feeData] = await Promise.all([
       provider.estimateGas(populatedTransaction).catch(throwErr),
-      getProviderFeeData(chainID, provider),
+      getStandardHistoricalFeeData(chainID),
     ]);
 
     return { gasEstimate, ...feeData };
@@ -47,43 +41,6 @@ export const getEstimateGasDetails = async (
     }
     throw err;
   }
-};
-
-export const getProviderFeeData = async (
-  chainID: NetworkChainID,
-  provider: BaseProvider,
-): Promise<
-  | { evmGasType: EVMGasType.Type0; gasPrice: BigNumber }
-  | {
-      evmGasType: EVMGasType.Type2;
-      maxFeePerGas: BigNumber;
-      maxPriorityFeePerGas: BigNumber;
-    }
-> => {
-  const { maxFeePerGas, maxPriorityFeePerGas, gasPrice } =
-    await provider.getFeeData();
-
-  const evmGasType = getEVMGasType(chainID);
-
-  switch (evmGasType) {
-    case EVMGasType.Type0: {
-      if (gasPrice == null) {
-        throw new Error(
-          'Could not fetch EVM Type 1 fee data for this transaction.',
-        );
-      }
-      return { evmGasType, gasPrice };
-    }
-    case EVMGasType.Type2: {
-      if (maxFeePerGas == null || maxPriorityFeePerGas == null) {
-        throw new Error(
-          'Could not fetch EVM Type 2 fee data for this transaction.',
-        );
-      }
-      return { evmGasType, maxFeePerGas, maxPriorityFeePerGas };
-    }
-  }
-  throw new Error('Unrecognized gas type.');
 };
 
 export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
