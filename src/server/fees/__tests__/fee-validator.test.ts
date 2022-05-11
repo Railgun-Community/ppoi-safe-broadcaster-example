@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
-import { BAD_TOKEN_FEE_ERROR_MESSAGE, validateFee } from '../fee-validator';
+import { validateFee } from '../fee-validator';
 import {
   cacheUnitFeesForTokens,
   resetTransactionFeeCache,
@@ -17,6 +17,7 @@ import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import configTokens from '../../config/config-tokens';
 import { initTokens } from '../../tokens/network-tokens';
+import { ErrorMessage } from '../../../util/errors';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -73,13 +74,13 @@ describe('fee-validator', () => {
     });
     expect(() =>
       validatePackagedFee(feeCacheID, BigNumber.from(50), BigNumber.from(10)),
-    ).to.throw(BAD_TOKEN_FEE_ERROR_MESSAGE);
+    ).to.throw(ErrorMessage.BAD_TOKEN_FEE);
   });
 
   it('Should invalidate without a cached or calculated fee', () => {
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(15), BigNumber.from(10)),
-    ).to.throw(BAD_TOKEN_FEE_ERROR_MESSAGE);
+    ).to.throw(ErrorMessage.BAD_TOKEN_FEE);
   });
 
   it('Should validate if packaged fee > calculated fee', () => {
@@ -109,6 +110,6 @@ describe('fee-validator', () => {
   it('Should invalidate if packaged fee < calculated fee', () => {
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(5), BigNumber.from(10)),
-    ).to.throw(BAD_TOKEN_FEE_ERROR_MESSAGE);
+    ).to.throw(ErrorMessage.BAD_TOKEN_FEE);
   });
 }).timeout(10000);

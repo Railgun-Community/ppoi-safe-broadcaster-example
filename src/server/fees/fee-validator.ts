@@ -4,8 +4,7 @@ import { logger } from '../../util/logger';
 import { getTokenFee } from './calculate-token-fee';
 import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
 import configNetworks from '../config/config-networks';
-
-export const BAD_TOKEN_FEE_ERROR_MESSAGE = 'Bad token fee.';
+import { ErrorMessage } from '../../util/errors';
 
 const comparePackagedFeeToCalculated = (
   chainID: NetworkChainID,
@@ -58,5 +57,5 @@ export const validateFee = (
   logger.log(`calculatedFee: ${calculatedFee?.toString()}`);
   logger.log(`tokenFee: ${packagedFee.toString()}`);
 
-  throw new Error(BAD_TOKEN_FEE_ERROR_MESSAGE);
+  throw new Error(ErrorMessage.BAD_TOKEN_FEE);
 };

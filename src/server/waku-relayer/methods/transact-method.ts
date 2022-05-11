@@ -16,7 +16,7 @@ import {
 } from '../../wallets/active-wallets';
 import { contentTopics } from '../topics';
 import { WakuMethodResponse } from '../waku-response';
-import { BAD_TOKEN_FEE_ERROR_MESSAGE } from '../../fees/fee-validator';
+import { ErrorMessage } from '../../../util/errors';
 
 export type WakuMethodParamsTransact = {
   pubkey: string;
@@ -102,12 +102,15 @@ const errorResponse = (
 ): WakuMethodResponse => {
   let sanitizedErrorMessage: string;
   switch (err.message) {
+    case ErrorMessage.BAD_TOKEN_FEE:
     case 'No Relayer payment included in transaction.':
-    case BAD_TOKEN_FEE_ERROR_MESSAGE:
-      sanitizedErrorMessage = BAD_TOKEN_FEE_ERROR_MESSAGE;
+      sanitizedErrorMessage = ErrorMessage.BAD_TOKEN_FEE;
+      break;
+    case ErrorMessage.GAS_ESTIMATE_ERROR:
+      sanitizedErrorMessage = ErrorMessage.GAS_ESTIMATE_ERROR;
       break;
     default:
-      sanitizedErrorMessage = 'Unknown Relayer error.';
+      sanitizedErrorMessage = ErrorMessage.UNKNOWN_ERROR;
       break;
   }
   const response = {

@@ -28,28 +28,33 @@ export const getLastNonceKey = (
   return `${LAST_NONCE_KEY}|${wallet.address}|${chainID}}`;
 };
 
-export const getCurrentNonce = async (
-  chainID: NetworkChainID,
+export const getCurrentWalletNonce = async (
   wallet: EthersWallet,
 ): Promise<number> => {
-  // const [txCount, lastTransactionNonce] = await Promise.all([
-  //   wallet.getTransactionCount().catch(throwErr),
-  //   await getSettingsNumber(getLastNonceKey(chainID, wallet)),
-  // ]);
-  // if (lastTransactionNonce) {
-  //   return Math.max(txCount, lastTransactionNonce + 1);
-  // }
-  // return txCount;
-
-  // Nonce storage has been unreliable...
-  // Since we keep the wallet locked while a tx is pending, we can just use the tx count.
-  // Only limitation is if we restart during a pending tx.
-
   try {
     return await wallet.getTransactionCount();
   } catch (err) {
     return throwErr(err);
   }
+};
+
+/**
+ * NOTE: This nonce storage has been unreliable...
+ * Since we keep the wallet locked while a tx is pending, we can just use the tx count.
+ * Only limitation is if we restart during a pending tx.
+ */
+export const getCurrentNonce = async (
+  chainID: NetworkChainID,
+  wallet: EthersWallet,
+): Promise<number> => {
+  const [txCount, lastTransactionNonce] = await Promise.all([
+    wallet.getTransactionCount().catch(throwErr),
+    await getSettingsNumber(getLastNonceKey(chainID, wallet)),
+  ]);
+  if (lastTransactionNonce) {
+    return Math.max(txCount, lastTransactionNonce + 1);
+  }
+  return txCount;
 };
 
 export const storeCurrentNonce = async (
@@ -71,7 +76,8 @@ export const executeTransaction = async (
   const activeWallet = await getBestMatchWalletForNetwork(chainID, maximumGas);
   const provider = getProviderForNetwork(chainID);
   const ethersWallet = createEthersWallet(activeWallet, provider);
-  const nonce = await getCurrentNonce(chainID, ethersWallet);
+  const nonce = await getCurrentWalletNonce(ethersWallet);
+  const gasLimit = calculateGasLimit(gasDetails.gasEstimate);
   dbg('Nonce', nonce);
 
   const finalTransaction: PopulatedTransaction = {
@@ -80,6 +86,8 @@ export const executeTransaction = async (
     nonce,
     gasLimit: calculateGasLimit(gasDetails.gasEstimate),
   };
+
+  dbg(`Gas limit: ${gasLimit.toString()}`);
 
   switch (gasDetails.evmGasType) {
     case EVMGasType.Type0: {

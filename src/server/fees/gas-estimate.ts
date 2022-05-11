@@ -1,5 +1,7 @@
 import { BigNumber, PopulatedTransaction } from 'ethers';
 import { EVMGasType } from '../../models/network-models';
+import { ErrorMessage } from '../../util/errors';
+import { logger } from '../../util/logger';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
@@ -26,13 +28,18 @@ export const getEstimateGasDetails = async (
   chainID: NetworkChainID,
   populatedTransaction: PopulatedTransaction,
 ): Promise<TransactionGasDetails> => {
-  const provider = getProviderForNetwork(chainID);
-  const [gasEstimate, feeData] = await Promise.all([
-    provider.estimateGas(populatedTransaction).catch(throwErr),
-    getStandardHistoricalFeeData(chainID),
-  ]);
+  try {
+    const provider = getProviderForNetwork(chainID);
+    const [gasEstimate, feeData] = await Promise.all([
+      provider.estimateGas(populatedTransaction).catch(throwErr),
+      getStandardHistoricalFeeData(chainID),
+    ]);
 
-  return { gasEstimate, ...feeData };
+    return { gasEstimate, ...feeData };
+  } catch (err) {
+    logger.error(err);
+    throw new Error(ErrorMessage.GAS_ESTIMATE_ERROR);
+  }
 };
 
 export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
