@@ -97,12 +97,16 @@ describe('execute-transaction', () => {
 
   it('Should get and store nonce values', async () => {
     let currentNonce: number;
-    currentNonce = await getCurrentNonce(ethersWallet);
+    currentNonce = await getCurrentNonce(NetworkChainID.Ropsten, ethersWallet);
     expect(currentNonce).to.equal(3);
 
-    await storeCurrentNonce(24, ethersWallet);
-    expect(await getSettingsNumber(getLastNonceKey(ethersWallet))).to.equal(24);
-    currentNonce = await getCurrentNonce(ethersWallet);
+    await storeCurrentNonce(NetworkChainID.Ropsten, 24, ethersWallet);
+    expect(
+      await getSettingsNumber(
+        getLastNonceKey(NetworkChainID.Ropsten, ethersWallet),
+      ),
+    ).to.equal(24);
+    currentNonce = await getCurrentNonce(NetworkChainID.Ropsten, ethersWallet);
     expect(currentNonce).to.equal(25); // 24 + 1
   });
 

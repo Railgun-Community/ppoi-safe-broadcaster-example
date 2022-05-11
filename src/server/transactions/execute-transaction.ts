@@ -21,28 +21,43 @@ const dbg = debug('relayer:transact:execute');
 
 const LAST_NONCE_KEY = 'last_nonce_key';
 
-export const getLastNonceKey = (wallet: EthersWallet) => {
-  return `${LAST_NONCE_KEY}|${wallet.address}}`;
+export const getLastNonceKey = (
+  chainID: NetworkChainID,
+  wallet: EthersWallet,
+) => {
+  return `${LAST_NONCE_KEY}|${wallet.address}|${chainID}}`;
 };
 
 export const getCurrentNonce = async (
+  chainID: NetworkChainID,
   wallet: EthersWallet,
 ): Promise<number> => {
-  const [txCount, lastTransactionNonce] = await Promise.all([
-    wallet.getTransactionCount().catch(throwErr),
-    await getSettingsNumber(getLastNonceKey(wallet)),
-  ]);
-  if (lastTransactionNonce) {
-    return Math.max(txCount, lastTransactionNonce + 1);
+  // const [txCount, lastTransactionNonce] = await Promise.all([
+  //   wallet.getTransactionCount().catch(throwErr),
+  //   await getSettingsNumber(getLastNonceKey(chainID, wallet)),
+  // ]);
+  // if (lastTransactionNonce) {
+  //   return Math.max(txCount, lastTransactionNonce + 1);
+  // }
+  // return txCount;
+
+  // Nonce storage has been unreliable...
+  // Since we keep the wallet locked while a tx is pending, we can just use the tx count.
+  // Only limitation is if we restart during a pending tx.
+
+  try {
+    return await wallet.getTransactionCount();
+  } catch (err) {
+    return throwErr(err);
   }
-  return txCount;
 };
 
 export const storeCurrentNonce = async (
+  chainID: NetworkChainID,
   nonce: number,
   wallet: EthersWallet,
 ) => {
-  await storeSettingsNumber(getLastNonceKey(wallet), nonce);
+  await storeSettingsNumber(getLastNonceKey(chainID, wallet), nonce);
 };
 
 export const executeTransaction = async (
@@ -56,7 +71,7 @@ export const executeTransaction = async (
   const activeWallet = await getBestMatchWalletForNetwork(chainID, maximumGas);
   const provider = getProviderForNetwork(chainID);
   const ethersWallet = createEthersWallet(activeWallet, provider);
-  const nonce = await getCurrentNonce(ethersWallet);
+  const nonce = await getCurrentNonce(chainID, ethersWallet);
   dbg('Nonce', nonce);
 
   const finalTransaction: PopulatedTransaction = {
@@ -111,7 +126,7 @@ export const waitForTx = async (
     setWalletAvailable(activeWallet, chainID, false);
     await waitTx(txResponse);
     dbg(`Transaction completed/mined: ${txResponse.hash}`);
-    await storeCurrentNonce(nonce, ethersWallet);
+    await storeCurrentNonce(chainID, nonce, ethersWallet);
   } catch (err) {
     dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
   } finally {
