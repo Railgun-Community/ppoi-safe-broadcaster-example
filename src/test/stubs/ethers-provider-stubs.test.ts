@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
 import { EVMGasType } from '../../models/network-models';
-import * as GasHistoryModule from '../../server/fees/gas-history';
+import * as GasHistoryModule from '../../server/fees/gas-by-speed';
 
 let estimateGasStub: SinonStub;
 let getHistoricalDataStub: SinonStub;
@@ -18,7 +18,7 @@ export const createGasEstimateStubs = (
     .stub(BaseProvider.prototype, 'estimateGas')
     .resolves(estimateGas);
   getHistoricalDataStub = sinon
-    .stub(GasHistoryModule, 'getStandardHistoricalFeeData')
+    .stub(GasHistoryModule, 'getMediumStandardGasDetails')
     .resolves({
       evmGasType: EVMGasType.Type2,
       maxFeePerGas,

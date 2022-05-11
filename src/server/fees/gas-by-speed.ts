@@ -30,6 +30,7 @@ import Web3 from 'web3-eth';
 import { EVMGasType } from '../../models/network-models';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
+import { getProviderForNetwork } from '../providers/active-network-providers';
 import { web3ProviderFromChainID } from '../providers/web3-providers';
 
 // Hack to get the types to apply correctly.
@@ -74,7 +75,7 @@ const Web3Eth = Web3 as unknown as typeof Web3.Eth;
 // };
 //
 
-type HistoricalGasDetails =
+export type GasDetailsBySpeed =
   | NumMapType<{
       evmGasType: EVMGasType.Type0;
       gasPrice: BigNumber;
@@ -135,14 +136,66 @@ const getMedianBigNumber = (feeHistoryOutputs: BigNumber[]): BigNumber => {
   return sorted[middleIndex];
 };
 
-export const getStandardHistoricalFeeData = async (chainID: NetworkChainID) => {
-  const historicalGasDetails = await getMedianHistoricalGasDetails(chainID);
-  return historicalGasDetails[GasHistoryPercentile.Medium];
+export const getMediumStandardGasDetails = async (chainID: NetworkChainID) => {
+  const { evmGasType } = configNetworks[chainID];
+
+  let gasDetailsBySpeed: GasDetailsBySpeed;
+  switch (evmGasType) {
+    case EVMGasType.Type0:
+      gasDetailsBySpeed = await getGasPricesBySpeed(evmGasType, chainID);
+      break;
+    case EVMGasType.Type2:
+      gasDetailsBySpeed = await getMedianHistoricalGasDetailsBySpeed(
+        evmGasType,
+        chainID,
+      );
+      break;
+  }
+
+  if (!gasDetailsBySpeed) {
+    throw new Error('Unhandled gas type.');
+  }
+
+  return gasDetailsBySpeed[GasHistoryPercentile.Medium];
 };
 
-const getMedianHistoricalGasDetails = async (
+const gasPriceForPercentile = (
+  gasPrice: BigNumber,
+  percentile: GasHistoryPercentile,
+) => {
+  const settings = SETTINGS_BY_PRIORITY_LEVEL[percentile];
+  return gasPrice.mul(settings.baseFeePercentageMultiplier).div(100);
+};
+
+export const getGasPricesBySpeed = async (
+  evmGasType: EVMGasType.Type0,
   chainID: NetworkChainID,
-): Promise<HistoricalGasDetails> => {
+): Promise<GasDetailsBySpeed> => {
+  const provider = getProviderForNetwork(chainID);
+  const gasPrice = await provider.getGasPrice();
+
+  const gasPricesBySpeed: GasDetailsBySpeed = {
+    [GasHistoryPercentile.Low]: {
+      evmGasType,
+      gasPrice: gasPriceForPercentile(gasPrice, GasHistoryPercentile.Low),
+    },
+    [GasHistoryPercentile.Medium]: {
+      evmGasType,
+      gasPrice: gasPriceForPercentile(gasPrice, GasHistoryPercentile.Medium),
+    },
+    [GasHistoryPercentile.High]: {
+      evmGasType,
+      gasPrice: gasPriceForPercentile(gasPrice, GasHistoryPercentile.High),
+    },
+  };
+
+  return gasPricesBySpeed;
+};
+
+const getMedianHistoricalGasDetailsBySpeed = async (
+  evmGasType: EVMGasType.Type2,
+  chainID: NetworkChainID,
+): Promise<GasDetailsBySpeed> => {
   const web3Eth = new Web3Eth();
   const provider = web3ProviderFromChainID(chainID);
   web3Eth.setProvider(provider);
@@ -200,31 +253,7 @@ const getMedianHistoricalGasDetails = async (
     ),
   };
 
-  const { evmGasType } = configNetworks[chainID];
-
   switch (evmGasType) {
-    case EVMGasType.Type0: {
-      return {
-        [GasHistoryPercentile.Low]: {
-          evmGasType,
-          gasPrice: convertSuggestedGasDetailsToGasPrice(
-            suggestedGasDetails[GasHistoryPercentile.Low],
-          ),
-        },
-        [GasHistoryPercentile.Medium]: {
-          evmGasType,
-          gasPrice: convertSuggestedGasDetailsToGasPrice(
-            suggestedGasDetails[GasHistoryPercentile.Medium],
-          ),
-        },
-        [GasHistoryPercentile.High]: {
-          evmGasType,
-          gasPrice: convertSuggestedGasDetailsToGasPrice(
-            suggestedGasDetails[GasHistoryPercentile.High],
-          ),
-        },
-      };
-    }
     case EVMGasType.Type2: {
       return {
         [GasHistoryPercentile.Low]: {

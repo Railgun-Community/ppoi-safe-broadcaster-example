@@ -5,7 +5,7 @@ import { logger } from '../../util/logger';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { getStandardHistoricalFeeData } from './gas-history';
+import { getMediumStandardGasDetails } from './gas-by-speed';
 
 export type TransactionGasDetails =
   | TransactionGasDetailsType0
@@ -30,12 +30,12 @@ export const getEstimateGasDetails = async (
 ): Promise<TransactionGasDetails> => {
   try {
     const provider = getProviderForNetwork(chainID);
-    const [gasEstimate, feeData] = await Promise.all([
+    const [gasEstimate, gasDetailsBySpeed] = await Promise.all([
       provider.estimateGas(populatedTransaction).catch(throwErr),
-      getStandardHistoricalFeeData(chainID),
+      getMediumStandardGasDetails(chainID),
     ]);
 
-    return { gasEstimate, ...feeData };
+    return { gasEstimate, ...gasDetailsBySpeed };
   } catch (err) {
     logger.error(err);
     throw new Error(ErrorMessage.GAS_ESTIMATE_ERROR);
