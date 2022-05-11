@@ -15,7 +15,7 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 ## Run RAILGUN relayer
 
 - `npm run copy-my-config`
-- Make config changes to MY-CONFIG.ts
+-  Make config changes to MY-CONFIG.ts
 - `npm install`
 - `npm start` or
 - `npm run debug` (DEBUG mode)
@@ -31,7 +31,7 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 
 - copy docker/.env.empty to docker/.env and fill in `EXTIP` and `NODEKEY` (see above)
 - build image, copying your .env file: `docker build -f docker/Dockerfile-nwaku -t nwaku docker`
-- run image: `docker run -it nwaku`
+- run image: `docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -it nwaku`
 
 ### docker stack (@todo)
 
