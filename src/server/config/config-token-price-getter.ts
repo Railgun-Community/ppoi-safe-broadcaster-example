@@ -45,7 +45,7 @@ const tokenPriceGetter = async (
 
   const tokenAddressesToPrice: TokenAddressesToPrice = {};
 
-  const batchSize = 30;
+  const batchSize = 50;
   for (let i = 0; i < tokenAddresses.length; i += batchSize) {
     const batch = tokenAddresses.slice(i, i + batchSize);
     // eslint-disable-next-line no-await-in-loop
