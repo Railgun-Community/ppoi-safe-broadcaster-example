@@ -24,10 +24,7 @@ const getEncryptionKey = (): string => {
 
 const getMnemonic = (): string => {
   const input = prompt('Enter wallet mnemonic: ');
-  if (input.split(' ').length === 12) {
-    return input;
-  }
-  throw new Error('Invalid mnemonic');
+  return input;
 };
 
 /**
