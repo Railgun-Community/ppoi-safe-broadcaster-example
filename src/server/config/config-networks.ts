@@ -18,6 +18,8 @@ const defaultFees = {
   profit: 0.1,
 };
 
+// 10 minute timeout on ticket prices retrieved from API.
+// Shorter is safer, but Coingecko can lag by up to 15 minutes.
 const defaultTokenPriceTTL = 10 * 60 * 1000;
 
 export default {
