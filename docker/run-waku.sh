@@ -1,2 +1,22 @@
 #!/bin/sh
-/usr/bin/wakunode --nat=none --rpc=true --rpc-private=true --rpc-admin=true --relay=true --staticnode=/dns4/relayer.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg --log-level=info --rpc-address=0.0.0.0 --rpc-port=8546
+if [ -f .env ]; then
+  export $(cat .env | xargs)
+fi
+echo "NODEKEY:$NODEKEY"
+echo "LOGLEVEL: $LOGLEVEL"
+echo "DOMAIN: $DOMAIN"
+echo "EXTIP: $EXTIP"
+/usr/bin/wakunode \
+    --log-level=$LOGLEVEL \
+    --rpc=true \
+    --rpc-private=true \
+    --rpc-admin=true \
+    --relay=true \
+    --store=true \
+    --rpc-address=0.0.0.0 \
+    --rpc-port=8546 \
+    --staticnode=/dns4/relayer.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg \
+    --staticnode=/dns4/node-01.gc-us-central1-a.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAkwBp8T6G77kQXSNMnxgaMky1JeyML5yqoTHRM8dbeCBNb \
+    --staticnode=/dns4/node-01.do-ams3.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAm6HZZr7aToTvEBPpiys4UxajCTU97zj5v7RNR2gbniy1D \
+    --nodekey="$NODEKEY" \
+    --nat="extip:$EXTIP"

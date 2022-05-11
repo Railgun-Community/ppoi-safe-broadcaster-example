@@ -1,0 +1,14 @@
+### install yarn and modules
+FROM statusteam/nim-waku:deploy-v2-test
+
+#ENV DOMAIN
+#ENV KEY
+#ENV EXTIP
+WORKDIR /app
+COPY ./.env /app
+COPY ./run-waku.sh /app
+#ENTRYPOINT ["/bin/sh"]
+#ENTRYPOINT ["/usr/bin/wakunode"]
+#CMD ["--help"]
+#CMD /usr/bin/wakunode -- --nat=extip:${EXTIP}
+ENTRYPOINT ["/app/run-waku.sh"]

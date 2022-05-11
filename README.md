@@ -23,6 +23,18 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 ## Use docker
 
 - Prereqs: Install docker
+- Create a secret key (`NODEKEY`) for your node. This is not currently used for encryption, but does establish your node's identity: `docker/nodekey.sh`
+- Know your external IP (`EXTIP`) and verify that ports 60000 and 8000 are exposed to the outside world (see https://www.canyouseeme.org/ or similar).
+- If you have a stable ip and domain and would like to join the community fleet of bootstrap nodes, you will need to generate an SSL certificate with letsencrypt (@todo expand later)
+
+### regular docker
+
+- copy docker/.env.empty to docker/.env and fill in `EXTIP` and `NODEKEY` (see above)
+- build image, copying your .env file: `docker build -f docker/Dockerfile-nwaku -t nwaku docker`
+- run image: `docker run -it nwaku`
+
+### docker stack (@todo)
+
 - Initialize docker swarm if you don't already have one: `docker swarm init`
 - Generate `DB_ENCRYPTION_KEY` docker secret: `docker/nodekey.sh | docker secret create DB_ENCRYPTION_KEY -`
 - Generate `nodekey` docker secret: `docker/nodekey.sh | docker secret create nodekey -`
