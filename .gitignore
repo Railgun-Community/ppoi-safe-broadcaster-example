@@ -34,3 +34,4 @@ docker/secret
 # Leveldown database
 *.db/
 tsconfig.tsbuildinfo
+docker/.env

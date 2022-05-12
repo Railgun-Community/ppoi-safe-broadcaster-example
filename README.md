@@ -4,6 +4,12 @@
 
 The RAILGUN relayer network runs on [Waku](https://wakunetwork.com/), a secure and decentralized messaging protocol.
 
+## Prerequisites
+
+- node 16+
+- docker, if using docker
+- jq (cli utility for parsing json)
+
 ## Configuration
 
 Customize your relayer by running `npm run copy-my-config`, which copies `MY-CONFIG.example.ts` to `MY_CONFIG.ts`.
@@ -15,7 +21,7 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 ## Run RAILGUN relayer
 
 - `npm run copy-my-config`
--  Make config changes to MY-CONFIG.ts
+- Make config changes to MY-CONFIG.ts
 - `npm install`
 - `npm start` or
 - `npm run debug` (DEBUG mode)
@@ -29,19 +35,53 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 
 ### regular docker
 
-- copy docker/.env.empty to docker/.env and fill in `EXTIP` and `NODEKEY` (see above)
-- build image, copying your .env file: `docker build -f docker/Dockerfile-nwaku -t nwaku docker`
-- run image: `docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -it nwaku`
+- copy `docker/.env.empty` to `docker/.env` and fill in `EXTIP` and `NODEKEY` (see above)
+
+- build image, copying your .env file:
+
+      docker build -f docker/Dockerfile-nwaku -t nwaku docker
+
+- run image:
+
+      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -it nwaku
+
+- verify that you can communicate with your nwaku instance over json-rpc:
+
+      scripts/nwaku/whoami.sh
+
+- verify that nwaku is connected to other nwaku nodes:
+
+      scripts/nwaku/peers.sh
 
 ### docker stack (@todo)
 
-- Initialize docker swarm if you don't already have one: `docker swarm init`
-- Generate `DB_ENCRYPTION_KEY` docker secret: `docker/nodekey.sh | docker secret create DB_ENCRYPTION_KEY -`
-- Generate `nodekey` docker secret: `docker/nodekey.sh | docker secret create nodekey -`
-- Register `MNEMONIC` docker secret: `echo "my mnemonic words..." | docker secret create MNEMONIC -`
-- Build `relayer` and `waku` docker images: `docker/build.sh`
-- Deploy stack: `docker/deploy.sh`
-- Stop stack: `docker/stop.sh`
+- Initialize docker swarm if you don't already have one:
+
+      docker swarm init
+
+- Generate `DB_ENCRYPTION_KEY` docker secret:
+
+      docker/nodekey.sh | docker secret create DB_ENCRYPTION_KEY -
+
+- Generate `nodekey` docker secret:
+
+      docker/nodekey.sh | docker secret create nodekey -
+
+- Register `MNEMONIC` docker secret:
+
+      echo "my mnemonic words..." | docker secret create MNEMONIC -
+
+- Build relayer and nwaku docker images:
+
+      docker/build.sh
+
+- Deploy stack:
+
+      docker/deploy.sh
+
+- Stop stack:
+
+      docker/stop.sh
 
 ## Run tests
 
