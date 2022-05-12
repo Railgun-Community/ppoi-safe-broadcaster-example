@@ -275,12 +275,6 @@ const getMedianHistoricalGasDetailsBySpeed = async (
   throw new Error('Unknown gas type for historical gas estimates');
 };
 
-const convertSuggestedGasDetailsToGasPrice = (
-  suggestedGasDetails: SuggestedGasDetails,
-): BigNumber => {
-  return suggestedGasDetails.maxFeePerGas;
-};
-
 const maxBigNumber = (b1: BigNumber, b2: BigNumber) => {
   return b1.gt(b2) ? b1 : b2;
 };

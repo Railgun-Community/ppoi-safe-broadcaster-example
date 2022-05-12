@@ -1,4 +1,3 @@
-import * as ed from '@noble/ed25519';
 import { FallbackProvider } from '@ethersproject/providers';
 import { Note, Lepton } from '@railgun-community/lepton';
 import { ERC20RailgunContract } from '@railgun-community/lepton/dist/contract';
