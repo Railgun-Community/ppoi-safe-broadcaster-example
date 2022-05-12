@@ -49,7 +49,8 @@ const MOCK_TOKEN_ADDRESS = getMockToken().address;
 const TREE = 0;
 const ROPSTEN_CHAIN_ID = NetworkChainID.Ropsten;
 const HARDHAT_CHAIN_ID = NetworkChainID.HardHat;
-('test test test test test test test test test test test junk');
+const MOCK_MNEMONIC_1 =
+  'test test test test test test test test test test test junk';
 
 const createRopstenTransaction = async (
   addressData: AddressData,
