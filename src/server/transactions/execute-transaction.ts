@@ -112,7 +112,8 @@ export const executeTransaction = async (
   }
 
   try {
-    dbg('Submitting transaction:', finalTransaction);
+    dbg('Submitting transaction');
+    dbg(finalTransaction);
     const txResponse = await ethersWallet.sendTransaction(finalTransaction);
     dbg('Submitted transaction:', txResponse.hash);
 
