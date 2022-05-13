@@ -5,10 +5,11 @@ import {
   nToHex,
   trim,
 } from '@railgun-community/lepton/dist/utils/bytes';
-import { BigNumber, Contract, PopulatedTransaction } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { Note } from '@railgun-community/lepton';
 import { getSharedSymmetricKey } from '@railgun-community/lepton/dist/utils/keys-utils';
 import { Ciphertext } from '@railgun-community/lepton/dist/models/transaction-types';
+import { TransactionRequest } from '@ethersproject/providers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
 import { abiForProxyContract } from '../abi/abi';
@@ -53,16 +54,15 @@ type TransactionData = {
 
 export const extractPackagedFeeFromTransaction = async (
   chainID: NetworkChainID,
-  populatedTransaction: PopulatedTransaction,
+  transactionRequest: TransactionRequest,
 ): Promise<PackagedFee> => {
   const network = configNetworks[chainID];
   if (
-    !populatedTransaction.to ||
-    populatedTransaction.to.toLowerCase() !==
-      network.proxyContract.toLowerCase()
+    !transactionRequest.to ||
+    transactionRequest.to.toLowerCase() !== network.proxyContract.toLowerCase()
   ) {
     throw new Error(
-      `Invalid contract address: got ${populatedTransaction.to}, expected ${network.proxyContract} for chain ${chainID}`,
+      `Invalid contract address: got ${transactionRequest.to}, expected ${network.proxyContract} for chain ${chainID}`,
     );
   }
 
@@ -71,8 +71,8 @@ export const extractPackagedFeeFromTransaction = async (
   const contract = new Contract(network.proxyContract, abi, provider);
 
   const parsedTransaction = contract.interface.parseTransaction({
-    data: populatedTransaction.data ?? '',
-    value: populatedTransaction.value,
+    data: (transactionRequest.data as string) ?? '',
+    value: transactionRequest.value,
   });
   if (parsedTransaction.name !== 'transact') {
     throw new Error('Contract method invalid');

@@ -28,8 +28,10 @@
   "license": "ISC",
   "dependencies": {
     "@ethersproject/bignumber": "^5.6.0",
+    "@ethersproject/contracts": "^5.6.0",
     "@ethersproject/providers": "^5.6.4",
     "@ethersproject/shims": "^5.6.0",
+    "@ethersproject/transactions": "^5.6.0",
     "@ethersproject/units": "^5.6.0",
     "@noble/ed25519": "^1.6.0",
     "@railgun-community/lepton": "https://npm.railgun.org/ci/1.1.1/railgun-community-lepton-1.1.1.tgz",

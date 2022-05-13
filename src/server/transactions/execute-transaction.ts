@@ -1,6 +1,9 @@
-import { TransactionResponse } from '@ethersproject/providers';
+import {
+  TransactionRequest,
+  TransactionResponse,
+} from '@ethersproject/providers';
 import debug from 'debug';
-import { PopulatedTransaction, Wallet as EthersWallet } from 'ethers';
+import { Wallet as EthersWallet } from 'ethers';
 import { EVMGasType } from '../../models/network-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { throwErr } from '../../util/promise-utils';
@@ -67,7 +70,7 @@ export const storeCurrentNonce = async (
 
 export const executeTransaction = async (
   chainID: NetworkChainID,
-  populatedTransaction: PopulatedTransaction,
+  transactionRequest: TransactionRequest,
   gasDetails: TransactionGasDetails,
 ): Promise<TransactionResponse> => {
   dbg('Execute transaction');
@@ -80,8 +83,8 @@ export const executeTransaction = async (
   const gasLimit = calculateGasLimit(gasDetails.gasEstimate);
   dbg('Nonce', nonce);
 
-  const finalTransaction: PopulatedTransaction = {
-    ...populatedTransaction,
+  const finalTransaction: TransactionRequest = {
+    ...transactionRequest,
     chainId: chainID,
     nonce,
     gasLimit: calculateGasLimit(gasDetails.gasEstimate),

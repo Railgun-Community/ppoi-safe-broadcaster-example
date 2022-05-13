@@ -1,14 +1,14 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { deserializePopulatedTransaction } from '../populated-transaction';
+import { deserializeTransaction } from '../populated-transaction';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('populated-transaction', () => {
   it('Should throw on bad deserialization', () => {
-    expect(() => deserializePopulatedTransaction('{{')).to.throw(
-      'Could not deserialize PopulatedTransaction.',
+    expect(() => deserializeTransaction('{{')).to.throw(
+      'Could not deserialize transaction.',
     );
   });
 }).timeout(120000);

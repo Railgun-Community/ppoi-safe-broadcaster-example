@@ -1,11 +1,18 @@
-import { PopulatedTransaction } from 'ethers';
+import { TransactionRequest } from '@ethersproject/providers';
+import { parse, Transaction } from '@ethersproject/transactions';
+import { logger } from '../../util/logger';
 
-export const deserializePopulatedTransaction = (
-  serializedTransaction: string,
-): PopulatedTransaction => {
+export const deserializeTransaction = (
+  rawTransaction: string,
+): TransactionRequest => {
   try {
-    return JSON.parse(serializedTransaction);
-  } catch (err: any) {
-    throw new Error('Could not deserialize PopulatedTransaction.');
+    const transaction: Transaction = parse(rawTransaction);
+    return {
+      ...transaction,
+      type: transaction.type ?? undefined,
+    };
+  } catch (err) {
+    logger.error(err);
+    throw new Error('Could not deserialize transaction.');
   }
 };
