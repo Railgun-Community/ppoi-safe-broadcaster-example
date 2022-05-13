@@ -176,7 +176,7 @@ const extractFeesFromRailgunTransactions = async (
     const commitHash = hash.toHexString();
     if (noteHash !== commitHash) {
       throw new Error(
-        'Client attempted to steal from relayer via invalid ciphertext.',
+        `Client attempted to steal from relayer via invalid ciphertext: Note hash mismatch ${noteHash} vs ${commitHash}.`,
       );
     }
 

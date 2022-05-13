@@ -111,19 +111,18 @@ export const executeTransaction = async (
     }
   }
 
-  const signedTransaction = await ethersWallet.signTransaction(
-    finalTransaction,
-  );
-  dbg('Signed transaction');
+  try {
+    dbg('Submitting transaction:', finalTransaction);
+    const txResponse = await ethersWallet.sendTransaction(finalTransaction);
+    dbg('Submitted transaction:', txResponse.hash);
 
-  const txResponse = await provider
-    .sendTransaction(signedTransaction)
-    .catch(throwErr);
-  dbg(`Submitted transaction: ${txResponse.hash}`);
-
-  // Call wait synchronously. This will set wallet unavailable until the tx is finished.
-  waitForTx(activeWallet, ethersWallet, chainID, txResponse, nonce);
-  return txResponse;
+    // Call wait synchronously. This will set wallet unavailable until the tx is finished.
+    waitForTx(activeWallet, ethersWallet, chainID, txResponse, nonce);
+    return txResponse;
+  } catch (err) {
+    dbg(err);
+    throw new Error('Could not send transaction.');
+  }
 };
 
 export const waitForTx = async (
