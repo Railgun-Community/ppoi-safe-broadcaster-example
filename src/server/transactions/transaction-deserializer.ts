@@ -2,6 +2,9 @@ import { TransactionRequest } from '@ethersproject/providers';
 import { parse, Transaction } from '@ethersproject/transactions';
 import { logger } from '../../util/logger';
 
+/**
+ * Note that nonce and chainId will automatically fill with 'undefined'.
+ */
 export const deserializeTransaction = (
   rawTransaction: string,
 ): TransactionRequest => {

@@ -9,7 +9,7 @@ import {
 } from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
 import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
-import { deserializeTransaction } from './populated-transaction';
+import { deserializeTransaction } from './transaction-deserializer';
 
 const dbg = debug('relayer:transact:validate');
 
