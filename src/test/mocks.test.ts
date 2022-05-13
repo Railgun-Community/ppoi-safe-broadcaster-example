@@ -76,8 +76,8 @@ export const getMockNetwork = (): Network => {
       minimumBalanceForAvailability: 0.1,
     },
     fees: {
-      slippageBuffer: 0.05,
-      profit: 0.05,
+      slippageBuffer: 0.03,
+      profit: 0.07,
     },
     proxyContract: '0x00' as RailProxyContract,
     coingeckoId: CoingeckoNetworkID.Ethereum,
