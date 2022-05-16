@@ -1,12 +1,14 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import debug from 'debug';
 import { NetworkChainID } from '../config/config-chain-ids';
+import configDefaults from '../config/config-defaults';
 import { createTransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { validateFee } from '../fees/fee-validator';
 import {
   getEstimateGasDetails,
   calculateMaximumGas,
 } from '../fees/gas-estimate';
+import { recognizesFeeCacheID } from '../fees/transaction-fee-cache';
 import { executeTransaction } from './execute-transaction';
 import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
 import { deserializeTransaction } from './transaction-deserializer';

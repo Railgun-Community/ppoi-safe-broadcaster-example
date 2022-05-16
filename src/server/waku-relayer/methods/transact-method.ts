@@ -17,6 +17,8 @@ import {
 import { contentTopics } from '../topics';
 import { WakuMethodResponse } from '../waku-response';
 import { ErrorMessage } from '../../../util/errors';
+import configDefaults from '../../config/config-defaults';
+import { recognizesFeeCacheID } from '../../fees/transaction-fee-cache';
 
 export type WakuMethodParamsTransact = {
   pubkey: string;
@@ -69,6 +71,15 @@ export const transactMethod = async (
   const { viewingPublicKey } = getRailgunAddressData();
   if (relayerViewingKey !== hexlify(viewingPublicKey)) {
     return undefined;
+  }
+
+  if (
+    configDefaults.transactionFees.requireMatchingFeeCacheID &&
+    !recognizesFeeCacheID(chainID, feeCacheID)
+  ) {
+    dbg(
+      'Fee cache ID unrecognized. Transaction sent to another Relayer with same Rail Address.',
+    );
   }
 
   try {

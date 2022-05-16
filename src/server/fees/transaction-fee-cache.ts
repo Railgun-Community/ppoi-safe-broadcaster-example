@@ -44,7 +44,7 @@ export const cacheUnitFeesForTokens = (
   chainID: NetworkChainID,
   tokenFees: MapType<BigNumber>,
 ): string => {
-  const id = generateFeeCacheID();
+  const feeCacheID = generateFeeCacheID();
   const cachedFee: CachedFees = {
     tokenFees,
     updatedAt: Date.now(),
@@ -52,9 +52,9 @@ export const cacheUnitFeesForTokens = (
   if (!transactionFeeCache[chainID]) {
     transactionFeeCache[chainID] = {};
   }
-  transactionFeeCache[chainID][id] = cachedFee;
+  transactionFeeCache[chainID][feeCacheID] = cachedFee;
   clearExpiredFees(chainID);
-  return id;
+  return feeCacheID;
 };
 
 const cachedFeesExpired = (cachedFees: CachedFees) => {
@@ -64,13 +64,13 @@ const cachedFeesExpired = (cachedFees: CachedFees) => {
 
 export const lookUpCachedUnitTokenFee = (
   chainID: NetworkChainID,
-  id: string,
+  feeCacheID: string,
   tokenAddress: string,
 ): Optional<BigNumber> => {
   if (!transactionFeeCache[chainID]) {
     transactionFeeCache[chainID] = {};
   }
-  const cachedFees = transactionFeeCache[chainID][id];
+  const cachedFees = transactionFeeCache[chainID][feeCacheID];
   if (!cachedFees) {
     return undefined;
   }
@@ -78,4 +78,20 @@ export const lookUpCachedUnitTokenFee = (
     return undefined;
   }
   return cachedFees.tokenFees[tokenAddress];
+};
+
+/**
+ * Checks if feeCacheID is in cache map. It's ok if it's expired.
+ * The fee cache ID ensures that this exact server sent out the fees.
+ * This enables a Relayer to run multiple servers with the same Rail Address (and different HD wallets).
+ * We check whether the fee was dispatched by this Relayer in transact-method.ts.
+ */
+export const recognizesFeeCacheID = (
+  chainID: NetworkChainID,
+  feeCacheID: string,
+) => {
+  if (!transactionFeeCache[chainID]) {
+    return false;
+  }
+  return transactionFeeCache[chainID][feeCacheID] != null;
 };
