@@ -26,7 +26,7 @@
 //
 
 import { BigNumber } from '@ethersproject/bignumber';
-import Web3 from 'web3-eth';
+import Web3, { Eth, FeeHistoryResult } from 'web3-eth';
 import { EVMGasType } from '../../models/network-models';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
@@ -192,6 +192,30 @@ export const getGasPricesBySpeed = async (
   return gasPricesBySpeed;
 };
 
+const getFeeHistory = (
+  web3Eth: Eth,
+  recentBlock: number,
+  retryCount = 0,
+): Promise<FeeHistoryResult> => {
+  try {
+    return web3Eth.getFeeHistory(
+      HISTORICAL_BLOCK_COUNT,
+      recentBlock,
+      REWARD_PERCENTILES,
+    );
+  } catch (err) {
+    if (err.message && err.message.includes('request beyond head block')) {
+      if (retryCount > 5) {
+        throw new Error(
+          'Recent on-chain fee history not available. Please refresh and try again.',
+        );
+      }
+      return getFeeHistory(web3Eth, recentBlock - 1, retryCount + 1);
+    }
+    throw err;
+  }
+};
+
 const getMedianHistoricalGasDetailsBySpeed = async (
   evmGasType: EVMGasType.Type2,
   chainID: NetworkChainID,
@@ -201,11 +225,7 @@ const getMedianHistoricalGasDetailsBySpeed = async (
   web3Eth.setProvider(provider);
 
   const recentBlock = (await web3Eth.getBlockNumber()) - 1;
-  const feeHistory = await web3Eth.getFeeHistory(
-    HISTORICAL_BLOCK_COUNT,
-    recentBlock,
-    REWARD_PERCENTILES,
-  );
+  const feeHistory = await getFeeHistory(web3Eth, recentBlock);
 
   const baseFees: BigNumber[] = feeHistory.baseFeePerGas.map((feeHex) =>
     BigNumber.from(feeHex),
