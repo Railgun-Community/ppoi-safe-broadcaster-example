@@ -120,6 +120,9 @@ const errorResponse = (
     case ErrorMessage.GAS_ESTIMATE_ERROR:
       sanitizedErrorMessage = ErrorMessage.GAS_ESTIMATE_ERROR;
       break;
+    case ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR:
+      sanitizedErrorMessage = ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR;
+      break;
     default:
       sanitizedErrorMessage = ErrorMessage.UNKNOWN_ERROR;
       break;

@@ -6,6 +6,7 @@ import debug from 'debug';
 import { Wallet as EthersWallet } from 'ethers';
 import { EVMGasType } from '../../models/network-models';
 import { ActiveWallet } from '../../models/wallet-models';
+import { ErrorMessage } from '../../util/errors';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { NetworkChainID } from '../config/config-chain-ids';
@@ -117,7 +118,7 @@ export const executeTransaction = async (
 
     const txResponse = await promiseTimeout(
       ethersWallet.sendTransaction(finalTransaction),
-      5000,
+      8000, // 8 second time-out.
     );
 
     dbg('Submitted transaction:', txResponse.hash);
@@ -126,6 +127,10 @@ export const executeTransaction = async (
     waitForTx(activeWallet, ethersWallet, chainID, txResponse, nonce);
     return txResponse;
   } catch (err) {
+    if (err?.message?.includes('Timed out')) {
+      throw new Error(ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR);
+    }
+
     dbg(err);
     throw new Error('Could not send transaction.');
   }
