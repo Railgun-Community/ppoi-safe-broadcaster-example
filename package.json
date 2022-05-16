@@ -1,6 +1,6 @@
 {
   "name": "@railgun-community/relayer",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "",
   "main": "dist/main.js",
   "engines": {
@@ -34,7 +34,7 @@
     "@ethersproject/transactions": "^5.6.0",
     "@ethersproject/units": "^5.6.0",
     "@noble/ed25519": "^1.6.0",
-    "@railgun-community/lepton": "https://npm.railgun.org/ci/1.1.1/railgun-community-lepton-1.1.1.tgz",
+    "@railgun-community/lepton": "https://npm.railgun.org/ci/1.1.2/railgun-community-lepton-1.1.2.tgz",
     "@walletconnect/jsonrpc-types": "^1.0.0",
     "@walletconnect/jsonrpc-utils": "^1.0.0",
     "axios": "^0.27",
