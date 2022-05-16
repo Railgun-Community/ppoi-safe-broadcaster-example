@@ -19,6 +19,7 @@ echo "EXTIP: $EXTIP"
     --keep-alive=true \
     --nodekey="$NODEKEY" \
     --nat="extip:$EXTIP" \
+    --staticnode=/dns4/relayer.railgun.org/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD \
     --staticnode=/ip4/18.117.34.173/tcp/60000/p2p/16Uiu2HAmEvDM3qLuS1fcAjwgDww9UqutSBCGX6yZEu9sVnLgUomj \
     --staticnode=/ip4/3.213.246.122/tcp/60000/p2p/16Uiu2HAmLHDo7bHwEs6k6yhWBi1fTrm4WwH48W5wGUps3gVDVFA6 \
     --staticnode=/dns4/relayer.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg \
