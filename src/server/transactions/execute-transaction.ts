@@ -6,7 +6,7 @@ import debug from 'debug';
 import { Wallet as EthersWallet } from 'ethers';
 import { EVMGasType } from '../../models/network-models';
 import { ActiveWallet } from '../../models/wallet-models';
-import { throwErr } from '../../util/promise-utils';
+import { promiseTimeout, throwErr } from '../../util/promise-utils';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
@@ -114,7 +114,12 @@ export const executeTransaction = async (
   try {
     dbg('Submitting transaction');
     dbg(finalTransaction);
-    const txResponse = await ethersWallet.sendTransaction(finalTransaction);
+
+    const txResponse = await promiseTimeout(
+      ethersWallet.sendTransaction(finalTransaction),
+      5000,
+    );
+
     dbg('Submitted transaction:', txResponse.hash);
 
     // Call wait synchronously. This will set wallet unavailable until the tx is finished.
