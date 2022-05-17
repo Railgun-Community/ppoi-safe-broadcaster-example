@@ -36,7 +36,8 @@ export const getCurrentWalletNonce = async (
   wallet: EthersWallet,
 ): Promise<number> => {
   try {
-    return await wallet.getTransactionCount();
+    const blockTag = 'pending';
+    return await wallet.getTransactionCount(blockTag);
   } catch (err) {
     return throwErr(err);
   }
@@ -45,14 +46,15 @@ export const getCurrentWalletNonce = async (
 /**
  * NOTE: This nonce storage has been unreliable...
  * Since we keep the wallet locked while a tx is pending, we can just use the tx count.
- * Only limitation is if we restart during a pending tx.
+ * Only limitation is if we restart during a pending tx, but blockTag 'pending' seems to help.
  */
 export const getCurrentNonce = async (
   chainID: NetworkChainID,
   wallet: EthersWallet,
 ): Promise<number> => {
+  const blockTag = 'pending';
   const [txCount, lastTransactionNonce] = await Promise.all([
-    wallet.getTransactionCount().catch(throwErr),
+    wallet.getTransactionCount(blockTag).catch(throwErr),
     await getSettingsNumber(getLastNonceKey(chainID, wallet)),
   ]);
   if (lastTransactionNonce) {
