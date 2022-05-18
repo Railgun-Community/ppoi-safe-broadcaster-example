@@ -41,9 +41,13 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 
       docker build -f docker/Dockerfile-nwaku -t nwaku docker
 
-- run image:
+- run image interactively (useful for first setup):
 
       docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -it nwaku
+      
+- run image in background/detached:
+
+      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -d nwaku
 
 - verify that you can communicate with your nwaku instance over json-rpc:
 
