@@ -35,16 +35,16 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 
 ### regular docker
 
-- copy `docker/.env.empty` to `docker/.env` and fill in `EXTIP` and `NODEKEY` (see above)
+- copy `docker/.env.empty` to `docker/.env` and fill in `EXTIP`, `NODEKEY`, `LISTENIP` (see above)
 
-- build image, copying your .env file:
+- build image and config.toml from your .env file:
 
-      docker build -f docker/Dockerfile-nwaku -t nwaku docker
+      docker/build.sh
 
 - run image interactively (useful for first setup):
 
       docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -it nwaku
-      
+
 - run image in background/detached:
 
       docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -d nwaku
