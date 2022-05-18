@@ -35,3 +35,4 @@ docker/secret
 *.db/
 tsconfig.tsbuildinfo
 docker/.env
+docker/config.toml
