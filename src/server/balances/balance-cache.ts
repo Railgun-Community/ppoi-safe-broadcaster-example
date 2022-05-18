@@ -23,12 +23,12 @@ export const updateCachedGasTokenBalance = async (
   chainID: NetworkChainID,
   walletAddress: string,
 ): Promise<void> => {
+  if (!gasTokenBalanceCache[chainID]) {
+    gasTokenBalanceCache[chainID] = {};
+  }
   const balance = await getGasTokenBalance(chainID, walletAddress);
   if (balance == null) {
     return;
-  }
-  if (!gasTokenBalanceCache[chainID]) {
-    gasTokenBalanceCache[chainID] = {};
   }
   gasTokenBalanceCache[chainID][walletAddress] = {
     balance,
