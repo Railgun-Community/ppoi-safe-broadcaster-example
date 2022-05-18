@@ -6,6 +6,7 @@ import { resetMapObject } from '../../util/utils';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { getGasTokenBalance } from './gas-token-balance';
 import { ActiveWallet } from '../../models/wallet-models';
+import { logger } from '../../util/logger';
 
 type CachedBalance = {
   balance: BigNumber;
@@ -74,6 +75,9 @@ export const getCachedGasTokenBalance = async (
   if (shouldUpdateCachedGasTokenBalance(chainID, walletAddress)) {
     await updateCachedGasTokenBalance(chainID, walletAddress);
   }
+  if (!gasTokenBalanceCache[chainID][walletAddress]) {
+    throw new Error('No balance found');
+  }
   return gasTokenBalanceCache[chainID][walletAddress].balance;
 };
 
@@ -81,15 +85,23 @@ export const getActiveWalletGasTokenBalanceMapForChain = async (
   chainID: NetworkChainID,
   activeWallets: ActiveWallet[],
 ): Promise<MapType<BigNumber>> => {
-  const getBalancePromises: Promise<BigNumber>[] = [];
+  const getBalancePromises: Promise<Optional<BigNumber>>[] = [];
   activeWallets.forEach(({ address }) => {
-    getBalancePromises.push(getCachedGasTokenBalance(chainID, address));
+    getBalancePromises.push(
+      getCachedGasTokenBalance(chainID, address).catch((err) => {
+        logger.error(err);
+        return undefined;
+      }),
+    );
   });
   const balances = await Promise.all(getBalancePromises);
 
   const balanceMap: MapType<BigNumber> = {};
   activeWallets.forEach((activeWallet, index) => {
-    balanceMap[activeWallet.address] = balances[index];
+    const balance = balances[index];
+    if (balance != null) {
+      balanceMap[activeWallet.address] = balance;
+    }
   });
 
   return balanceMap;

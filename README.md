@@ -24,7 +24,7 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 - Make config changes to src/MY-CONFIG.ts
 - `npm install`
 - `npm start` or
-- `npm run debug` (DEBUG mode)
+- `npm run debug` (DEBUG mode, with logs)
 
 ## Use docker
 

@@ -1,6 +1,7 @@
 import { parseUnits } from '@ethersproject/units';
 import debug from 'debug';
 import { ActiveWallet } from '../../models/wallet-models';
+import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';
 import { getCachedGasTokenBalance } from '../balances/balance-cache';
 import { NetworkChainID } from '../config/config-chain-ids';
@@ -35,11 +36,19 @@ export const isWalletAvailable = async (
     String(gasToken.minimumBalanceForAvailability),
     18,
   );
-  const balance = await getCachedGasTokenBalance(chainID, wallet.address);
-  if (balance.lt(minimumBalance)) {
+  try {
+    const balance = await getCachedGasTokenBalance(chainID, wallet.address);
+    if (balance.lt(minimumBalance)) {
+      return false;
+    }
+    return true;
+  } catch (err) {
+    logger.error(err);
+    logger.warn(
+      `Error getting gas token balance for wallet ${wallet.address}. Assuming wallet unavailable.`,
+    );
     return false;
   }
-  return true;
 };
 
 export const getAvailableWallets = async (
