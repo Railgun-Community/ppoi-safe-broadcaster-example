@@ -1,6 +1,6 @@
 import {
   ByteLength,
-  hexlify,
+  formatToByteLength,
   nToBytes,
   nToHex,
   trim,
@@ -157,7 +157,7 @@ const extractFeesFromRailgunTransactions = async (
   }
 
   const ciphertextHexlified = ciphertext.ciphertext.map((el) =>
-    hexlify(el.toHexString()),
+    formatToByteLength(el.toHexString(), ByteLength.UINT_256),
   );
   const ivTag = ciphertextHexlified[0];
   const encryptedNote: Ciphertext = {
@@ -172,8 +172,11 @@ const extractFeesFromRailgunTransactions = async (
   }
 
   if (decryptedNote.masterPublicKey === masterPublicKey) {
-    const noteHash = `0x${nToHex(decryptedNote.hash, ByteLength.UINT_256)}`;
-    const commitHash = hash.toHexString();
+    const noteHash = nToHex(decryptedNote.hash, ByteLength.UINT_256);
+    const commitHash = formatToByteLength(
+      hash.toHexString(),
+      ByteLength.UINT_256,
+    );
     if (noteHash !== commitHash) {
       throw new Error(
         `Client attempted to steal from relayer via invalid ciphertext: Note hash mismatch ${noteHash} vs ${commitHash}.`,

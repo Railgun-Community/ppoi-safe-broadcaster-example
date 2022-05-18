@@ -143,7 +143,7 @@ describe('execute-transaction', () => {
     expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
       .false;
     // Delay of 10 set in waitTxStub
-    await delay(15);
+    await delay(20);
     expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
       .true;
   });
