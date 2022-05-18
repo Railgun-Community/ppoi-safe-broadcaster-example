@@ -2,6 +2,8 @@
  * Configure your overrides for default settings and networks here.
  */
 
+import { DebugLevel } from 'models/debug-models';
+import { NetworkChainID } from 'server/config/config-chain-ids';
 import configDefaults from './server/config/config-defaults';
 
 export const myConfigOverrides = () => {
@@ -14,15 +16,16 @@ export const myConfigOverrides = () => {
     },
   ];
 
-  //
   // Set other configs, for example:
   //
-  // configDefaults.debug.logLevel = DebugLevel.None;
+  configDefaults.debug.logLevel = DebugLevel.WarningsErrors;
   //
-  // configDefaults.networks.active = [
-  //   NetworkChainID.Ropsten,
-  //   NetworkChainID.BNBSmartChain,
-  // ];
+  configDefaults.networks.active = [
+    NetworkChainID.Ethereum,
+    NetworkChainID.Ropsten,
+    NetworkChainID.BNBSmartChain,
+    NetworkChainID.PolygonPOS,
+  ];
   //
   // configTokens[NetworkChainID.Ethereum] = {
   //   '0x_token_address': {
