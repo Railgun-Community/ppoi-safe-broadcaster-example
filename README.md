@@ -30,7 +30,7 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 
 - Prereqs: Install docker
 - Create a secret key (`NODEKEY`) for your node. This is not currently used for encryption, but does establish your node's identity: `docker/nodekey.sh`
-- Know your external IP (`EXTIP`) and verify that ports 60000 and 8000 are exposed to the outside world (see https://www.canyouseeme.org/ or similar).
+- Know your external IP (`EXTIP`) and verify that TCP ports 60000 and 8000 are exposed to the outside world (see https://www.canyouseeme.org/ or similar).
 - If you have a stable ip and domain and would like to join the community fleet of bootstrap nodes, you will need to generate an SSL certificate with letsencrypt (@todo expand later)
 
 ### regular docker
