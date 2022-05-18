@@ -12,7 +12,7 @@ The RAILGUN relayer network runs on [Waku](https://wakunetwork.com/), a secure a
 
 ## Configuration
 
-Customize your relayer by running `npm run copy-my-config`, which copies `MY-CONFIG.example.ts` to `MY_CONFIG.ts`.
+Customize your relayer by running `npm run copy-my-config`, which copies `src/MY-CONFIG.example.ts` to `src/MY-CONFIG.ts`.
 You can specify most defaults with configDefaults, and import configTokens to modify token configuration per network.
 
 - `configDefaults.waku.rpcURL` - defaults to http://localhost:8546
@@ -20,8 +20,8 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 
 ## Run RAILGUN relayer
 
-- `npm run copy-my-config`
-- Make config changes to MY-CONFIG.ts
+- `npm run copy-my-config`, run in root
+- Make config changes to src/MY-CONFIG.ts
 - `npm install`
 - `npm start` or
 - `npm run debug` (DEBUG mode)
