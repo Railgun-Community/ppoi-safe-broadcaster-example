@@ -3,7 +3,6 @@ import { TransactionResponse } from '@ethersproject/providers';
 import { hexlify } from '@railgun-community/lepton/dist/utils/bytes';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
-import { EncryptedData } from '@railgun-community/lepton/dist/models/transaction-types';
 import {
   encryptJSONDataWithSharedKey,
   tryDecryptJSONDataWithSharedKey,
@@ -19,6 +18,7 @@ import { WakuMethodResponse } from '../waku-response';
 import { ErrorMessage } from '../../../util/errors';
 import configDefaults from '../../config/config-defaults';
 import { recognizesFeeCacheID } from '../../fees/transaction-fee-cache';
+import { EncryptedData } from '@railgun-community/lepton/dist/models/formatted-types';
 
 export type WakuMethodParamsTransact = {
   pubkey: string;

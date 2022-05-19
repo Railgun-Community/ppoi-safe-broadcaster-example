@@ -8,7 +8,6 @@ import {
 import { BigNumber, Contract } from 'ethers';
 import { Note } from '@railgun-community/lepton';
 import { getSharedSymmetricKey } from '@railgun-community/lepton/dist/utils/keys-utils';
-import { Ciphertext } from '@railgun-community/lepton/dist/models/transaction-types';
 import { TransactionRequest } from '@ethersproject/providers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
@@ -18,6 +17,7 @@ import {
   getRailgunAddressData,
   getRailgunWallet,
 } from '../wallets/active-wallets';
+import { Ciphertext } from '@railgun-community/lepton/dist/models/formatted-types';
 
 const parseFormattedTokenAddress = (formattedTokenAddress: string) => {
   return `0x${trim(formattedTokenAddress, 20)}`;

@@ -1,7 +1,6 @@
 import { FallbackProvider } from '@ethersproject/providers';
 import { Note, Lepton } from '@railgun-community/lepton';
 import { ERC20RailgunContract } from '@railgun-community/lepton/dist/contract';
-import { Transaction } from '@railgun-community/lepton/dist/transaction';
 import {
   hexlify,
   padToLength,
@@ -12,10 +11,6 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { AddressData } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
-import {
-  SerializedTransaction,
-  TokenType,
-} from '@railgun-community/lepton/dist/models/transaction-types';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configDefaults from '../../config/config-defaults';
 import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
@@ -35,6 +30,11 @@ import {
   createLeptonWalletBalancesStub,
   restoreLeptonStubs,
 } from '../../../test/stubs/lepton-stubs.test';
+import {
+  SerializedTransaction,
+  TokenType,
+} from '@railgun-community/lepton/dist/models/formatted-types';
+import { TransactionBatch } from '@railgun-community/lepton/dist/transaction/transaction-batch';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -51,20 +51,20 @@ const HARDHAT_CHAIN_ID = NetworkChainID.HardHat;
 const MOCK_MNEMONIC_1 =
   'test test test test test test test test test test test junk';
 
-const createRopstenTransaction = async (
+const createRopstenTransactions = (
   addressData: AddressData,
   fee: BigNumber,
   tokenAddress: string,
-): Promise<SerializedTransaction> => {
-  const transaction = new Transaction(
+): Promise<SerializedTransaction[]> => {
+  const transaction = new TransactionBatch(
     tokenAddress,
     TokenType.ERC20,
     ROPSTEN_CHAIN_ID,
   );
-  transaction.outputs = [
+  transaction.addOutput(
     new Note(addressData, RANDOM, fee.toHexString(), tokenAddress),
-  ];
-  return await transaction.dummyProve(
+  );
+  return transaction.generateDummySerializedTransactions(
     railgunWallet,
     configDefaults.lepton.dbEncryptionKey,
   );
@@ -107,9 +107,11 @@ describe('extract-packaged-fee', () => {
   it('Should extract fee correctly', async () => {
     const fee = BigNumber.from('1000');
     const addressData = getRailgunAddressData();
-    const transactions = await Promise.all([
-      createRopstenTransaction(addressData, fee, MOCK_TOKEN_ADDRESS),
-    ]);
+    const transactions = await createRopstenTransactions(
+      addressData,
+      fee,
+      MOCK_TOKEN_ADDRESS,
+    );
     const populatedTransaction = await contract.transact(transactions);
     const packagedFee = await extractPackagedFeeFromTransaction(
       ROPSTEN_CHAIN_ID,
@@ -124,9 +126,11 @@ describe('extract-packaged-fee', () => {
     const addressData = Lepton.decodeAddress(
       '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
     );
-    const transactions = await Promise.all([
-      createRopstenTransaction(addressData, fee, MOCK_TOKEN_ADDRESS),
-    ]);
+    const transactions = await createRopstenTransactions(
+      addressData,
+      fee,
+      MOCK_TOKEN_ADDRESS,
+    );
     const populatedTransaction = await contract.transact(transactions);
     await expect(
       extractPackagedFeeFromTransaction(ROPSTEN_CHAIN_ID, populatedTransaction),

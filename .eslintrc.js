@@ -41,6 +41,7 @@ module.exports = {
     'default-case': 0,
     '@typescript-eslint/ban-ts-comment': 0,
     '@typescript-eslint/no-explicit-any': 0,
+    'import/order': 0,
   },
   ignorePatterns: ['dist'],
 };

@@ -1,5 +1,5 @@
 import { Database } from '@railgun-community/lepton/dist/database';
-import { BytesData } from '@railgun-community/lepton/dist/models/transaction-types';
+import { BytesData } from '@railgun-community/lepton/dist/models/formatted-types';
 import leveldown from 'leveldown';
 import { logger } from '../../util/logger';
 import configDefaults from '../config/config-defaults';

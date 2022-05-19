@@ -1,5 +1,5 @@
 import { CommitmentEvent } from '@railgun-community/lepton/dist/contract/erc20';
-import { Nullifier } from '@railgun-community/lepton/dist/models/transaction-types';
+import { Nullifier } from '@railgun-community/lepton/dist/models/formatted-types';
 import axios from 'axios';
 import { logger } from '../../../util/logger';
 
