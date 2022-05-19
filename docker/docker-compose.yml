@@ -1,74 +1,79 @@
 version: '3.9'
 
-networks:
-  railgun:
-
 volumes:
-  waku:
-    name: 'waku'
-  relayer1:
-    name: 'relayer1'
-  relayer2:
-    name: 'relayer2'
-
+  nwaku:
+    name: 'nwaku'
+  relayer:
+    name: 'relayer'
 
 services:
-  waku:
-    image: wakunode:latest
-    hostname: "waku"
+  nwaku:
+    image: statusteam/nim-waku:deploy-status-test
+    container_name: nwaku
+    hostname: 'nwaku'
     ports:
       - 60000:60000
       - 8000:8000
+      - 8546:8546
     expose:
-      - "8546"
-    deploy:
-      replicas: 1
-    entrypoint: ["/app/run-waku.sh"]
-    volumes:
-      - waku:/mnt
-
-  relayer1:
-    image: 'relayer:latest'
-    hostname: "relayer1"
-    deploy:
-      replicas: 1
-    environment:
-      WAKU_RPC_URL: "http://waku:8546"
-      LEPTON_DB: '/mnt/relayer1.db'
-      LOG_LEVEL: 'debug'
-      DEBUG: 'relayer*,waku:jsonrpc-api'
-    secrets:
-      - MNEMONIC
-      - DB_ENCRYPTION_KEY
-    depends_on:
-      - waku
+      - '8546'
     restart: always
     volumes:
-      - relayer1:/mnt
+      - ./appdata/nwaku:/app
+      - ./appdata/swag/etc/letsencrypt:/ssl
+    depends_on:
+      - swag
+    #entrypoint: tail -F anything
+    entrypoint: >
+      wakunode2 --config-file=/app/config.toml
+      --nat="extip:${EXTIP}"
+      --listen-address="${LISTENIP}"
+      --dns4-domain-name=${SUBDOMAIN}.${BASEDOMAIN}
+      --nodekey=${NODEKEY}
+      --websocket-support=true
+      --websocket-secure-support=true
+      --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
+      --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
 
-  relayer2:
+  relayer:
     image: 'relayer:latest'
-    hostname: "relayer2"
-    deploy:
-      replicas: 1
+    container_name: relayer
+    hostname: 'relayer'
     environment:
-      WAKU_RPC_URL: "http://waku:8546"
-      LEPTON_DB: '/mnt/relayer2.db'
+      WAKU_RPC_URL: 'http://nwaku:8546'
+      LEPTON_DB: '/mnt/relayer.db'
       LOG_LEVEL: 'debug'
       DEBUG: 'relayer*,waku:jsonrpc-api'
-    secrets:
-      - MNEMONIC
-      - DB_ENCRYPTION_KEY
+    #secrets:
+    #- MNEMONIC
+    #- DB_ENCRYPTION_KEY
     depends_on:
-      - waku
+      - nwaku
     restart: always
     volumes:
-      - relayer1:/mnt
+      - relayer:/mnt
+    profiles:
+      - relayer
 
-secrets:
-  MNEMONIC:
-    #    external: true
-    file: secret/MNEMONIC
-  DB_ENCRYPTION_KEY:
-    #    external: true
-    file: secret/DB_ENCRYPTION_KEY
+  swag:
+    image: ghcr.io/linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=EST
+      - URL=${BASEDOMAIN}
+      - ONLY_SUBDOMAINS=true
+      - SUBDOMAINS=${SUBDOMAIN}
+      - VALIDATION=http
+      - EMAIL=${EMAIL}
+    volumes:
+      - ./appdata/swag:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+    #profiles:
+    # - domain
