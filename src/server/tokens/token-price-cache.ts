@@ -5,29 +5,54 @@ import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';
 import { tokenForAddress } from './network-tokens';
 
+export enum TokenPriceSource {
+  CoinGecko = 'CoinGecko',
+  ZeroX = '0x',
+}
+
 export type TokenPrice = {
   price: number;
   updatedAt: number; // In milliseconds.
 };
 
-export type TokenAddressesToPrice = MapType<Optional<TokenPrice>>;
+export type TokenPriceUpdater = (
+  tokenAddress: string,
+  tokenPrice: TokenPrice,
+) => void;
+
+type TokenAddressesToPrice = MapType<Optional<TokenPrice>>;
 
 // Cached token prices per network.
-// {chainID: {address: TokenPrice}}
-const tokenPriceCache: NumMapType<TokenAddressesToPrice> = {};
+// {source: {chainID: {address: TokenPrice}}}
+const tokenPriceCache: MapType<NumMapType<TokenAddressesToPrice>> = {};
 
-export const cacheTokenPricesForNetwork = (
+export const cacheTokenPriceForNetwork = (
+  source: TokenPriceSource,
   chainID: NetworkChainID,
-  tokenPrices: TokenAddressesToPrice,
+  tokenAddress: string,
+  tokenPrice: TokenPrice,
 ) => {
+  if (!tokenPriceCache[source]) {
+    tokenPriceCache[source] = {};
+  }
+  if (!tokenPriceCache[source][chainID]) {
+    tokenPriceCache[source][chainID] = {};
+  }
+  tokenPriceCache[source][chainID][tokenAddress.toLowerCase()] = {
+    price: tokenPrice.price,
+    updatedAt: tokenPrice.updatedAt,
+  };
   logger.log(
-    `Got token prices for chain ${chainID}: ${Object.keys(tokenPrices).length}`,
+    `${source} [${chainID}]: Cache price $${tokenPrice.price} for token ${tokenAddress}`,
   );
-  tokenPriceCache[chainID] = tokenPrices;
 };
 
 export const resetTokenPriceCache = () => {
   resetMapObject(tokenPriceCache);
+};
+
+export const getTokenPriceCache = () => {
+  return tokenPriceCache;
 };
 
 const logTokenLookupError = (
@@ -40,22 +65,25 @@ const logTokenLookupError = (
   logger.warn(`${errorMsg}: ${tokenDetails}`);
 };
 
-export const lookUpCachedTokenPrice = (
+const cachedTokenPriceForSource = (
+  source: TokenPriceSource,
   chainID: NetworkChainID,
   tokenAddress: string,
-): TokenPrice => {
-  const cachedNetworkPrices = tokenPriceCache[chainID];
+): Optional<TokenPrice> => {
+  const pricesForSource = tokenPriceCache[source];
+  if (!pricesForSource) {
+    return undefined;
+  }
+  const cachedNetworkPrices = pricesForSource[chainID];
   if (!cachedNetworkPrices) {
-    logTokenLookupError('NO NETWORK PRICES', chainID, tokenAddress);
-    throw new Error(`No prices cached for network: ${chainID}`);
+    logTokenLookupError(`[${source}] No network prices`, chainID, tokenAddress);
+    return undefined;
   }
 
-  const cachedPrice = cachedNetworkPrices[tokenAddress.toLowerCase()];
-
-  // No price available.
+  const cachedPrice = cachedNetworkPrices[tokenAddress];
   if (!cachedPrice) {
-    logTokenLookupError('NO TOKEN PRICE', chainID, tokenAddress);
-    throw new Error(`No cached price for token: ${tokenAddress}`);
+    // No cached price for this source/network. Likely still loading.
+    return undefined;
   }
 
   // Token price expired (configurable per network: priceTTLInMS).
@@ -65,11 +93,55 @@ export const lookUpCachedTokenPrice = (
   if (priceExpired) {
     const expirationTimeLapsed = Date.now() - expiration;
     logTokenLookupError(
-      `TOKEN PRICE EXPIRED by ${expirationTimeLapsed} ms`,
+      `[${source}] Token price expired by ${expirationTimeLapsed} ms`,
       chainID,
       tokenAddress,
     );
-    throw new Error(`Price expired for token: ${tokenAddress}`);
+    return undefined;
+  }
+
+  return cachedPrice;
+};
+
+const getAverageCachedTokenPrice = (
+  chainID: NetworkChainID,
+  tokenAddress: string,
+): Optional<number> => {
+  const tokenPrices: TokenPrice[] = [];
+
+  Object.values(TokenPriceSource).forEach((source) => {
+    const cachedPrice = cachedTokenPriceForSource(
+      source,
+      chainID,
+      tokenAddress,
+    );
+    if (cachedPrice) {
+      tokenPrices.push(cachedPrice);
+    }
+  });
+
+  if (!tokenPrices.length) {
+    return undefined;
+  }
+
+  const prices = tokenPrices.map((t) => t.price);
+  const averageValidPrice = prices.reduce((a, b) => a + b) / tokenPrices.length;
+  return averageValidPrice;
+};
+
+export const lookUpCachedTokenPrice = (
+  chainID: NetworkChainID,
+  tokenAddress: string,
+): number => {
+  const cachedPrice = getAverageCachedTokenPrice(
+    chainID,
+    tokenAddress.toLowerCase(),
+  );
+
+  // No price available.
+  if (!cachedPrice) {
+    logTokenLookupError('NO TOKEN PRICE', chainID, tokenAddress);
+    throw new Error(`No cached price for token: ${tokenAddress}`);
   }
 
   return cachedPrice;
@@ -79,7 +151,7 @@ export const getTransactionTokenPrices = (
   chainID: NetworkChainID,
   token: Token,
   gasToken: GasTokenConfig,
-): { gasTokenPrice: TokenPrice; tokenPrice: TokenPrice } => {
+): { gasTokenPrice: number; tokenPrice: number } => {
   const tokenPrice = lookUpCachedTokenPrice(chainID, token.address);
   const gasTokenPrice = lookUpCachedTokenPrice(
     chainID,

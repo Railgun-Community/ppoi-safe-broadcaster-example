@@ -61,12 +61,6 @@ export default {
      */
     priceLookupRetries: 1,
 
-    /** Refresh all token prices every 30 seconds.
-     * Note that free Coingecko API tier only allows 50 requests per minute.
-     * We send one request per network for every refresh (disregarding test nets).
-     */
-    priceRefreshDelayInMS: 30 * 1000,
-
     /**
      * Configurable API Keys for Pricing APIs.
      * Pro tiers are more stable and reliable.

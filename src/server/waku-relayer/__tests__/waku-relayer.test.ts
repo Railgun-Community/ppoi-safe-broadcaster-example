@@ -1,3 +1,4 @@
+/// <reference types="../../../global" />
 import * as ed from '@noble/ed25519';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -40,8 +41,9 @@ import {
 import { initLepton } from '../../lepton/lepton-init';
 import configDefaults from '../../config/config-defaults';
 import {
-  cacheTokenPricesForNetwork,
+  cacheTokenPriceForNetwork,
   resetTokenPriceCache,
+  TokenPriceSource,
 } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
 import { Network } from '../../../models/network-models';
@@ -154,17 +156,24 @@ describe('waku-relayer', () => {
   it('Should test fee broadcast', async () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
-    const tokenPrices = {
-      [MOCK_TOKEN_ADDRESS]: {
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      chainID,
+      MOCK_TOKEN_ADDRESS,
+      {
         price: tokenPrice,
         updatedAt: Date.now(),
       },
-      [network.gasToken.wrappedAddress]: {
+    );
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      chainID,
+      network.gasToken.wrappedAddress,
+      {
         price: gasTokenPrice,
         updatedAt: Date.now(),
       },
-    };
-    cacheTokenPricesForNetwork(chainID, tokenPrices);
+    );
 
     const contentTopic = '/railgun/v1/1/fees/json';
     expect(contentTopic).to.equal(contentTopics.fees(chainID));

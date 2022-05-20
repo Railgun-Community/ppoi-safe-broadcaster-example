@@ -9,9 +9,9 @@ import {
 } from '../transaction-fee-cache';
 import { getMockNetwork } from '../../../test/mocks.test';
 import {
-  cacheTokenPricesForNetwork,
+  cacheTokenPriceForNetwork,
   resetTokenPriceCache,
-  TokenPrice,
+  TokenPriceSource,
 } from '../../tokens/token-price-cache';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
@@ -84,11 +84,18 @@ describe('fee-validator', () => {
   });
 
   it('Should validate if packaged fee > calculated fee', () => {
-    const tokenPrices: MapType<TokenPrice> = {
-      [MOCK_TOKEN_ADDRESS]: { price: 2, updatedAt: Date.now() },
-      [gasTokenAddress]: { price: 20, updatedAt: Date.now() },
-    };
-    cacheTokenPricesForNetwork(CHAIN_ID, tokenPrices);
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      CHAIN_ID,
+      MOCK_TOKEN_ADDRESS,
+      { price: 2, updatedAt: Date.now() },
+    );
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      CHAIN_ID,
+      gasTokenAddress,
+      { price: 20, updatedAt: Date.now() },
+    );
     // 10 * 10 + 10%.
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(110), BigNumber.from(10)),
@@ -96,11 +103,18 @@ describe('fee-validator', () => {
   });
 
   it('Should validate if packaged fee > calculated fee, with slippage', () => {
-    const tokenPrices: MapType<TokenPrice> = {
-      [MOCK_TOKEN_ADDRESS]: { price: 2, updatedAt: Date.now() },
-      [gasTokenAddress]: { price: 20, updatedAt: Date.now() },
-    };
-    cacheTokenPricesForNetwork(CHAIN_ID, tokenPrices);
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      CHAIN_ID,
+      MOCK_TOKEN_ADDRESS,
+      { price: 2, updatedAt: Date.now() },
+    );
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      CHAIN_ID,
+      gasTokenAddress,
+      { price: 20, updatedAt: Date.now() },
+    );
     // 10 * 10 + 10% - 5% slippage.
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(105), BigNumber.from(10)),

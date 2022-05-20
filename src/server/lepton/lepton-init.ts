@@ -4,7 +4,7 @@ import { LeptonDebugger } from '@railgun-community/lepton/dist/models/types';
 import { FallbackProvider } from '@ethersproject/providers';
 import { logger } from '../../util/logger';
 import { artifactsGetter } from './artifacts';
-import { quickSync } from '../api/quick-sync/quick-sync';
+import { quickSync } from '../api/railgun-events/quick-sync';
 import configDefaults from '../config/config-defaults';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';

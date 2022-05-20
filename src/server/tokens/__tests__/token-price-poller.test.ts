@@ -2,15 +2,15 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import {
+  cacheTokenPriceForNetwork,
   lookUpCachedTokenPrice,
   resetTokenPriceCache,
-  TokenAddressesToPrice,
+  TokenPriceSource,
 } from '../token-price-cache';
 import { mockTokenConfig } from '../../../test/mocks.test';
-import configDefaults from '../../config/config-defaults';
-import configTokenPriceGetter, {
-  TokenPricesGetter,
-} from '../../config/config-token-price-getter';
+import configTokenPriceRefresher, {
+  TokenPriceRefresher,
+} from '../../config/config-token-price-refresher';
 import { initPricePoller, stopPolling } from '../token-price-poller';
 import { delay } from '../../../util/promise-utils';
 import { initTokens } from '../network-tokens';
@@ -23,39 +23,56 @@ const MOCK_TOKEN_PRICE_1 = 10.0;
 const MOCK_TOKEN_ADDRESS_2 = 'b456';
 const MOCK_TOKEN_PRICE_2 = 20.0;
 
-const mockTokenPriceGetter: TokenPricesGetter = async (
-  chainID: NetworkChainID,
-  tokenAddresses: string[],
-  // eslint-disable-next-line require-await
-) => {
-  const tokenAddressesToPrice: TokenAddressesToPrice = {};
-  if (chainID === NetworkChainID.Ethereum) {
-    for (const address of tokenAddresses) {
-      switch (address) {
-        case MOCK_TOKEN_ADDRESS_1:
-          tokenAddressesToPrice[address] = {
-            price: MOCK_TOKEN_PRICE_1,
-            updatedAt: Date.now(),
-          };
-          break;
-        case MOCK_TOKEN_ADDRESS_2:
-          tokenAddressesToPrice[address] = {
-            price: MOCK_TOKEN_PRICE_2,
-            updatedAt: Date.now(),
-          };
-          break;
-        default:
-          break;
+const mockTokenPriceRefresherCoingecko = (
+  refreshDelayInMS: number,
+): TokenPriceRefresher => {
+  const refresher = (chainID: NetworkChainID, tokenAddresses: string[]) => {
+    if (chainID === NetworkChainID.Ethereum) {
+      for (const address of tokenAddresses) {
+        switch (address) {
+          case MOCK_TOKEN_ADDRESS_1:
+            cacheTokenPriceForNetwork(
+              TokenPriceSource.CoinGecko,
+              chainID,
+              address,
+              {
+                price: MOCK_TOKEN_PRICE_1,
+                updatedAt: Date.now(),
+              },
+            );
+            break;
+          case MOCK_TOKEN_ADDRESS_2:
+            cacheTokenPriceForNetwork(
+              TokenPriceSource.CoinGecko,
+              chainID,
+              address,
+              {
+                price: MOCK_TOKEN_PRICE_2,
+                updatedAt: Date.now(),
+              },
+            );
+            break;
+          default:
+            break;
+        }
       }
     }
-  }
-  return tokenAddressesToPrice;
+    return Promise.resolve();
+  };
+
+  return {
+    refreshDelayInMS,
+    refresher,
+  };
 };
 
 describe('token-price-poller', () => {
   before(async () => {
-    configTokenPriceGetter.tokenPriceGetter = mockTokenPriceGetter;
-    configDefaults.tokenPrices.priceRefreshDelayInMS = 3 * 1000; // 3 second refresh.
+    const refreshDelayInMS = 3000;
+    configTokenPriceRefresher.tokenPriceRefreshers = {
+      [TokenPriceSource.CoinGecko]:
+        mockTokenPriceRefresherCoingecko(refreshDelayInMS),
+    };
     mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1);
     mockTokenConfig(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2);
     await initTokens();
@@ -76,8 +93,7 @@ describe('token-price-poller', () => {
       lookUpCachedTokenPrice(NetworkChainID.Ropsten, MOCK_TOKEN_ADDRESS_1),
     ).to.throw(`No cached price for token: ${MOCK_TOKEN_ADDRESS_1}`);
     expect(
-      lookUpCachedTokenPrice(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1)
-        .price,
+      lookUpCachedTokenPrice(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1),
     ).to.equal(MOCK_TOKEN_PRICE_1);
   });
 }).timeout(20000);

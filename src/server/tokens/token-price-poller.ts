@@ -1,23 +1,19 @@
-import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
-import configTokenPriceGetter, {
-  TokenPricesGetter,
-} from '../config/config-token-price-getter';
+import configTokenPriceRefresher, {
+  TokenPriceRefresher,
+} from '../config/config-token-price-refresher';
 import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import { allTokenAddressesForNetwork } from './network-tokens';
-import {
-  cacheTokenPricesForNetwork,
-  TokenAddressesToPrice,
-} from './token-price-cache';
+import { TokenPriceSource } from './token-price-cache';
 
 let shouldPoll = true;
 
 const pullAndCacheCurrentPricesForAllNetworks = async (
-  tokenPricesGetter: TokenPricesGetter,
+  tokenPriceRefresher: TokenPriceRefresher,
 ): Promise<void> => {
-  const networkPromises: Promise<TokenAddressesToPrice>[] = [];
+  const networkPriceRefreshers: Promise<void>[] = [];
 
   const chainIDs = configuredNetworkChainIDs();
   chainIDs.forEach((chainID) => {
@@ -26,28 +22,26 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
     if (gasTokenAddress) {
       tokenAddresses.push(gasTokenAddress);
     }
-    networkPromises.push(tokenPricesGetter(chainID, tokenAddresses));
+    networkPriceRefreshers.push(
+      tokenPriceRefresher.refresher(chainID, tokenAddresses),
+    );
   });
 
-  const networkTokenPrices = await Promise.all(networkPromises);
-  chainIDs.forEach((chainID, index) => {
-    const tokenPrices = networkTokenPrices[index];
-    cacheTokenPricesForNetwork(chainID, tokenPrices);
-  });
+  await Promise.all(networkPriceRefreshers);
 };
 
-const pollPrices = async () => {
+const pollPrices = async (source: TokenPriceSource) => {
+  const tokenPriceRefresher =
+    configTokenPriceRefresher.tokenPriceRefreshers[source];
   try {
-    await pullAndCacheCurrentPricesForAllNetworks(
-      configTokenPriceGetter.tokenPriceGetter,
-    );
+    await pullAndCacheCurrentPricesForAllNetworks(tokenPriceRefresher);
   } catch (err: any) {
     logger.warn('pollPrices error');
     logger.error(err);
   } finally {
-    await delay(configDefaults.tokenPrices.priceRefreshDelayInMS);
+    await delay(tokenPriceRefresher.refreshDelayInMS);
     if (shouldPoll) {
-      pollPrices();
+      pollPrices(source);
     }
   }
 };
@@ -58,5 +52,8 @@ export const stopPolling = () => {
 
 export const initPricePoller = () => {
   shouldPoll = true;
-  pollPrices();
+  const sources = Object.keys(
+    configTokenPriceRefresher.tokenPriceRefreshers,
+  ) as TokenPriceSource[];
+  sources.forEach((source) => pollPrices(source));
 };

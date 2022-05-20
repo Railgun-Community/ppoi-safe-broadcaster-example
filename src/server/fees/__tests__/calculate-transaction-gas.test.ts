@@ -18,9 +18,9 @@ import {
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import {
-  cacheTokenPricesForNetwork,
+  cacheTokenPriceForNetwork,
   resetTokenPriceCache,
-  TokenPrice,
+  TokenPriceSource,
 } from '../../tokens/token-price-cache';
 import { createTransactionGasDetails } from '../calculate-transaction-gas';
 import { getTokenFee } from '../calculate-token-fee';
@@ -60,12 +60,24 @@ describe('calculate-transaction-gas', () => {
     configNetworks[MOCK_CHAIN_ID].fees.slippageBuffer = 0.05;
     configNetworks[MOCK_CHAIN_ID].fees.profit = 0.05;
     initNetworkProviders();
-    const tokenPrices: MapType<TokenPrice> = {
-      [MOCK_GAS_TOKEN]: { price: 3250.0, updatedAt: Date.now() },
-      [MOCK_TOKEN_ADDRESS]: { price: 1.0, updatedAt: Date.now() },
-      [MOCK_TOKEN_6_DECIMALS]: { price: 1.0, updatedAt: Date.now() },
-    };
-    cacheTokenPricesForNetwork(MOCK_CHAIN_ID, tokenPrices);
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      MOCK_CHAIN_ID,
+      MOCK_GAS_TOKEN,
+      { price: 3250.0, updatedAt: Date.now() },
+    );
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      MOCK_CHAIN_ID,
+      MOCK_TOKEN_ADDRESS,
+      { price: 1.0, updatedAt: Date.now() },
+    );
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      MOCK_CHAIN_ID,
+      MOCK_TOKEN_6_DECIMALS,
+      { price: 1.0, updatedAt: Date.now() },
+    );
   });
 
   afterEach(() => {

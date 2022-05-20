@@ -3,10 +3,10 @@ import chaiAsPromised from 'chai-as-promised';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import {
-  cacheTokenPricesForNetwork,
+  cacheTokenPriceForNetwork,
   lookUpCachedTokenPrice,
   resetTokenPriceCache,
-  TokenPrice,
+  TokenPriceSource,
 } from '../token-price-cache';
 import { mockTokenConfig } from '../../../test/mocks.test';
 import { initTokens } from '../network-tokens';
@@ -32,23 +32,27 @@ describe('token-price-cache', () => {
   it('Should error on empty map', () => {
     expect(() =>
       lookUpCachedTokenPrice(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1),
-    ).to.throw(`No prices cached for network: ${NetworkChainID.Ethereum}`);
+    ).to.throw(`No cached price for token: ${MOCK_TOKEN_ADDRESS_1}`);
   });
 
   it('Should pull price only for correct network and address', () => {
-    const tokenPrices: MapType<TokenPrice> = {
-      [MOCK_TOKEN_ADDRESS_1]: { price: 10.0, updatedAt: Date.now() },
-    };
-    cacheTokenPricesForNetwork(NetworkChainID.Ethereum, tokenPrices);
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      NetworkChainID.Ethereum,
+      MOCK_TOKEN_ADDRESS_1,
+      {
+        price: 10.0,
+        updatedAt: Date.now(),
+      },
+    );
     expect(() =>
       lookUpCachedTokenPrice(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_2),
     ).to.throw(`No cached price for token: ${MOCK_TOKEN_ADDRESS_2}`);
     expect(() =>
       lookUpCachedTokenPrice(NetworkChainID.Ropsten, MOCK_TOKEN_ADDRESS_1),
-    ).to.throw(`No prices cached for network: ${NetworkChainID.Ropsten}`);
+    ).to.throw(`No cached price for token: ${MOCK_TOKEN_ADDRESS_1}`);
     expect(
-      lookUpCachedTokenPrice(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1)
-        .price,
+      lookUpCachedTokenPrice(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1),
     ).to.equal(10.0);
   });
 
@@ -57,29 +61,35 @@ describe('token-price-cache', () => {
 
     const expiredTime = Date.now() - 30 * 1000;
     const unexpiredTime = Date.now() - 10 * 1000;
-    const tokenPrices: MapType<TokenPrice> = {
-      [MOCK_TOKEN_ADDRESS_1]: {
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      NetworkChainID.Ethereum,
+      MOCK_TOKEN_ADDRESS_1,
+      {
         price: 10.0,
         updatedAt: expiredTime,
       },
-      [MOCK_TOKEN_ADDRESS_2]: {
+    );
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      NetworkChainID.Ethereum,
+      MOCK_TOKEN_ADDRESS_2,
+      {
         price: 10.0,
         updatedAt: unexpiredTime,
       },
-    };
-    cacheTokenPricesForNetwork(NetworkChainID.Ethereum, tokenPrices);
+    );
 
     // Expired price should throw.
     expect(() =>
       lookUpCachedTokenPrice(NetworkChainID.Ethereum, MOCK_TOKEN_ADDRESS_1),
-    ).to.throw(`Price expired for token: ${MOCK_TOKEN_ADDRESS_1}`);
+    ).to.throw(`No cached price for token: ${MOCK_TOKEN_ADDRESS_1}`);
 
     // Unexpired price should pull.
     const cachedPrice = lookUpCachedTokenPrice(
       NetworkChainID.Ethereum,
       MOCK_TOKEN_ADDRESS_2,
     );
-    expect(cachedPrice.price).to.equal(10.0);
-    expect(cachedPrice.updatedAt).to.equal(unexpiredTime);
+    expect(cachedPrice).to.equal(10.0);
   });
 }).timeout(10000);

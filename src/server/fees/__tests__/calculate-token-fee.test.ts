@@ -10,8 +10,9 @@ import {
 } from '../../../test/mocks.test';
 import { setupTestNetwork, testChainID } from '../../../test/setup.test';
 import {
-  cacheTokenPricesForNetwork,
+  cacheTokenPriceForNetwork,
   resetTokenPriceCache,
+  TokenPriceSource,
 } from '../../tokens/token-price-cache';
 import {
   calculateTokenFeePerUnitGasToken,
@@ -56,17 +57,19 @@ const setupMocks = (
   maxPriorityFeePerGas?: BigNumber,
 ) => {
   const gasTokenAddress = network.gasToken.wrappedAddress ?? '';
-  const tokenPrices = {
-    [tokenAddress]: {
-      price: tokenPrice,
-      updatedAt: Date.now(),
-    },
-    [gasTokenAddress]: {
+  cacheTokenPriceForNetwork(TokenPriceSource.CoinGecko, chainID, tokenAddress, {
+    price: tokenPrice,
+    updatedAt: Date.now(),
+  });
+  cacheTokenPriceForNetwork(
+    TokenPriceSource.CoinGecko,
+    chainID,
+    gasTokenAddress,
+    {
       price: gasTokenPrice,
       updatedAt: Date.now(),
     },
-  };
-  cacheTokenPricesForNetwork(chainID, tokenPrices);
+  );
   if (gasEstimate && maxFeePerGas && maxPriorityFeePerGas) {
     stubEstimateGasDetails(gasEstimate, maxFeePerGas, maxPriorityFeePerGas);
   }

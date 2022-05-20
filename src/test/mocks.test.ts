@@ -80,7 +80,7 @@ export const getMockNetwork = (): Network => {
       profit: 0.07,
     },
     proxyContract: '0x00' as RailProxyContract,
-    coingeckoId: CoingeckoNetworkID.Ethereum,
+    coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: getMockFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
     evmGasType: EVMGasType.Type2,

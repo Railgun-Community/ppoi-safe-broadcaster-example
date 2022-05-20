@@ -27,7 +27,7 @@ export type Network = {
   deploymentBlock?: RailProxyDeploymentBlock;
   fallbackProviderConfig: FallbackProviderJsonConfig;
   gasToken: GasTokenConfig;
-  coingeckoId?: CoingeckoNetworkID;
+  coingeckoNetworkId?: CoingeckoNetworkID;
   priceTTLInMS: number;
   fees: NetworkFeeSettings;
   isTestNetwork?: boolean;

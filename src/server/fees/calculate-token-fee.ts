@@ -8,10 +8,7 @@ import {
   allTokenAddressesForNetwork,
   getTransactionTokens,
 } from '../tokens/network-tokens';
-import {
-  getTransactionTokenPrices,
-  TokenPrice,
-} from '../tokens/token-price-cache';
+import { getTransactionTokenPrices } from '../tokens/token-price-cache';
 import { cacheUnitFeesForTokens } from './transaction-fee-cache';
 
 export const getAllUnitTokenFeesForChain = (
@@ -83,12 +80,12 @@ const getTokenRatiosFromCachedPrices = (
 };
 
 export const getRoundedTokenToGasPriceRatio = (
-  tokenPrice: TokenPrice,
-  gasTokenPrice: TokenPrice,
+  tokenPrice: number,
+  gasTokenPrice: number,
   fees: NetworkFeeSettings,
   precision: number,
 ): BigNumber => {
-  const priceRatio = gasTokenPrice.price / tokenPrice.price;
+  const priceRatio = gasTokenPrice / tokenPrice;
   const slippage = priceRatio * fees.slippageBuffer;
   const profit = priceRatio * fees.profit;
   const totalFeeRatio = priceRatio + slippage + profit;
@@ -97,7 +94,7 @@ export const getRoundedTokenToGasPriceRatio = (
   const ratio = totalFeeRatio * precision;
   if (ratio < ratioMinimum) {
     throw new Error(
-      `Price ratio between token (${tokenPrice.price}) and gas token (${gasTokenPrice.price})
+      `Price ratio between token (${tokenPrice}) and gas token (${gasTokenPrice})
       is not precise enough to provide an accurate fee.`,
     );
   }
