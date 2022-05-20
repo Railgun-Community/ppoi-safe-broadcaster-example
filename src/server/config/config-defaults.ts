@@ -66,6 +66,14 @@ export default {
      * We send one request per network for every refresh (disregarding test nets).
      */
     priceRefreshDelayInMS: 30 * 1000,
+
+    /**
+     * Configurable API Keys for Pricing APIs.
+     * Pro tiers are more stable and reliable.
+     */
+    api: {
+      coingeckoProApiKey: 'CG-zmXR1JBHNGdG98yZz7QUHUTr',
+    },
   },
 
   balances: {
