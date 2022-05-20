@@ -36,3 +36,4 @@ docker/secret
 tsconfig.tsbuildinfo
 docker/.env
 docker/config.toml
+docker/docker-stack.yml

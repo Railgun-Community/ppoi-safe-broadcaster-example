@@ -1,0 +1,83 @@
+version: '3.9'
+
+volumes:
+  nwaku:
+    name: 'nwaku'
+  relayer:
+    name: 'relayer'
+
+services:
+  nwaku:
+    image: statusteam/nim-waku:deploy-status-test
+    # container_name: nwaku
+    hostname: 'nwaku'
+    ports:
+      - 60000:60000
+      - 8000:8000
+      - 8546:8546
+    expose:
+      - '8546'
+    restart: always
+    volumes:
+      - ./appdata/nwaku:/app
+      - ./appdata/swag/etc/letsencrypt:/ssl
+    depends_on:
+      - swag
+    #entrypoint: tail -F anything
+    entrypoint: >
+      wakunode2 --config-file=/app/config.toml
+      --nat="extip:${EXTIP}"
+      --listen-address="${LISTENIP}"
+      --dns4-domain-name=${SUBDOMAIN}.${BASEDOMAIN}
+      --nodekey=${NODEKEY}
+      --websocket-support=true
+      --websocket-secure-support=true
+      --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
+      --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
+
+  relayer:
+    image: 'relayer:latest'
+    # container_name: relayer
+    hostname: 'relayer'
+    environment:
+      WAKU_RPC_URL: 'http://nwaku:8546'
+      LEPTON_DB: '/mnt/relayer.db'
+      LOG_LEVEL: 'debug'
+      DEBUG: 'relayer*,waku:jsonrpc-api'
+    secrets:
+      - MNEMONIC
+      - DB_ENCRYPTION_KEY
+    depends_on:
+      - nwaku
+    restart: always
+    volumes:
+      - relayer:/mnt
+
+  swag:
+    image: ghcr.io/linuxserver/swag
+    # container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=EST
+      - URL=${BASEDOMAIN}
+      - ONLY_SUBDOMAINS=true
+      - SUBDOMAINS=${SUBDOMAIN}
+      - VALIDATION=http
+      - EMAIL=${EMAIL}
+    volumes:
+      - ./appdata/swag:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+    #profiles:
+    # - domain
+
+secrets:
+  MNEMONIC:
+    external: true
+  DB_ENCRYPTION_KEY:
+    external: true
