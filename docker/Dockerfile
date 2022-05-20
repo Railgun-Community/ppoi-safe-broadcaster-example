@@ -1,6 +1,8 @@
 ### install yarn and modules
 FROM node:16-alpine as module-install-stage
 
+RUN apk add git
+
 RUN npm install -g npm@8.5.1
 
 WORKDIR /app
