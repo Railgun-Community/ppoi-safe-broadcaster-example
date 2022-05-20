@@ -3,16 +3,20 @@ import configDefaults from '../../config/config-defaults';
 import { CoingeckoNetworkID } from '../../../models/api-constants';
 import { logger } from '../../../util/logger';
 
-const PRO_API_KEY = configDefaults.tokenPrices.api.coingeckoProApiKey;
-
-const COINGECKO_API_URL = PRO_API_KEY
-  ? 'https://pro-api.coingecko.com/api/v3/'
-  : 'https://api.coingecko.com/api/v3/';
-
 export enum CoingeckoApiEndpoint {
   PriceLookupByID = 'simple/price/',
   PriceLookup = 'simple/token_price/',
 }
+
+const coingeckoApiUrl = (): string => {
+  return coingeckoProApiKey()
+    ? 'https://pro-api.coingecko.com/api/v3/'
+    : 'https://api.coingecko.com/api/v3/';
+};
+
+const coingeckoProApiKey = () => {
+  return configDefaults.tokenPrices.api.coingeckoProApiKey;
+};
 
 const paramString = (params?: MapType<any>) => {
   if (!params) {
@@ -21,8 +25,9 @@ const paramString = (params?: MapType<any>) => {
   // TODO: Add (opt) configurable Coingecko API key.
   const searchParams = new URLSearchParams(params);
 
-  if (PRO_API_KEY) {
-    searchParams.append('x_cg_pro_api_key', PRO_API_KEY);
+  const proApiKey = coingeckoProApiKey();
+  if (proApiKey) {
+    searchParams.append('x_cg_pro_api_key', proApiKey);
   }
 
   return searchParams.toString() ? `?${searchParams.toString()}` : '';
@@ -33,7 +38,7 @@ const createUrl = (
   coingeckoNetworkId?: CoingeckoNetworkID,
   params?: MapType<any>,
 ) => {
-  const url = `${COINGECKO_API_URL}${endpoint}${
+  const url = `${coingeckoApiUrl()}${endpoint}${
     coingeckoNetworkId || ''
   }${paramString(params)}`;
   return url;
