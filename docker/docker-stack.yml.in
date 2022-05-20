@@ -17,7 +17,6 @@ services:
       - 60000:60000
       - 8000:8000
       - 8546:8546
-    restart: always
     volumes:
       - ./appdata/nwaku:/app
       - ./appdata/swag/etc/letsencrypt:/ssl
@@ -29,8 +28,8 @@ services:
       wakunode2 --config-file=/app/config.toml
       --nat="extip:${EXTIP}"
       --listen-address="${LISTENIP}"
-      --dns4-domain-name=${SUBDOMAIN}.${BASEDOMAIN}
-      --nodekey="$$(cat /run/secrets/NODEKEY)"
+      --dns4-domain-name="${SUBDOMAIN}.${BASEDOMAIN}"
+      --nodekey="${NODEKEY}"
       --websocket-support=true
       --websocket-secure-support=true
       --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
@@ -49,7 +48,6 @@ services:
       - DB_ENCRYPTION_KEY
     depends_on:
       - nwaku
-    restart: always
     volumes:
       - relayer:/mnt
 
@@ -71,7 +69,6 @@ services:
     ports:
       - 443:443
       - 80:80
-    restart: unless-stopped
 
 secrets:
   MNEMONIC:
