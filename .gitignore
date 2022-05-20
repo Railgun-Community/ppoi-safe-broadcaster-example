@@ -37,3 +37,4 @@ tsconfig.tsbuildinfo
 docker/.env
 docker/config.toml
 docker/docker-stack.yml
+docker/appdata

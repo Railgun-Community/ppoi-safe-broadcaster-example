@@ -9,7 +9,6 @@ volumes:
 services:
   nwaku:
     image: statusteam/nim-waku:deploy-status-test
-    # container_name: nwaku
     hostname: 'nwaku'
     ports:
       - 60000:60000
@@ -23,13 +22,14 @@ services:
       - ./appdata/swag/etc/letsencrypt:/ssl
     depends_on:
       - swag
-    #entrypoint: tail -F anything
+    secrets:
+      - NODEKEY
     entrypoint: >
       wakunode2 --config-file=/app/config.toml
       --nat="extip:${EXTIP}"
       --listen-address="${LISTENIP}"
       --dns4-domain-name=${SUBDOMAIN}.${BASEDOMAIN}
-      --nodekey=${NODEKEY}
+      --nodekey="$$(cat /run/secrets/NODEKEY)"
       --websocket-support=true
       --websocket-secure-support=true
       --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
@@ -37,7 +37,6 @@ services:
 
   relayer:
     image: 'relayer:latest'
-    # container_name: relayer
     hostname: 'relayer'
     environment:
       WAKU_RPC_URL: 'http://nwaku:8546'
@@ -55,7 +54,6 @@ services:
 
   swag:
     image: ghcr.io/linuxserver/swag
-    # container_name: swag
     cap_add:
       - NET_ADMIN
     environment:
@@ -73,11 +71,11 @@ services:
       - 443:443
       - 80:80
     restart: unless-stopped
-    #profiles:
-    # - domain
 
 secrets:
   MNEMONIC:
     external: true
   DB_ENCRYPTION_KEY:
+    external: true
+  NODEKEY:
     external: true
