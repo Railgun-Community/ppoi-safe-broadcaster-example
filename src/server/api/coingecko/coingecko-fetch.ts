@@ -14,7 +14,7 @@ const coingeckoApiUrl = (): string => {
     : 'https://api.coingecko.com/api/v3/';
 };
 
-const coingeckoProApiKey = () => {
+const coingeckoProApiKey = (): Optional<string> => {
   return configDefaults.tokenPrices.api.coingeckoProApiKey;
 };
 
