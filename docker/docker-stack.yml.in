@@ -14,8 +14,6 @@ services:
       - 60000:60000
       - 8000:8000
       - 8546:8546
-    expose:
-      - '8546'
     restart: always
     volumes:
       - ./appdata/nwaku:/app
