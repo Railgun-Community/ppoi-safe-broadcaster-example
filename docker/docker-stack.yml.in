@@ -1,5 +1,8 @@
 version: '3.9'
 
+networks:
+  default:
+
 volumes:
   nwaku:
     name: 'nwaku'
