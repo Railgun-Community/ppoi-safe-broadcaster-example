@@ -20,23 +20,24 @@ services:
       - 8000:8000
     #  - 8546:8546
     volumes:
-      - ./appdata/nwaku:/app
+      - nwaku:/data
       - ./appdata/swag/etc/letsencrypt:/ssl
     depends_on:
       - swag
     entrypoint: >
-      wakunode2 --config-file=/app/config.toml
-      --nat="extip:${EXTIP}"
-      --listen-address="${LISTENIP}"
-      --dns4-domain-name="${SUBDOMAIN}.${BASEDOMAIN}"
-      --nodekey="${NODEKEY}"
-      --websocket-support=true
-      --websocket-secure-support=true
-      --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
-      --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
+      wakunode2
+        --config-file=/app/config.toml
+        --nat="extip:${EXTIP}"
+        --listen-address="${LISTENIP}"
+        --dns4-domain-name="${SUBDOMAIN}.${BASEDOMAIN}"
+        --nodekey="${NODEKEY}"
+        --websocket-support=true
+        --websocket-secure-support=true
+        --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
+        --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
 
   relayer:
-    image: 'relayer:latest'
+    image: relayer:latest
     hostname: 'relayer'
     networks:
       - relayer

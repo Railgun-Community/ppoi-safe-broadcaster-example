@@ -9,11 +9,11 @@ rpc-admin=true
 rpc-private=true
 rpc-address='0.0.0.0'
 rpc-port=8546
-persist-peers=true
 relay-peer-exchange=false
 keep-alive=true
-persist-messages=false
-#db-path='./store'
+persist-peers=true
+persist-messages=true
+db-path='/data/nwaku.db'
 ports-shift=0
 staticnode=[
   '/dns4/relayer.railgun.org/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD',
