@@ -23,15 +23,3 @@ staticnode=[
   '/dns4/node-01.gc-us-central1-a.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAkwBp8T6G77kQXSNMnxgaMky1JeyML5yqoTHRM8dbeCBNb',
   '/dns4/node-01.do-ams3.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAm6HZZr7aToTvEBPpiys4UxajCTU97zj5v7RNR2gbniy1D'
 ]
-
-nodekey="0x17cfa6e8621229b3ffc8397a04b0802d345a5c905550d205841c9978f5d8c725"
-nat="extip:67.177.158.27"
-listen-address="0.0.0.0"
-
-## If running a domain and security cert for wss, uncomment lines below and replace DOMAIN and cert paths as required
-
-#dns4-domain-name=""
-#websocket-support=true
-#websocket-secure-support=true
-#websocket-secure-key-path="/etc/letsencrypt/live//privkey.pem"
-#websocket-secure-cert-path="/etc/letsencrypt/live//fullchain.pem"

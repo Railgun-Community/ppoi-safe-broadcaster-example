@@ -8,6 +8,7 @@ RUN npm install -g npm@8.5.1
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 
+COPY scripts/ ./scripts
 COPY package*.json ./
 RUN npm install --ignore-scripts
 
@@ -22,6 +23,7 @@ RUN npm run compile
 FROM node:16-alpine
 COPY --from=build-stage /app/dist/ /app/dist
 COPY --from=module-install-stage /app/node_modules/ /app/node_modules
+COPY --from=module-install-stage /app/scripts/ /app/scripts
 WORKDIR /app
 
 CMD node dist/main.js

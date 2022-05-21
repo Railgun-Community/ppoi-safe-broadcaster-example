@@ -1,7 +1,7 @@
 version: '3.9'
 
 networks:
-  default:
+  relayer:
 
 volumes:
   nwaku:
@@ -11,19 +11,19 @@ volumes:
 
 services:
   nwaku:
-    image: statusteam/nim-waku:deploy-status-test
+    image: nwaku:latest
     hostname: 'nwaku'
+    networks:
+      - relayer
     ports:
       - 60000:60000
       - 8000:8000
-      - 8546:8546
+    #  - 8546:8546
     volumes:
       - ./appdata/nwaku:/app
       - ./appdata/swag/etc/letsencrypt:/ssl
     depends_on:
       - swag
-    secrets:
-      - NODEKEY
     entrypoint: >
       wakunode2 --config-file=/app/config.toml
       --nat="extip:${EXTIP}"
@@ -38,6 +38,8 @@ services:
   relayer:
     image: 'relayer:latest'
     hostname: 'relayer'
+    networks:
+      - relayer
     environment:
       WAKU_RPC_URL: 'http://nwaku:8546'
       LEPTON_DB: '/mnt/relayer.db'
@@ -55,6 +57,8 @@ services:
     image: ghcr.io/linuxserver/swag
     cap_add:
       - NET_ADMIN
+    networks:
+      - relayer
     environment:
       - PUID=1000
       - PGID=1000
@@ -74,6 +78,4 @@ secrets:
   MNEMONIC:
     external: true
   DB_ENCRYPTION_KEY:
-    external: true
-  NODEKEY:
     external: true
