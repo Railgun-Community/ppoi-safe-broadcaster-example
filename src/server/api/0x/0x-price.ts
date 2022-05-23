@@ -1,3 +1,5 @@
+import { BigNumber } from '@ethersproject/bignumber';
+import { parseUnits } from '@ethersproject/units';
 import { delay } from '../../../util/promise-utils';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import { tokenForAddress } from '../../tokens/network-tokens';
@@ -30,6 +32,10 @@ type ZeroXFormattedPriceData = {
   price: number;
 };
 
+const parsePriceToNumber = (priceString: string, decimals: number): number => {
+  return parseUnits(priceString, decimals).toNumber();
+};
+
 const zeroXPriceLookupByAddress = async (
   chainID: NetworkChainID,
   tokenAddress: string,
@@ -43,7 +49,7 @@ const zeroXPriceLookupByAddress = async (
     // so for this use case, it is not harmful.
 
     if (symbol === 'DAI') {
-      return { price: 1 };
+      return { price: parsePriceToNumber('1', decimals) };
     }
     const sellAmount = (10 ** decimals).toString(10);
     const params: ZeroXPriceParams = {
@@ -57,7 +63,7 @@ const zeroXPriceLookupByAddress = async (
       params,
     );
     return {
-      price: parseFloat(price),
+      price: parsePriceToNumber(price, decimals),
     };
   } catch (err) {
     return undefined;
