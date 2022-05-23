@@ -33,6 +33,7 @@ type ZeroXFormattedPriceData = {
 };
 
 const parsePriceToNumber = (priceString: string, decimals: number): number => {
+  // TODO: This might be dangerous, if the price string is too large.
   return parseUnits(priceString, decimals).toNumber();
 };
 
