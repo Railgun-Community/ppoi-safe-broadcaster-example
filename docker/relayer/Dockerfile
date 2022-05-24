@@ -21,6 +21,9 @@ RUN npm run compile
 
 ### run relayer
 FROM node:16-alpine
+RUN apk add bash
+RUN apk add curl
+RUN apk add jq
 COPY --from=build-stage /app/dist/ /app/dist
 COPY --from=module-install-stage /app/node_modules/ /app/node_modules
 COPY --from=module-install-stage /app/scripts/ /app/scripts
