@@ -17,8 +17,8 @@ services:
       - relayer
     ports:
       - 60000:60000
-      - 8000:8000
-    #  - 8546:8546
+    #  - 8000:8000 # wss proxied through swag
+      - 8546:8546
     volumes:
       - nwaku:/data
       - ./appdata/swag/etc/letsencrypt:/ssl
@@ -32,9 +32,9 @@ services:
         --dns4-domain-name="${SUBDOMAIN}.${BASEDOMAIN}"
         --nodekey="${NODEKEY}"
         --websocket-support=true
-        --websocket-secure-support=true
-        --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
-        --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
+        --websocket-secure-support=false
+    #--websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
+    #--websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
 
   relayer:
     image: relayer:latest
@@ -71,9 +71,11 @@ services:
       - EMAIL=${EMAIL}
     volumes:
       - ./appdata/swag:/config
+      - ./swag/nwaku.subdomain.conf:/config/nginx/proxy-confs/nwaku.subdomain.conf
     ports:
       - 443:443
       - 80:80
+      - 8000:8000 # wss proxied to nwaku
 
 secrets:
   MNEMONIC:
