@@ -23,7 +23,7 @@ Create and edit docker/.env to define your environment. Start by copying docker/
 The fields to configure are described below. Note that you may leave the domain and email fields empty if not using a domain name.
 
 - `EXTIP` - this is the IP address at which your system can be reached by the rest of the world
-- `LISTENIP` - if your system has its own public ip, this is the same as `EXTIP`. If you are running behind a router with NAT, this may be '0.0.0.0'
+- `LISTENIP` - if your system has its own public ip, this is the same as `EXTIP`. If you are running inside docker or behind a router with NAT, this will be '0.0.0.0'
 - `BASEDOMAIN` - If your full domain were 'relayer.railgun.org, this would be 'railgun.org'
 - `SUBDOMAIN` - If your domain were `relayer.railgun.org', this would be 'relayer'
 - `TZ` - timezone code; eg 'EST'
@@ -60,10 +60,10 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 
 - Generate `DB_ENCRYPTION_KEY` docker secret:
 
-      scripts/nodekey.sh | docker secret create DB_ENCRYPTION_KEY -
+      # scripts/nodekey.sh | docker secret create DB_ENCRYPTION_KEY -
       echo "CHANGE_ME" -n | sha256sum | awk '{print $1}' | docker secret create DB_ENCRYPTION_KEY -
 
-- Generate `nodekey` docker secret:
+- Generate `NODEKEY` docker secret:
 
       scripts/nodekey.sh | docker secret create NODEKEY -
 
@@ -121,6 +121,60 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 - verify that nwaku is connected to other nwaku nodes:
 
       scripts/nwaku/peers.sh
+
+## Diagnostics
+
+- should be able to run ./scripts/nwaku/whoami.sh and see something like:
+
+```
+{
+  "listenAddresses": [
+    "/dns4/relayer.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg",
+    "/dns4/relayer.of.holdings/tcp/8000/ws/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg"
+  ],
+  "enrUri": "enr:-LO4QGvrbg2hqZnqdOFxGVZnDs9U2PWMkwfQUJdbjWixYkzUC8WOAkZXSlM3E4zxC-sh0yPcrYoiwrjooS2egIqnWnsBgmlkgnY0gmlwhKdH8B6KbXVsdGlhZGRyc5wAGjYTcmVsYXllci5vZi5ob2xkaW5ncwYfQN0DiXNlY3AyNTZrMaEDgxhTW1QQXUp6rmDAj8RflocYG0_fxiW9GnU_pzl_7XWDdGNwgupghXdha3UyDw"
+}
+```
+
+- should be able to run ./scripts/nwaku/peers.sh and see something like:
+
+```
+[
+  {
+    "multiaddr": "/dns4/node-01.do-ams3.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAm6HZZr7aToTvEBPpiys4UxajCTU97zj5v7RNR2gbniy1D",
+    "protocol": "/vac/waku/relay/2.0.0",
+    "connected": true
+  },
+  {
+    "multiaddr": "/dns4/node-01.gc-us-central1-a.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAkwBp8T6G77kQXSNMnxgaMky1JeyML5yqoTHRM8dbeCBNb",
+    "protocol": "/vac/waku/relay/2.0.0",
+    "connected": false
+  },
+  {
+    "multiaddr": "/dns4/relayer.railgun.org/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD",
+    "protocol": "/vac/waku/relay/2.0.0",
+    "connected": true
+  }
+]
+```
+
+- Monitor logs with commands like
+
+  - `docker service logs relayer_nwaku`
+  - `docker service logs relayer_relayer`
+  - `docker service logs relayer_swag`
+
+- In the event that services were restarted, the logs shown by the above commands may not be the true logs. If in doubt, execute:
+  - `docker container ps`
+  - This will show a list of running containers. The first column is the id of the container. You can generally refernce it with the first two characters of the id.
+  - `docker logs 34` (where `34` are the first two characters of the container id)
+
+```
+ CONTAINER ID   IMAGE                             COMMAND                  CREATED       STATUS       PORTS                            NAMES
+345265257f8f   relayer:latest                    "docker-entrypoint.s…"   5 hours ago   Up 5 hours                                    relayer_relayer.1.k8e9vk23lhzi79g3vcu02wtr9
+8fe5803a4314   nwaku:latest                      "wakunode2 --config-…"   5 hours ago   Up 5 hours   8545/tcp, 30303/tcp, 60000/tcp   relayer_nwaku.1.5kfe0bcahwbb95bdqxmqgx6ak
+4e76b7e1cd3d   ghcr.io/linuxserver/swag:latest   "/init"                  5 hours ago   Up 5 hours   80/tcp, 443/tcp                  relayer_swag.1.cmi0mo0r1fto3mbsz7iyfsms
+```
 
 ## Run tests
 
