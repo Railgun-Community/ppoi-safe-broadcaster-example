@@ -14,7 +14,7 @@
     "clean": "rm -rf dist",
     "lint": "eslint . --ext .ts && tsc",
     "compile": "npm run clean && tsc && tsc-alias",
-    "start": "npm run compile && node dist/main.js",
+    "start": "node dist/main.js",
     "debug": "env-cmd -e all,debug npm start",
     "debug-pm2": "pm2 delete main; env-cmd -e all,debug pm2 start dist/main.js -f && pm2 save",
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",

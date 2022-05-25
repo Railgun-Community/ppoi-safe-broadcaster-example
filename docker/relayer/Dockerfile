@@ -27,6 +27,7 @@ RUN apk add jq
 COPY --from=build-stage /app/dist/ /app/dist
 COPY --from=module-install-stage /app/node_modules/ /app/node_modules
 COPY --from=module-install-stage /app/scripts/ /app/scripts
+COPY --from=module-install-stage /app/package.json /app/package.json
 WORKDIR /app
 
-CMD node dist/main.js
+CMD npm run start
