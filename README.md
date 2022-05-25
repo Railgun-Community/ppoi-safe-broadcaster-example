@@ -58,16 +58,15 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 
       docker swarm init
 
-- Generate `DB_ENCRYPTION_KEY` docker secret:
+- Generate `DB_ENCRYPTION_KEY` docker secret. Do not use password `sw0rdf1sh`. This is an example. Change it to your own. This command hashes your password to 32 bytes and wrangles it into the docker secret.
 
-      # scripts/nodekey.sh | docker secret create DB_ENCRYPTION_KEY -
-      echo "CHANGE_ME" -n | sha256sum | awk '{print $1}' | docker secret create DB_ENCRYPTION_KEY -
+      echo "sw0rdf1sh" -n | sha256sum | awk '{print $1}' | docker secret create DB_ENCRYPTION_KEY -
 
 - Generate `NODEKEY` docker secret:
 
       scripts/nodekey.sh | docker secret create NODEKEY -
 
-- Register `MNEMONIC` docker secret:
+- Register `MNEMONIC` docker secret. This is an example. Your actual mnemonic is not 'my mnemonic words...'
 
       echo "my mnemonic words..." | docker secret create MNEMONIC -
 
@@ -75,18 +74,16 @@ You can specify most defaults with configDefaults, and import configTokens to mo
 
       docker/build.sh
 
-- Deploy stack:
+- Deploy stack with `./docker/run.sh`:
 
-        docker/run.sh
+        $ ./docker/run.sh
 
         Creating network relayer_relayer
         Creating service relayer_relayer
         Creating service relayer_swag
         Creating service relayer_nwaku
 
-You should see output like:
-
-If you get an error about the `relayer_relayer` network not existing, just execute `docker/run.sh` again until it works.
+If you get an error about the `relayer_relayer` network not existing, just execute `docker/run.sh` again until it works. This is a known issue with docker, but you may need to do it 5 times. Just press up instead of typing it again.
 
 - Stop stack:
 
