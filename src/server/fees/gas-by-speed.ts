@@ -209,30 +209,33 @@ const findHeadBlockInMessage = (message: string): Optional<number> => {
 
 const getFeeHistory = (
   web3Eth: Eth,
-  recentBlock: number,
+  recentBlock?: number,
   retryCount = 0,
 ): Promise<FeeHistoryResult> => {
-  try {
-    return web3Eth.getFeeHistory(
+  return web3Eth
+    .getFeeHistory(
       HISTORICAL_BLOCK_COUNT,
-      recentBlock,
+      recentBlock ?? 'latest',
       REWARD_PERCENTILES,
-    );
-  } catch (err) {
-    if (err.message && err.message.includes('request beyond head block')) {
-      if (retryCount > 5) {
-        throw new Error(
-          'Recent on-chain fee history not available. Please refresh and try again.',
-        );
+    )
+    .catch(async (err) => {
+      if (err.message && err.message.includes('request beyond head block')) {
+        if (retryCount > 5) {
+          throw new Error(
+            'Recent on-chain fee history not available. Please refresh and try again.',
+          );
+        }
+        const headBlock = findHeadBlockInMessage(err.message);
+        if (headBlock) {
+          return getFeeHistory(web3Eth, headBlock, retryCount + 1);
+        }
+
+        // eslint-disable-next-line no-param-reassign
+        recentBlock = recentBlock ?? (await web3Eth.getBlockNumber()) - 1;
+        return getFeeHistory(web3Eth, recentBlock - 1, retryCount + 1);
       }
-      const headBlock = findHeadBlockInMessage(err.message);
-      if (headBlock) {
-        return getFeeHistory(web3Eth, headBlock, retryCount + 1);
-      }
-      return getFeeHistory(web3Eth, recentBlock - 1, retryCount + 1);
-    }
-    throw err;
-  }
+      throw err;
+    });
 };
 
 const getMedianHistoricalGasDetailsBySpeed = async (
