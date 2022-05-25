@@ -34,7 +34,7 @@ The fields to configure are described below. Note that you may leave the domain 
 Customize your relayer by running `npm run copy-my-config`, which copies `src/MY-CONFIG.ts.example` to `src/MY-CONFIG.ts`.
 You can specify most defaults with configDefaults, and import configTokens to modify token configuration per network.
 
-- `configDefaults.networks.active = [3];` - network IDs you want to relay fees for. A value of `[1, 3, 56, 137]` would run on ethereum, binance smart chain, and polygon
+- `configDefaults.networks.active = [3];` - network IDs you want to relay fees for. A value of `[1, 3, 56, 137]` would run on ethereum, ropsten testnet, binance smart chain, and polygon
 - `configDefaults.waku.rpcURL` - defaults to http://localhost:8546
 
 ## Run RAILGUN relayer
