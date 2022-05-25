@@ -80,6 +80,7 @@ export const transactMethod = async (
     dbg(
       'Fee cache ID unrecognized. Transaction sent to another Relayer with same Rail Address.',
     );
+    return undefined;
   }
 
   try {
