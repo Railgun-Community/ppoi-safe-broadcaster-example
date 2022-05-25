@@ -192,6 +192,21 @@ export const getGasPricesBySpeed = async (
   return gasPricesBySpeed;
 };
 
+const findHeadBlockInMessage = (message: string): Optional<number> => {
+  try {
+    const headBlockInMessageSplit = message.split(', head ');
+    if (headBlockInMessageSplit.length === 2) {
+      const headBlock = parseInt(headBlockInMessageSplit[1], 10);
+      if (!Number.isNaN(headBlock)) {
+        return headBlock;
+      }
+    }
+    return undefined;
+  } catch (err) {
+    return undefined;
+  }
+};
+
 const getFeeHistory = (
   web3Eth: Eth,
   recentBlock: number,
@@ -209,6 +224,10 @@ const getFeeHistory = (
         throw new Error(
           'Recent on-chain fee history not available. Please refresh and try again.',
         );
+      }
+      const headBlock = findHeadBlockInMessage(err.message);
+      if (headBlock) {
+        return getFeeHistory(web3Eth, headBlock, retryCount + 1);
       }
       return getFeeHistory(web3Eth, recentBlock - 1, retryCount + 1);
     }

@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { delay } from '../../../util/promise-utils';
 import { NetworkChainID } from '../../config/config-chain-ids';
