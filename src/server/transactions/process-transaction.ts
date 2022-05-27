@@ -21,6 +21,9 @@ export const processTransaction = async (
 ): Promise<TransactionResponse> => {
   const transactionRequest = deserializeTransaction(serializedTransaction);
 
+  transactionRequest.gasLimit = undefined;
+  transactionRequest.gasPrice = undefined;
+
   const gasEstimateDetails = await getEstimateGasDetails(
     chainID,
     transactionRequest,
