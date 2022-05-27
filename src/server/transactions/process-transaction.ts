@@ -1,7 +1,6 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import debug from 'debug';
 import { NetworkChainID } from '../config/config-chain-ids';
-import configDefaults from '../config/config-defaults';
 import { createTransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { validateFee } from '../fees/fee-validator';
 import {
