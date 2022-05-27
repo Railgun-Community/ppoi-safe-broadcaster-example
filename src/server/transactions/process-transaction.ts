@@ -23,6 +23,8 @@ export const processTransaction = async (
 
   transactionRequest.gasLimit = undefined;
   transactionRequest.gasPrice = undefined;
+  transactionRequest.maxFeePerGas = undefined;
+  transactionRequest.maxPriorityFeePerGas = undefined;
 
   const gasEstimateDetails = await getEstimateGasDetails(
     chainID,
