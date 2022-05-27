@@ -30,6 +30,7 @@ export type RawParamsTransact = {
   chainID: number;
   feesID: string;
   relayerViewingKey: string;
+  useRelayAdapt: boolean;
 };
 
 const handledClientPubKeys: string[] = [];
@@ -64,6 +65,7 @@ export const transactMethod = async (
     feesID: feeCacheID,
     serializedTransaction,
     relayerViewingKey,
+    useRelayAdapt,
   } = decrypted as RawParamsTransact;
 
   dbg('Decrypted - attempting to transact');
@@ -88,6 +90,7 @@ export const transactMethod = async (
       chainID,
       feeCacheID,
       serializedTransaction,
+      useRelayAdapt ?? false,
     );
     return resultResponse(id, chainID, sharedKey, txResponse);
   } catch (err: any) {

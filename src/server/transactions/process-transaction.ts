@@ -8,7 +8,7 @@ import {
   calculateMaximumGas,
 } from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
-import { extractPackagedFeeFromProxyTransaction } from './extract-packaged-fee';
+import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
 import { deserializeTransaction } from './transaction-deserializer';
 
 const dbg = debug('relayer:transact:validate');
@@ -17,6 +17,7 @@ export const processTransaction = async (
   chainID: NetworkChainID,
   feeCacheID: string,
   serializedTransaction: string,
+  useRelayAdapt: boolean,
 ): Promise<TransactionResponse> => {
   const transactionRequest = deserializeTransaction(serializedTransaction);
 
@@ -29,7 +30,11 @@ export const processTransaction = async (
   dbg('Maximum gas:', maximumGas);
 
   const { tokenAddress, packagedFeeAmount } =
-    await extractPackagedFeeFromProxyTransaction(chainID, transactionRequest);
+    await extractPackagedFeeFromTransaction(
+      chainID,
+      transactionRequest,
+      useRelayAdapt,
+    );
   validateFee(chainID, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
   dbg('Fee validated:', packagedFeeAmount, tokenAddress);
 

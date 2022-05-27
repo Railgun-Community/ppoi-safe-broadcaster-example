@@ -57,12 +57,27 @@ enum TransactionName {
   RelayAdapt = 'relay',
 }
 
-export const extractPackagedFeeFromProxyTransaction = (
+export const extractPackagedFeeFromTransaction = (
+  chainID: NetworkChainID,
+  transactionRequest: TransactionRequest,
+  useRelayAdapt: boolean,
+): Promise<PackagedFee> => {
+  if (useRelayAdapt) {
+    return extractPackagedFeeFromRelayAdaptTransaction(
+      chainID,
+      transactionRequest,
+    );
+  }
+
+  return extractPackagedFeeFromProxyTransaction(chainID, transactionRequest);
+};
+
+const extractPackagedFeeFromProxyTransaction = (
   chainID: NetworkChainID,
   transactionRequest: TransactionRequest,
 ): Promise<PackagedFee> => {
   const network = configNetworks[chainID];
-  return extractPackagedFeeFromTransaction(
+  return extractPackagedFee(
     chainID,
     transactionRequest,
     TransactionName.Proxy,
@@ -70,12 +85,12 @@ export const extractPackagedFeeFromProxyTransaction = (
   );
 };
 
-export const extractPackagedFeeFromRelayAdaptTransaction = (
+const extractPackagedFeeFromRelayAdaptTransaction = (
   chainID: NetworkChainID,
   transactionRequest: TransactionRequest,
 ): Promise<PackagedFee> => {
   const network = configNetworks[chainID];
-  return extractPackagedFeeFromTransaction(
+  return extractPackagedFee(
     chainID,
     transactionRequest,
     TransactionName.RelayAdapt,
@@ -83,7 +98,7 @@ export const extractPackagedFeeFromRelayAdaptTransaction = (
   );
 };
 
-const extractPackagedFeeFromTransaction = async (
+const extractPackagedFee = async (
   chainID: NetworkChainID,
   transactionRequest: TransactionRequest,
   transactionName: TransactionName,
