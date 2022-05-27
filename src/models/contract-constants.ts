@@ -6,6 +6,14 @@ export enum RailProxyContract {
   HardHat = '0x0165878A594ca255338adfa4d48449f69242Eb8F',
 }
 
+export enum RelayAdaptContract {
+  Ethereum = '', // TODO
+  Ropsten = '', // TODO
+  BNBSmartChain = '', // TODO
+  PolygonPOS = '', // TODO
+  HardHat = '0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f',
+}
+
 export enum RailProxyDeploymentBlock {
   Ethereum = 14737691,
   Ropsten = 12226000,

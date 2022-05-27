@@ -4,7 +4,10 @@ import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-enco
 import { NetworkChainID } from '../server/config/config-chain-ids';
 import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
-import { RailProxyContract } from '../models/contract-constants';
+import {
+  RailProxyContract,
+  RelayAdaptContract,
+} from '../models/contract-constants';
 import { EVMGasType, Network } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 import {
@@ -80,6 +83,7 @@ export const getMockNetwork = (): Network => {
       profit: 0.07,
     },
     proxyContract: '0x00' as RailProxyContract,
+    relayAdaptContract: '0x00' as RelayAdaptContract,
     coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: getMockFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
@@ -100,6 +104,7 @@ export const getMockRopstenNetwork = (): Network => {
       profit: 0.05,
     },
     proxyContract: RailProxyContract.Ropsten,
+    relayAdaptContract: RelayAdaptContract.Ropsten,
     fallbackProviderConfig: getMockRopstenFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,

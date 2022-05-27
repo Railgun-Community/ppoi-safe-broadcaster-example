@@ -43,6 +43,10 @@ enum TokenAddressPoly {
   // Unused until more liquidity and price stability:
   // RAILPOLY = '0x92A9C92C215092720C731c96D4Ff508c831a714f',
 }
+enum TokenAddressHardHat {
+  TESTERC20 = '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+  WETH = '0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44',
+}
 
 export default {
   [NetworkChainID.Ethereum]: {
@@ -105,8 +109,11 @@ export default {
     },
   },
   [NetworkChainID.HardHat]: {
-    '0x5FbDB2315678afecb367f032d93F642f64180aa3': {
+    [TokenAddressHardHat.TESTERC20]: {
       symbol: 'TESTERC20',
+    },
+    [TokenAddressHardHat.WETH]: {
+      symbol: 'WETH',
     },
   },
 } as NetworkTokensConfig;

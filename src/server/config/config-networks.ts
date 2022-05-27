@@ -8,6 +8,7 @@ import { CoingeckoNetworkID } from '../../models/api-constants';
 import {
   RailProxyContract,
   RailProxyDeploymentBlock,
+  RelayAdaptContract,
 } from '../../models/contract-constants';
 import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../../models/config-models';
@@ -32,6 +33,7 @@ export default {
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.Ethereum,
+    relayAdaptContract: RelayAdaptContract.Ethereum,
     coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
     priceTTLInMS: defaultTokenPriceTTL,
@@ -46,6 +48,7 @@ export default {
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.Ropsten,
+    relayAdaptContract: RelayAdaptContract.Ropsten,
     deploymentBlock: RailProxyDeploymentBlock.Ropsten,
     fallbackProviderConfig: fallbackProvidersRopsten,
     priceTTLInMS: defaultTokenPriceTTL,
@@ -61,6 +64,7 @@ export default {
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.BNBSmartChain,
+    relayAdaptContract: RelayAdaptContract.BNBSmartChain,
     coingeckoNetworkId: CoingeckoNetworkID.BNBSmartChain,
     fallbackProviderConfig: fallbackProvidersBNBSmartChain,
     priceTTLInMS: defaultTokenPriceTTL,
@@ -75,6 +79,7 @@ export default {
     },
     fees: defaultFees,
     proxyContract: RailProxyContract.PolygonPOS,
+    relayAdaptContract: RelayAdaptContract.PolygonPOS,
     coingeckoNetworkId: CoingeckoNetworkID.PolygonPOS,
     fallbackProviderConfig: fallbackProvidersPolygon,
     priceTTLInMS: defaultTokenPriceTTL,
@@ -89,6 +94,7 @@ export default {
     },
     fees: defaultFees,
     proxyContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
+    relayAdaptContract: RelayAdaptContract.HardHat,
     fallbackProviderConfig: fallbackProvidersHardhat,
     priceTTLInMS: defaultTokenPriceTTL,
     isTestNetwork: true,

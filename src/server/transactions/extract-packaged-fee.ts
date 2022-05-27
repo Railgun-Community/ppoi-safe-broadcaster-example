@@ -52,30 +52,62 @@ type TransactionData = {
   // address overrideOutput;
 };
 
-export const extractPackagedFeeFromTransaction = async (
+enum TransactionName {
+  Proxy = 'transact',
+  RelayAdapt = 'relay',
+}
+
+export const extractPackagedFeeFromProxyTransaction = (
   chainID: NetworkChainID,
   transactionRequest: TransactionRequest,
 ): Promise<PackagedFee> => {
   const network = configNetworks[chainID];
+  return extractPackagedFeeFromTransaction(
+    chainID,
+    transactionRequest,
+    TransactionName.Proxy,
+    network.proxyContract,
+  );
+};
+
+export const extractPackagedFeeFromRelayAdaptTransaction = (
+  chainID: NetworkChainID,
+  transactionRequest: TransactionRequest,
+): Promise<PackagedFee> => {
+  const network = configNetworks[chainID];
+  return extractPackagedFeeFromTransaction(
+    chainID,
+    transactionRequest,
+    TransactionName.RelayAdapt,
+    network.relayAdaptContract,
+  );
+};
+
+const extractPackagedFeeFromTransaction = async (
+  chainID: NetworkChainID,
+  transactionRequest: TransactionRequest,
+  transactionName: TransactionName,
+  contractAddress: string,
+): Promise<PackagedFee> => {
   if (
     !transactionRequest.to ||
-    transactionRequest.to.toLowerCase() !== network.proxyContract.toLowerCase()
+    transactionRequest.to.toLowerCase() !== contractAddress.toLowerCase()
   ) {
     throw new Error(
-      `Invalid contract address: got ${transactionRequest.to}, expected ${network.proxyContract} for chain ${chainID}`,
+      `Invalid contract address: got ${transactionRequest.to}, expected ${contractAddress} for chain ${chainID}`,
     );
   }
 
   const provider = getProviderForNetwork(chainID);
   const abi = abiForProxyContract();
-  const contract = new Contract(network.proxyContract, abi, provider);
+  const contract = new Contract(contractAddress, abi, provider);
 
   const parsedTransaction = contract.interface.parseTransaction({
     data: (transactionRequest.data as string) ?? '',
     value: transactionRequest.value,
   });
-  if (parsedTransaction.name !== 'transact') {
-    throw new Error('Contract method invalid');
+  if (parsedTransaction.name !== transactionName) {
+    throw new Error(`Contract method invalid: expected ${transactionName}`);
   }
 
   const viewingKeys = getRailgunWallet().getViewingKeyPair();

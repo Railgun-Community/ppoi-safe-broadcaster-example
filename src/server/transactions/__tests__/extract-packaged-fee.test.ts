@@ -24,7 +24,7 @@ import {
   getRailgunWallet,
   initWallets,
 } from '../../wallets/active-wallets';
-import { extractPackagedFeeFromTransaction } from '../extract-packaged-fee';
+import { extractPackagedFeeFromProxyTransaction } from '../extract-packaged-fee';
 import {
   createLeptonVerifyProofStub,
   createLeptonWalletBalancesStub,
@@ -113,7 +113,7 @@ describe('extract-packaged-fee', () => {
       MOCK_TOKEN_ADDRESS,
     );
     const populatedTransaction = await contract.transact(transactions);
-    const packagedFee = await extractPackagedFeeFromTransaction(
+    const packagedFee = await extractPackagedFeeFromProxyTransaction(
       ROPSTEN_CHAIN_ID,
       populatedTransaction,
     );
@@ -133,7 +133,10 @@ describe('extract-packaged-fee', () => {
     );
     const populatedTransaction = await contract.transact(transactions);
     await expect(
-      extractPackagedFeeFromTransaction(ROPSTEN_CHAIN_ID, populatedTransaction),
+      extractPackagedFeeFromProxyTransaction(
+        ROPSTEN_CHAIN_ID,
+        populatedTransaction,
+      ),
     ).to.be.rejectedWith('No Relayer payment included in transaction.');
   }).timeout(60000);
 }).timeout(120000);

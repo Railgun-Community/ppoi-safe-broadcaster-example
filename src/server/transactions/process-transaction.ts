@@ -8,9 +8,8 @@ import {
   getEstimateGasDetails,
   calculateMaximumGas,
 } from '../fees/gas-estimate';
-import { recognizesFeeCacheID } from '../fees/transaction-fee-cache';
 import { executeTransaction } from './execute-transaction';
-import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
+import { extractPackagedFeeFromProxyTransaction } from './extract-packaged-fee';
 import { deserializeTransaction } from './transaction-deserializer';
 
 const dbg = debug('relayer:transact:validate');
@@ -31,7 +30,7 @@ export const processTransaction = async (
   dbg('Maximum gas:', maximumGas);
 
   const { tokenAddress, packagedFeeAmount } =
-    await extractPackagedFeeFromTransaction(chainID, transactionRequest);
+    await extractPackagedFeeFromProxyTransaction(chainID, transactionRequest);
   validateFee(chainID, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
   dbg('Fee validated:', packagedFeeAmount, tokenAddress);
 

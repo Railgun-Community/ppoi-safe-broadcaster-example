@@ -6,6 +6,7 @@ export enum GasTokenWrappedAddress {
   RopstenWETH = '0xc778417e063141139fce010982780140aa0cd5ab', // (Ropsten) WETH
   BinanceWBNB = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c', // WBNB
   PolygonWMATIC = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270', // WMATIC
+  HardHatWETH = '0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44', // (HardHat) WETH
 }
 
 export const GAS_TOKEN_DECIMALS = 18;

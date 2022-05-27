@@ -2,6 +2,7 @@ import { CoingeckoNetworkID } from './api-constants';
 import {
   RailProxyContract,
   RailProxyDeploymentBlock,
+  RelayAdaptContract,
 } from './contract-constants';
 import { FallbackProviderJsonConfig } from './provider-models';
 import { GasTokenConfig } from './token-models';
@@ -24,6 +25,7 @@ export type NetworkFeeSettings = {
 export type Network = {
   name: string;
   proxyContract: RailProxyContract;
+  relayAdaptContract: RelayAdaptContract;
   deploymentBlock?: RailProxyDeploymentBlock;
   fallbackProviderConfig: FallbackProviderJsonConfig;
   gasToken: GasTokenConfig;
