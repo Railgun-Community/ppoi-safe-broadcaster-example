@@ -58,6 +58,7 @@ export const initLeptonNetwork = async (
     await lepton.loadNetwork(
       chainID,
       network.proxyContract,
+      network.relayAdaptContract,
       provider,
       deploymentBlock,
     );

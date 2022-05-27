@@ -1,9 +1,14 @@
-import ABI_RAILGUN from '@railgun-community/lepton/dist/contract/erc20/RailgunLogic.json';
+import ABI_RAILGUN_LOGIC from '@railgun-community/lepton/dist/abi/RailgunLogic.json';
+import ABI_RELAY_ADAPT from '@railgun-community/lepton/dist/abi/RelayAdapt.json';
 import { NetworkChainID } from '../config/config-chain-ids';
 import ABI_ERC20 from './json/erc20.json';
 
 export const abiForProxyContract = () => {
-  return ABI_RAILGUN;
+  return ABI_RAILGUN_LOGIC;
+};
+
+export const abiForRelayAdaptContract = () => {
+  return ABI_RELAY_ADAPT;
 };
 
 export const abiForChainToken = (chainID: NetworkChainID): Array<any> => {

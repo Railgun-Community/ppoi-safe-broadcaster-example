@@ -40,8 +40,8 @@ export const processTransaction = async (
       transactionRequest,
       useRelayAdapt,
     );
-  validateFee(chainID, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
-  dbg('Fee validated:', packagedFeeAmount, tokenAddress);
+  // validateFee(chainID, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
+  // dbg('Fee validated:', packagedFeeAmount, tokenAddress);
 
   const transactionGasDetails = createTransactionGasDetails(
     chainID,

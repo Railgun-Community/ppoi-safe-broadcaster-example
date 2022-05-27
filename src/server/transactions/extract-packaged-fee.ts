@@ -11,7 +11,7 @@ import { getSharedSymmetricKey } from '@railgun-community/lepton/dist/utils/keys
 import { TransactionRequest } from '@ethersproject/providers';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
-import { abiForProxyContract } from '../abi/abi';
+import { abiForProxyContract, abiForRelayAdaptContract } from '../abi/abi';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import {
   getRailgunAddressData,
@@ -82,6 +82,7 @@ const extractPackagedFeeFromProxyTransaction = (
     transactionRequest,
     TransactionName.Proxy,
     network.proxyContract,
+    abiForProxyContract(),
   );
 };
 
@@ -95,6 +96,7 @@ const extractPackagedFeeFromRelayAdaptTransaction = (
     transactionRequest,
     TransactionName.RelayAdapt,
     network.relayAdaptContract,
+    abiForRelayAdaptContract(),
   );
 };
 
@@ -103,6 +105,7 @@ const extractPackagedFee = async (
   transactionRequest: TransactionRequest,
   transactionName: TransactionName,
   contractAddress: string,
+  abi: Array<any>,
 ): Promise<PackagedFee> => {
   if (
     !transactionRequest.to ||
@@ -114,7 +117,6 @@ const extractPackagedFee = async (
   }
 
   const provider = getProviderForNetwork(chainID);
-  const abi = abiForProxyContract();
   const contract = new Contract(contractAddress, abi, provider);
 
   const parsedTransaction = contract.interface.parseTransaction({
