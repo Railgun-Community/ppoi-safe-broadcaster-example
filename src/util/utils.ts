@@ -1,3 +1,5 @@
+import { BigNumber } from '@ethersproject/bignumber';
+
 export const removeNaNs = (a: number[]): number[] => {
   const newArray: number[] = [];
   a.forEach((item) => {
@@ -30,4 +32,12 @@ export const resetMapObject = (map: MapType<any> | NumMapType<any>) => {
 export const resetArray = (a: any[]) => {
   // eslint-disable-next-line no-param-reassign
   a.length = 0;
+};
+
+export const maxBigNumber = (b1: BigNumber, b2: BigNumber) => {
+  return b1.gt(b2) ? b1 : b2;
+};
+
+export const minBigNumber = (b1: BigNumber, b2: BigNumber) => {
+  return b1.lt(b2) ? b1 : b2;
 };

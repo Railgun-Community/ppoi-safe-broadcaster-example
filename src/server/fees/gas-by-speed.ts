@@ -28,6 +28,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import Web3, { Eth, FeeHistoryResult } from 'web3-eth';
 import { EVMGasType } from '../../models/network-models';
+import { maxBigNumber } from '../../util/utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
 import { getProviderForNetwork } from '../providers/active-network-providers';
@@ -315,10 +316,6 @@ const getMedianHistoricalGasDetailsBySpeed = async (
   }
 
   throw new Error('Unknown gas type for historical gas estimates');
-};
-
-const maxBigNumber = (b1: BigNumber, b2: BigNumber) => {
-  return b1.gt(b2) ? b1 : b2;
 };
 
 const getSuggestedGasDetails = (

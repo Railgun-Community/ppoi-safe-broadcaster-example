@@ -8,6 +8,7 @@ import { EVMGasType } from '../../models/network-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { ErrorMessage } from '../../util/errors';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
+import { minBigNumber } from '../../util/utils';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
@@ -107,7 +108,10 @@ export const executeTransaction = async (
       const { maxFeePerGas, maxPriorityFeePerGas } = gasDetails;
       finalTransaction.type = 2;
       finalTransaction.maxFeePerGas = maxFeePerGas;
-      finalTransaction.maxPriorityFeePerGas = maxPriorityFeePerGas;
+      finalTransaction.maxPriorityFeePerGas = minBigNumber(
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+      );
       dbg(`Max fee per gas: ${maxFeePerGas.toString()}`);
       dbg(`Max priority fee: ${maxPriorityFeePerGas.toString()}`);
       break;
