@@ -8,9 +8,10 @@ import configTokenPriceRefresher from '../../../config/config-token-price-refres
 import { NetworkChainID } from '../../../config/config-chain-ids';
 import {
   cacheTokenPriceForNetwork,
-  getTokenPriceCache,
+  cachedTokenPriceForSource,
   resetTokenPriceCache,
   TokenPriceSource,
+  getTokenPriceCache,
 } from '../../../tokens/token-price-cache';
 import configNetworks from '../../../config/config-networks';
 import {
@@ -44,10 +45,12 @@ const expectedZeroXPriceOutput: ZeroXPriceData = {
 };
 
 const validatePriceRefresherOutput = (chainID: NetworkChainID) => {
-  const tokenAddressesToPrice =
-    getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainID];
   TOKEN_ADDRESSES.forEach((address) => {
-    const priceData = tokenAddressesToPrice[address];
+    const priceData = cachedTokenPriceForSource(
+      TOKEN_PRICE_SOURCE,
+      chainID,
+      address,
+    );
     expect(priceData).to.be.an('object');
     expect(priceData?.price).to.be.a('number');
     expect(priceData?.updatedAt).to.be.greaterThan(Date.now() - 20);

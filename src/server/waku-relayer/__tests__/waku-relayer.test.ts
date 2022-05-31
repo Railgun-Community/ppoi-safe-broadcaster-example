@@ -224,6 +224,7 @@ describe('waku-relayer', () => {
       feesID: '468abc',
       serializedTransaction: getMockSerializedTransaction(),
       relayerViewingKey: hexlify(viewingPublicKey),
+      useRelayAdapt: false,
     };
     const randomPrivKey = bytes.random(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
@@ -239,7 +240,7 @@ describe('waku-relayer', () => {
     expect(await tryDecryptData(encryptedData, sharedKey)).to.deep.equal(data);
   });
 
-  it('Should test transact method', async () => {
+  it('Should test transact method - transfer', async () => {
     const handleHTTPPost = () => {
       return { result: {} };
     };
@@ -256,6 +257,7 @@ describe('waku-relayer', () => {
       feesID: '468abc',
       serializedTransaction: getMockSerializedTransaction(),
       relayerViewingKey: hexlify(viewingPublicKey),
+      useRelayAdapt: false,
     };
     const randomPrivKey = bytes.random(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);

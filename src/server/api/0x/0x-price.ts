@@ -31,11 +31,6 @@ type ZeroXFormattedPriceData = {
   price: number;
 };
 
-const parsePriceToNumber = (priceString: string, decimals: number): number => {
-  // TODO: This might be dangerous, if the price string is too large.
-  return parseUnits(priceString, decimals).toNumber();
-};
-
 const zeroXPriceLookupByAddress = async (
   chainID: NetworkChainID,
   tokenAddress: string,
@@ -49,7 +44,7 @@ const zeroXPriceLookupByAddress = async (
     // so for this use case, it is not harmful.
 
     if (symbol === 'DAI') {
-      return { price: parsePriceToNumber('1', decimals) };
+      return { price: 1 };
     }
     const sellAmount = (10 ** decimals).toString(10);
     const params: ZeroXPriceParams = {
@@ -63,7 +58,7 @@ const zeroXPriceLookupByAddress = async (
       params,
     );
     return {
-      price: parsePriceToNumber(price, decimals),
+      price: parseFloat(price),
     };
   } catch (err) {
     return undefined;

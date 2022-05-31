@@ -65,7 +65,7 @@ const logTokenLookupError = (
   logger.warn(`${errorMsg}: ${tokenDetails}`);
 };
 
-const cachedTokenPriceForSource = (
+export const cachedTokenPriceForSource = (
   source: TokenPriceSource,
   chainID: NetworkChainID,
   tokenAddress: string,
