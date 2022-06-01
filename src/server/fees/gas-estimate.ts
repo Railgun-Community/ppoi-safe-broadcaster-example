@@ -6,7 +6,7 @@ import { logger } from '../../util/logger';
 import { throwErr } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { getMediumStandardGasDetails } from './gas-by-speed';
+import { getStandardGasDetails } from './gas-by-speed';
 
 export type TransactionGasDetails =
   | TransactionGasDetailsType0
@@ -33,7 +33,7 @@ export const getEstimateGasDetails = async (
     const provider = getProviderForNetwork(chainID);
     const [gasEstimate, gasDetailsBySpeed] = await Promise.all([
       provider.estimateGas(transactionRequest).catch(throwErr),
-      getMediumStandardGasDetails(chainID),
+      getStandardGasDetails(chainID),
     ]);
 
     return { gasEstimate, ...gasDetailsBySpeed };
