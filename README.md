@@ -64,7 +64,7 @@ configDefaults.waku.rpcURL = 'http://127.0.0.1:8546'
 Set the mnemonic used to fund the relayer
 
 ```
-configDefaults.wallet.mnemonic = "word1, word2,  ..."
+configDefaults.wallet.mnemonic = "word1 word2  ..."
 ```
 - configDefaults.wallet.hdWallets
 
