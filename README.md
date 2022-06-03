@@ -31,11 +31,81 @@ The fields to configure are described below. Note that you may leave the domain 
 
 ### relayer
 
+#### Init
 Customize your relayer by running `npm run copy-my-config`, which copies `src/MY-CONFIG.ts.example` to `src/MY-CONFIG.ts`.
-You can specify most defaults with configDefaults, and import configTokens to modify token configuration per network.
 
-- `configDefaults.networks.active = [3];` - network IDs you want to relay fees for. A value of `[1, 3, 56, 137]` would run on ethereum, ropsten testnet, binance smart chain, and polygon
-- `configDefaults.waku.rpcURL` - defaults to http://localhost:8546
+#### Configuration 
+The standard relayer configurations are set in config files in `src/server/config/`.  All of these can be overridden in `src/MY-CONFIG.ts`. The following are the most common fields that you might want to edit. 
+
+- configDefaults.networks.active  
+
+Configure the networks on which you want to run a relayer.  Simply add or remove networks from `configDefaults.networks.active`
+
+```
+import {NetworkChainID} from './server/config/config-chain-ids';
+
+configDefaults.networks.active = [
+    NetworkChainID.Ropsten,
+    NetworkChainID.Ethereum, 
+    NetworkChainID.BNBSmartChain,
+  ];
+```
+
+- configDefaults.waku.rpcURL
+Specify a waku server to use for your relayer's p2p communication. It defaults to http://localhost:8546. 
+
+```
+configDefaults.waku.rpcURL = 'http://127.0.0.1:8546'
+```
+
+- configDefaults.wallet.mnemonic 
+Set the mnemonic used to fund the relayer
+
+```
+configDefaults.wallet.mnemonic = "word1, word2,  ..."
+```
+- configDefaults.wallet.hdWallets
+Set the derivation paths you want to use 
+
+```
+configDefaults.wallet.hdWallets = [
+    {
+      index: 0,
+      priority: 1,
+    },
+  ];
+```
+- configNetworks 
+Set network provider 
+
+```
+configNetworks[NetworkChainID.Ethereum].fallbackProviderConfig.providers.unshift({
+      provider: 'http://<IP>:<PORT>',
+      priority: 1,
+      weight: 1,
+});
+```
+- configTokens 
+Set the tokens you want to accept for each network. 
+
+```
+configTokens[NetworkChainID.Ethereum]['0x_token_address'] = {
+    symbol: 'TOKEN1',
+  };
+```
+
+
+
+
+
+
+
+
+Networks:
+
+Tokens: 
+
+
 
 ## Run RAILGUN relayer
 
