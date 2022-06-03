@@ -18,7 +18,7 @@ export const createGasEstimateStubs = (
     .stub(BaseProvider.prototype, 'estimateGas')
     .resolves(estimateGas);
   getHistoricalDataStub = sinon
-    .stub(GasHistoryModule, 'getMediumStandardGasDetails')
+    .stub(GasHistoryModule, 'getStandardGasDetails')
     .resolves({
       evmGasType: EVMGasType.Type2,
       maxFeePerGas,
