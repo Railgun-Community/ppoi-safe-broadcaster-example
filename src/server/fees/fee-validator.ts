@@ -55,7 +55,7 @@ export const validateFee = (
 
   logger.log(`cachedFee: ${cachedFee?.toString()}`);
   logger.log(`calculatedFee: ${calculatedFee?.toString()}`);
-  logger.log(`tokenFee: ${packagedFee.toString()}`);
+  logger.log(`packagedFee: ${packagedFee.toString()}`);
 
   throw new Error(ErrorMessage.BAD_TOKEN_FEE);
 };

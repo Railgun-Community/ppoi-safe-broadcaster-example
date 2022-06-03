@@ -31,6 +31,14 @@ export const processTransaction = async (
     transactionRequest,
   );
 
+  if (useRelayAdapt) {
+    // Adjust gasEstimate by +20%.
+    // TODO: Fix cross-contract call gas estimate.
+    gasEstimateDetails.gasEstimate = gasEstimateDetails.gasEstimate
+      .mul(12000)
+      .div(10000);
+  }
+
   const maximumGas = calculateMaximumGas(gasEstimateDetails);
   dbg('Maximum gas:', maximumGas);
 

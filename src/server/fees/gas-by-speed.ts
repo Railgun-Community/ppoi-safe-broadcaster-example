@@ -17,7 +17,7 @@
 //
 //
 //   This logic comes from private RAILGUN contributor
-//   frontend repos, where the logic should be modified instead.
+//   frontend repos, where the logic is managed.
 //
 //
 // *********************************************
@@ -107,6 +107,7 @@ const REWARD_PERCENTILES: number[] = [
   GasHistoryPercentile.High,
 ];
 
+// WARNING: TRANSACTIONS RISK BEING REVERTED IF YOU MODIFY THIS.
 const SETTINGS_BY_PRIORITY_LEVEL = {
   [GasHistoryPercentile.Low]: {
     baseFeePercentageMultiplier: BigNumber.from(125),
@@ -139,21 +140,21 @@ const getMedianBigNumber = (feeHistoryOutputs: BigNumber[]): BigNumber => {
   return sorted[middleIndex];
 };
 
-const gasSpeedForChain = (
-  gasDetailsBySpeed: GasDetailsBySpeed,
+// WARNING: TRANSACTIONS RISK BEING REVERTED IF YOU MODIFY THIS.
+const gasHistoryPercentileForChain = (
   chainID: NetworkChainID,
-): GasDetails => {
+): GasHistoryPercentile => {
   switch (chainID) {
     case NetworkChainID.Ethereum:
-      return gasDetailsBySpeed[GasHistoryPercentile.Low];
+      return GasHistoryPercentile.Low;
     case NetworkChainID.HardHat:
-      return gasDetailsBySpeed[GasHistoryPercentile.Medium];
+      return GasHistoryPercentile.Medium;
     case NetworkChainID.BNBSmartChain:
     case NetworkChainID.PolygonPOS:
     case NetworkChainID.Ropsten:
-      return gasDetailsBySpeed[GasHistoryPercentile.High];
+      return GasHistoryPercentile.High;
   }
-  throw new Error(`Chain ${chainID} unhandled for gas speed.`);
+  throw new Error(`Chain ${chainID} unhandled for gas speeds.`);
 };
 
 export const getStandardGasDetails = async (chainID: NetworkChainID) => {
@@ -176,7 +177,8 @@ export const getStandardGasDetails = async (chainID: NetworkChainID) => {
     throw new Error('Unhandled gas type.');
   }
 
-  return gasSpeedForChain(gasDetailsBySpeed, chainID);
+  const percentile = gasHistoryPercentileForChain(chainID);
+  return gasDetailsBySpeed[percentile];
 };
 
 const gasPriceForPercentile = (
