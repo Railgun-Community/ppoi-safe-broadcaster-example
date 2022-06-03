@@ -52,6 +52,7 @@ configDefaults.networks.active = [
 ```
 
 - configDefaults.waku.rpcURL
+
 Specify a waku server to use for your relayer's p2p communication. It defaults to http://localhost:8546. 
 
 ```
@@ -59,12 +60,14 @@ configDefaults.waku.rpcURL = 'http://127.0.0.1:8546'
 ```
 
 - configDefaults.wallet.mnemonic 
+
 Set the mnemonic used to fund the relayer
 
 ```
 configDefaults.wallet.mnemonic = "word1, word2,  ..."
 ```
 - configDefaults.wallet.hdWallets
+
 Set the derivation paths you want to use 
 
 ```
@@ -76,6 +79,7 @@ configDefaults.wallet.hdWallets = [
   ];
 ```
 - configNetworks 
+
 Set network provider 
 
 ```
@@ -86,6 +90,7 @@ configNetworks[NetworkChainID.Ethereum].fallbackProviderConfig.providers.unshift
 });
 ```
 - configTokens 
+
 Set the tokens you want to accept for each network. 
 
 ```
@@ -93,18 +98,6 @@ configTokens[NetworkChainID.Ethereum]['0x_token_address'] = {
     symbol: 'TOKEN1',
   };
 ```
-
-
-
-
-
-
-
-
-Networks:
-
-Tokens: 
-
 
 
 ## Run RAILGUN relayer
