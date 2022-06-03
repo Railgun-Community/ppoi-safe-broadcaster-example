@@ -4,6 +4,7 @@ import fallbackProvidersRopsten from './fallback-providers/3-ropsten';
 import fallbackProvidersBNBSmartChain from './fallback-providers/56-binance-smart-chain';
 import fallbackProvidersPolygon from './fallback-providers/137-polygon';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
+import configFees from './config-fees';
 import { CoingeckoNetworkID } from '../../models/api-constants';
 import {
   RailProxyContract,
@@ -14,10 +15,11 @@ import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../../models/config-models';
 import { EVMGasType } from '../../models/network-models';
 
-const defaultFees = {
-  slippageBuffer: 0.05,
-  profit: 0.1,
-};
+
+// const defaultFees = {
+//   slippageBuffer: 0.05,
+//   profit: 0.1,
+// };
 
 // 10 minute timeout on ticket prices retrieved from API.
 // Shorter is safer, but Coingecko free tier can lag by 15-30 minutes.
@@ -31,7 +33,7 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
       minimumBalanceForAvailability: 0.1,
     },
-    fees: defaultFees,
+    fees: configFees,
     proxyContract: RailProxyContract.Ethereum,
     relayAdaptContract: RelayAdaptContract.Ethereum,
     coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
@@ -46,7 +48,7 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.RopstenWETH,
       minimumBalanceForAvailability: 0.1,
     },
-    fees: defaultFees,
+    fees: configFees,
     proxyContract: RailProxyContract.Ropsten,
     relayAdaptContract: RelayAdaptContract.Ropsten,
     deploymentBlock: RailProxyDeploymentBlock.Ropsten,
@@ -62,7 +64,7 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.BinanceWBNB,
       minimumBalanceForAvailability: 0.1,
     },
-    fees: defaultFees,
+    fees: configFees,
     proxyContract: RailProxyContract.BNBSmartChain,
     relayAdaptContract: RelayAdaptContract.BNBSmartChain,
     coingeckoNetworkId: CoingeckoNetworkID.BNBSmartChain,
@@ -77,7 +79,7 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.PolygonWMATIC,
       minimumBalanceForAvailability: 0.1,
     },
-    fees: defaultFees,
+    fees: configFees,
     proxyContract: RailProxyContract.PolygonPOS,
     relayAdaptContract: RelayAdaptContract.PolygonPOS,
     coingeckoNetworkId: CoingeckoNetworkID.PolygonPOS,
@@ -92,7 +94,7 @@ export default {
       wrappedAddress: GasTokenWrappedAddress.None,
       minimumBalanceForAvailability: 0.1,
     },
-    fees: defaultFees,
+    fees: configFees,
     proxyContract: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
     relayAdaptContract: RelayAdaptContract.HardHat,
     fallbackProviderConfig: fallbackProvidersHardhat,
