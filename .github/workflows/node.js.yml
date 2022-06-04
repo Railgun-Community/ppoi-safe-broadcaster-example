@@ -16,4 +16,5 @@ jobs:
         with:
           node-version: '16.6'
       - run: npm i
+      - run: npm run copy-my-config
       - run: npm test
