@@ -2,8 +2,8 @@
  * Configure your overrides for default settings and networks here.
  */
 
-import { DebugLevel } from 'models/debug-models';
-import { NetworkChainID } from 'server/config/config-chain-ids';
+import { DebugLevel } from './models/debug-models';
+import { NetworkChainID } from './server/config/config-chain-ids';
 import configDefaults from './server/config/config-defaults';
 
 export const myConfigOverrides = () => {
