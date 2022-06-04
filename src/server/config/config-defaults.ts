@@ -128,4 +128,11 @@ export default {
      */
     broadcastFeesDelayInMS: 30 * 1000,
   },
+
+  featureFlags: {
+    /**
+     * Please DO NOT ENABLE THIS until released by core team.
+     */
+    enableRelayAdapt: false,
+  },
 };

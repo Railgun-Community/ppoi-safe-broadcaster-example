@@ -15,6 +15,7 @@ import { numAvailableWallets } from '../wallets/active-wallets';
 import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
 import configNetworks from '../config/config-networks';
+import configDefaults from '../config/config-defaults';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 
@@ -167,7 +168,9 @@ export class WakuRelayer {
       railAddress: this.walletRailAddress,
       availableWallets,
       version: process.env.npm_package_version ?? '0.0.0',
-      relayAdapt: configNetworks[chainID].relayAdaptContract,
+      relayAdapt: configDefaults.featureFlags.enableRelayAdapt
+        ? configNetworks[chainID].relayAdaptContract
+        : '',
     };
     const message = bytes.fromUTF8String(JSON.stringify(data));
     const signature = bytes.hexlify(
