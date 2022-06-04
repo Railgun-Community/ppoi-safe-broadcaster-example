@@ -80,7 +80,6 @@ describe('execute-transaction', () => {
     getBestMatchWalletForNetwork = sinon
       .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')
       .resolves(activeWallet);
-    createGasBalanceStub(BigNumber.from(1000));
   });
 
   afterEach(() => {
@@ -143,7 +142,7 @@ describe('execute-transaction', () => {
     expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
       .false;
     // Delay of 10 set in waitTxStub
-    await delay(20);
+    await delay(50);
     expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
       .true;
   });
