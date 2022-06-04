@@ -8,6 +8,7 @@ import * as activeProvidersModule from '../../providers/active-network-providers
 import * as activeTokenPricePollerModule from '../../tokens/token-price-poller';
 import { closeSettingsDB } from '../../db/settings-db';
 import { resetConfigDefaults } from '../../../test/setup.test';
+// @ts-ignore
 import { myConfigOverrides } from '../../../MY-CONFIG';
 
 chai.use(chaiAsPromised);
