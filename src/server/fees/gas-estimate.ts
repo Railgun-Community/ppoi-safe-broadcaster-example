@@ -48,7 +48,7 @@ export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
   return gasEstimate.mul(12000).div(10000);
 };
 
-const calculateGasPrice = (gasDetails: TransactionGasDetails) => {
+const getGasPrice = (gasDetails: TransactionGasDetails) => {
   switch (gasDetails.evmGasType) {
     case EVMGasType.Type0: {
       return gasDetails.gasPrice;
@@ -64,7 +64,7 @@ const calculateGasPrice = (gasDetails: TransactionGasDetails) => {
 export const calculateTotalGas = (
   transactionGasDetails: TransactionGasDetails,
 ) => {
-  const gasPrice = calculateGasPrice(transactionGasDetails);
+  const gasPrice = getGasPrice(transactionGasDetails);
   const { gasEstimate } = transactionGasDetails;
   return gasEstimate.mul(gasPrice);
 };
@@ -72,7 +72,7 @@ export const calculateTotalGas = (
 export const calculateMaximumGas = (
   transactionGasDetails: TransactionGasDetails,
 ): BigNumber => {
-  const gasPrice = calculateGasPrice(transactionGasDetails);
+  const gasPrice = getGasPrice(transactionGasDetails);
   const { gasEstimate } = transactionGasDetails;
   return calculateGasLimit(gasEstimate).mul(gasPrice);
 };
