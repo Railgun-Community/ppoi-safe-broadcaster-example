@@ -91,7 +91,7 @@ export const executeTransaction = async (
     ...transactionRequest,
     chainId: chainID,
     nonce,
-    gasLimit: calculateGasLimit(gasDetails.gasEstimate),
+    gasLimit: gasLimit.mul(3),
   };
 
   dbg(`Gas limit: ${gasLimit.toString()}`);
