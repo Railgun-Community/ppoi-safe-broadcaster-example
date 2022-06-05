@@ -101,6 +101,8 @@ export const executeTransaction = async (
       const { gasPrice } = gasDetails;
       finalTransaction.type = 0;
       finalTransaction.gasPrice = gasPrice;
+      delete finalTransaction.maxFeePerGas;
+      delete finalTransaction.maxPriorityFeePerGas;
       dbg(`Gas price: ${gasPrice.toString()}`);
       break;
     }
@@ -112,6 +114,7 @@ export const executeTransaction = async (
         maxFeePerGas,
         maxPriorityFeePerGas,
       );
+      delete finalTransaction.gasPrice;
       dbg(`Max fee per gas: ${maxFeePerGas.toString()}`);
       dbg(`Max priority fee: ${maxPriorityFeePerGas.toString()}`);
       break;

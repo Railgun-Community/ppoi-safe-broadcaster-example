@@ -21,10 +21,10 @@ export const processTransaction = async (
 ): Promise<TransactionResponse> => {
   const transactionRequest = deserializeTransaction(serializedTransaction);
 
-  transactionRequest.gasLimit = undefined;
-  transactionRequest.gasPrice = undefined;
-  transactionRequest.maxFeePerGas = undefined;
-  transactionRequest.maxPriorityFeePerGas = undefined;
+  delete transactionRequest.gasLimit;
+  delete transactionRequest.gasPrice;
+  delete transactionRequest.maxFeePerGas;
+  delete transactionRequest.maxPriorityFeePerGas;
 
   const gasEstimateDetails = await getEstimateGasDetails(
     chainID,
