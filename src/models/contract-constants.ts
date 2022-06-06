@@ -7,10 +7,10 @@ export enum RailProxyContract {
 }
 
 export enum RelayAdaptContract {
-  Ethereum = '0xcc50541f488bbe6215f83cb790c9195077619c3d',
-  Ropsten = '0x6B9d93e02D4e30D7080A7a375fda89AdFCB0b65F',
-  BNBSmartChain = '0xbF45Ef12Bfc84A7Ae064bA07616c09Df5da1a9F2',
-  PolygonPOS = '0xa3197a0109c91DE888e08C3271349cd5896C8fF4',
+  Ethereum = '0x22af4EDBeA3De885dDa8f0a0653E6209e44e5B84',
+  Ropsten = '0x95abeff80554b23cefe1d3f8dcff3b7d90e28045',
+  BNBSmartChain = '0x20d868C7F1Eb706C46641ADD2f849c5DBf4dB158',
+  PolygonPOS = '0x30D8AD0339e2CF160620589f2DBa1765126A5fDC',
   HardHat = '0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f',
 }
 
