@@ -131,8 +131,10 @@ export default {
 
   featureFlags: {
     /**
-     * Please DO NOT ENABLE THIS until released by core team.
+     * Enables arbitrary Relay Adapt cross contract calls, which
+     *  are used for smart contract execution against a private balance,
+     *  along with automatic wrapping during deposit/withdraw of base tokens (eg ETH).
      */
-    enableRelayAdapt: false,
+    enableRelayAdapt: true,
   },
 };
