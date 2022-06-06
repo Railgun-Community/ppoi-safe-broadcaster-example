@@ -18,6 +18,7 @@ export const processTransaction = async (
   feeCacheID: string,
   serializedTransaction: string,
   useRelayAdapt: boolean,
+  devLog?: boolean,
 ): Promise<TransactionResponse> => {
   const transactionRequest = deserializeTransaction(serializedTransaction);
 
@@ -29,6 +30,7 @@ export const processTransaction = async (
   const gasEstimateDetails = await getEstimateGasDetails(
     chainID,
     transactionRequest,
+    devLog,
   );
 
   const maximumGas = calculateMaximumGas(gasEstimateDetails);

@@ -28,6 +28,7 @@ export type TransactionGasDetailsType2 = {
 export const getEstimateGasDetails = async (
   chainID: NetworkChainID,
   transactionRequest: TransactionRequest,
+  devLog?: boolean,
 ): Promise<TransactionGasDetails> => {
   try {
     const provider = getProviderForNetwork(chainID);
@@ -39,6 +40,9 @@ export const getEstimateGasDetails = async (
     return { gasEstimate, ...gasDetailsBySpeed };
   } catch (err) {
     logger.error(err);
+    if (devLog) {
+      throw new Error(err);
+    }
     throw new Error(ErrorMessage.GAS_ESTIMATE_ERROR);
   }
 };

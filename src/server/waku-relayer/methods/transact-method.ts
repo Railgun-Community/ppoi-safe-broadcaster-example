@@ -31,6 +31,7 @@ export type RawParamsTransact = {
   feesID: string;
   relayerViewingKey: string;
   useRelayAdapt: boolean;
+  devLog?: boolean;
 };
 
 const handledClientPubKeys: string[] = [];
@@ -66,6 +67,7 @@ export const transactMethod = async (
     serializedTransaction,
     relayerViewingKey,
     useRelayAdapt,
+    devLog,
   } = decrypted as RawParamsTransact;
 
   dbg('Decrypted - attempting to transact');
@@ -91,11 +93,12 @@ export const transactMethod = async (
       feeCacheID,
       serializedTransaction,
       useRelayAdapt ?? false,
+      devLog,
     );
     return resultResponse(id, chainID, sharedKey, txResponse);
   } catch (err: any) {
     dbg(err);
-    return errorResponse(id, chainID, sharedKey, err);
+    return errorResponse(id, chainID, sharedKey, err, devLog);
   }
 };
 
@@ -109,30 +112,31 @@ const resultResponse = (
   return encryptedRPCResponse(response, id, chainID, sharedKey);
 };
 
+const sanitizeErrorMessage = (errMsg: string, devLog?: boolean): string => {
+  if (devLog) {
+    return errMsg;
+  }
+  switch (errMsg) {
+    case ErrorMessage.BAD_TOKEN_FEE:
+    case 'No Relayer payment included in transaction.':
+      return ErrorMessage.BAD_TOKEN_FEE;
+    case ErrorMessage.GAS_ESTIMATE_ERROR:
+      return ErrorMessage.GAS_ESTIMATE_ERROR;
+    case ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR:
+      return ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR;
+  }
+  return ErrorMessage.UNKNOWN_ERROR;
+};
+
 const errorResponse = (
   id: number,
   chainID: NetworkChainID,
   sharedKey: Uint8Array,
   err: Error,
+  devLog?: boolean,
 ): WakuMethodResponse => {
-  let sanitizedErrorMessage: string;
-  switch (err.message) {
-    case ErrorMessage.BAD_TOKEN_FEE:
-    case 'No Relayer payment included in transaction.':
-      sanitizedErrorMessage = ErrorMessage.BAD_TOKEN_FEE;
-      break;
-    case ErrorMessage.GAS_ESTIMATE_ERROR:
-      sanitizedErrorMessage = ErrorMessage.GAS_ESTIMATE_ERROR;
-      break;
-    case ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR:
-      sanitizedErrorMessage = ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR;
-      break;
-    default:
-      sanitizedErrorMessage = ErrorMessage.UNKNOWN_ERROR;
-      break;
-  }
   const response = {
-    error: sanitizedErrorMessage,
+    error: sanitizeErrorMessage(err.message, devLog),
   };
   return encryptedRPCResponse(response, id, chainID, sharedKey);
 };
