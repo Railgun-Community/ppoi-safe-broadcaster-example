@@ -7,7 +7,7 @@ export enum RailProxyContract {
 }
 
 export enum RelayAdaptContract {
-  Ethereum = '0x00', // TODO
+  Ethereum = '0xcc50541f488bbe6215f83cb790c9195077619c3d',
   Ropsten = '0x6B9d93e02D4e30D7080A7a375fda89AdFCB0b65F',
   BNBSmartChain = '0xbF45Ef12Bfc84A7Ae064bA07616c09Df5da1a9F2',
   PolygonPOS = '0xa3197a0109c91DE888e08C3271349cd5896C8fF4',
