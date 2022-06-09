@@ -31,7 +31,7 @@ export class WakuApiClient {
   constructor(options: WakuApiClientOptions) {
     this.dbg = debug('waku:jsonrpc-api');
     const httpConfig = {
-      timeout: 10000,
+      timeout: 60000,
       baseURL: options.url,
       headers: { 'Content-Type': 'application/json' },
     };
@@ -91,7 +91,7 @@ export class WakuApiClient {
    */
   async publish(message: WakuMessage, topic: string) {
     if (!message.payload) {
-      this.dbg('Tried to pubish empty message');
+      this.dbg('Tried to publish empty message');
       return false;
     }
     const { timestamp } = message;

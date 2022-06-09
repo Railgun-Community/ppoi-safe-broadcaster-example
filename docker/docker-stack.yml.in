@@ -53,6 +53,7 @@ services:
       - nwaku
     volumes:
       - relayer:/mnt
+    command: sh -c './scripts/wait-for nwaku:8546 -t 30 -- npm start'
 
   swag:
     image: ghcr.io/linuxserver/swag

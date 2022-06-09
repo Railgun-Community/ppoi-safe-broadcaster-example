@@ -1,3 +1,3 @@
-FROM statusteam/nim-waku:deploy-status-test
+FROM ghcr.io/railgun-community/nwaku
 
 COPY ./config.toml /app
