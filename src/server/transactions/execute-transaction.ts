@@ -127,7 +127,7 @@ export const executeTransaction = async (
 
     const txResponse = await promiseTimeout(
       ethersWallet.sendTransaction(finalTransaction),
-      8000, // 8 second time-out.
+      15000, // 15 second time-out.
     );
 
     dbg('Submitted transaction:', txResponse.hash);
