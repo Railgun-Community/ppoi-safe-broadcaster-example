@@ -1,5 +1,12 @@
 #!/bin/bash
+
+# set cwd to docker/
 cd -- "$( dirname -- "${BASH_SOURCE[0]}" )"
+
+# create empty custom.yml if it doesn't exist
+if [ ! -f custom.yml ]; then
+  echo "version: '3.9'" > custom.yml
+fi
 
 if [ -f .env ]; then
   if [ ! -f docker-stack.yml ]; then

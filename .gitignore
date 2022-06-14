@@ -1,6 +1,5 @@
 # Node
 node_modules
-package-lock.json
 yarn.lock
 
 # Log files
@@ -38,3 +37,4 @@ docker/.env
 docker/config.toml
 docker/docker-stack.yml
 docker/appdata
+docker/custom.yml

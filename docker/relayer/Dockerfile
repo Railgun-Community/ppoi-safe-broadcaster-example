@@ -3,14 +3,14 @@ FROM node:16-alpine as module-install-stage
 
 RUN apk add git
 
-RUN npm install -g npm@8.5.1
+RUN npm install -g npm
 
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 
-COPY scripts/ ./scripts
 COPY package*.json ./
-RUN npm install --ignore-scripts
+RUN npm ci --ignore-scripts
+COPY scripts/ ./scripts
 
 ### build app using cached modules
 FROM node:16-alpine as build-stage

@@ -24,6 +24,12 @@ services:
       - ./appdata/swag/etc/letsencrypt:/ssl
     depends_on:
       - swag
+    healthcheck:
+      test: curl --fail http://localhost:8546 || exit 1
+      interval: 60s
+      retries: 4
+      start_period: 20s
+      timeout: 10s
     entrypoint: >
       wakunode2
         --config-file=/app/config.toml
@@ -33,8 +39,6 @@ services:
         --nodekey="${NODEKEY}"
         --websocket-support=true
         --websocket-secure-support=false
-    #--websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
-    #--websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
 
   relayer:
     image: relayer:latest
