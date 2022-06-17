@@ -55,7 +55,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt install -y nodejs
 
 # Copy everything into place for the relayer
-RUN apt install bash jq
+RUN apt install -y bash jq
 COPY --from=build-stage /app/dist/ /app/dist
 COPY --from=module-install-stage /app/node_modules/ /app/node_modules
 COPY --from=module-install-stage /app/scripts/ /app/scripts
