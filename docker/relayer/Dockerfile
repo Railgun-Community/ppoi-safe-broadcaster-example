@@ -2,7 +2,7 @@
 FROM ubuntu:22.04 as module-install-stage
 
 # Add Nodesource Node.JS repositories
-RUN set -o pipefail && curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 # Install Node.JS 16
 RUN apt install -y nodejs
 
@@ -24,7 +24,7 @@ COPY scripts/ ./scripts
 ### build app using cached modules
 FROM ubuntu:22.04 as build-stage
 # Add Nodesource Node.JS repositories
-RUN set -o pipefail && curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 # Install Node.JS 16
 RUN apt install -y nodejs
 
@@ -36,7 +36,7 @@ RUN npm run compile
 ### run relayer
 FROM ubuntu:22.04
 # Add Nodesource Node.JS repositories
-RUN set -o pipefail && curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 # Install Node.JS 16
 RUN apt install -y nodejs
 
