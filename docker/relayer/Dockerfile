@@ -1,5 +1,6 @@
 ### install yarn and modules
 FROM ubuntu:22.04 as module-install-stage
+RUN apt update
 
 # Install curl
 RUN apt install -y curl
@@ -26,6 +27,7 @@ COPY scripts/ ./scripts
 
 ### build app using cached modules
 FROM ubuntu:22.04 as build-stage
+RUN apt update
 
 # Install curl
 RUN apt install -y curl
@@ -42,6 +44,7 @@ RUN npm run compile
 
 ### run relayer
 FROM ubuntu:22.04
+RUN apt update
 
 # Install curl
 RUN apt install -y curl
