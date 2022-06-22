@@ -16,11 +16,6 @@ import { NetworksConfig } from '../../models/config-models';
 import { EVMGasType } from '../../models/network-models';
 
 
-// const defaultFees = {
-//   slippageBuffer: 0.05,
-//   profit: 0.1,
-// };
-
 // 10 minute timeout on ticket prices retrieved from API.
 // Shorter is safer, but Coingecko free tier can lag by 15-30 minutes.
 const defaultTokenPriceTTL = 10 * 60 * 1000;
