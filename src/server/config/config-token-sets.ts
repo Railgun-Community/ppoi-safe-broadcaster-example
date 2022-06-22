@@ -1,7 +1,7 @@
 import {AddressToTokenMap} from '../../models/config-models';
 import { TokenAddressEth, TokenAddressBSC, TokenAddressPoly, TokenAddressRopsten } from './config-tokens';
 
-export const EthStables: AddressToTokenMap = { 
+export const STABLES_ETH: AddressToTokenMap = { 
     [TokenAddressEth.USDT]: {
       symbol: 'USDT',
     },
@@ -22,7 +22,7 @@ export const EthStables: AddressToTokenMap = {
     },
 }; 
 
-export const BscStables: AddressToTokenMap ={
+export const STABLES_BSC: AddressToTokenMap ={
     [TokenAddressBSC.BUSD]: {
         symbol: 'BUSD',
       },
@@ -36,7 +36,7 @@ export const BscStables: AddressToTokenMap ={
         symbol: 'USDT',
       },
 };
-export const PolyStables: AddressToTokenMap = {
+export const STABLES_POLYGON: AddressToTokenMap = {
     [TokenAddressPoly.DAI]: {
         symbol: 'DAI',
       },
@@ -48,7 +48,7 @@ export const PolyStables: AddressToTokenMap = {
       },
 };
 
-export const ETHRenTokens: AddressToTokenMap = {
+export const REN_TOKENS_ETH: AddressToTokenMap = {
     [TokenAddressEth.REN]: {
         symbol: 'REN'
     },
@@ -64,7 +64,6 @@ export const ETHRenTokens: AddressToTokenMap = {
     [TokenAddressEth.RENFIL]: {
         symbol: 'RENFIL'
     },
-
 
 }
 
