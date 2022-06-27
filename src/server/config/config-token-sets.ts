@@ -1,5 +1,5 @@
 import {AddressToTokenMap} from '../../models/config-models';
-import { TokenAddressEth, TokenAddressBSC, TokenAddressPoly, TokenAddressRopsten } from './config-tokens';
+import { TokenAddressEth, TokenAddressBSC, TokenAddressPoly, TokenAddressRopsten } from './config-token-addresses';
 
 export const STABLES_ETH: AddressToTokenMap = { 
     [TokenAddressEth.USDT]: {
@@ -22,6 +22,43 @@ export const STABLES_ETH: AddressToTokenMap = {
     },
 }; 
 
+export const BLUECHIP_ETH: AddressToTokenMap = {
+  [TokenAddressEth.WETH] : {
+    symbol: 'WETH',
+  },
+  [TokenAddressEth.WBTC] : {
+    symbol: 'WBTC',
+  },
+  [TokenAddressEth.RAIL] : {
+    symbol: 'RAIL',
+  },
+};
+
+export const BLUECHIP_BSC: AddressToTokenMap = {
+  [TokenAddressBSC.WBNB] : {
+    symbol: 'WETH',
+  },
+
+  [TokenAddressBSC.CAKE] : {
+    symbol: 'CAKE',
+  }
+
+};
+export const BLUECHIP_POLY: AddressToTokenMap = {
+  [TokenAddressPoly.WETH] : {
+    symbol: 'WETH',
+  },
+  [TokenAddressPoly.BNB] : {
+    symbol: 'WETH',
+  },
+  [TokenAddressPoly.WMATIC]: {
+    symbol: 'WMATIC',
+  }, 
+  [TokenAddressPoly.WBTC] : {
+    symbol: 'WBTC',
+  },
+
+};
 export const STABLES_BSC: AddressToTokenMap ={
     [TokenAddressBSC.BUSD]: {
         symbol: 'BUSD',
@@ -36,7 +73,7 @@ export const STABLES_BSC: AddressToTokenMap ={
         symbol: 'USDT',
       },
 };
-export const STABLES_POLYGON: AddressToTokenMap = {
+export const STABLES_POLY: AddressToTokenMap = {
     [TokenAddressPoly.DAI]: {
         symbol: 'DAI',
       },
@@ -65,6 +102,6 @@ export const REN_TOKENS_ETH: AddressToTokenMap = {
         symbol: 'RENFIL'
     },
 
-}
+};
 
 
