@@ -8,7 +8,7 @@ import { logger } from '../../util/logger';
 
 export const getBestMatchWalletForNetwork = async (
   chainID: NetworkChainID,
-  maximumGas: BigNumber,
+  minimumGasNeeded: BigNumber,
 ): Promise<ActiveWallet> => {
   const activeWallets = getActiveWallets();
   const gasTokenBalanceMap = await getActiveWalletGasTokenBalanceMapForChain(
@@ -24,7 +24,9 @@ export const getBestMatchWalletForNetwork = async (
   // Simple sort:
   // - Priority.
   const sortedAvailableWallets = availableWallets
-    .filter((wallet) => gasTokenBalanceMap[wallet.address].gte(maximumGas))
+    .filter((wallet) =>
+      gasTokenBalanceMap[wallet.address].gte(minimumGasNeeded),
+    )
     .sort((a, b) => {
       // Sort ascending by priority.
       return a.priority - b.priority;
@@ -32,12 +34,12 @@ export const getBestMatchWalletForNetwork = async (
 
   if (sortedAvailableWallets.length < 1) {
     const outofFundsWallets = activeWallets.filter((wallet) =>
-      gasTokenBalanceMap[wallet.address].gte(maximumGas),
+      gasTokenBalanceMap[wallet.address].lt(minimumGasNeeded),
     );
     logger.warn(
       `${availableWallets.length} wallets available. ${
         outofFundsWallets.length
-      } wallets have enough gas funds. (Need gas: ${maximumGas.toHexString()})`,
+      } wallets are out of gas funds. (Need gas: ${minimumGasNeeded.toHexString()})`,
     );
     throw new Error(`All wallets busy or out of funds.`);
   }
