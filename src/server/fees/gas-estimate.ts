@@ -48,8 +48,10 @@ export const getEstimateGasDetails = async (
 };
 
 export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
-  // Gas Limit: Add 20% to gas estimate.
-  return gasEstimate.mul(12000).div(10000);
+  // Gas Limit: Note that we add 20% to gas estimate on the client side.
+  // return gasEstimate.mul(12000).div(10000);
+  // On Relayer side, we don't add anything.
+  return gasEstimate;
 };
 
 const getGasPrice = (gasDetails: TransactionGasDetails) => {
