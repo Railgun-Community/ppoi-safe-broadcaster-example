@@ -4,6 +4,7 @@ import { NetworkChainID } from '../../config/config-chain-ids';
 
 export enum ZeroXApiEndpoint {
   PriceLookup = 'swap/v1/price',
+  GetSwapQuote = 'swap/v1/quote',
 }
 
 const zeroXApiUrl = (chainID: NetworkChainID): string => {
