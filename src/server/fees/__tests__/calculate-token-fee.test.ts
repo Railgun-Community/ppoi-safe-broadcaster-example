@@ -148,7 +148,8 @@ describe('calculate-token-fee', () => {
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal(
-      '152729072164800000000000',
+      '127274226804000000000000',
+      // '152729072164800000000000', // +20%
     );
   });
 
@@ -178,7 +179,10 @@ describe('calculate-token-fee', () => {
       MOCK_TOKEN_6_DECIMALS,
     );
 
-    expect(maximumGasFeeForToken.toString()).to.equal('152729072164');
+    expect(maximumGasFeeForToken.toString()).to.equal(
+      '127274226804',
+      // '152729072164', // +20%
+    );
   });
 
   it('Should get all unit token fees for chain', () => {
