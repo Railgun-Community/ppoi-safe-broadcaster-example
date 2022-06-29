@@ -21,7 +21,7 @@ export const setWalletAvailable = (
   dbg(`Set wallet ${wallet.address}:`, available ? 'AVAILABLE' : 'BUSY');
 };
 
-export const isWalletAvailable = async (
+export const isWalletAvailable = (
   wallet: ActiveWallet,
   chainID: NetworkChainID,
 ) => {
@@ -31,6 +31,21 @@ export const isWalletAvailable = async (
   ) {
     return false;
   }
+  try {
+    return isBelowMinimumGasTokenBalance(wallet, chainID);
+  } catch (err) {
+    logger.error(err);
+    logger.warn(
+      `Error getting gas token balance for wallet ${wallet.address}. Assuming wallet unavailable.`,
+    );
+    return false;
+  }
+};
+
+const isBelowMinimumGasTokenBalance = async (
+  wallet: ActiveWallet,
+  chainID: NetworkChainID,
+) => {
   const { gasToken } = configNetworks[chainID];
   const minimumBalance = parseUnits(
     String(gasToken.minimumBalanceForAvailability),
@@ -45,10 +60,33 @@ export const isWalletAvailable = async (
   } catch (err) {
     logger.error(err);
     logger.warn(
-      `Error getting gas token balance for wallet ${wallet.address}. Assuming wallet unavailable.`,
+      `Error getting gas token balance for wallet ${wallet.address}. Assuming wallet has enough funds.`,
     );
     return false;
   }
+};
+
+const isProcessingTransaction = (
+  wallet: ActiveWallet,
+  chainID: NetworkChainID,
+) => {
+  if (
+    unavailableWalletMap[chainID] &&
+    unavailableWalletMap[chainID][wallet.address]
+  ) {
+    return false;
+  }
+  return true;
+};
+
+export const shouldTopUpWallet = (
+  wallet: ActiveWallet,
+  chainID: NetworkChainID,
+) => {
+  return (
+    !isProcessingTransaction(wallet, chainID) &&
+    isBelowMinimumGasTokenBalance(wallet, chainID)
+  );
 };
 
 export const getAvailableWallets = async (
