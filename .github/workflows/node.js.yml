@@ -18,3 +18,19 @@ jobs:
       - run: npm i
       - run: npm run copy-my-config
       - run: npm test
+
+  fail-report:
+    if: ${{ failure() }}
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Telegram message with fail report
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.CI_TELEGRAM_TO }}
+          token: ${{ secrets.CI_TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            ❌ **${{ github.repository }}** - Workflow: ${{ github.workflow }}
+            [Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for commit "[${{ github.event.commits[0].message }}](https://github.com/${{ github.repository }}/commit/${{github.sha}})"
