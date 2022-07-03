@@ -21,7 +21,7 @@ jobs:
 
   fail-report:
     if: ${{ failure() }}
-    needs: build
+    needs: unit-tests
     runs-on: ubuntu-latest
 
     steps:
