@@ -13,7 +13,7 @@ import { getBestMatchWalletForNetwork } from '../best-match-wallet';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import {
   resetAvailableWallets,
-  setWalletAvailable,
+  setWalletAvailability,
 } from '../available-wallets';
 import { getMockNetwork, getMockProvider } from '../../../test/mocks.test';
 import * as BalanceCacheModule from '../../balances/balance-cache';
@@ -109,7 +109,7 @@ describe('best-match-wallet', () => {
       getMockProvider(),
     );
     expect(firstWallet.address).to.equal(addressForIndex(0));
-    setWalletAvailable(firstActiveWallet, MOCK_CHAIN_ID, false);
+    setWalletAvailability(firstActiveWallet, MOCK_CHAIN_ID, false);
 
     const bestWallet = await getBestMatchWalletForNetwork(
       MOCK_CHAIN_ID,
@@ -131,7 +131,7 @@ describe('best-match-wallet', () => {
     await initWallets();
 
     const firstWallet = getActiveWallets()[0];
-    setWalletAvailable(firstWallet, MOCK_CHAIN_ID, false);
+    setWalletAvailability(firstWallet, MOCK_CHAIN_ID, false);
 
     await expect(
       getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(100)),

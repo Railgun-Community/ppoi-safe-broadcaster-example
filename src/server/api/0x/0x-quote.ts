@@ -2,9 +2,10 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { AxiosError } from 'axios';
 import { ZeroXApiEndpoint, getZeroXData } from './0x-fetch';
-import { TokenAmount, TokenConfig } from '../../../models/token-models';
+import { TokenAmount } from '../../../models/token-models';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import { logger } from '../../../util/logger';
+import { getProviderForNetwork } from '../../providers/active-network-providers';
 
 export const ZERO_X_PRICE_DECIMALS = 18;
 
@@ -55,7 +56,7 @@ export const zeroXProxyBaseTokenAddress = (chainID: NetworkChainID) => {
   throw new Error('Unrecognized chain for 0x proxy base token address');
 };
 
-const zeroXExchangeProxyContractAddress = (chainID: NetworkChainID) => {
+export const zeroXExchangeProxyContractAddress = (chainID: NetworkChainID) => {
   switch (chainID) {
     case NetworkChainID.Ropsten:
     case NetworkChainID.Ethereum:

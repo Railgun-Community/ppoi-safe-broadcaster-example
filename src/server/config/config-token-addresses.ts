@@ -1,5 +1,3 @@
-import { NetworkChainID } from './config-chain-ids';
-
 export enum TokenAddressEth {
   USDT = '0xdac17f958d2ee523a2206206994597c13d831ec7',
   WETH = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
@@ -24,11 +22,11 @@ export enum TokenAddressRopsten {
 export enum TokenAddressBSC {
   WBNB = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
   BUSD = '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56',
-  DAI =  '0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3',
+  DAI = '0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3',
   CAKE = '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
   USDC = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',
   USDT = '0x55d398326f99059fF775485246999027B3197955',
-  
+
   // Unused until more liquidity and price stability:
   // RAILBSC = '0x3F847b01d4d498a293e3197B186356039eCd737F',
 }
@@ -43,5 +41,3 @@ export enum TokenAddressPoly {
   // Unused until more liquidity and price stability:
   // RAILPOLY = '0x92A9C92C215092720C731c96D4Ff508c831a714f',
 }
-
-

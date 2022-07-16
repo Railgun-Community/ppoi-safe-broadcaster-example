@@ -2,6 +2,7 @@ import ABI_RAILGUN_LOGIC from '@railgun-community/lepton/dist/abi/RailgunLogic.j
 import ABI_RELAY_ADAPT from '@railgun-community/lepton/dist/abi/RelayAdapt.json';
 import { NetworkChainID } from '../config/config-chain-ids';
 import ABI_ERC20 from './json/erc20.json';
+import ZERO_X_ABI from './json/zerox.json';
 
 export const abiForProxyContract = () => {
   return ABI_RAILGUN_LOGIC;
@@ -9,6 +10,29 @@ export const abiForProxyContract = () => {
 
 export const abiForRelayAdaptContract = () => {
   return ABI_RELAY_ADAPT;
+};
+
+export const zeroXAbiForChain = (chainID: NetworkChainID): Array<any> => {
+  switch (chainID) {
+    case NetworkChainID.Ethereum: {
+      return ZERO_X_ABI;
+    }
+    case NetworkChainID.BNBSmartChain: {
+      return ZERO_X_ABI;
+    }
+    case NetworkChainID.PolygonPOS: {
+      return ZERO_X_ABI;
+    }
+    case NetworkChainID.Ropsten: {
+      return ZERO_X_ABI;
+    }
+    case NetworkChainID.HardHat: {
+      return ZERO_X_ABI;
+    }
+    default: {
+      throw new Error(`Unimplemented: ABI for chain ${chainID}`);
+    }
+  }
 };
 
 export const abiForChainToken = (chainID: NetworkChainID): Array<any> => {

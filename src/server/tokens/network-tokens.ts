@@ -10,7 +10,7 @@ import { removeUndefineds } from '../../util/utils';
 import { logger } from '../../util/logger';
 import { abiForChainToken } from '../abi/abi';
 
-const networkTokens: NumMapType<Token[]> = {};
+export const networkTokens: NumMapType<Token[]> = {};
 
 export const initTokens = async () => {
   for (const chainID of configuredNetworkChainIDs()) {

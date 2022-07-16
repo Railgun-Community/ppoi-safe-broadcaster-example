@@ -176,7 +176,7 @@ const decryptSenderNoteSafe = (
 ) => {
   try {
     const memoField: string[] = [];
-    return Note.decrypt(encryptedNote, sharedKey, memoField);
+    return Note.decrypt(encryptedNote, sharedKey , memoField );
   } catch (err) {
     return null;
   }

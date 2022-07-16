@@ -46,7 +46,7 @@ const pollPrices = async (source: TokenPriceSource) => {
   }
 };
 
-export const stopPolling = () => {
+export const stopTokenPricePolling = () => {
   shouldPoll = false;
 };
 

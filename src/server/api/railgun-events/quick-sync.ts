@@ -5,6 +5,7 @@ import { getRailgunEventLog, QuickSyncEventLog } from './railgun-event-log';
 
 export const quickSync: QuickSync = async (
   chainID: NetworkChainID,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _startingBlock: number,
 ): Promise<QuickSyncEventLog> => {
   const network = configNetworks[chainID];

@@ -22,7 +22,7 @@ describe('quick-sync', () => {
     expect(eventLog.nullifierEvents).to.be.an('array');
     // expect(eventLog.commitmentEvents.length).to.be.at.least(10);
     // expect(eventLog.nullifierEvents.length).to.be.at.least(2);
-  }).timeout(10000);
+  }).timeout(20000);
 
   it('Should retry Railgun Event Log API fetch on error', async () => {
     const stubAxiosGet = sinon.stub(axios, 'get').throws();

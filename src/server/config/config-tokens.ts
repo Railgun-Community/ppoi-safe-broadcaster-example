@@ -1,6 +1,14 @@
 import { NetworkTokensConfig } from '../../models/config-models';
-import {TokenAddressEth, TokenAddressBSC, TokenAddressPoly, TokenAddressRopsten} from './config-token-addresses'
-import { STABLES_ETH, STABLES_BSC, STABLES_POLY, BLUECHIP_ETH, REN_TOKENS_ETH, BLUECHIP_BSC, BLUECHIP_POLY} from './config-token-sets';
+import { TokenAddressRopsten } from './config-token-addresses';
+import {
+  STABLES_ETH,
+  STABLES_BSC,
+  STABLES_POLY,
+  BLUECHIP_ETH,
+  REN_TOKENS_ETH,
+  BLUECHIP_BSC,
+  BLUECHIP_POLY,
+} from './config-token-sets';
 import { NetworkChainID } from './config-chain-ids';
 
 /**
@@ -47,6 +55,3 @@ export default {
     },
   },
 } as NetworkTokensConfig;
-
-
-

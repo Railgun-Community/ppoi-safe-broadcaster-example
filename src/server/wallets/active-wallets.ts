@@ -19,6 +19,7 @@ import {
 } from '../balances/balance-cache';
 import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
 import configNetworks from '../config/config-networks';
+import { subscribeToShieldedBalanceEvents } from '../balances/shielded-balance-cache';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -48,6 +49,7 @@ const initRailgunWallet = async (mnemonic: string) => {
     mnemonic,
   );
   railgunWallet = lepton.wallets[walletID];
+  subscribeToShieldedBalanceEvents(railgunWallet);
   const anyChainID = 0;
   railgunWalletAnyAddress = railgunWallet.getAddress(anyChainID);
 };
@@ -133,7 +135,9 @@ export const numAvailableWallets = async (
   chainID: NetworkChainID,
 ): Promise<number> => {
   const walletAvailability = await Promise.all(
-    getActiveWallets().map((wallet) => isWalletAvailable(wallet, chainID)),
+    getActiveWallets().map(
+      async (wallet) => await isWalletAvailable(wallet, chainID),
+    ),
   );
   return walletAvailability.filter((available) => available).length;
 };

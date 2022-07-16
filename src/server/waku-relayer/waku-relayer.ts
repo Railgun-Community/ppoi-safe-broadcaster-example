@@ -204,6 +204,7 @@ export class WakuRelayer {
     const broadcastPromises: Promise<void>[] = chainIDs.map((chainID) =>
       this.broadcastFeesForChain(chainID),
     );
+
     await Promise.all(broadcastPromises);
     await delay(interval);
     this.broadcastFeesOnInterval(interval);

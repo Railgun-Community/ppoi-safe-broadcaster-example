@@ -15,7 +15,6 @@ import { NetworkChainID } from './config-chain-ids';
 import { NetworksConfig } from '../../models/config-models';
 import { EVMGasType } from '../../models/network-models';
 
-
 // 10 minute timeout on ticket prices retrieved from API.
 // Shorter is safer, but Coingecko free tier can lag by 15-30 minutes.
 const defaultTokenPriceTTL = 10 * 60 * 1000;
@@ -72,7 +71,7 @@ export default {
     gasToken: {
       symbol: 'MATIC',
       wrappedAddress: GasTokenWrappedAddress.PolygonWMATIC,
-      minimumBalanceForAvailability: 0.1,
+      minimumBalanceForAvailability: 1.1,
     },
     fees: configFees,
     proxyContract: RailProxyContract.PolygonPOS,

@@ -11,7 +11,7 @@ import { mockTokenConfig } from '../../../test/mocks.test';
 import configTokenPriceRefresher, {
   TokenPriceRefresher,
 } from '../../config/config-token-price-refresher';
-import { initPricePoller, stopPolling } from '../token-price-poller';
+import { initPricePoller, stopTokenPricePolling } from '../token-price-poller';
 import { delay } from '../../../util/promise-utils';
 import { initTokens } from '../network-tokens';
 
@@ -87,7 +87,7 @@ describe('token-price-poller', () => {
 
     // Wait for async call to finish.
     await delay(10);
-    stopPolling();
+    stopTokenPricePolling();
 
     expect(() =>
       lookUpCachedTokenPrice(NetworkChainID.Ropsten, MOCK_TOKEN_ADDRESS_1),

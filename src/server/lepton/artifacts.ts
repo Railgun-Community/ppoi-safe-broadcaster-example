@@ -3,7 +3,7 @@ import {
   PublicInputs,
 } from '@railgun-community/lepton/dist/prover';
 // @ts-ignore
-import artifacts from 'railgun-artifacts-node';
+import artifacts from '@railgun-community/test-artifacts';
 
 export const artifactsGetter: ArtifactsGetter = (inputs: PublicInputs) => {
   if (

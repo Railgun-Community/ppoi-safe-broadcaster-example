@@ -1,4 +1,3 @@
-import { parseUnits } from '@ethersproject/units';
 import { delay } from '../../../util/promise-utils';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import { tokenForAddress } from '../../tokens/network-tokens';

@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
-import { isWalletAvailable, setWalletAvailable } from '../available-wallets';
+import { isWalletAvailable, setWalletAvailability } from '../available-wallets';
 import { getActiveWallets, numAvailableWallets } from '../active-wallets';
 import { NetworkChainID } from '../../config/config-chain-ids';
 import {
@@ -22,7 +22,9 @@ describe('available-wallets', () => {
     await setupSingleTestWallet();
     initNetworkProviders();
     resetGasTokenBalanceCache();
-    createGasBalanceStub(BigNumber.from(10).pow(18));
+    createGasBalanceStub(
+      BigNumber.from('100000000000000000000000000000000000'),
+    );
   });
   after(() => {
     restoreGasBalanceStub();
@@ -35,11 +37,11 @@ describe('available-wallets', () => {
     expect(await isWalletAvailable(wallet, chainID)).to.be.true;
     expect(await numAvailableWallets(chainID)).to.equal(1);
 
-    setWalletAvailable(wallet, chainID, false);
+    setWalletAvailability(wallet, chainID, false);
     expect(await isWalletAvailable(wallet, chainID)).to.be.false;
     expect(await numAvailableWallets(chainID)).to.equal(0);
 
-    setWalletAvailable(wallet, chainID, true);
+    setWalletAvailability(wallet, chainID, true);
     expect(await isWalletAvailable(wallet, chainID)).to.be.true;
     expect(await numAvailableWallets(chainID)).to.equal(1);
   });

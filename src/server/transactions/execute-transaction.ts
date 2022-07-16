@@ -19,7 +19,7 @@ import {
 } from '../fees/gas-estimate';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
-import { setWalletAvailable } from '../wallets/available-wallets';
+import { setWalletAvailability } from '../wallets/available-wallets';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 
 const dbg = debug('relayer:transact:execute');
@@ -76,11 +76,14 @@ export const executeTransaction = async (
   chainID: NetworkChainID,
   transactionRequest: TransactionRequest,
   gasDetails: TransactionGasDetails,
+  wallet?: ActiveWallet,
 ): Promise<TransactionResponse> => {
   dbg('Execute transaction');
 
   const maximumGas = calculateMaximumGas(gasDetails);
-  const activeWallet = await getBestMatchWalletForNetwork(chainID, maximumGas);
+  const activeWallet =
+    wallet ?? (await getBestMatchWalletForNetwork(chainID, maximumGas));
+
   const provider = getProviderForNetwork(chainID);
   const ethersWallet = createEthersWallet(activeWallet, provider);
   const nonce = await getCurrentWalletNonce(ethersWallet);
@@ -153,16 +156,30 @@ export const waitForTx = async (
   nonce: number,
 ) => {
   try {
-    setWalletAvailable(activeWallet, chainID, false);
+    setWalletAvailability(activeWallet, chainID, false);
     await waitTx(txResponse);
     dbg(`Transaction completed/mined: ${txResponse.hash}`);
     await storeCurrentNonce(chainID, nonce, ethersWallet);
   } catch (err) {
     dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
   } finally {
-    setWalletAvailable(activeWallet, chainID, true);
+    setWalletAvailability(activeWallet, chainID, true);
     await updateCachedGasTokenBalance(chainID, activeWallet.address);
   }
+};
+
+export const waitForTxs = async (
+  activeWallet: ActiveWallet,
+  ethersWallet: EthersWallet,
+  chainID: NetworkChainID,
+  txResponses: TransactionResponse[],
+) => {
+  await Promise.all(
+    txResponses.map(async (txResponse) => {
+      const nonce = await getCurrentNonce(chainID, ethersWallet);
+      await waitForTx(activeWallet, ethersWallet, chainID, txResponse, nonce);
+    }),
+  );
 };
 
 // Separated so it can be stubbed for tests.

@@ -8,6 +8,8 @@ import { quickSync } from '../api/railgun-events/quick-sync';
 import configDefaults from '../config/config-defaults';
 import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
+import  { groth16 } from 'snarkjs';
+import { Groth16 } from '@railgun-community/lepton/dist/prover';
 
 let lepton: Lepton;
 
@@ -36,6 +38,7 @@ export const initLepton = (optDebugger?: LeptonDebugger) => {
     quickSync,
     configDefaults.debug.lepton ? leptonDebugger : undefined,
   );
+  lepton.prover.setGroth16(groth16 as Groth16)
 };
 
 /**

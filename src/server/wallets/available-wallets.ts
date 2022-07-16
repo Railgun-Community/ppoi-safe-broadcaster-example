@@ -11,7 +11,7 @@ const unavailableWalletMap: NumMapType<MapType<boolean>> = {};
 
 const dbg = debug('relayer:wallets:availability');
 
-export const setWalletAvailable = (
+export const setWalletAvailability = (
   wallet: ActiveWallet,
   chainID: NetworkChainID,
   available: boolean,
@@ -21,7 +21,7 @@ export const setWalletAvailable = (
   dbg(`Set wallet ${wallet.address}:`, available ? 'AVAILABLE' : 'BUSY');
 };
 
-export const isWalletAvailable = (
+export const isWalletAvailable = async (
   wallet: ActiveWallet,
   chainID: NetworkChainID,
 ) => {
@@ -32,7 +32,7 @@ export const isWalletAvailable = (
     return false;
   }
   try {
-    return isBelowMinimumGasTokenBalance(wallet, chainID);
+    return !(await isBelowMinimumGasTokenBalance(wallet, chainID));
   } catch (err) {
     logger.error(err);
     logger.warn(
@@ -42,7 +42,7 @@ export const isWalletAvailable = (
   }
 };
 
-const isBelowMinimumGasTokenBalance = async (
+export const isBelowMinimumGasTokenBalance = async (
   wallet: ActiveWallet,
   chainID: NetworkChainID,
 ) => {
@@ -54,9 +54,9 @@ const isBelowMinimumGasTokenBalance = async (
   try {
     const balance = await getCachedGasTokenBalance(chainID, wallet.address);
     if (balance.lt(minimumBalance)) {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   } catch (err) {
     logger.error(err);
     logger.warn(
@@ -66,7 +66,8 @@ const isBelowMinimumGasTokenBalance = async (
   }
 };
 
-const isProcessingTransaction = (
+export const isProcessingTransaction = (
+  // questions for JMJ -- is processing transaction bools correct
   wallet: ActiveWallet,
   chainID: NetworkChainID,
 ) => {
@@ -74,18 +75,18 @@ const isProcessingTransaction = (
     unavailableWalletMap[chainID] &&
     unavailableWalletMap[chainID][wallet.address]
   ) {
-    return false;
+    return true;
   }
-  return true;
+  return false;
 };
 
-export const shouldTopUpWallet = (
+export const shouldTopUpWallet = async (
   wallet: ActiveWallet,
   chainID: NetworkChainID,
 ) => {
   return (
     !isProcessingTransaction(wallet, chainID) &&
-    isBelowMinimumGasTokenBalance(wallet, chainID)
+    (await isBelowMinimumGasTokenBalance(wallet, chainID))
   );
 };
 

@@ -32,6 +32,7 @@ const main = async (): Promise<void> => {
     feeExpiration: config.transactionFees.feeExpirationInMS,
   };
   relayer = await WakuRelayer.init(client, wallet, options);
+
   relayer.poll(config.waku.pollFrequencyInMS);
   relayer.broadcastFeesOnInterval(config.waku.broadcastFeesDelayInMS);
 

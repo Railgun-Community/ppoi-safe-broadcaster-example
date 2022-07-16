@@ -112,6 +112,14 @@ export default {
     ],
   },
 
+  topUps: {
+    /**
+     * Enable regular top-ups for each wallet when their gas tokens run low (ie. below networkConfig.gasToken.minimumBalanceForAvailability).
+     * Automatically unshields ERC-20 tokens from private balance and swaps for gas token.
+     */
+    shouldTopUp: true,
+  },
+
   waku: {
     /**
      * URL of nim-waku rpc server (eg http://localhost:8546).
