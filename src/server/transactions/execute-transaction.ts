@@ -167,5 +167,6 @@ export const waitForTx = async (
 
 // Separated so it can be stubbed for tests.
 export const waitTx = async (txResponse: TransactionResponse) => {
-  await txResponse.wait().catch(throwErr);
+  const timeout = 5 * 60 * 1000; // 5 minutes
+  await promiseTimeout(txResponse.wait().catch(throwErr), timeout);
 };
