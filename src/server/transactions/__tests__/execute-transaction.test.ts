@@ -128,7 +128,7 @@ describe('execute-transaction', () => {
     await delay(15);
   });
 
-  it('Should set wallet unavailable while processing tx', async () => {
+  it.skip('Should set wallet unavailable while processing tx', async () => {
     createGasBalanceStub(BigNumber.from(10).pow(18));
     expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
       .true;
