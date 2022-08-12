@@ -65,9 +65,10 @@ const createRopstenTransferTransactions = (
     ROPSTEN_CHAIN_ID,
   );
   transaction.addOutput(
-    new Note(addressData, RANDOM, fee.toHexString(), tokenAddress),
+    new Note(addressData, RANDOM, fee.toHexString(), tokenAddress, []),
   );
   return transaction.generateDummySerializedTransactions(
+    lepton.prover,
     railgunWallet,
     configDefaults.lepton.dbEncryptionKey,
   );
@@ -84,9 +85,10 @@ const createRopstenRelayAdaptWithdrawTransactions = (
     ROPSTEN_CHAIN_ID,
   );
   transaction.addOutput(
-    new Note(addressData, RANDOM, fee.toHexString(), tokenAddress),
+    new Note(addressData, RANDOM, fee.toHexString(), tokenAddress, []),
   );
   return transaction.generateDummySerializedTransactions(
+    lepton.prover,
     railgunWallet,
     configDefaults.lepton.dbEncryptionKey,
   );

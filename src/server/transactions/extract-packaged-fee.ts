@@ -170,9 +170,13 @@ const getSharedKeySafe = (
   }
 };
 
-const decryptNoteSafe = (encryptedNote: Ciphertext, sharedKey: Uint8Array) => {
+const decryptSenderNoteSafe = (
+  encryptedNote: Ciphertext,
+  sharedKey: Uint8Array,
+) => {
   try {
-    return Note.decrypt(encryptedNote, sharedKey);
+    const memoField: string[] = [];
+    return Note.decrypt(encryptedNote, sharedKey, memoField);
   } catch (err) {
     return null;
   }
@@ -191,14 +195,14 @@ const extractFeesFromRailgunTransactions = async (
   const hash = commitments[index];
   const ciphertext = railgunTx.boundParams.commitmentCiphertext[index];
 
-  const ephemeralKeyBytes = nToBytes(
+  const ephemeralKeySenderBytes = nToBytes(
     BigInt(ciphertext.ephemeralKeys[0].toHexString()),
     ByteLength.UINT_256,
   );
 
   const sharedKey = await getSharedKeySafe(
     viewingPrivateKey,
-    ephemeralKeyBytes,
+    ephemeralKeySenderBytes,
   );
   if (sharedKey == null) {
     // Not addressed to us.
@@ -214,14 +218,14 @@ const extractFeesFromRailgunTransactions = async (
     tag: ivTag.substring(32),
     data: ciphertextHexlified.slice(1),
   };
-  const decryptedNote = decryptNoteSafe(encryptedNote, sharedKey);
-  if (decryptedNote == null) {
+  const decryptedSenderNote = decryptSenderNoteSafe(encryptedNote, sharedKey);
+  if (decryptedSenderNote == null) {
     // Addressed to us, but different note than fee.
     return;
   }
 
-  if (decryptedNote.masterPublicKey === masterPublicKey) {
-    const noteHash = nToHex(decryptedNote.hash, ByteLength.UINT_256);
+  if (decryptedSenderNote.masterPublicKey === masterPublicKey) {
+    const noteHash = nToHex(decryptedSenderNote.hash, ByteLength.UINT_256);
     const commitHash = formatToByteLength(
       hash.toHexString(),
       ByteLength.UINT_256,
@@ -232,13 +236,13 @@ const extractFeesFromRailgunTransactions = async (
       );
     }
 
-    if (!tokenPaymentAmounts[decryptedNote.token]) {
+    if (!tokenPaymentAmounts[decryptedSenderNote.token]) {
       // eslint-disable-next-line no-param-reassign
-      tokenPaymentAmounts[decryptedNote.token] = BigNumber.from(0);
+      tokenPaymentAmounts[decryptedSenderNote.token] = BigNumber.from(0);
     }
     // eslint-disable-next-line no-param-reassign
-    tokenPaymentAmounts[decryptedNote.token] = tokenPaymentAmounts[
-      decryptedNote.token
-    ].add(decryptedNote.value.toString());
+    tokenPaymentAmounts[decryptedSenderNote.token] = tokenPaymentAmounts[
+      decryptedSenderNote.token
+    ].add(decryptedSenderNote.value.toString());
   }
 };

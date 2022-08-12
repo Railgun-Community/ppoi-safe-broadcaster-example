@@ -27,6 +27,7 @@ export const createLeptonWalletBalancesStub = (
             '12345678901234561234567890123456',
             '1000000000000000000000',
             tokenAddressHexlify,
+            [],
           ),
         },
       ],
