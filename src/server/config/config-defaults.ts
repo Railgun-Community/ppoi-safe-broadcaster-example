@@ -42,9 +42,9 @@ export default {
 
     /** How long to enable the fee sent for a given transaction.
      * Note that clients will have to prove a transaction before sending, which can take up to 20-30 seconds.
-     * We recommend an expiration of 2+ minutes.
+     * We recommend an expiration of 3+ minutes.
      */
-    feeExpirationInMS: 2 * 60 * 1000,
+    feeExpirationInMS: 3 * 60 * 1000,
 
     /**
      * Checks if feeCacheID is in cache map before processing a transaction.
@@ -126,7 +126,7 @@ export default {
     /**
      * Frequency to broadcast fees.
      */
-    broadcastFeesDelayInMS: 30 * 1000,
+    broadcastFeesDelayInMS: 15 * 1000,
   },
 
   featureFlags: {
