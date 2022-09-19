@@ -1,10 +1,10 @@
 import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+import { RelayerChain } from '../../models/chain-models';
 import { EVMGasType } from '../../models/network-models';
 import { ErrorMessage } from '../../util/errors';
 import { logger } from '../../util/logger';
 import { throwErr } from '../../util/promise-utils';
-import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getStandardGasDetails } from './gas-by-speed';
 
@@ -26,15 +26,15 @@ export type TransactionGasDetailsType2 = {
 };
 
 export const getEstimateGasDetails = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   transactionRequest: TransactionRequest,
   devLog?: boolean,
 ): Promise<TransactionGasDetails> => {
   try {
-    const provider = getProviderForNetwork(chainID);
+    const provider = getProviderForNetwork(chain);
     const [gasEstimate, gasDetailsBySpeed] = await Promise.all([
       provider.estimateGas(transactionRequest).catch(throwErr),
-      getStandardGasDetails(chainID),
+      getStandardGasDetails(chain),
     ]);
 
     return { gasEstimate, ...gasDetailsBySpeed };

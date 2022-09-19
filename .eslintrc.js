@@ -17,8 +17,7 @@ module.exports = {
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 13,
-    sourceType: 'module',
+    project: ['./tsconfig.json', './tsconfig.test.json'],
   },
   plugins: ['@typescript-eslint'],
   rules: {
@@ -42,6 +41,10 @@ module.exports = {
     '@typescript-eslint/ban-ts-comment': 0,
     '@typescript-eslint/no-explicit-any': 0,
     'import/order': 0,
+    '@typescript-eslint/no-empty-function': 0,
+    '@typescript-eslint/switch-exhaustiveness-check': 2,
+    '@typescript-eslint/no-unused-vars': 1,
+    'consistent-return': 0,
     camelcase: 0,
   },
   ignorePatterns: ['dist'],

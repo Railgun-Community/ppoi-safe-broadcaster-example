@@ -1,13 +1,12 @@
 import debug from 'debug';
 import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
-import { Wallet } from '@railgun-community/lepton/dist/wallet';
+import { Wallet } from '@railgun-community/lepton/dist/wallet/wallet';
 import { bytes } from '@railgun-community/lepton/dist/utils';
 import { hexStringToBytes } from '@railgun-community/lepton/dist/utils/bytes';
 import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
-import { NetworkChainID } from '../config/config-chain-ids';
-import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
+import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
 import { contentTopics } from './topics';
@@ -16,6 +15,7 @@ import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
 import configNetworks from '../config/config-networks';
 import configDefaults from '../config/config-defaults';
+import { RelayerChain } from '../../models/chain-models';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 
@@ -72,7 +72,7 @@ export class WakuRelayer {
     wallet: Wallet,
     options: WakuRelayerOptions,
   ) {
-    const chainIDs = configuredNetworkChainIDs();
+    const chainIDs = configuredNetworkChains();
     this.client = client;
     this.options = options;
     this.dbg = debug('relayer:waku:relayer');
@@ -80,8 +80,7 @@ export class WakuRelayer {
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
     this.wallet = wallet;
-    const anyChainID = 0; // Use "any" 0-index chain ID for broadcasted wallet.
-    this.walletRailAddress = wallet.getAddress(anyChainID);
+    this.walletRailAddress = wallet.getAddress();
     this.dbg(this.subscribedContentTopics);
   }
 
@@ -149,7 +148,7 @@ export class WakuRelayer {
   private createFeeBroadcastData = async (
     fees: MapType<BigNumber>,
     feeCacheID: string,
-    chainID: NetworkChainID,
+    chain: RelayerChain,
   ): Promise<FeeMessage> => {
     const tokenAddresses = Object.keys(fees);
     const feesHex: MapType<string> = {};
@@ -158,7 +157,7 @@ export class WakuRelayer {
     });
 
     // Availability must be accurate or Relayer risks automatic blocking by clients.
-    const availableWallets = await numAvailableWallets(chainID);
+    const availableWallets = await numAvailableWallets(chain);
 
     const data: FeeMessageData = {
       fees: feesHex,
@@ -169,7 +168,7 @@ export class WakuRelayer {
       availableWallets,
       version: process.env.npm_package_version ?? '0.0.0',
       relayAdapt: configDefaults.featureFlags.enableRelayAdapt
-        ? configNetworks[chainID].relayAdaptContract
+        ? configNetworks[chain.type][chain.id].relayAdaptContract
         : '',
     };
     const message = bytes.fromUTF8String(JSON.stringify(data));
@@ -177,7 +176,7 @@ export class WakuRelayer {
       await this.wallet.signWithViewingKey(hexStringToBytes(message)),
     );
     this.dbg(
-      `Broadcasting fees for chain ${chainID}:`,
+      `Broadcasting fees for chain ${chain.type}:${chain.id}:`,
       Object.keys(fees).length,
     );
     return {
@@ -186,23 +185,23 @@ export class WakuRelayer {
     };
   };
 
-  async broadcastFeesForChain(chainID: NetworkChainID) {
+  async broadcastFeesForChain(chain: RelayerChain) {
     // Map from tokenAddress to BigNumber hex string
-    const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chainID);
+    const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chain);
     const feeBroadcastData = await this.createFeeBroadcastData(
       fees,
       feeCacheID,
-      chainID,
+      chain,
     );
-    const contentTopic = contentTopics.fees(chainID);
+    const contentTopic = contentTopics.fees(chain);
     await this.publish(feeBroadcastData, contentTopic);
   }
 
   async broadcastFeesOnInterval(interval: number) {
     if (this.stopping) return;
-    const chainIDs = configuredNetworkChainIDs();
-    const broadcastPromises: Promise<void>[] = chainIDs.map((chainID) =>
-      this.broadcastFeesForChain(chainID),
+    const chains = configuredNetworkChains();
+    const broadcastPromises: Promise<void>[] = chains.map((chain) =>
+      this.broadcastFeesForChain(chain),
     );
 
     await Promise.all(broadcastPromises);

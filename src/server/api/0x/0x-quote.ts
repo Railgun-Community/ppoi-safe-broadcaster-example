@@ -3,9 +3,10 @@ import { parseUnits } from '@ethersproject/units';
 import { AxiosError } from 'axios';
 import { ZeroXApiEndpoint, getZeroXData } from './0x-fetch';
 import { TokenAmount } from '../../../models/token-models';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../../config/config-chains';
 import { logger } from '../../../util/logger';
-import { getProviderForNetwork } from '../../providers/active-network-providers';
+import { RelayerChain } from '../../../models/chain-models';
+import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
 
 export const ZERO_X_PRICE_DECIMALS = 18;
 
@@ -41,32 +42,23 @@ export type ZeroXFormattedQuoteData = {
   sellTokenValue: string;
 };
 
-export const zeroXProxyBaseTokenAddress = (chainID: NetworkChainID) => {
-  switch (chainID) {
-    case NetworkChainID.Ropsten:
-      return '0xc778417e063141139fce010982780140aa0cd5ab';
-    case NetworkChainID.Ethereum:
-      return '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
-    case NetworkChainID.PolygonPOS:
-    case NetworkChainID.BNBSmartChain:
-    case NetworkChainID.HardHat:
-      return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+export const zeroXExchangeProxyContractAddress = (chain: RelayerChain) => {
+  switch (chain.type) {
+    case ChainType.EVM: {
+      switch (chain.id) {
+        case NetworkChainID.Ropsten:
+        case NetworkChainID.Ethereum:
+        case NetworkChainID.PolygonPOS:
+        case NetworkChainID.BNBSmartChain:
+          return '0xdef1c0ded9bec7f1a1670819833240f027b25eff';
+        case NetworkChainID.HardHat:
+          throw new Error('Unsupported network for 0x Exchange');
+      }
+    }
   }
-
-  throw new Error('Unrecognized chain for 0x proxy base token address');
-};
-
-export const zeroXExchangeProxyContractAddress = (chainID: NetworkChainID) => {
-  switch (chainID) {
-    case NetworkChainID.Ropsten:
-    case NetworkChainID.Ethereum:
-    case NetworkChainID.PolygonPOS:
-    case NetworkChainID.BNBSmartChain:
-      return '0xdef1c0ded9bec7f1a1670819833240f027b25eff';
-    case NetworkChainID.HardHat:
-      throw new Error('Unsupported network for 0x Exchange');
-  }
-  throw new Error(`Unsupported network for 0x Exchange: ${chainID}`);
+  throw new Error(
+    `Unsupported network for 0x Exchange: ${chain.type}:${chain.id}`,
+  );
 };
 
 // const validateZeroXDataField = (
@@ -95,7 +87,7 @@ export const zeroXExchangeProxyContractAddress = (chainID: NetworkChainID) => {
 // };
 
 const getZeroXQuoteInvalidError = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   to: string,
   data: string,
   value: string,
@@ -104,7 +96,7 @@ const getZeroXQuoteInvalidError = (
 ): Optional<string> => {
   try {
     // Validate "to" address.
-    const expectedAddress = zeroXExchangeProxyContractAddress(chainID);
+    const expectedAddress = zeroXExchangeProxyContractAddress(chain);
     if (to === expectedAddress) {
       // Validate "data" and "value" for 0x exchange.
       // TODO: Re-enable the below. Disabled because currently we pass 'ETH' in for sellTokenAddress or buyTokenAddress if it is a base token. And argsString that is produced within validateZeroXDataField returns 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee for the base token
@@ -132,7 +124,7 @@ const getZeroXQuoteInvalidError = (
 };
 
 export const zeroXGetSwapQuote = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   sellTokenAmount: TokenAmount,
   buyTokenAddress: string,
   slippagePercentage: number,
@@ -164,12 +156,12 @@ export const zeroXGetSwapQuote = async (
       sellAmount: sellTokenValueResponse,
     } = await getZeroXData<ZeroXPriceData>(
       ZeroXApiEndpoint.GetSwapQuote,
-      chainID,
+      chain,
       params,
     );
 
     const invalidError = getZeroXQuoteInvalidError(
-      chainID,
+      chain,
       to,
       data,
       value,

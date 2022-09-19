@@ -1,5 +1,4 @@
 import { BigNumber } from 'ethers';
-import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { NetworkFeeSettings } from '../../models/network-models';
@@ -10,42 +9,43 @@ import {
 } from '../tokens/network-tokens';
 import { getTransactionTokenPrices } from '../tokens/token-price-cache';
 import { cacheUnitFeesForTokens } from './transaction-fee-cache';
+import { RelayerChain } from '../../models/chain-models';
 
 export const getAllUnitTokenFeesForChain = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): { fees: MapType<BigNumber>; feeCacheID: string } => {
-  const tokenAddresses = allTokenAddressesForNetwork(chainID);
+  const tokenAddresses = allTokenAddressesForNetwork(chain);
   const tokenFeesForChain: MapType<BigNumber> = {};
   tokenAddresses.forEach((tokenAddress) => {
     try {
       tokenFeesForChain[tokenAddress] = calculateTokenFeePerUnitGasToken(
-        chainID,
+        chain,
         tokenAddress,
       );
     } catch (err: any) {
       // No op.
     }
   });
-  const feeCacheID = cacheUnitFeesForTokens(chainID, tokenFeesForChain);
+  const feeCacheID = cacheUnitFeesForTokens(chain, tokenFeesForChain);
   return { fees: tokenFeesForChain, feeCacheID };
 };
 
 export const calculateTokenFeePerUnitGasToken = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   tokenAddress: string,
 ) => {
   const oneUnitGas = BigNumber.from(10).pow(BigNumber.from(GAS_TOKEN_DECIMALS));
-  return getTokenFee(chainID, oneUnitGas, tokenAddress);
+  return getTokenFee(chain, oneUnitGas, tokenAddress);
 };
 
 export const getTokenFee = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   maximumGas: BigNumber,
   tokenAddress: string,
 ) => {
   const { precision } = configDefaults.transactionFees;
   const { roundedPriceRatio, decimalRatio } = getTokenRatiosFromCachedPrices(
-    chainID,
+    chain,
     tokenAddress,
     precision,
   );
@@ -56,14 +56,14 @@ export const getTokenFee = (
 };
 
 const getTokenRatiosFromCachedPrices = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   tokenAddress: string,
   precision: number,
 ) => {
-  const networkConfig = configNetworks[chainID];
-  const { token, gasToken } = getTransactionTokens(chainID, tokenAddress);
+  const networkConfig = configNetworks[chain.type][chain.id];
+  const { token, gasToken } = getTransactionTokens(chain, tokenAddress);
   const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
-    chainID,
+    chain,
     token,
     gasToken,
   );

@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
-import { NetworkChainID } from '../config/config-chain-ids';
+import { RelayerChain } from '../../models/chain-models';
 
 type CachedFees = {
   tokenFees: MapType<BigNumber>;
@@ -9,8 +9,8 @@ type CachedFees = {
 };
 
 // Cached token prices per network.
-// {chainID: {feeID: CachedFee}}
-const transactionFeeCache: NumMapType<MapType<CachedFees>> = {};
+// {chainType: {chainID: {feeID: CachedFee}}}
+const transactionFeeCache: NumMapType<NumMapType<MapType<CachedFees>>> = {};
 
 export const resetTransactionFeeCache = () => {
   resetMapObject(transactionFeeCache);
@@ -29,8 +29,8 @@ const generateFeeCacheID = (length = 16) => {
   return retVal;
 };
 
-const clearExpiredFees = (chainID: NetworkChainID) => {
-  const cacheForChain = transactionFeeCache[chainID];
+const clearExpiredFees = (chain: RelayerChain) => {
+  const cacheForChain = transactionFeeCache[chain.type][chain.id];
   const keys = Object.keys(cacheForChain);
   for (const key of keys) {
     const cachedFees = cacheForChain[key];
@@ -41,7 +41,7 @@ const clearExpiredFees = (chainID: NetworkChainID) => {
 };
 
 export const cacheUnitFeesForTokens = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   tokenFees: MapType<BigNumber>,
 ): string => {
   const feeCacheID = generateFeeCacheID();
@@ -49,11 +49,10 @@ export const cacheUnitFeesForTokens = (
     tokenFees,
     updatedAt: Date.now(),
   };
-  if (!transactionFeeCache[chainID]) {
-    transactionFeeCache[chainID] = {};
-  }
-  transactionFeeCache[chainID][feeCacheID] = cachedFee;
-  clearExpiredFees(chainID);
+  transactionFeeCache[chain.type] ??= {};
+  transactionFeeCache[chain.type][chain.id] ??= {};
+  transactionFeeCache[chain.type][chain.id][feeCacheID] = cachedFee;
+  clearExpiredFees(chain);
   return feeCacheID;
 };
 
@@ -63,14 +62,13 @@ const cachedFeesExpired = (cachedFees: CachedFees) => {
 };
 
 export const lookUpCachedUnitTokenFee = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   feeCacheID: string,
   tokenAddress: string,
 ): Optional<BigNumber> => {
-  if (!transactionFeeCache[chainID]) {
-    transactionFeeCache[chainID] = {};
-  }
-  const cachedFees = transactionFeeCache[chainID][feeCacheID];
+  transactionFeeCache[chain.type] ??= {};
+  transactionFeeCache[chain.type][chain.id] ??= {};
+  const cachedFees = transactionFeeCache[chain.type][chain.id][feeCacheID];
   if (!cachedFees) {
     return undefined;
   }
@@ -87,11 +85,10 @@ export const lookUpCachedUnitTokenFee = (
  * We check whether the fee was dispatched by this Relayer in transact-method.ts.
  */
 export const recognizesFeeCacheID = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   feeCacheID: string,
 ) => {
-  if (!transactionFeeCache[chainID]) {
-    return false;
-  }
-  return transactionFeeCache[chainID][feeCacheID] != null;
+  transactionFeeCache[chain.type] ??= {};
+  transactionFeeCache[chain.type][chain.id] ??= {};
+  return transactionFeeCache[chain.type][chain.id][feeCacheID] != null;
 };

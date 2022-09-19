@@ -6,7 +6,6 @@ import {
   ZeroXFormattedQuoteData,
   zeroXGetSwapQuote,
 } from '../api/0x/0x-quote';
-import { NetworkChainID } from '../config/config-chain-ids';
 import { getEstimateGasDetails } from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
 import { ActiveWallet } from '../../models/wallet-models';
@@ -14,21 +13,22 @@ import configNetworks from '../config/config-networks';
 import configWalletTopUpRefresher from '../config/config-wallet-top-up-refresher';
 import debug from 'debug';
 import { removeUndefineds } from '../../util/utils';
+import { RelayerChain } from '../../models/chain-models';
 
 const dbg = debug('relayer:swaps');
 
 export const generateSwapTransactions = async (
   tokenAmounts: TokenAmount[],
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<PopulatedTransaction[]> => {
   const populatedTransactions: Optional<PopulatedTransaction>[] =
     await Promise.all(
       tokenAmounts.map(async (tokenAmount) => {
         try {
           const swapQuote = await zeroXGetSwapQuote(
-            chainID,
+            chain,
             tokenAmount,
-            configNetworks[chainID].gasToken.symbol,
+            configNetworks[chain.type][chain.id].gasToken.symbol,
             configWalletTopUpRefresher.toleratedSlippage,
           );
           if (!swapQuote.quote) {
@@ -38,7 +38,7 @@ export const generateSwapTransactions = async (
             return undefined;
           }
           const populatedSwap = quoteToPopulatedTransaction(
-            chainID,
+            chain,
             swapQuote.quote,
           );
           return populatedSwap;
@@ -55,11 +55,11 @@ export const generateSwapTransactions = async (
 };
 
 const quoteToPopulatedTransaction = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   quote: ZeroXFormattedQuoteData,
 ): PopulatedTransaction => {
   const populatedTransaction: PopulatedTransaction = {
-    to: zeroXExchangeProxyContractAddress(chainID),
+    to: zeroXExchangeProxyContractAddress(chain),
     data: quote.data,
     value: BigNumber.from(quote.value),
   };
@@ -69,17 +69,14 @@ const quoteToPopulatedTransaction = (
 export const swapZeroX = async (
   activeWallet: ActiveWallet,
   tokenAmounts: TokenAmount[],
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<TransactionResponse[]> => {
-  const populatedSwapTXs = await generateSwapTransactions(
-    tokenAmounts,
-    chainID,
-  );
+  const populatedSwapTXs = await generateSwapTransactions(tokenAmounts, chain);
   const TransactionResponses: TransactionResponse[] = await Promise.all(
     populatedSwapTXs.map(async (populatedSwap) => {
-      const gasDetails = await getEstimateGasDetails(chainID, populatedSwap);
+      const gasDetails = await getEstimateGasDetails(chain, populatedSwap);
       const txResponse = await executeTransaction(
-        chainID,
+        chain,
         populatedSwap,
         gasDetails,
         activeWallet,

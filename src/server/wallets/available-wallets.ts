@@ -1,38 +1,36 @@
 import { parseUnits } from '@ethersproject/units';
-import debug from 'debug';
+import { RelayerChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';
 import { getCachedGasTokenBalance } from '../balances/balance-cache';
-import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
+import debug from 'debug';
 
-const unavailableWalletMap: NumMapType<MapType<boolean>> = {};
+const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
 const dbg = debug('relayer:wallets:availability');
 
 export const setWalletAvailability = (
   wallet: ActiveWallet,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   available: boolean,
 ) => {
-  unavailableWalletMap[chainID] = unavailableWalletMap[chainID] ?? {};
-  unavailableWalletMap[chainID][wallet.address] = !available;
+  unavailableWalletMap[chain.type] ??= {};
+  unavailableWalletMap[chain.type][chain.id] ??= {};
+  unavailableWalletMap[chain.type][chain.id][wallet.address] = !available;
   dbg(`Set wallet ${wallet.address}:`, available ? 'AVAILABLE' : 'BUSY');
 };
 
-export const isWalletAvailable = async (
+export const isWalletAvailableWithEnoughFunds = async (
   wallet: ActiveWallet,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ) => {
-  if (
-    unavailableWalletMap[chainID] &&
-    unavailableWalletMap[chainID][wallet.address]
-  ) {
+  if (isWalletUnavailable(wallet, chain)) {
     return false;
   }
   try {
-    return !(await isBelowMinimumGasTokenBalance(wallet, chainID));
+    return !(await isBelowMinimumGasTokenBalance(wallet, chain));
   } catch (err) {
     logger.error(err);
     logger.warn(
@@ -44,15 +42,15 @@ export const isWalletAvailable = async (
 
 export const isBelowMinimumGasTokenBalance = async (
   wallet: ActiveWallet,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ) => {
-  const { gasToken } = configNetworks[chainID];
+  const { gasToken } = configNetworks[chain.type][chain.id];
   const minimumBalance = parseUnits(
     String(gasToken.minimumBalanceForAvailability),
     18,
   );
   try {
-    const balance = await getCachedGasTokenBalance(chainID, wallet.address);
+    const balance = await getCachedGasTokenBalance(chain, wallet.address);
     if (balance.lt(minimumBalance)) {
       return true;
     }
@@ -66,15 +64,13 @@ export const isBelowMinimumGasTokenBalance = async (
   }
 };
 
-export const isProcessingTransaction = (
-  // questions for JMJ -- is processing transaction bools correct
+export const isWalletUnavailable = (
   wallet: ActiveWallet,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ) => {
-  if (
-    unavailableWalletMap[chainID] &&
-    unavailableWalletMap[chainID][wallet.address]
-  ) {
+  unavailableWalletMap[chain.type] ??= {};
+  unavailableWalletMap[chain.type][chain.id] ??= {};
+  if (unavailableWalletMap[chain.type][chain.id][wallet.address]) {
     return true;
   }
   return false;
@@ -82,24 +78,27 @@ export const isProcessingTransaction = (
 
 export const shouldTopUpWallet = async (
   wallet: ActiveWallet,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ) => {
   return (
-    !isProcessingTransaction(wallet, chainID) &&
-    (await isBelowMinimumGasTokenBalance(wallet, chainID))
+    !isWalletUnavailable(wallet, chain) &&
+    (await isBelowMinimumGasTokenBalance(wallet, chain))
   );
 };
 
 export const getAvailableWallets = async (
   activeWallets: ActiveWallet[],
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ) => {
   const walletAvailability = await Promise.all(
-    activeWallets.map((wallet) => isWalletAvailable(wallet, chainID)),
+    activeWallets.map((wallet) =>
+      isWalletAvailableWithEnoughFunds(wallet, chain),
+    ),
   );
   return activeWallets.filter((_wallet, index) => walletAvailability[index]);
 };
 
-export const resetAvailableWallets = (chainID: NetworkChainID) => {
-  resetMapObject(unavailableWalletMap[chainID]);
+export const resetAvailableWallets = (chain: RelayerChain) => {
+  unavailableWalletMap[chain.type] ??= {};
+  resetMapObject(unavailableWalletMap[chain.type][chain.id]);
 };

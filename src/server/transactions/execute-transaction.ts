@@ -4,13 +4,13 @@ import {
 } from '@ethersproject/providers';
 import debug from 'debug';
 import { Wallet as EthersWallet } from 'ethers';
+import { RelayerChain } from '../../models/chain-models';
 import { EVMGasType } from '../../models/network-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { ErrorMessage } from '../../util/errors';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
 import { minBigNumber } from '../../util/utils';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
-import { NetworkChainID } from '../config/config-chain-ids';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import {
   calculateGasLimit,
@@ -26,11 +26,8 @@ const dbg = debug('relayer:transact:execute');
 
 const LAST_NONCE_KEY = 'last_nonce_key';
 
-export const getLastNonceKey = (
-  chainID: NetworkChainID,
-  wallet: EthersWallet,
-) => {
-  return `${LAST_NONCE_KEY}|${wallet.address}|${chainID}}`;
+export const getLastNonceKey = (chain: RelayerChain, wallet: EthersWallet) => {
+  return `${LAST_NONCE_KEY}|${wallet.address}|${chain.type}|${chain.id}`;
 };
 
 export const getCurrentWalletNonce = async (
@@ -50,13 +47,13 @@ export const getCurrentWalletNonce = async (
  * Only limitation is if we restart during a pending tx, but blockTag 'pending' seems to help.
  */
 export const getCurrentNonce = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   wallet: EthersWallet,
 ): Promise<number> => {
   const blockTag = 'pending';
   const [txCount, lastTransactionNonce] = await Promise.all([
     wallet.getTransactionCount(blockTag).catch(throwErr),
-    await getSettingsNumber(getLastNonceKey(chainID, wallet)),
+    await getSettingsNumber(getLastNonceKey(chain, wallet)),
   ]);
   if (lastTransactionNonce) {
     return Math.max(txCount, lastTransactionNonce + 1);
@@ -65,15 +62,15 @@ export const getCurrentNonce = async (
 };
 
 export const storeCurrentNonce = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   nonce: number,
   wallet: EthersWallet,
 ) => {
-  await storeSettingsNumber(getLastNonceKey(chainID, wallet), nonce);
+  await storeSettingsNumber(getLastNonceKey(chain, wallet), nonce);
 };
 
 export const executeTransaction = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   transactionRequest: TransactionRequest,
   gasDetails: TransactionGasDetails,
   wallet?: ActiveWallet,
@@ -82,9 +79,9 @@ export const executeTransaction = async (
 
   const maximumGas = calculateMaximumGas(gasDetails);
   const activeWallet =
-    wallet ?? (await getBestMatchWalletForNetwork(chainID, maximumGas));
+    wallet ?? (await getBestMatchWalletForNetwork(chain, maximumGas));
 
-  const provider = getProviderForNetwork(chainID);
+  const provider = getProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(activeWallet, provider);
   const nonce = await getCurrentWalletNonce(ethersWallet);
   const gasLimit = calculateGasLimit(gasDetails.gasEstimate);
@@ -92,7 +89,7 @@ export const executeTransaction = async (
 
   const finalTransaction: TransactionRequest = {
     ...transactionRequest,
-    chainId: chainID,
+    chainId: chain.id,
     nonce,
     gasLimit,
   };
@@ -136,7 +133,7 @@ export const executeTransaction = async (
     dbg('Submitted transaction:', txResponse.hash);
 
     // Call wait synchronously. This will set wallet unavailable until the tx is finished.
-    waitForTx(activeWallet, ethersWallet, chainID, txResponse, nonce);
+    waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce);
     return txResponse;
   } catch (err) {
     if (err?.message?.includes('Timed out')) {
@@ -151,33 +148,33 @@ export const executeTransaction = async (
 export const waitForTx = async (
   activeWallet: ActiveWallet,
   ethersWallet: EthersWallet,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   txResponse: TransactionResponse,
   nonce: number,
 ) => {
   try {
-    setWalletAvailability(activeWallet, chainID, false);
+    setWalletAvailability(activeWallet, chain, false);
     await waitTx(txResponse);
     dbg(`Transaction completed/mined: ${txResponse.hash}`);
-    await storeCurrentNonce(chainID, nonce, ethersWallet);
+    await storeCurrentNonce(chain, nonce, ethersWallet);
   } catch (err) {
     dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
   } finally {
-    setWalletAvailability(activeWallet, chainID, true);
-    await updateCachedGasTokenBalance(chainID, activeWallet.address);
+    setWalletAvailability(activeWallet, chain, true);
+    await updateCachedGasTokenBalance(chain, activeWallet.address);
   }
 };
 
 export const waitForTxs = async (
   activeWallet: ActiveWallet,
   ethersWallet: EthersWallet,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   txResponses: TransactionResponse[],
 ) => {
   await Promise.all(
     txResponses.map(async (txResponse) => {
-      const nonce = await getCurrentNonce(chainID, ethersWallet);
-      await waitForTx(activeWallet, ethersWallet, chainID, txResponse, nonce);
+      const nonce = await getCurrentNonce(chain, ethersWallet);
+      await waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce);
     }),
   );
 };

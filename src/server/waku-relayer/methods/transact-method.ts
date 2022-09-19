@@ -7,7 +7,6 @@ import {
   encryptJSONDataWithSharedKey,
   tryDecryptJSONDataWithSharedKey,
 } from '@railgun-community/lepton/dist/utils/ecies';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import { processTransaction } from '../../transactions/process-transaction';
 import {
   getRailgunAddressData,
@@ -19,6 +18,8 @@ import { ErrorMessage } from '../../../util/errors';
 import configDefaults from '../../config/config-defaults';
 import { recognizesFeeCacheID } from '../../fees/transaction-fee-cache';
 import { EncryptedData } from '@railgun-community/lepton/dist/models/formatted-types';
+import { RelayerChain } from '../../../models/chain-models';
+import configNetworks from '../../config/config-networks';
 
 export type WakuMethodParamsTransact = {
   pubkey: string;
@@ -27,6 +28,7 @@ export type WakuMethodParamsTransact = {
 
 export type RawParamsTransact = {
   serializedTransaction: string;
+  chainType: number;
   chainID: number;
   feesID: string;
   relayerViewingKey: string;
@@ -62,6 +64,7 @@ export const transactMethod = async (
   }
 
   const {
+    chainType,
     chainID,
     feesID: feeCacheID,
     serializedTransaction,
@@ -72,6 +75,20 @@ export const transactMethod = async (
 
   dbg('Decrypted - attempting to transact');
 
+  const chain: RelayerChain = {
+    type: chainType,
+    id: chainID,
+  };
+  if (!configNetworks[chain.type] || !configNetworks[chain.type][chain.id]) {
+    return errorResponse(
+      id,
+      chain,
+      sharedKey,
+      new Error(ErrorMessage.UNSUPPORTED_NETWORK),
+      devLog,
+    );
+  }
+
   const { viewingPublicKey } = getRailgunAddressData();
   if (relayerViewingKey !== hexlify(viewingPublicKey)) {
     return undefined;
@@ -79,7 +96,7 @@ export const transactMethod = async (
 
   if (
     configDefaults.transactionFees.requireMatchingFeeCacheID &&
-    !recognizesFeeCacheID(chainID, feeCacheID)
+    !recognizesFeeCacheID(chain, feeCacheID)
   ) {
     dbg(
       'Fee cache ID unrecognized. Transaction sent to another Relayer with same Rail Address.',
@@ -89,27 +106,27 @@ export const transactMethod = async (
 
   try {
     const txResponse = await processTransaction(
-      chainID,
+      chain,
       feeCacheID,
       serializedTransaction,
       useRelayAdapt ?? false,
       devLog,
     );
-    return resultResponse(id, chainID, sharedKey, txResponse);
+    return resultResponse(id, chain, sharedKey, txResponse);
   } catch (err: any) {
     dbg(err);
-    return errorResponse(id, chainID, sharedKey, err, devLog);
+    return errorResponse(id, chain, sharedKey, err, devLog);
   }
 };
 
 const resultResponse = (
   id: number,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   sharedKey: Uint8Array,
   txResponse: TransactionResponse,
 ): WakuMethodResponse => {
   const response = { txHash: txResponse.hash };
-  return encryptedRPCResponse(response, id, chainID, sharedKey);
+  return encryptedRPCResponse(response, id, chain, sharedKey);
 };
 
 const sanitizeErrorMessage = (errMsg: string, devLog?: boolean): string => {
@@ -124,13 +141,15 @@ const sanitizeErrorMessage = (errMsg: string, devLog?: boolean): string => {
       return ErrorMessage.GAS_ESTIMATE_ERROR;
     case ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR:
       return ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR;
+    case ErrorMessage.UNSUPPORTED_NETWORK:
+      return ErrorMessage.UNSUPPORTED_NETWORK;
   }
   return ErrorMessage.UNKNOWN_ERROR;
 };
 
 const errorResponse = (
   id: number,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   sharedKey: Uint8Array,
   err: Error,
   devLog?: boolean,
@@ -138,13 +157,13 @@ const errorResponse = (
   const response = {
     error: sanitizeErrorMessage(err.message, devLog),
   };
-  return encryptedRPCResponse(response, id, chainID, sharedKey);
+  return encryptedRPCResponse(response, id, chain, sharedKey);
 };
 
 const encryptedRPCResponse = (
   response: object,
   id: number,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   sharedKey: Uint8Array,
 ) => {
   dbg('Response:', response);
@@ -152,7 +171,7 @@ const encryptedRPCResponse = (
   const rpcResult = formatJsonRpcResult(id, encryptedResponse);
   return {
     rpcResult,
-    contentTopic: contentTopics.transactResponse(chainID),
+    contentTopic: contentTopics.transactResponse(chain),
   };
 };
 

@@ -1,17 +1,17 @@
 import { BigNumber } from 'ethers';
-import { NetworkChainID } from '../config/config-chain-ids';
 import { logger } from '../../util/logger';
 import { getTokenFee } from './calculate-token-fee';
 import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
 import configNetworks from '../config/config-networks';
 import { ErrorMessage } from '../../util/errors';
+import { RelayerChain } from '../../models/chain-models';
 
 const comparePackagedFeeToCalculated = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   packagedFee: BigNumber,
   calculatedFee: BigNumber,
 ) => {
-  const { slippageBuffer } = configNetworks[chainID].fees;
+  const { slippageBuffer } = configNetworks[chain.type][chain.id].fees;
   const calculatedFeeWithBuffer = calculatedFee
     .mul(Math.round(10000 * (1 - slippageBuffer)))
     .div(10000);
@@ -19,21 +19,21 @@ const comparePackagedFeeToCalculated = (
 };
 
 export const validateFee = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   tokenAddress: string,
   maximumGas: BigNumber,
   feeCacheID: string,
   packagedFee: BigNumber,
 ) => {
-  logger.log(`validateFee: ${tokenAddress} (chain ${chainID})`);
+  logger.log(`validateFee: ${tokenAddress} (chain ${chain.type}:${chain.id})`);
 
   // Check packaged fee against cached fee.
   // Cache expires with TTL setting: transactionFees.feeExpirationInMS.
-  const cachedFee = lookUpCachedUnitTokenFee(chainID, feeCacheID, tokenAddress);
+  const cachedFee = lookUpCachedUnitTokenFee(chain, feeCacheID, tokenAddress);
   if (cachedFee) {
     if (
       comparePackagedFeeToCalculated(
-        chainID,
+        chain,
         packagedFee,
         cachedFee.mul(maximumGas),
       )
@@ -45,8 +45,8 @@ export const validateFee = (
   // Re-calculate the fee based on current pricing if cache is expired.
   let calculatedFee;
   try {
-    calculatedFee = getTokenFee(chainID, maximumGas, tokenAddress);
-    if (comparePackagedFeeToCalculated(chainID, packagedFee, calculatedFee)) {
+    calculatedFee = getTokenFee(chain, maximumGas, tokenAddress);
+    if (comparePackagedFeeToCalculated(chain, packagedFee, calculatedFee)) {
       return;
     }
   } catch (err: any) {

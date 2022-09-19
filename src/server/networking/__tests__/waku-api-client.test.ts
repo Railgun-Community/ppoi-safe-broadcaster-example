@@ -2,7 +2,10 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
 import { WakuApiClient, WakuRelayMessage } from '../waku-api-client';
-import { setupSingleTestWallet, testChainID } from '../../../test/setup.test';
+import {
+  setupSingleTestWallet,
+  testChainEthereum,
+} from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import configDefaults from '../../config/config-defaults';
 import { resetTokenPriceCache } from '../../tokens/token-price-cache';
@@ -18,14 +21,14 @@ let client: WakuApiClient;
 let clientHTTPStub: SinonStub;
 
 const MOCK_TOKEN_ADDRESS = '0x12345';
-const chainID = testChainID();
+const MOCK_CHAIN = testChainEthereum();
 
 describe('waku-api-client', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
     initLepton();
     await setupSingleTestWallet();
-    configTokens[chainID][MOCK_TOKEN_ADDRESS] = {
+    configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',
     };
     await initTokens();

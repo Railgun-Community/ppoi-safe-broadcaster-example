@@ -8,6 +8,7 @@ import {
   resetTransactionFeeCache,
 } from '../transaction-fee-cache';
 import { delay } from '../../../util/promise-utils';
+import { testChainEthereum } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -26,18 +27,18 @@ describe('transaction-fee-cache', () => {
   });
 
   it('Should return cached fees within TTL', async () => {
-    const CHAIN_ID = 1;
+    const MOCK_CHAIN = testChainEthereum();
 
     expect(
-      lookUpCachedUnitTokenFee(CHAIN_ID, 'mockfeeid', MOCK_TOKEN_ADDRESS),
+      lookUpCachedUnitTokenFee(MOCK_CHAIN, 'mockfeeid', MOCK_TOKEN_ADDRESS),
     ).to.equal(undefined);
 
-    const feeCacheID = cacheUnitFeesForTokens(CHAIN_ID, {
+    const feeCacheID = cacheUnitFeesForTokens(MOCK_CHAIN, {
       [MOCK_TOKEN_ADDRESS]: MOCK_FEE,
     });
 
     const cachedFee = lookUpCachedUnitTokenFee(
-      CHAIN_ID,
+      MOCK_CHAIN,
       feeCacheID,
       MOCK_TOKEN_ADDRESS,
     );
@@ -47,7 +48,7 @@ describe('transaction-fee-cache', () => {
     await delay(15);
 
     expect(
-      lookUpCachedUnitTokenFee(CHAIN_ID, feeCacheID, MOCK_TOKEN_ADDRESS),
+      lookUpCachedUnitTokenFee(MOCK_CHAIN, feeCacheID, MOCK_TOKEN_ADDRESS),
     ).to.equal(undefined);
   });
 }).timeout(10000);

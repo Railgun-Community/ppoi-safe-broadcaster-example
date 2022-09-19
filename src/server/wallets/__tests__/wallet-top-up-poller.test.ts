@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import {
   getTopUpWallet,
   initTopUpPoller,
@@ -14,6 +13,7 @@ import { getActiveWallets } from '../active-wallets';
 import {
   resetConfigDefaults,
   setupSingleTestWallet,
+  testChainEthereum,
 } from '../../../test/setup.test';
 import {
   createGasBalanceStub,
@@ -24,7 +24,7 @@ import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
+const MOCK_CHAIN = testChainEthereum();
 const MOCK_WALLET_1_GAS_BALANCE = BigNumber.from('9000000000000000');
 const MOCK_WALLET_2_GAS_BALANCE = BigNumber.from('1200000000000000000');
 
@@ -32,7 +32,7 @@ describe('wallet-top-up-poller', () => {
   before(async () => {
     configDefaults.topUps.shouldTopUp = true;
     resetGasTokenBalanceCache();
-    resetAvailableWallets(MOCK_CHAIN_ID);
+    resetAvailableWallets(MOCK_CHAIN);
     await setupSingleTestWallet();
   });
 
@@ -43,14 +43,14 @@ describe('wallet-top-up-poller', () => {
 
   it('Should return a wallet to top up', async () => {
     createGasBalanceStub(MOCK_WALLET_1_GAS_BALANCE);
-    expect(await getTopUpWallet(MOCK_CHAIN_ID)).to.not.be.undefined;
+    expect(await getTopUpWallet(MOCK_CHAIN)).to.not.be.undefined;
     resetGasTokenBalanceCache();
     restoreGasBalanceStub();
   });
 
   it('Should find no wallets to top up', async () => {
     createGasBalanceStub(MOCK_WALLET_2_GAS_BALANCE);
-    expect(await getTopUpWallet(MOCK_CHAIN_ID)).to.be.undefined;
+    expect(await getTopUpWallet(MOCK_CHAIN)).to.be.undefined;
     resetGasTokenBalanceCache();
     restoreGasBalanceStub();
   });

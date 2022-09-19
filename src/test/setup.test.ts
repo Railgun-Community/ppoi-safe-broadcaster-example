@@ -1,7 +1,7 @@
 import fs from 'fs';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
-import { NetworkChainID } from '../server/config/config-chain-ids';
+import { NetworkChainID } from '../server/config/config-chains';
 import configDefaults from '../server/config/config-defaults';
 import configNetworks from '../server/config/config-networks';
 import { DebugLevel } from '../models/debug-models';
@@ -11,6 +11,8 @@ import { getMockNetwork, MOCK_TOKEN_6_DECIMALS } from './mocks.test';
 import configTokens from '../server/config/config-tokens';
 import { resetMapObject } from '../util/utils';
 import * as NetworkTokensModule from '../server/tokens/network-tokens';
+import { RelayerChain } from '../models/chain-models';
+import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
 
 export const LEPTON_TEST_DB = 'lepton.test.db';
 const SETTINGS_TEST_DB = 'settings.test.db';
@@ -69,12 +71,29 @@ export const resetConfigDefaults = () => {
   }
 };
 
-export const testChainID = (): NetworkChainID => {
-  return 1;
+export const testChainRopsten = (): RelayerChain => {
+  return {
+    type: ChainType.EVM,
+    id: NetworkChainID.Ropsten,
+  };
+};
+export const testChainHardhat = (): RelayerChain => {
+  return {
+    type: ChainType.EVM,
+    id: NetworkChainID.HardHat,
+  };
+};
+
+export const testChainEthereum = (): RelayerChain => {
+  return {
+    type: ChainType.EVM,
+    id: NetworkChainID.Ethereum,
+  };
 };
 
 export const setupTestNetwork = (): Network => {
   const testNetwork = getMockNetwork();
-  configNetworks[testChainID()] = testNetwork;
+  const chain = testChainEthereum();
+  configNetworks[chain.type][chain.id] = testNetwork;
   return testNetwork;
 };

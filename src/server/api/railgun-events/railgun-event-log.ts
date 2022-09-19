@@ -1,4 +1,4 @@
-import { CommitmentEvent } from '@railgun-community/lepton/dist/contracts/railgun-proxy';
+import { CommitmentEvent } from '@railgun-community/lepton/dist/models/event-types';
 import { Nullifier } from '@railgun-community/lepton/dist/models/formatted-types';
 import axios from 'axios';
 import { logger } from '../../../util/logger';

@@ -8,10 +8,13 @@ import {
 } from '@ethersproject/providers';
 import { getActiveWallets } from '../../wallets/active-wallets';
 import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
-import { setupSingleTestWallet } from '../../../test/setup.test';
+import {
+  setupSingleTestWallet,
+  testChainEthereum,
+  testChainRopsten,
+} from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import { delay } from '../../../util/promise-utils';
 import * as ExecuteTransactionModule from '../execute-transaction';
 import * as BestWalletMatchModule from '../../wallets/best-match-wallet';
@@ -48,8 +51,8 @@ const MOCK_TOKEN_AMOUNT_2 = {
 };
 const TO_SWAP = [MOCK_TOKEN_AMOUNT_1, MOCK_TOKEN_AMOUNT_2];
 
-const MOCK_LOW_LIQUIDITY_CHAIN_ID = NetworkChainID.Ropsten;
-const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
+const MOCK_LOW_LIQUIDITY_CHAIN = testChainRopsten();
+const MOCK_CHAIN = testChainEthereum();
 
 describe('swap', () => {
   before(async () => {
@@ -58,7 +61,8 @@ describe('swap', () => {
     clearSettingsDB();
     await setupSingleTestWallet();
     [activeWallet] = getActiveWallets();
-    configNetworks[NetworkChainID.Ropsten] = getMockRopstenNetwork();
+    configNetworks[testChainRopsten().type][testChainRopsten().id] =
+      getMockRopstenNetwork();
     initNetworkProviders();
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getTransactionCount')
@@ -95,28 +99,28 @@ describe('swap', () => {
   it('Should not generate swap transactions for illiquid tokens', async () => {
     const swapTxs = await generateSwapTransactions(
       TO_SWAP,
-      MOCK_LOW_LIQUIDITY_CHAIN_ID,
+      MOCK_LOW_LIQUIDITY_CHAIN,
     );
     expect(swapTxs.length).to.equal(0);
   }).timeout(200000);
 
   it('Should generate the correct number of swap transactions', async () => {
-    const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN_ID);
+    const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN);
     expect(swapTxs.length).to.equal(2);
   }).timeout(200000);
 
   it('Should generate approval transactions to each token', async () => {
-    const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN_ID);
+    const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN);
     expect(swapTxs[0].to).to.equal(
-      zeroXExchangeProxyContractAddress(MOCK_CHAIN_ID),
+      zeroXExchangeProxyContractAddress(MOCK_CHAIN),
     );
     expect(swapTxs[1].to).to.equal(
-      zeroXExchangeProxyContractAddress(MOCK_CHAIN_ID),
+      zeroXExchangeProxyContractAddress(MOCK_CHAIN),
     );
   }).timeout(200000);
 
   it('Should generate transactions with expected hash', async () => {
-    const txReceipts = await swapZeroX(activeWallet, TO_SWAP, MOCK_CHAIN_ID);
+    const txReceipts = await swapZeroX(activeWallet, TO_SWAP, MOCK_CHAIN);
     expect(txReceipts[0].hash).to.equal('123');
     expect(txReceipts[1].hash).to.equal('123');
   }).timeout(200000);

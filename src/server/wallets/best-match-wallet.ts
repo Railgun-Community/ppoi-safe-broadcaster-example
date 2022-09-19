@@ -1,22 +1,22 @@
 import { BigNumber } from 'ethers';
-import { NetworkChainID } from '../config/config-chain-ids';
 import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
 import { getActiveWallets } from './active-wallets';
 import { getAvailableWallets } from './available-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
+import { RelayerChain } from '../../models/chain-models';
 
 export const getBestMatchWalletForNetwork = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   minimumGasNeeded: BigNumber,
 ): Promise<ActiveWallet> => {
   const activeWallets = getActiveWallets();
   const gasTokenBalanceMap = await getActiveWalletGasTokenBalanceMapForChain(
-    chainID,
+    chain,
     activeWallets,
   );
 
-  const availableWallets = await getAvailableWallets(activeWallets, chainID);
+  const availableWallets = await getAvailableWallets(activeWallets, chain);
 
   // Simple filters:
   // - Availability.

@@ -3,7 +3,6 @@ import { TokenAmount } from '../../models/token-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { zeroXGetSwapQuote } from '../api/0x/0x-quote';
 import { getERC20TokenBalance } from '../balances/erc20-token-balance';
-import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
 import { networkTokens } from '../tokens/network-tokens';
 import {
@@ -26,17 +25,18 @@ import {
   updateCachedShieldedBalances,
 } from '../balances/shielded-balance-cache';
 import { removeUndefineds } from '../../util/utils';
+import { RelayerChain } from '../../models/chain-models';
 
 const dbg = debug('relayer:topup');
 
 const getPublicTokenAmountsAfterUnwrap = async (
   wallet: ActiveWallet,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<TokenAmount[]> => {
-  const allTokens = networkTokens[chainID];
+  const allTokens = networkTokens[chain.type][chain.id];
   const newPublicTokenAmounts: TokenAmount[] = await Promise.all(
     allTokens.map(async (token) => {
-      const amt = await getERC20TokenBalance(chainID, wallet.address, token);
+      const amt = await getERC20TokenBalance(chain, wallet.address, token);
       const tokenAmount: TokenAmount = {
         tokenAddress: token.address,
         amount: amt,
@@ -48,25 +48,26 @@ const getPublicTokenAmountsAfterUnwrap = async (
 };
 
 const getShieldedTokenAmountsForChain = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<ShieldedCachedBalance[]> => {
   const wallet = getRailgunWallet();
-  await updateCachedShieldedBalances(wallet, chainID);
-  const shieldedBalancesForChain = getPrivateTokenBalanceCache(chainID);
+  await updateCachedShieldedBalances(wallet, chain);
+  const shieldedBalancesForChain = getPrivateTokenBalanceCache(chain);
   return shieldedBalancesForChain;
 };
 
 export const getTopUpTokenAmountsForChain = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<TokenAmount[]> => {
-  const tokenAmountsForChain = await getShieldedTokenAmountsForChain(chainID);
+  const tokenAmountsForChain = await getShieldedTokenAmountsForChain(chain);
 
   const topUpTokenAmountsForChain: Optional<TokenAmount>[] = await Promise.all(
     tokenAmountsForChain.map(async (shieldedTokenCache) => {
-      const gasTokenSymbol = configNetworks[chainID].gasToken.symbol;
+      const gasTokenSymbol =
+        configNetworks[chain.type][chain.id].gasToken.symbol;
 
       const tokenAmountInGasToken = await zeroXGetSwapQuote(
-        chainID,
+        chain,
         shieldedTokenCache.tokenAmount,
         gasTokenSymbol,
         configWalletTopUpRefresher.toleratedSlippage,
@@ -91,22 +92,22 @@ export const getTopUpTokenAmountsForChain = async (
 
 export const topUpWallet = async (
   topUpWallet: ActiveWallet,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ) => {
   // begin topup
   dbg(
-    `Begin top up for wallet with address ${topUpWallet.address} and index ${topUpWallet.index} on chain ${chainID}`,
+    `Begin top up for wallet with address ${topUpWallet.address} and index ${topUpWallet.index} on chain ${chain.type}:${chain.id}`,
   );
 
   // get relevant data for transactions
   const railWallet = getRailgunWallet();
   const { prover } = getLepton();
 
-  setWalletAvailability(topUpWallet, chainID, false);
-  const topUpTokens = await getTopUpTokenAmountsForChain(chainID);
-  const provider = getProviderForNetwork(chainID);
+  setWalletAvailability(topUpWallet, chain, false);
+  const topUpTokens = await getTopUpTokenAmountsForChain(chain);
+  const provider = getProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(topUpWallet, provider);
-  const nonce = await getCurrentNonce(chainID, ethersWallet);
+  const nonce = await getCurrentNonce(chain, ethersWallet);
 
   // unshield tokens intended to swap
   const batchResponse = await unshieldTokens(
@@ -116,34 +117,34 @@ export const topUpWallet = async (
     topUpWallet.address,
     false, // allowOveride
     topUpTokens,
-    chainID,
+    chain,
   );
-  await waitForTx(topUpWallet, ethersWallet, chainID, batchResponse, nonce);
+  await waitForTx(topUpWallet, ethersWallet, chain, batchResponse, nonce);
 
   // get public balances
   const publicTokenAmounts = await getPublicTokenAmountsAfterUnwrap(
     topUpWallet,
-    chainID,
+    chain,
   );
 
   // perform approvals
   const approvalTxResponses = await approveZeroX(
     topUpWallet,
     publicTokenAmounts,
-    chainID,
+    chain,
   );
-  await waitForTxs(topUpWallet, ethersWallet, chainID, approvalTxResponses);
+  await waitForTxs(topUpWallet, ethersWallet, chain, approvalTxResponses);
   dbg('Approvals complete');
 
   // perform swaps
   const swapTxResponses = await swapZeroX(
     topUpWallet,
     publicTokenAmounts,
-    chainID,
+    chain,
   );
-  await waitForTxs(topUpWallet, ethersWallet, chainID, swapTxResponses);
+  await waitForTxs(topUpWallet, ethersWallet, chain, swapTxResponses);
 
   // set wallet available and conclude
-  setWalletAvailability(topUpWallet, chainID, true);
+  setWalletAvailability(topUpWallet, chain, true);
   dbg('Topup complete');
 };

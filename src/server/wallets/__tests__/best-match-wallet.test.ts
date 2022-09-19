@@ -10,7 +10,6 @@ import {
   initWallets,
 } from '../active-wallets';
 import { getBestMatchWalletForNetwork } from '../best-match-wallet';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import {
   resetAvailableWallets,
   setWalletAvailability,
@@ -20,11 +19,12 @@ import * as BalanceCacheModule from '../../balances/balance-cache';
 import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
+import { testChainEthereum } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
+const MOCK_CHAIN = testChainEthereum();
 const MOCK_MNEMONIC =
   'hint profit virus forest angry puzzle index same feel behind grant repair';
 
@@ -44,12 +44,12 @@ describe('best-match-wallet', () => {
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
       .resolves(BigNumber.from(10).pow(18));
-    configNetworks[NetworkChainID.Ethereum] = getMockNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
     initNetworkProviders();
   });
 
   afterEach(() => {
-    resetAvailableWallets(MOCK_CHAIN_ID);
+    resetAvailableWallets(MOCK_CHAIN);
   });
 
   after(() => {
@@ -77,7 +77,7 @@ describe('best-match-wallet', () => {
     await initWallets();
 
     const bestWallet = await getBestMatchWalletForNetwork(
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
       BigNumber.from(100),
     );
     expect(bestWallet.address).to.equal(addressForIndex(2));
@@ -109,10 +109,10 @@ describe('best-match-wallet', () => {
       getMockProvider(),
     );
     expect(firstWallet.address).to.equal(addressForIndex(0));
-    setWalletAvailability(firstActiveWallet, MOCK_CHAIN_ID, false);
+    setWalletAvailability(firstActiveWallet, MOCK_CHAIN, false);
 
     const bestWallet = await getBestMatchWalletForNetwork(
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
       BigNumber.from(100),
     );
     expect(bestWallet.address).to.equal(addressForIndex(2));
@@ -131,10 +131,10 @@ describe('best-match-wallet', () => {
     await initWallets();
 
     const firstWallet = getActiveWallets()[0];
-    setWalletAvailability(firstWallet, MOCK_CHAIN_ID, false);
+    setWalletAvailability(firstWallet, MOCK_CHAIN, false);
 
     await expect(
-      getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(100)),
+      getBestMatchWalletForNetwork(MOCK_CHAIN, BigNumber.from(100)),
     ).to.be.rejectedWith('All wallets busy or out of funds.');
   }).timeout(10000);
 
@@ -151,7 +151,7 @@ describe('best-match-wallet', () => {
     await initWallets();
 
     await expect(
-      getBestMatchWalletForNetwork(MOCK_CHAIN_ID, BigNumber.from(10).pow(19)),
+      getBestMatchWalletForNetwork(MOCK_CHAIN, BigNumber.from(10).pow(19)),
     ).to.be.rejectedWith('All wallets busy or out of funds.');
   }).timeout(10000);
 }).timeout(20000);

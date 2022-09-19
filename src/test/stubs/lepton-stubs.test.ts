@@ -1,10 +1,14 @@
 import { Note } from '@railgun-community/lepton';
+import { ViewingKeyPair } from '@railgun-community/lepton/dist/keyderivation/wallet-node';
+import { OutputType } from '@railgun-community/lepton/dist/models/formatted-types';
 import { Prover } from '@railgun-community/lepton/dist/prover';
 import {
   ByteLength,
   formatToByteLength,
 } from '@railgun-community/lepton/dist/utils/bytes';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
+import { getPublicViewingKey } from '@railgun-community/lepton/dist/utils/keys-utils';
+import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+import { randomBytes } from 'ethers/lib/utils';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
 import { getRailgunAddressData } from '../../server/wallets/active-wallets';
@@ -13,8 +17,14 @@ let balancesStub: SinonStub;
 let treeBalancesStub: SinonStub;
 let verifyProofStub: SinonStub;
 
-const getBalanceData = (tokenAddress: string, tree: number) => {
+const getMockBalanceData = async (tokenAddress: string, tree: number) => {
   const addressData = getRailgunAddressData();
+  const privateViewingKey = randomBytes(32);
+  const publicViewingKey = await getPublicViewingKey(privateViewingKey);
+  const senderViewingKeys: ViewingKeyPair = {
+    privateKey: privateViewingKey,
+    pubkey: publicViewingKey,
+  };
 
   return {
     balance: BigInt('1000000000000000000000'),
@@ -24,28 +34,31 @@ const getBalanceData = (tokenAddress: string, tree: number) => {
         position: 0,
         txid: '123',
         spendtxid: '123',
-        note: new Note(
+        note: Note.create(
           addressData,
           '12345678901234561234567890123456',
           '1000000000000000000000',
           tokenAddress,
-          [],
+          senderViewingKeys,
+          undefined, // senderBlindingKey
+          OutputType.Transfer,
+          undefined, // memoText
         ),
       },
     ],
   };
 };
 
-export const createLeptonWalletBalancesStub = (
+export const createLeptonWalletBalancesStub = async (
   tokenAddress: string,
   tree: number,
 ) => {
   balancesStub = sinon
     .stub(RailgunWallet.prototype, 'balances')
-    .resolves({ [tokenAddress]: getBalanceData(tokenAddress, tree) });
+    .resolves({ [tokenAddress]: await getMockBalanceData(tokenAddress, tree) });
 };
 
-export const createLeptonWalletTreeBalancesStub = (
+export const createLeptonWalletTreeBalancesStub = async (
   tokenAddress: string,
   tree: number,
 ) => {
@@ -56,7 +69,7 @@ export const createLeptonWalletTreeBalancesStub = (
   treeBalancesStub = sinon
     .stub(RailgunWallet.prototype, 'balancesByTree')
     .resolves({
-      [formattedTokenAddress]: [getBalanceData(tokenAddress, tree)],
+      [formattedTokenAddress]: [await getMockBalanceData(tokenAddress, tree)],
     });
 };
 

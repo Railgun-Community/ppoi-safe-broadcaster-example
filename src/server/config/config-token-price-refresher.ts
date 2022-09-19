@@ -1,3 +1,4 @@
+import { RelayerChain } from '../../models/chain-models';
 import { zeroXUpdatePricesByAddresses } from '../api/0x/0x-price';
 import { coingeckoUpdatePricesByAddresses } from '../api/coingecko/coingecko-price';
 import { allTokenAddressesForNetwork } from '../tokens/network-tokens';
@@ -7,25 +8,21 @@ import {
   TokenPriceSource,
   TokenPriceUpdater,
 } from '../tokens/token-price-cache';
-import { NetworkChainID } from './config-chain-ids';
 import configNetworks from './config-networks';
 
 export type TokenPriceRefresher = {
   refreshDelayInMS: number;
-  refresher: (
-    chainID: NetworkChainID,
-    tokenAddresses: string[],
-  ) => Promise<void>;
+  refresher: (chain: RelayerChain, tokenAddresses: string[]) => Promise<void>;
 };
 
 export const updateTestNetworkDefaultPrices = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   updater: TokenPriceUpdater,
 ): void => {
   // Assigns simple values for test nets without
   // price lookups available (eg. Ropsten, HardHat).
-  const network = configNetworks[chainID];
-  const tokenAddresses = allTokenAddressesForNetwork(chainID);
+  const network = configNetworks[chain.type][chain.id];
+  const tokenAddresses = allTokenAddressesForNetwork(chain);
   tokenAddresses.forEach((tokenAddress) => {
     updater(tokenAddress, {
       price: 2000.0, // Every token price.
@@ -39,7 +36,7 @@ export const updateTestNetworkDefaultPrices = (
 };
 
 const tokenPriceRefresherCoingecko = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   tokenAddresses: string[],
 ): Promise<void> => {
   const updater: TokenPriceUpdater = (
@@ -48,16 +45,16 @@ const tokenPriceRefresherCoingecko = (
   ) =>
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      chainID,
+      chain,
       tokenAddress,
       tokenPrice,
     );
 
-  const network = configNetworks[chainID];
+  const network = configNetworks[chain.type][chain.id];
   const { coingeckoNetworkId } = network;
   if (!coingeckoNetworkId) {
     if (network.isTestNetwork) {
-      updateTestNetworkDefaultPrices(chainID, updater);
+      updateTestNetworkDefaultPrices(chain, updater);
     }
     return Promise.resolve();
   }
@@ -70,10 +67,10 @@ const tokenPriceRefresherCoingecko = (
 };
 
 const tokenPriceRefresherZeroX = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   tokenAddresses: string[],
 ): Promise<void> => {
-  const network = configNetworks[chainID];
+  const network = configNetworks[chain.type][chain.id];
   if (network.isTestNetwork) {
     return Promise.resolve();
   }
@@ -84,12 +81,12 @@ const tokenPriceRefresherZeroX = (
   ) =>
     cacheTokenPriceForNetwork(
       TokenPriceSource.ZeroX,
-      chainID,
+      chain,
       tokenAddress,
       tokenPrice,
     );
 
-  return zeroXUpdatePricesByAddresses(chainID, tokenAddresses, updater);
+  return zeroXUpdatePricesByAddresses(chain, tokenAddresses, updater);
 };
 
 export default {

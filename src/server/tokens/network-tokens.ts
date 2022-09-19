@@ -1,33 +1,35 @@
 import { FallbackProvider } from '@ethersproject/providers';
 import { Contract } from 'ethers';
-import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
 import configTokens from '../config/config-tokens';
 import { GasTokenConfig, Token } from '../../models/token-models';
-import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
+import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { removeUndefineds } from '../../util/utils';
 import { logger } from '../../util/logger';
 import { abiForChainToken } from '../abi/abi';
+import { RelayerChain } from '../../models/chain-models';
 
-export const networkTokens: NumMapType<Token[]> = {};
+export const networkTokens: NumMapType<NumMapType<Token[]>> = {};
 
 export const initTokens = async () => {
-  for (const chainID of configuredNetworkChainIDs()) {
-    const tokensForChain = configTokens[chainID];
+  for (const chain of configuredNetworkChains()) {
+    const tokensForChain = configTokens[chain.type][chain.id];
     if (!tokensForChain) {
-      networkTokens[chainID] = [];
+      networkTokens[chain.type] ??= [];
+      networkTokens[chain.type][chain.id] = [];
       continue;
     }
     const tokenAddresses = Object.keys(tokensForChain);
-    const provider = getProviderForNetwork(chainID);
-    const abi = abiForChainToken(chainID);
+    const provider = getProviderForNetwork(chain);
+    const abi = abiForChainToken(chain);
     const tokenPromises = tokenAddresses.map((tokenAddress) =>
-      erc20TokenDetailsForAddress(tokenAddress, provider, abi, chainID),
+      erc20TokenDetailsForAddress(tokenAddress, provider, abi, chain),
     );
     // eslint-disable-next-line no-await-in-loop
     const tokens = await Promise.all(tokenPromises);
-    networkTokens[chainID] = removeUndefineds(tokens);
+    networkTokens[chain.type] ??= [];
+    networkTokens[chain.type][chain.id] = removeUndefineds(tokens);
   }
 };
 
@@ -44,9 +46,9 @@ const erc20TokenDetailsForAddress = async (
   tokenAddress: string,
   provider: FallbackProvider,
   abi: Array<any>,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<Optional<Token>> => {
-  const { symbol } = configTokens[chainID][tokenAddress];
+  const { symbol } = configTokens[chain.type][chain.id][tokenAddress];
   try {
     const decimals = await getERC20Decimals(tokenAddress, provider, abi);
     return {
@@ -56,38 +58,40 @@ const erc20TokenDetailsForAddress = async (
     };
   } catch (err: any) {
     logger.warn(
-      `Could not load token ${tokenAddress} (${symbol}) for chain ${chainID}: ${err.message}`,
+      `Could not load token ${tokenAddress} (${symbol}) for chain ${chain.type}:${chain.id}: ${err.message}`,
     );
     return undefined;
   }
 };
 
-export const allTokenAddressesForNetwork = (
-  chainID: NetworkChainID,
-): string[] => {
-  return networkTokens[chainID].map((token) => token.address.toLowerCase());
+export const allTokenAddressesForNetwork = (chain: RelayerChain): string[] => {
+  return networkTokens[chain.type][chain.id].map((token) =>
+    token.address.toLowerCase(),
+  );
 };
 
 export const tokenForAddress = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   address: string,
 ): Token => {
   const lowercaseAddress = address.toLowerCase();
-  const tokens = networkTokens[chainID];
+  const tokens = networkTokens[chain.type][chain.id];
   for (const token of tokens) {
     if (token.address.toLowerCase() === lowercaseAddress) {
       return token;
     }
   }
-  throw new Error(`Unsupported token for chain ${chainID}: ${address}`);
+  throw new Error(
+    `Unsupported token for chain ${chain.type}:${chain.id}: ${address}`,
+  );
 };
 
 export const getTransactionTokens = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   tokenAddress: string,
 ): { token: Token; gasToken: GasTokenConfig } => {
-  const token = tokenForAddress(chainID, tokenAddress);
-  const networkConfig = configNetworks[chainID];
+  const token = tokenForAddress(chain, tokenAddress);
+  const networkConfig = configNetworks[chain.type][chain.id];
   const { gasToken } = networkConfig;
   return {
     token,

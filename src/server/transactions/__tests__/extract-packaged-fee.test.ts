@@ -5,16 +5,19 @@ import { RelayAdaptContract } from '@railgun-community/lepton/dist/contracts/rel
 import {
   hexlify,
   padToLength,
-  random,
+  randomHex,
 } from '@railgun-community/lepton/dist/utils/bytes';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
+import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { AddressData } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import configDefaults from '../../config/config-defaults';
-import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
+import {
+  getMockRopstenNetwork,
+  getMockToken,
+  mockViewingKeys,
+} from '../../../test/mocks.test';
 import { getLepton, initLepton } from '../../lepton/lepton-init';
 import {
   getProviderForNetwork,
@@ -33,10 +36,12 @@ import {
   restoreLeptonStubs,
 } from '../../../test/stubs/lepton-stubs.test';
 import {
+  OutputType,
   SerializedTransaction,
   TokenType,
 } from '@railgun-community/lepton/dist/models/formatted-types';
 import { TransactionBatch } from '@railgun-community/lepton/dist/transaction/transaction-batch';
+import { testChainHardhat, testChainRopsten } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -45,16 +50,16 @@ let lepton: Lepton;
 let proxyContract: RailgunProxyContract;
 let relayAdaptContract: RelayAdaptContract;
 let railgunWallet: RailgunWallet;
-const RANDOM = random(16);
+const RANDOM = randomHex(16);
 const MOCK_TOKEN_ADDRESS = getMockToken().address;
 
 const TREE = 0;
-const ROPSTEN_CHAIN_ID = NetworkChainID.Ropsten;
-const HARDHAT_CHAIN_ID = NetworkChainID.HardHat;
+const ROPSTEN_CHAIN = testChainRopsten();
+const HARDHAT_CHAIN = testChainHardhat();
 const MOCK_MNEMONIC_1 =
   'test test test test test test test test test test test junk';
 
-const createRopstenTransferTransactions = (
+const createRopstenTransferTransactions = async (
   addressData: AddressData,
   fee: BigNumber,
   tokenAddress: string,
@@ -62,18 +67,28 @@ const createRopstenTransferTransactions = (
   const transaction = new TransactionBatch(
     tokenAddress,
     TokenType.ERC20,
-    ROPSTEN_CHAIN_ID,
+    ROPSTEN_CHAIN,
   );
   transaction.addOutput(
-    new Note(addressData, RANDOM, fee.toHexString(), tokenAddress),
+    Note.create(
+      addressData,
+      RANDOM,
+      fee.toHexString(),
+      tokenAddress,
+      await mockViewingKeys(),
+      undefined, // senderBlindingKey
+      OutputType.Transfer,
+      undefined, // memoText
+    ),
   );
   return transaction.generateDummySerializedTransactions(
+    lepton.prover,
     railgunWallet,
     configDefaults.lepton.dbEncryptionKey,
   );
 };
 
-const createRopstenRelayAdaptWithdrawTransactions = (
+const createRopstenRelayAdaptWithdrawTransactions = async (
   addressData: AddressData,
   fee: BigNumber,
   tokenAddress: string,
@@ -81,12 +96,22 @@ const createRopstenRelayAdaptWithdrawTransactions = (
   const transaction = new TransactionBatch(
     tokenAddress,
     TokenType.ERC20,
-    ROPSTEN_CHAIN_ID,
+    ROPSTEN_CHAIN,
   );
   transaction.addOutput(
-    new Note(addressData, RANDOM, fee.toHexString(), tokenAddress),
+    Note.create(
+      addressData,
+      RANDOM,
+      fee.toHexString(),
+      tokenAddress,
+      await mockViewingKeys(),
+      undefined, // senderBlindingKey
+      OutputType.Transfer,
+      undefined, // memoText
+    ),
   );
   return transaction.generateDummySerializedTransactions(
+    lepton.prover,
     railgunWallet,
     configDefaults.lepton.dbEncryptionKey,
   );
@@ -106,13 +131,13 @@ describe('extract-packaged-fee', () => {
       relayAdaptContract: ropstenRelayAdaptContractAddress,
     } = ropstenNetwork;
     // Async call - run sync
-    initNetworkProviders([ROPSTEN_CHAIN_ID, HARDHAT_CHAIN_ID]);
-    const provider = getProviderForNetwork(ROPSTEN_CHAIN_ID);
+    initNetworkProviders([ROPSTEN_CHAIN, HARDHAT_CHAIN]);
+    const provider = getProviderForNetwork(ROPSTEN_CHAIN);
 
     // Note: this call is typically async but we won't wait for the full call.
     // We just need to load the merkletrees.
     lepton.loadNetwork(
-      ROPSTEN_CHAIN_ID,
+      ROPSTEN_CHAIN,
       ropstenProxyContractAddress,
       ropstenRelayAdaptContractAddress,
       provider as FallbackProvider,
@@ -147,7 +172,7 @@ describe('extract-packaged-fee', () => {
     );
     const populatedTransaction = await proxyContract.transact(transactions);
     const packagedFee = await extractPackagedFeeFromTransaction(
-      ROPSTEN_CHAIN_ID,
+      ROPSTEN_CHAIN,
       populatedTransaction,
       false, // useRelayAdapt
     );
@@ -168,7 +193,7 @@ describe('extract-packaged-fee', () => {
     const populatedTransaction = await proxyContract.transact(transactions);
     await expect(
       extractPackagedFeeFromTransaction(
-        ROPSTEN_CHAIN_ID,
+        ROPSTEN_CHAIN,
         populatedTransaction,
         false, // useRelayAdapt
       ),
@@ -190,7 +215,7 @@ describe('extract-packaged-fee', () => {
         RANDOM,
       );
     const packagedFee = await extractPackagedFeeFromTransaction(
-      ROPSTEN_CHAIN_ID,
+      ROPSTEN_CHAIN,
       populatedTransaction,
       true, // useRelayAdapt
     );
@@ -216,7 +241,7 @@ describe('extract-packaged-fee', () => {
       );
     await expect(
       extractPackagedFeeFromTransaction(
-        ROPSTEN_CHAIN_ID,
+        ROPSTEN_CHAIN,
         populatedTransaction,
         true, // useRelayAdapt
       ),

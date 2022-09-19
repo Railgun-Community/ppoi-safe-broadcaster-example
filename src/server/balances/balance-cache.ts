@@ -1,37 +1,36 @@
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
-import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
-import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
+import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { getGasTokenBalance } from './gas-token-balance';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
+import { RelayerChain } from '../../models/chain-models';
 
 type CachedBalance = {
   balance: BigNumber;
   updatedAt: number;
 };
 
-// {ChainID: {Address: Balance}}
-const gasTokenBalanceCache: NumMapType<MapType<CachedBalance>> = {};
+// {chainType: {chainID: {Address: Balance}}}
+const gasTokenBalanceCache: NumMapType<NumMapType<MapType<CachedBalance>>> = {};
 
 export const resetGasTokenBalanceCache = () => {
   resetMapObject(gasTokenBalanceCache);
 };
 
 export const updateCachedGasTokenBalance = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   walletAddress: string,
 ): Promise<void> => {
-  if (!gasTokenBalanceCache[chainID]) {
-    gasTokenBalanceCache[chainID] = {};
-  }
-  const balance = await getGasTokenBalance(chainID, walletAddress);
+  const balance = await getGasTokenBalance(chain, walletAddress);
   if (balance == null) {
     return;
   }
-  gasTokenBalanceCache[chainID][walletAddress] = {
+  gasTokenBalanceCache[chain.type] ??= {};
+  gasTokenBalanceCache[chain.type][chain.id] ??= {};
+  gasTokenBalanceCache[chain.type][chain.id][walletAddress] = {
     balance,
     updatedAt: Date.now(),
   };
@@ -42,7 +41,7 @@ export const updateAllActiveWalletsGasTokenBalances = async (
 ) => {
   const balanceUpdatePromises: Promise<void>[] = [];
 
-  configuredNetworkChainIDs().forEach((chainID) => {
+  configuredNetworkChains().forEach((chainID) => {
     activeWallets.forEach(({ address }) => {
       balanceUpdatePromises.push(updateCachedGasTokenBalance(chainID, address));
     });
@@ -52,16 +51,16 @@ export const updateAllActiveWalletsGasTokenBalances = async (
 };
 
 export const shouldUpdateCachedGasTokenBalance = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   walletAddress: string,
 ) => {
-  if (
-    !gasTokenBalanceCache[chainID] ||
-    !gasTokenBalanceCache[chainID][walletAddress]
-  ) {
+  gasTokenBalanceCache[chain.type] ??= {};
+  gasTokenBalanceCache[chain.type][chain.id] ??= {};
+  if (!gasTokenBalanceCache[chain.type][chain.id][walletAddress]) {
     return true;
   }
-  const cachedBalance = gasTokenBalanceCache[chainID][walletAddress];
+  const cachedBalance =
+    gasTokenBalanceCache[chain.type][chain.id][walletAddress];
   const cachedBalanceExpired =
     cachedBalance.updatedAt <
     Date.now() - configDefaults.balances.gasTokenBalanceCacheTTLInMS;
@@ -69,26 +68,28 @@ export const shouldUpdateCachedGasTokenBalance = (
 };
 
 export const getCachedGasTokenBalance = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   walletAddress: string,
 ): Promise<BigNumber> => {
-  if (shouldUpdateCachedGasTokenBalance(chainID, walletAddress)) {
-    await updateCachedGasTokenBalance(chainID, walletAddress);
+  if (shouldUpdateCachedGasTokenBalance(chain, walletAddress)) {
+    await updateCachedGasTokenBalance(chain, walletAddress);
   }
-  if (!gasTokenBalanceCache[chainID][walletAddress]) {
+  gasTokenBalanceCache[chain.type] ??= {};
+  gasTokenBalanceCache[chain.type][chain.id] ??= {};
+  if (!gasTokenBalanceCache[chain.type][chain.id][walletAddress]) {
     throw new Error('No balance found');
   }
-  return gasTokenBalanceCache[chainID][walletAddress].balance;
+  return gasTokenBalanceCache[chain.type][chain.id][walletAddress].balance;
 };
 
 export const getActiveWalletGasTokenBalanceMapForChain = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   activeWallets: ActiveWallet[],
 ): Promise<MapType<BigNumber>> => {
   const getBalancePromises: Promise<Optional<BigNumber>>[] = [];
   activeWallets.forEach(({ address }) => {
     getBalancePromises.push(
-      getCachedGasTokenBalance(chainID, address).catch((err) => {
+      getCachedGasTokenBalance(chain, address).catch((err) => {
         logger.error(err);
         return undefined;
       }),

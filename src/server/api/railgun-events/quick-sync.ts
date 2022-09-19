@@ -1,14 +1,14 @@
-import { QuickSync } from '@railgun-community/lepton';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { QuickSync } from '@railgun-community/lepton/dist/models/event-types';
+import { RelayerChain } from '../../../models/chain-models';
 import configNetworks from '../../config/config-networks';
 import { getRailgunEventLog, QuickSyncEventLog } from './railgun-event-log';
 
 export const quickSync: QuickSync = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _startingBlock: number,
 ): Promise<QuickSyncEventLog> => {
-  const network = configNetworks[chainID];
+  const network = configNetworks[chain.type][chain.id];
   if (network.skipQuickScan) {
     // Return empty logs, Lepton will default to full scan.
     return {
@@ -16,7 +16,7 @@ export const quickSync: QuickSync = async (
       nullifierEvents: [],
     };
   }
-  const quickSyncURL = `https://events.railgun.org/chain/${chainID}`;
+  const quickSyncURL = `https://events.railgun.org/chain/${chain.id}`;
   const log = await getRailgunEventLog(quickSyncURL);
   return log;
 };

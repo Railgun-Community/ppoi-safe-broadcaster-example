@@ -8,10 +8,12 @@ import {
 } from '@ethersproject/providers';
 import { getActiveWallets } from '../../wallets/active-wallets';
 import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
-import { setupSingleTestWallet } from '../../../test/setup.test';
+import {
+  setupSingleTestWallet,
+  testChainEthereum,
+} from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import { delay } from '../../../util/promise-utils';
 import * as ExecuteTransactionModule from '../execute-transaction';
 import * as BestWalletMatchModule from '../../wallets/best-match-wallet';
@@ -47,7 +49,7 @@ const MOCK_TOKEN_AMOUNT_2 = {
 };
 const TO_APPROVE = [MOCK_TOKEN_AMOUNT_1, MOCK_TOKEN_AMOUNT_2];
 
-const MOCK_CHAIN_ID = NetworkChainID.Ropsten;
+const MOCK_CHAIN = testChainEthereum();
 
 describe('approve-spender', () => {
   before(async () => {
@@ -56,7 +58,7 @@ describe('approve-spender', () => {
     clearSettingsDB();
     await setupSingleTestWallet();
     [activeWallet] = getActiveWallets();
-    configNetworks[NetworkChainID.Ropsten] = getMockRopstenNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockRopstenNetwork();
     initNetworkProviders();
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getTransactionCount')
@@ -94,7 +96,7 @@ describe('approve-spender', () => {
   it('Should generate the correct number of approval transactions', async () => {
     const approvalTxs = await generateApprovalTransactions(
       TO_APPROVE,
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
     );
     expect(approvalTxs.length).to.equal(2);
   });
@@ -102,18 +104,14 @@ describe('approve-spender', () => {
   it('Should generate approval transactions to each token', async () => {
     const approvalTxs = await generateApprovalTransactions(
       TO_APPROVE,
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
     );
     expect(approvalTxs[0].to).to.equal(TO_APPROVE[0].tokenAddress);
     expect(approvalTxs[1].to).to.equal(TO_APPROVE[1].tokenAddress);
   });
 
   it('Should generate transactions with expected hash', async () => {
-    const txReceipts = await approveZeroX(
-      activeWallet,
-      TO_APPROVE,
-      MOCK_CHAIN_ID,
-    );
+    const txReceipts = await approveZeroX(activeWallet, TO_APPROVE, MOCK_CHAIN);
     expect(txReceipts[0].hash).to.equal('123');
     expect(txReceipts[1].hash).to.equal('123');
   });

@@ -1,15 +1,18 @@
-import { NetworkChainID } from '../server/config/config-chain-ids';
+import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { NetworkChainID } from '../server/config/config-chains';
 import { Network } from './network-models';
 import { TokenConfig } from './token-models';
 
-type ChainIDMapType<T> = {
+export type ChainTypeMap<T> = {
+  [index in ChainType]: T;
+};
+export type ChainIDMap<T> = {
   [index in NetworkChainID]: T;
 };
 
 export type AddressToTokenMap = MapType<TokenConfig>;
-export type NetworkTokensConfig = ChainIDMapType<AddressToTokenMap>;
-
-export type NetworksConfig = ChainIDMapType<Network>;
+export type NetworkTokensConfig = ChainTypeMap<ChainIDMap<AddressToTokenMap>>;
+export type NetworksConfig = ChainTypeMap<ChainIDMap<Network>>;
 
 export type Secrets = {
   dbEncryptionKey: string;

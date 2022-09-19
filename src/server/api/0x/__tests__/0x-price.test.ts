@@ -5,7 +5,6 @@ import axios from 'axios';
 import * as zeroXFetchModule from '../0x-fetch';
 import { getZeroXData, ZeroXApiEndpoint } from '../0x-fetch';
 import configTokenPriceRefresher from '../../../config/config-token-price-refresher';
-import { NetworkChainID } from '../../../config/config-chain-ids';
 import {
   cacheTokenPriceForNetwork,
   cachedTokenPriceForSource,
@@ -28,6 +27,11 @@ import {
   ZeroXPriceParams,
   zeroXUpdatePricesByAddresses,
 } from '../0x-price';
+import { RelayerChain } from '../../../../models/chain-models';
+import {
+  testChainEthereum,
+  testChainRopsten,
+} from '../../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -38,17 +42,20 @@ const TOKEN_ADDRESSES = [TOKEN_ADDRESS_1, TOKEN_ADDRESS_2];
 
 const ropstenNetwork = getMockRopstenNetwork();
 
+const chainEthereum = testChainEthereum();
+const chainRopsten = testChainRopsten();
+
 const TOKEN_PRICE_SOURCE = TokenPriceSource.ZeroX;
 
 const expectedZeroXPriceOutput: ZeroXPriceData = {
   price: '1234.56',
 };
 
-const validatePriceRefresherOutput = (chainID: NetworkChainID) => {
+const validatePriceRefresherOutput = (chain: RelayerChain) => {
   TOKEN_ADDRESSES.forEach((address) => {
     const priceData = cachedTokenPriceForSource(
       TOKEN_PRICE_SOURCE,
-      chainID,
+      chain,
       address,
     );
     expect(priceData).to.be.an('object');
@@ -59,8 +66,8 @@ const validatePriceRefresherOutput = (chainID: NetworkChainID) => {
 
 describe('0x-price', () => {
   before(async () => {
-    configNetworks[NetworkChainID.Ethereum] = getMockNetwork();
-    configNetworks[NetworkChainID.Ropsten] = ropstenNetwork;
+    configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
+    configNetworks[chainRopsten.type][chainRopsten.id] = ropstenNetwork;
     initNetworkProviders();
 
     resetTokenPriceCache();
@@ -72,8 +79,12 @@ describe('0x-price', () => {
 
     overrideZeroXPriceLookupDelay_TEST_ONLY(5);
 
-    configTokens[NetworkChainID.Ethereum] = tokenConfigs;
-    configTokens[NetworkChainID.Ropsten] = tokenConfigs;
+    // @ts-ignore
+    configTokens[chainEthereum.type] ??= {};
+    // @ts-ignore
+    configTokens[chainRopsten.type] ??= {};
+    configTokens[chainEthereum.type][chainEthereum.id] = tokenConfigs;
+    configTokens[chainRopsten.type][chainRopsten.id] = tokenConfigs;
     await initTokens();
   });
 
@@ -85,7 +96,7 @@ describe('0x-price', () => {
     } as ZeroXPriceParams;
     const zeroXPriceData = await getZeroXData<ZeroXPriceData>(
       ZeroXApiEndpoint.PriceLookup,
-      NetworkChainID.Ethereum,
+      chainEthereum,
       params,
     );
     expect(zeroXPriceData).to.be.an('object');
@@ -99,17 +110,17 @@ describe('0x-price', () => {
       .resolves(expectedZeroXPriceOutput);
 
     await zeroXUpdatePricesByAddresses(
-      NetworkChainID.Ethereum,
+      chainEthereum,
       TOKEN_ADDRESSES,
       (tokenAddress, tokenPrice) =>
         cacheTokenPriceForNetwork(
           TOKEN_PRICE_SOURCE,
-          NetworkChainID.Ethereum,
+          chainEthereum,
           tokenAddress,
           tokenPrice,
         ),
     );
-    validatePriceRefresherOutput(NetworkChainID.Ethereum);
+    validatePriceRefresherOutput(chainEthereum);
 
     stubGetZeroXData.restore();
   });
@@ -123,12 +134,12 @@ describe('0x-price', () => {
 
     const emptyList: string[] = [];
     await zeroXUpdatePricesByAddresses(
-      NetworkChainID.Ethereum,
+      chainEthereum,
       emptyList,
       (tokenAddress, tokenPrice) =>
         cacheTokenPriceForNetwork(
           TOKEN_PRICE_SOURCE,
-          NetworkChainID.Ethereum,
+          chainEthereum,
           tokenAddress,
           tokenPrice,
         ),
@@ -149,11 +160,7 @@ describe('0x-price', () => {
       include_last_updated_at: true,
     };
     await expect(
-      getZeroXData(
-        ZeroXApiEndpoint.PriceLookup,
-        NetworkChainID.Ethereum,
-        params,
-      ),
+      getZeroXData(ZeroXApiEndpoint.PriceLookup, chainEthereum, params),
     ).to.be.rejected;
     expect(stubAxiosGet.callCount).to.equal(1);
 
@@ -167,8 +174,8 @@ describe('0x-price', () => {
 
     await configTokenPriceRefresher.tokenPriceRefreshers[
       TOKEN_PRICE_SOURCE
-    ].refresher(NetworkChainID.Ethereum, TOKEN_ADDRESSES);
-    validatePriceRefresherOutput(NetworkChainID.Ethereum);
+    ].refresher(chainEthereum, TOKEN_ADDRESSES);
+    validatePriceRefresherOutput(chainEthereum);
 
     stubGetZeroXData.restore();
   });
@@ -176,9 +183,11 @@ describe('0x-price', () => {
   it('Should run 0x configured price refresher for Ropsten', async () => {
     await configTokenPriceRefresher.tokenPriceRefreshers[
       TOKEN_PRICE_SOURCE
-    ].refresher(NetworkChainID.Ropsten, TOKEN_ADDRESSES);
+    ].refresher(chainRopsten, TOKEN_ADDRESSES);
     const ropstenPrices =
-      getTokenPriceCache()[TOKEN_PRICE_SOURCE][NetworkChainID.Ropsten];
+      getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainRopsten.type][
+        chainRopsten.id
+      ];
     expect(ropstenPrices).to.equal(undefined);
   });
 }).timeout(30000);

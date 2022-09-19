@@ -36,7 +36,7 @@ import {
 import {
   setupSingleTestWallet,
   setupTestNetwork,
-  testChainID,
+  testChainEthereum,
 } from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import configDefaults from '../../config/config-defaults';
@@ -83,7 +83,7 @@ let requestData: Optional<JsonRpcRequest>;
 
 const MOCK_TOKEN_ADDRESS = '0x12345';
 let network: Network;
-const chainID = testChainID();
+const chain = testChainEthereum();
 
 // eslint-disable-next-line require-await
 const handleHTTPPost = async (url: string, data?: unknown) => {
@@ -98,10 +98,10 @@ describe('waku-relayer', () => {
     initLepton();
     await setupSingleTestWallet();
     network = setupTestNetwork();
-    configNetworks[chainID] = getMockNetwork();
+    configNetworks[chain.type][chain.id] = getMockNetwork();
     initNetworkProviders();
-    configTokens[chainID] = {};
-    configTokens[chainID][MOCK_TOKEN_ADDRESS] = {
+    configTokens[chain.type][chain.id] = {};
+    configTokens[chain.type][chain.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',
     };
     await initTokens();
@@ -158,7 +158,7 @@ describe('waku-relayer', () => {
     const gasTokenPrice = 1234.56;
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      chainID,
+      chain,
       MOCK_TOKEN_ADDRESS,
       {
         price: tokenPrice,
@@ -167,7 +167,7 @@ describe('waku-relayer', () => {
     );
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      chainID,
+      chain,
       network.gasToken.wrappedAddress,
       {
         price: gasTokenPrice,
@@ -175,10 +175,10 @@ describe('waku-relayer', () => {
       },
     );
 
-    const contentTopic = '/railgun/v1/1/fees/json';
-    expect(contentTopic).to.equal(contentTopics.fees(chainID));
+    const contentTopic = '/railgun/v2/0/1/fees/json';
+    expect(contentTopic).to.equal(contentTopics.fees(chain));
 
-    await wakuRelayer?.broadcastFeesForChain(chainID);
+    await wakuRelayer?.broadcastFeesForChain(chain);
     expect(requestData?.id).to.be.a('number');
     expect(requestData?.method).to.equal(WakuRequestMethods.PublishMessage);
     expect(requestData?.params).to.be.an('array');
@@ -220,13 +220,14 @@ describe('waku-relayer', () => {
     const { viewingPublicKey } = getRailgunAddressData();
 
     const data: RawParamsTransact = {
-      chainID,
+      chainID: chain.id,
+      chainType: chain.type,
       feesID: '468abc',
       serializedTransaction: getMockSerializedTransaction(),
       relayerViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
     };
-    const randomPrivKey = bytes.random(32);
+    const randomPrivKey = bytes.randomHex(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
     const encryptedData = encryptResponseData(data, sharedKey);
@@ -246,20 +247,21 @@ describe('waku-relayer', () => {
     };
     clientHTTPStub.callsFake(handleHTTPPost);
 
-    const contentTopic = contentTopics.transact(chainID);
+    const contentTopic = contentTopics.transact(chain);
 
     const relayerPrivateKey = getRailgunPrivateViewingKey();
     const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
     const { viewingPublicKey } = getRailgunAddressData();
 
     const data: RawParamsTransact = {
-      chainID,
+      chainID: chain.id,
+      chainType: chain.type,
       feesID: '468abc',
       serializedTransaction: getMockSerializedTransaction(),
       relayerViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
     };
-    const randomPrivKey = bytes.random(32);
+    const randomPrivKey = bytes.randomHex(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
     const clientPubKey = hexlify(randomPubKeyUint8Array);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
@@ -303,12 +305,12 @@ describe('waku-relayer', () => {
     );
     const expectedWakuMessage = WakuMessage.fromUtf8String(
       JSON.stringify(expectedJsonRpcResult),
-      contentTopics.transactResponse(chainID),
+      contentTopics.transactResponse(chain),
       // { timestamp: relayMessage.timestamp },
     );
     expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
     expect(rpcArgs.params[1].contentTopic).to.equal(
-      contentTopics.transactResponse(chainID),
+      contentTopics.transactResponse(chain),
     );
 
     const decoded = JSON.parse(

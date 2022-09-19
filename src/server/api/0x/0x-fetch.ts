@@ -1,25 +1,31 @@
+import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
 import axios from 'axios';
+import { RelayerChain } from '../../../models/chain-models';
 import { logger } from '../../../util/logger';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../../config/config-chains';
 
 export enum ZeroXApiEndpoint {
   PriceLookup = 'swap/v1/price',
   GetSwapQuote = 'swap/v1/quote',
 }
 
-const zeroXApiUrl = (chainID: NetworkChainID): string => {
-  switch (chainID) {
-    case NetworkChainID.Ethereum:
-      return 'https://api.0x.org/';
-    case NetworkChainID.Ropsten:
-      return 'https://ropsten.api.0x.org/';
-    case NetworkChainID.BNBSmartChain:
-      return 'https://bsc.api.0x.org/';
-    case NetworkChainID.PolygonPOS:
-      return 'https://polygon.api.0x.org/';
+const zeroXApiUrl = (chain: RelayerChain): string => {
+  switch (chain.type) {
+    case ChainType.EVM: {
+      switch (chain.id) {
+        case NetworkChainID.Ethereum:
+          return 'https://api.0x.org/';
+        case NetworkChainID.Ropsten:
+          return 'https://ropsten.api.0x.org/';
+        case NetworkChainID.BNBSmartChain:
+          return 'https://bsc.api.0x.org/';
+        case NetworkChainID.PolygonPOS:
+          return 'https://polygon.api.0x.org/';
+        case NetworkChainID.HardHat:
+          throw new Error(`No 0x API URL for chain ${chain}`);
+      }
+    }
   }
-
-  throw new Error(`No 0x API URL for chain ${chainID}`);
 };
 
 const paramString = (params?: MapType<any>) => {
@@ -32,19 +38,19 @@ const paramString = (params?: MapType<any>) => {
 
 const createUrl = (
   endpoint: ZeroXApiEndpoint,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   params?: MapType<any>,
 ) => {
-  const url = `${zeroXApiUrl(chainID)}${endpoint}${paramString(params)}`;
+  const url = `${zeroXApiUrl(chain)}${endpoint}${paramString(params)}`;
   return url;
 };
 
 export const getZeroXData = async <T>(
   endpoint: ZeroXApiEndpoint,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   params?: MapType<any>,
 ): Promise<T> => {
-  const url = createUrl(endpoint, chainID, params);
+  const url = createUrl(endpoint, chain, params);
   try {
     const rsp = await axios.get(url, {
       method: 'GET',

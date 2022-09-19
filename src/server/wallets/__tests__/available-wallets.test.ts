@@ -1,11 +1,16 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
-import { setupSingleTestWallet } from '../../../test/setup.test';
+import {
+  setupSingleTestWallet,
+  testChainEthereum,
+} from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
-import { isWalletAvailable, setWalletAvailability } from '../available-wallets';
+import {
+  isWalletAvailableWithEnoughFunds,
+  setWalletAvailability,
+} from '../available-wallets';
 import { getActiveWallets, numAvailableWallets } from '../active-wallets';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import {
   createGasBalanceStub,
   restoreGasBalanceStub,
@@ -31,18 +36,18 @@ describe('available-wallets', () => {
   });
 
   it('Should update available wallets correctly', async () => {
-    const chainID = NetworkChainID.Ropsten;
+    const chain = testChainEthereum();
 
     const wallet = getActiveWallets()[0];
-    expect(await isWalletAvailable(wallet, chainID)).to.be.true;
-    expect(await numAvailableWallets(chainID)).to.equal(1);
+    expect(await isWalletAvailableWithEnoughFunds(wallet, chain)).to.be.true;
+    expect(await numAvailableWallets(chain)).to.equal(1);
 
-    setWalletAvailability(wallet, chainID, false);
-    expect(await isWalletAvailable(wallet, chainID)).to.be.false;
-    expect(await numAvailableWallets(chainID)).to.equal(0);
+    setWalletAvailability(wallet, chain, false);
+    expect(await isWalletAvailableWithEnoughFunds(wallet, chain)).to.be.false;
+    expect(await numAvailableWallets(chain)).to.equal(0);
 
-    setWalletAvailability(wallet, chainID, true);
-    expect(await isWalletAvailable(wallet, chainID)).to.be.true;
-    expect(await numAvailableWallets(chainID)).to.equal(1);
+    setWalletAvailability(wallet, chain, true);
+    expect(await isWalletAvailableWithEnoughFunds(wallet, chain)).to.be.true;
+    expect(await numAvailableWallets(chain)).to.equal(1);
   });
 }).timeout(10000);

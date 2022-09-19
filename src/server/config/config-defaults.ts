@@ -1,5 +1,5 @@
 import { DebugLevel } from '../../models/debug-models';
-import { NetworkChainID } from './config-chain-ids';
+import { NetworkChainID } from './config-chains';
 import secrets from './config-secrets';
 
 export default {
@@ -7,7 +7,7 @@ export default {
     /*
      * Blockchain networks to activate.
      */
-    active: [
+    EVM: [
       NetworkChainID.Ethereum,
       NetworkChainID.Ropsten,
       NetworkChainID.BNBSmartChain,

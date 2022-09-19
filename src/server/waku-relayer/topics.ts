@@ -1,9 +1,11 @@
-import { NetworkChainID } from '../config/config-chain-ids';
+import { RelayerChain } from '../../models/chain-models';
 
 export const contentTopics = {
-  default: () => '/railgun/v1/default/json',
-  fees: (chainID: NetworkChainID) => `/railgun/v1/${chainID}/fees/json`,
-  transact: (chainID: NetworkChainID) => `/railgun/v1/${chainID}/transact/json`,
-  transactResponse: (chainID: NetworkChainID) =>
-    `/railgun/v1/${chainID}/transact-response/json`,
+  default: () => '/railgun/v2/default/json',
+  fees: (chain: RelayerChain) =>
+    `/railgun/v2/${chain.type}/${chain.id}/fees/json`,
+  transact: (chain: RelayerChain) =>
+    `/railgun/v2/${chain.type}/${chain.id}/transact/json`,
+  transactResponse: (chain: RelayerChain) =>
+    `/railgun/v2/${chain.type}/${chain.id}/transact-response/json`,
 };

@@ -1,6 +1,8 @@
 import ABI_RAILGUN_LOGIC from '@railgun-community/lepton/dist/abi/RailgunLogic.json';
 import ABI_RELAY_ADAPT from '@railgun-community/lepton/dist/abi/RelayAdapt.json';
-import { NetworkChainID } from '../config/config-chain-ids';
+import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { RelayerChain } from '../../models/chain-models';
+import { NetworkChainID } from '../config/config-chains';
 import ABI_ERC20 from './json/erc20.json';
 import ZERO_X_ABI from './json/zerox.json';
 
@@ -12,48 +14,32 @@ export const abiForRelayAdaptContract = () => {
   return ABI_RELAY_ADAPT;
 };
 
-export const zeroXAbiForChain = (chainID: NetworkChainID): Array<any> => {
-  switch (chainID) {
-    case NetworkChainID.Ethereum: {
-      return ZERO_X_ABI;
-    }
-    case NetworkChainID.BNBSmartChain: {
-      return ZERO_X_ABI;
-    }
-    case NetworkChainID.PolygonPOS: {
-      return ZERO_X_ABI;
-    }
-    case NetworkChainID.Ropsten: {
-      return ZERO_X_ABI;
-    }
-    case NetworkChainID.HardHat: {
-      return ZERO_X_ABI;
-    }
-    default: {
-      throw new Error(`Unimplemented: ABI for chain ${chainID}`);
+export const zeroXAbiForChain = (chain: RelayerChain): Array<any> => {
+  switch (chain.type) {
+    case ChainType.EVM: {
+      switch (chain.id) {
+        case NetworkChainID.Ethereum:
+        case NetworkChainID.BNBSmartChain:
+        case NetworkChainID.PolygonPOS:
+        case NetworkChainID.Ropsten:
+        case NetworkChainID.HardHat:
+          return ZERO_X_ABI;
+      }
     }
   }
 };
 
-export const abiForChainToken = (chainID: NetworkChainID): Array<any> => {
-  switch (chainID) {
-    case NetworkChainID.Ethereum: {
-      return ABI_ERC20;
-    }
-    case NetworkChainID.BNBSmartChain: {
-      return ABI_ERC20;
-    }
-    case NetworkChainID.PolygonPOS: {
-      return ABI_ERC20;
-    }
-    case NetworkChainID.Ropsten: {
-      return ABI_ERC20;
-    }
-    case NetworkChainID.HardHat: {
-      return ABI_ERC20;
-    }
-    default: {
-      throw new Error(`Unimplemented: ABI for chain ${chainID}`);
+export const abiForChainToken = (chain: RelayerChain): Array<any> => {
+  switch (chain.type) {
+    case ChainType.EVM: {
+      switch (chain.id) {
+        case NetworkChainID.Ethereum:
+        case NetworkChainID.BNBSmartChain:
+        case NetworkChainID.PolygonPOS:
+        case NetworkChainID.Ropsten:
+        case NetworkChainID.HardHat:
+          return ABI_ERC20;
+      }
     }
   }
 };

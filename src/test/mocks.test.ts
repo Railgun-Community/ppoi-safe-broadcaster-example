@@ -1,7 +1,6 @@
 import { BaseProvider } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
 import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
-import { NetworkChainID } from '../server/config/config-chain-ids';
 import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import {
@@ -15,12 +14,15 @@ import {
   Token,
   TokenConfig,
 } from '../models/token-models';
+import { RelayerChain } from '../models/chain-models';
+import { ViewingKeyPair } from '@railgun-community/lepton/dist/keyderivation/wallet-node';
+import { getPublicViewingKey } from '@railgun-community/lepton/dist/utils/keys-utils';
+import { randomBytes } from 'ethers/lib/utils';
 
-export const mockTokenConfig = (
-  chainID: NetworkChainID,
-  tokenAddress: string,
-) => {
-  configTokens[chainID][tokenAddress] = {
+export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
+  // @ts-ignore
+  configTokens[chain.type] ??= {};
+  configTokens[chain.type][chain.id][tokenAddress] = {
     symbol: tokenAddress.toUpperCase(),
   };
 };
@@ -141,4 +143,14 @@ export const getMockWalletAddress = (): string => {
 
 export const getMockWalletViewingPublicKey = (): Uint8Array => {
   return decode(getMockWalletAddress()).viewingPublicKey;
+};
+
+export const mockViewingKeys = async () => {
+  const privateViewingKey = randomBytes(32);
+  const publicViewingKey = await getPublicViewingKey(privateViewingKey);
+  const mockViewingKeys: ViewingKeyPair = {
+    privateKey: privateViewingKey,
+    pubkey: publicViewingKey,
+  };
+  return mockViewingKeys;
 };

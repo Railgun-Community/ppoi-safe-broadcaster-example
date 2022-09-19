@@ -3,26 +3,26 @@ import { Contract, PopulatedTransaction } from 'ethers';
 import { TokenAmount } from '../../models/token-models';
 import { abiForChainToken } from '../abi/abi';
 import { zeroXExchangeProxyContractAddress } from '../api/0x/0x-quote';
-import { NetworkChainID } from '../config/config-chain-ids';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { ActiveWallet } from '../../models/wallet-models';
 import { getEstimateGasDetails } from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
 import { removeUndefineds } from '../../util/utils';
 import debug from 'debug';
+import { RelayerChain } from '../../models/chain-models';
 
 const dbg = debug('relayer:approvals');
 
 export const generateApprovalTransactions = async (
   tokenAmounts: TokenAmount[],
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<PopulatedTransaction[]> => {
   const populatedTransactions: Optional<PopulatedTransaction>[] =
     await Promise.all(
       tokenAmounts.map(async (tokenAmount) => {
         try {
-          const abi = abiForChainToken(chainID);
-          const provider = getProviderForNetwork(chainID);
+          const abi = abiForChainToken(chain);
+          const provider = getProviderForNetwork(chain);
           const contract = new Contract(
             tokenAmount.tokenAddress,
             abi,
@@ -30,7 +30,7 @@ export const generateApprovalTransactions = async (
           );
           const approvalAmount = tokenAmount.amount;
           const value = approvalAmount.toHexString();
-          const spender = zeroXExchangeProxyContractAddress(chainID);
+          const spender = zeroXExchangeProxyContractAddress(chain);
           return await contract.populateTransaction.approve(spender, value);
         } catch (err: any) {
           dbg(`Could not populate transaction for some token: ${err.message}`);
@@ -45,20 +45,17 @@ export const generateApprovalTransactions = async (
 export const approveZeroX = async (
   activeWallet: ActiveWallet,
   tokenAmounts: TokenAmount[],
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<TransactionResponse[]> => {
   const populatedApprovalTXs = await generateApprovalTransactions(
     tokenAmounts,
-    chainID,
+    chain,
   );
   const TransactionResponses: TransactionResponse[] = await Promise.all(
     populatedApprovalTXs.map(async (populatedApproval) => {
-      const gasDetails = await getEstimateGasDetails(
-        chainID,
-        populatedApproval,
-      );
+      const gasDetails = await getEstimateGasDetails(chain, populatedApproval);
       const txResponse = await executeTransaction(
-        chainID,
+        chain,
         populatedApproval,
         gasDetails,
         activeWallet,

@@ -1,9 +1,7 @@
-/// <reference types="../../../global" />
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { assert } from 'console';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import configNetworks from '../../config/config-networks';
 import { GasTokenWrappedAddress } from '../../../models/token-models';
 import {
@@ -31,11 +29,12 @@ import {
 } from '../gas-estimate';
 import { initTokens } from '../../tokens/network-tokens';
 import { EVMGasType } from '../../../models/network-models';
+import { testChainEthereum } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
+const MOCK_CHAIN = testChainEthereum();
 const MOCK_GAS_TOKEN = GasTokenWrappedAddress.EthereumWETH;
 const MOCK_TOKEN_ADDRESS = '0x001';
 
@@ -53,28 +52,28 @@ const mockGasDetails: TransactionGasDetails = {
 describe('calculate-transaction-gas', () => {
   before(async () => {
     resetTokenPriceCache();
-    mockTokenConfig(MOCK_CHAIN_ID, MOCK_TOKEN_ADDRESS);
-    mockTokenConfig(MOCK_CHAIN_ID, MOCK_TOKEN_6_DECIMALS);
+    mockTokenConfig(MOCK_CHAIN, MOCK_TOKEN_ADDRESS);
+    mockTokenConfig(MOCK_CHAIN, MOCK_TOKEN_6_DECIMALS);
     await initTokens();
-    configNetworks[MOCK_CHAIN_ID] = getMockNetwork();
-    configNetworks[MOCK_CHAIN_ID].fees.slippageBuffer = 0.05;
-    configNetworks[MOCK_CHAIN_ID].fees.profit = 0.05;
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fees.slippageBuffer = 0.05;
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fees.profit = 0.05;
     initNetworkProviders();
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
       MOCK_GAS_TOKEN,
       { price: 3250.0, updatedAt: Date.now() },
     );
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
       MOCK_TOKEN_ADDRESS,
       { price: 1.0, updatedAt: Date.now() },
     );
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
       MOCK_TOKEN_6_DECIMALS,
       { price: 1.0, updatedAt: Date.now() },
     );
@@ -97,7 +96,7 @@ describe('calculate-transaction-gas', () => {
 
     const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(18)); // $390 "USDC" (0.12 ETH) + 10% profit/buffer fee.
     const gasDetails = createTransactionGasDetails(
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
       mockGasDetails,
       MOCK_TOKEN_ADDRESS,
       tokenFee,
@@ -122,7 +121,7 @@ describe('calculate-transaction-gas', () => {
 
     const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(6)); // $390 "USDT" (0.12 ETH) + 10% profit/buffer fee.
     const gasDetails = createTransactionGasDetails(
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
       mockGasDetails,
       MOCK_TOKEN_6_DECIMALS,
       tokenFee,
@@ -148,13 +147,13 @@ describe('calculate-transaction-gas', () => {
     const populatedTransaction = getMockPopulatedTransaction();
 
     const estimateGasDetails = await getEstimateGasDetails(
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
       populatedTransaction,
     );
     const maximumGas = calculateMaximumGas(estimateGasDetails);
-    const tokenFee = getTokenFee(MOCK_CHAIN_ID, maximumGas, MOCK_TOKEN_ADDRESS);
+    const tokenFee = getTokenFee(MOCK_CHAIN, maximumGas, MOCK_TOKEN_ADDRESS);
     const gasDetails = createTransactionGasDetails(
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
       mockGasDetails,
       MOCK_TOKEN_ADDRESS,
       tokenFee,

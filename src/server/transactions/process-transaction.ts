@@ -4,7 +4,7 @@ import {
 } from '@ethersproject/providers';
 import debug from 'debug';
 import { BigNumber } from 'ethers';
-import { NetworkChainID } from '../config/config-chain-ids';
+import { RelayerChain } from '../../models/chain-models';
 import { createTransactionGasDetails } from '../fees/calculate-transaction-gas';
 import { validateFee } from '../fees/fee-validator';
 import {
@@ -19,7 +19,7 @@ import { deserializeTransaction } from './transaction-deserializer';
 const dbg = debug('relayer:transact:validate');
 
 export const processTransaction = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   feeCacheID: string,
   serializedTransaction: string,
   useRelayAdapt: boolean,
@@ -31,7 +31,7 @@ export const processTransaction = async (
   const minimumGasNeeded = BigNumber.from(10).pow(17);
 
   const walletForGasEstimate = await getBestMatchWalletForNetwork(
-    chainID,
+    chain,
     minimumGasNeeded,
   );
 
@@ -45,7 +45,7 @@ export const processTransaction = async (
   };
 
   const gasEstimateDetails = await getEstimateGasDetails(
-    chainID,
+    chain,
     transactionRequestForGasEstimate,
     devLog,
   );
@@ -55,20 +55,20 @@ export const processTransaction = async (
 
   const { tokenAddress, packagedFeeAmount } =
     await extractPackagedFeeFromTransaction(
-      chainID,
+      chain,
       transactionRequest,
       useRelayAdapt,
     );
-  validateFee(chainID, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
+  validateFee(chain, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
   dbg('Fee validated:', packagedFeeAmount, tokenAddress);
 
   const transactionGasDetails = createTransactionGasDetails(
-    chainID,
+    chain,
     gasEstimateDetails,
     tokenAddress,
     packagedFeeAmount,
   );
   dbg('Transaction gas details:', transactionGasDetails);
 
-  return executeTransaction(chainID, transactionRequest, transactionGasDetails);
+  return executeTransaction(chain, transactionRequest, transactionGasDetails);
 };

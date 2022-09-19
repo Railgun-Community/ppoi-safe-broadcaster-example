@@ -4,7 +4,7 @@ import configTokenPriceRefresher, {
 } from '../config/config-token-price-refresher';
 import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
-import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
+import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { allTokenAddressesForNetwork } from './network-tokens';
 import { TokenPriceSource } from './token-price-cache';
 
@@ -15,15 +15,16 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
 ): Promise<void> => {
   const networkPriceRefreshers: Promise<void>[] = [];
 
-  const chainIDs = configuredNetworkChainIDs();
-  chainIDs.forEach((chainID) => {
-    const tokenAddresses = allTokenAddressesForNetwork(chainID);
-    const gasTokenAddress = configNetworks[chainID].gasToken.wrappedAddress;
+  const chains = configuredNetworkChains();
+  chains.forEach((chain) => {
+    const tokenAddresses = allTokenAddressesForNetwork(chain);
+    const gasTokenAddress =
+      configNetworks[chain.type][chain.id].gasToken.wrappedAddress;
     if (gasTokenAddress) {
       tokenAddresses.push(gasTokenAddress);
     }
     networkPriceRefreshers.push(
-      tokenPriceRefresher.refresher(chainID, tokenAddresses),
+      tokenPriceRefresher.refresher(chain, tokenAddresses),
     );
   });
 

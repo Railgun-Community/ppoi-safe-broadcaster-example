@@ -1,5 +1,5 @@
+import { RelayerChain } from '../../../models/chain-models';
 import { delay } from '../../../util/promise-utils';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import { tokenForAddress } from '../../tokens/network-tokens';
 import { TokenPrice, TokenPriceUpdater } from '../../tokens/token-price-cache';
 import { ZeroXApiEndpoint, getZeroXData } from './0x-fetch';
@@ -8,7 +8,7 @@ import { ZeroXApiEndpoint, getZeroXData } from './0x-fetch';
 // https://docs.0x.org/0x-api-swap/advanced-topics/rate-limiting
 let ZERO_X_PRICE_LOOKUP_DELAY = 1500;
 
-const refreshLocks: MapType<boolean> = {};
+const refreshLocks: NumMapType<NumMapType<boolean>> = {};
 
 export type ZeroXPriceData = {
   price: string;
@@ -31,11 +31,11 @@ type ZeroXFormattedPriceData = {
 };
 
 const zeroXPriceLookupByAddress = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   tokenAddress: string,
 ): Promise<Optional<ZeroXFormattedPriceData>> => {
   try {
-    const { decimals, symbol } = tokenForAddress(chainID, tokenAddress);
+    const { decimals, symbol } = tokenForAddress(chain, tokenAddress);
 
     // TODO: This depends on DAI being stable at $1.
     // As we've seen, this isn't the safest methodology.
@@ -53,7 +53,7 @@ const zeroXPriceLookupByAddress = async (
     };
     const { price } = await getZeroXData<ZeroXPriceData>(
       ZeroXApiEndpoint.PriceLookup,
-      chainID,
+      chain,
       params,
     );
     return {
@@ -65,22 +65,20 @@ const zeroXPriceLookupByAddress = async (
 };
 
 export const zeroXUpdatePricesByAddresses = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   tokenAddresses: string[],
   updater: TokenPriceUpdater,
 ): Promise<void> => {
-  if (refreshLocks[chainID]) {
+  refreshLocks[chain.type] ??= {};
+  if (refreshLocks[chain.type][chain.id]) {
     // Continue refreshing 0x prices.
     return;
   }
-  refreshLocks[chainID] = true;
+  refreshLocks[chain.type][chain.id] = true;
 
   for (const tokenAddress of tokenAddresses) {
     // eslint-disable-next-line no-await-in-loop
-    const zeroXPriceData = await zeroXPriceLookupByAddress(
-      chainID,
-      tokenAddress,
-    );
+    const zeroXPriceData = await zeroXPriceLookupByAddress(chain, tokenAddress);
     if (zeroXPriceData) {
       const tokenPrice: TokenPrice = {
         price: zeroXPriceData.price,
@@ -93,5 +91,5 @@ export const zeroXUpdatePricesByAddresses = async (
     await delay(ZERO_X_PRICE_LOOKUP_DELAY);
   }
 
-  refreshLocks[chainID] = false;
+  refreshLocks[chain.type][chain.id] = false;
 };

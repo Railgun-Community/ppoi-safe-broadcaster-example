@@ -1,13 +1,13 @@
 import { Lepton } from '@railgun-community/lepton';
 import leveldown from 'leveldown';
-import { LeptonDebugger } from '@railgun-community/lepton/dist/models/types';
 import { FallbackProvider } from '@ethersproject/providers';
 import { logger } from '../../util/logger';
 import { artifactsGetter } from './artifacts';
 import { quickSync } from '../api/railgun-events/quick-sync';
 import configDefaults from '../config/config-defaults';
-import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
+import { LeptonDebugger } from '@railgun-community/lepton/dist/models/lepton-types';
+import { RelayerChain } from '../../models/chain-models';
 import  { groth16 } from 'snarkjs';
 import { Groth16 } from '@railgun-community/lepton/dist/prover';
 
@@ -33,6 +33,7 @@ export const initLepton = (optDebugger?: LeptonDebugger) => {
     },
   };
   lepton = new Lepton(
+    'relayer',
     levelDB,
     artifactsGetter,
     quickSync,
@@ -46,7 +47,7 @@ export const initLepton = (optDebugger?: LeptonDebugger) => {
  * so it will run the slow scan in the background.
  */
 export const initLeptonNetwork = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   provider: FallbackProvider,
 ) => {
   if (!lepton) {
@@ -54,18 +55,20 @@ export const initLeptonNetwork = async (
     return;
   }
 
-  const network = configNetworks[chainID];
+  const network = configNetworks[chain.type][chain.id];
   const deploymentBlock = network.deploymentBlock ?? 0;
 
   try {
     await lepton.loadNetwork(
-      chainID,
+      chain,
       network.proxyContract,
       network.relayAdaptContract,
       provider,
       deploymentBlock,
     );
   } catch (err: any) {
-    logger.warn(`Could not load network ${chainID} in Lepton: ${err.message}.`);
+    logger.warn(
+      `Could not load network ${chain.id} in Lepton: ${err.message}.`,
+    );
   }
 };

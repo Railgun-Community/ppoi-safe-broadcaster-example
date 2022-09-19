@@ -1,5 +1,5 @@
 import { BaseProvider } from '@ethersproject/providers';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
+import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
 import { Wallet as EthersWallet } from 'ethers';
 import { isValidMnemonic } from 'ethers/lib/utils';
 import {
@@ -7,19 +7,19 @@ import {
   decode,
 } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import debug from 'debug';
-import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
 import { resetArray } from '../../util/utils';
 import { getLepton } from '../lepton/lepton-init';
-import { isWalletAvailable } from './available-wallets';
+import { isWalletAvailableWithEnoughFunds } from './available-wallets';
 import {
   convertToReadableGasTokenBalanceMap,
   getActiveWalletGasTokenBalanceMapForChain,
 } from '../balances/balance-cache';
-import { configuredNetworkChainIDs } from '../chains/network-chain-ids';
+import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configNetworks from '../config/config-networks';
 import { subscribeToShieldedBalanceEvents } from '../balances/shielded-balance-cache';
+import { RelayerChain } from '../../models/chain-models';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -44,14 +44,12 @@ const initRailgunWallet = async (mnemonic: string) => {
       'DB_ENCRYPTION_KEY not set (use docker secret, or env-cmdrc for insecure testing)',
     );
   }
-  const walletID = await lepton.createWalletFromMnemonic(
+  railgunWallet = await lepton.createWalletFromMnemonic(
     encryptionKey,
     mnemonic,
   );
-  railgunWallet = lepton.wallets[walletID];
   subscribeToShieldedBalanceEvents(railgunWallet);
-  const anyChainID = 0;
-  railgunWalletAnyAddress = railgunWallet.getAddress(anyChainID);
+  railgunWalletAnyAddress = railgunWallet.getAddress();
 };
 
 export const initWallets = async () => {
@@ -86,15 +84,18 @@ const printDebugWalletData = () => {
   );
   dbg('Loaded private wallet:', railgunWalletAnyAddress);
 
-  configuredNetworkChainIDs().forEach(async (chainID) => {
+  configuredNetworkChains().forEach(async (chain) => {
     const gasTokenBalanceMap = await getActiveWalletGasTokenBalanceMapForChain(
-      chainID,
+      chain,
       activeWallets,
     );
-    const gasToken = configNetworks[chainID].gasToken.symbol;
+    const gasToken = configNetworks[chain.type][chain.id].gasToken.symbol;
     const gasTokenBalanceMapReadable =
       convertToReadableGasTokenBalanceMap(gasTokenBalanceMap);
-    dbg(`Chain ${chainID}, ${gasToken} balances:`, gasTokenBalanceMapReadable);
+    dbg(
+      `Chain ${chain.type}:${chain.id}, ${gasToken} balances:`,
+      gasTokenBalanceMapReadable,
+    );
   });
 };
 
@@ -132,11 +133,11 @@ export const getActiveWallets = (): ActiveWallet[] => {
 };
 
 export const numAvailableWallets = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<number> => {
   const walletAvailability = await Promise.all(
     getActiveWallets().map(
-      async (wallet) => await isWalletAvailable(wallet, chainID),
+      async (wallet) => await isWalletAvailableWithEnoughFunds(wallet, chain),
     ),
   );
   return walletAvailability.filter((available) => available).length;

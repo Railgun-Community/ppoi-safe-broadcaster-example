@@ -6,12 +6,14 @@ import {
   getActiveWallets,
   getRailgunWallet,
 } from '../../wallets/active-wallets';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
+import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
 import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
-import { setupSingleTestWallet } from '../../../test/setup.test';
+import {
+  setupSingleTestWallet,
+  testChainEthereum,
+} from '../../../test/setup.test';
 import { getLepton, initLepton } from '../../lepton/lepton-init';
 import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import * as BestWalletMatchModule from '../../wallets/best-match-wallet';
 import { ActiveWallet } from '../../../models/wallet-models';
 import { initNetworkProviders } from '../../providers/active-network-providers';
@@ -57,7 +59,8 @@ const MOCK_TOKEN_AMOUNT_2 = {
 };
 const TREE = 0;
 
-const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
+const MOCK_CHAIN = testChainEthereum();
+
 const zeroProof = (): Proof => {
   const zero = nToHex(BigInt(0), ByteLength.UINT_8);
   return {
@@ -78,7 +81,7 @@ describe('unshield-tokens', () => {
     await setupSingleTestWallet();
     railWallet = getRailgunWallet();
     [activeWallet] = getActiveWallets();
-    configNetworks[NetworkChainID.Ropsten] = getMockRopstenNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockRopstenNetwork();
     initNetworkProviders();
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getTransactionCount')
@@ -119,7 +122,7 @@ describe('unshield-tokens', () => {
       activeWallet.address,
       false, // allowOveride
       [MOCK_TOKEN_AMOUNT_1],
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
     );
     expect(unshieldTransactions.length).to.equal(1);
   });
@@ -135,7 +138,7 @@ describe('unshield-tokens', () => {
         activeWallet.address,
         false, // allowOveride
         [MOCK_TOKEN_AMOUNT_2],
-        MOCK_CHAIN_ID,
+        MOCK_CHAIN,
       ),
     ).to.be.rejectedWith('');
   });
@@ -150,13 +153,13 @@ describe('unshield-tokens', () => {
       activeWallet.address,
       false, // allowOveride
       [MOCK_TOKEN_AMOUNT_1],
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
     );
     const populatedTransaction = await generatePopulatedUnshieldTransact(
       unshieldTransactions,
-      MOCK_CHAIN_ID,
+      MOCK_CHAIN,
     );
-    const contractAddress = getProxyContractForNetwork(MOCK_CHAIN_ID).address;
+    const contractAddress = getProxyContractForNetwork(MOCK_CHAIN).address;
 
     expect(populatedTransaction.to?.toLowerCase()).to.equal(contractAddress);
 

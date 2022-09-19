@@ -1,12 +1,12 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getMockRopstenNetwork } from '../../../test/mocks.test';
+import { testChainRopsten } from '../../../test/setup.test';
 import { initTokens } from '../../tokens/network-tokens';
 import {
   getTokenPriceCache,
   TokenPriceSource,
 } from '../../tokens/token-price-cache';
-import { NetworkChainID } from '../config-chain-ids';
 import configNetworks from '../config-networks';
 import configTokenPriceRefresher from '../config-token-price-refresher';
 import configTokens from '../config-tokens';
@@ -16,11 +16,12 @@ const { expect } = chai;
 
 const testNetwork = getMockRopstenNetwork();
 const MOCK_TOKEN_ADDRESS = '0x123';
+const MOCK_CHAIN = testChainRopsten();
 
 describe('config-token-price-refresher', () => {
   before(async () => {
-    configNetworks[NetworkChainID.Ropsten] = testNetwork;
-    configTokens[NetworkChainID.Ropsten][MOCK_TOKEN_ADDRESS] = {
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = testNetwork;
+    configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK',
     };
     await initTokens();
@@ -29,9 +30,11 @@ describe('config-token-price-refresher', () => {
   it('Should get test network prices', async () => {
     await configTokenPriceRefresher.tokenPriceRefreshers[
       TokenPriceSource.CoinGecko
-    ].refresher(NetworkChainID.Ropsten, [MOCK_TOKEN_ADDRESS]);
+    ].refresher(MOCK_CHAIN, [MOCK_TOKEN_ADDRESS]);
     const tokenAddressesToPrice =
-      getTokenPriceCache()[TokenPriceSource.CoinGecko][NetworkChainID.Ropsten];
+      getTokenPriceCache()[TokenPriceSource.CoinGecko][MOCK_CHAIN.type][
+        MOCK_CHAIN.id
+      ];
     expect(tokenAddressesToPrice[MOCK_TOKEN_ADDRESS]?.price).to.equal(2000);
     expect(
       tokenAddressesToPrice[testNetwork.gasToken.wrappedAddress]?.price,

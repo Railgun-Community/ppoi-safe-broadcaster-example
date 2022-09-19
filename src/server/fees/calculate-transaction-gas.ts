@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
+import { RelayerChain } from '../../models/chain-models';
 import { EVMGasType } from '../../models/network-models';
-import { NetworkChainID } from '../config/config-chain-ids';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { getTransactionTokens } from '../tokens/network-tokens';
@@ -12,21 +12,21 @@ import {
 import { calculateGasLimit, TransactionGasDetails } from './gas-estimate';
 
 export const createTransactionGasDetails = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   gasEstimateDetails: TransactionGasDetails,
   tokenAddress: string,
   tokenFee: BigNumber,
 ): TransactionGasDetails => {
   const { evmGasType, gasEstimate } = gasEstimateDetails;
   const gasLimit = calculateGasLimit(gasEstimate);
-  const { token, gasToken } = getTransactionTokens(chainID, tokenAddress);
+  const { token, gasToken } = getTransactionTokens(chain, tokenAddress);
   const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
-    chainID,
+    chain,
     token,
     gasToken,
   );
 
-  const networkConfig = configNetworks[chainID];
+  const networkConfig = configNetworks[chain.type][chain.id];
   const { precision } = configDefaults.transactionFees;
   const roundedRatio = getRoundedTokenToGasPriceRatio(
     tokenPrice,

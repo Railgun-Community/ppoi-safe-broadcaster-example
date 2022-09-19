@@ -1,15 +1,33 @@
-import { NetworkChainID } from '../config/config-chain-ids';
-import { removeNaNs } from '../../util/utils';
+import { NetworkChainID } from '../config/config-chains';
 import configNetworks from '../config/config-networks';
 import configDefaults from '../config/config-defaults';
+import { RelayerChain } from '../../models/chain-models';
+import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { removeUndefineds } from '../../util/utils';
 
-export const configuredNetworkChainIDs = (): NetworkChainID[] => {
-  const chainIDs: NetworkChainID[] = removeNaNs(
-    Object.keys(NetworkChainID).map((chainID) => {
-      return Number(chainID) as NetworkChainID;
-    }),
+export const configuredNetworkChains = (): RelayerChain[] => {
+  const chainTypes: ChainType[] = removeUndefineds(
+    Object.keys(configNetworks),
+  ).map((chainType) => Number(chainType));
+  const chains: RelayerChain[] = [];
+
+  chainTypes.forEach((chainType) => {
+    const chainIDs: NetworkChainID[] = removeUndefineds(
+      Object.keys(configNetworks[chainType]),
+    ).map((chainID) => Number(chainID));
+    chains.push(
+      ...chainIDs.map((chainID) => {
+        return {
+          type: chainType,
+          id: chainID,
+        };
+      }),
+    );
+  });
+
+  return chains.filter(
+    (chain) =>
+      chain.type !== ChainType.EVM ||
+      configDefaults.networks.EVM.includes(chain.id),
   );
-  return chainIDs
-    .filter((chainID) => configDefaults.networks.active.includes(chainID))
-    .filter((chainID) => configNetworks[chainID] != null);
 };

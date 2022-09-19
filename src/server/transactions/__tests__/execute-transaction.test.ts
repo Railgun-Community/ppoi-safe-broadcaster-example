@@ -22,19 +22,21 @@ import {
   getMockProvider,
   getMockRopstenNetwork,
 } from '../../../test/mocks.test';
-import { setupSingleTestWallet } from '../../../test/setup.test';
+import {
+  setupSingleTestWallet,
+  testChainRopsten,
+} from '../../../test/setup.test';
 import { initLepton } from '../../lepton/lepton-init';
 import {
   clearSettingsDB,
   getSettingsNumber,
   initSettingsDB,
 } from '../../db/settings-db';
-import { NetworkChainID } from '../../config/config-chain-ids';
 import { delay } from '../../../util/promise-utils';
 import * as ExecuteTransactionModule from '../execute-transaction';
 import * as BestWalletMatchModule from '../../wallets/best-match-wallet';
 import { ActiveWallet } from '../../../models/wallet-models';
-import { isWalletAvailable } from '../../wallets/available-wallets';
+import { isWalletAvailableWithEnoughFunds } from '../../wallets/available-wallets';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import configNetworks from '../../config/config-networks';
 import { TransactionGasDetails } from '../../fees/gas-estimate';
@@ -56,6 +58,8 @@ let sendTransactionStub: SinonStub;
 let waitTxStub: SinonStub;
 let getBestMatchWalletForNetwork: SinonStub;
 
+const MOCK_CHAIN = testChainRopsten();
+
 describe('execute-transaction', () => {
   before(async () => {
     initLepton();
@@ -63,7 +67,8 @@ describe('execute-transaction', () => {
     clearSettingsDB();
     await setupSingleTestWallet();
     [activeWallet] = getActiveWallets();
-    configNetworks[NetworkChainID.Ropsten] = getMockRopstenNetwork();
+    configNetworks[testChainRopsten().type][testChainRopsten().id] =
+      getMockRopstenNetwork();
     initNetworkProviders();
     ethersWallet = createEthersWallet(activeWallet, getMockProvider());
     walletGetTransactionCountStub = sinon
@@ -96,16 +101,14 @@ describe('execute-transaction', () => {
 
   it('Should get and store nonce values', async () => {
     let currentNonce: number;
-    currentNonce = await getCurrentNonce(NetworkChainID.Ropsten, ethersWallet);
+    currentNonce = await getCurrentNonce(MOCK_CHAIN, ethersWallet);
     expect(currentNonce).to.equal(3);
 
-    await storeCurrentNonce(NetworkChainID.Ropsten, 24, ethersWallet);
+    await storeCurrentNonce(MOCK_CHAIN, 24, ethersWallet);
     expect(
-      await getSettingsNumber(
-        getLastNonceKey(NetworkChainID.Ropsten, ethersWallet),
-      ),
+      await getSettingsNumber(getLastNonceKey(MOCK_CHAIN, ethersWallet)),
     ).to.equal(24);
-    currentNonce = await getCurrentNonce(NetworkChainID.Ropsten, ethersWallet);
+    currentNonce = await getCurrentNonce(MOCK_CHAIN, ethersWallet);
     expect(currentNonce).to.equal(25); // 24 + 1
   });
 
@@ -119,7 +122,7 @@ describe('execute-transaction', () => {
       maxPriorityFeePerGas: BigNumber.from(30),
     };
     const txResponse = await executeTransaction(
-      NetworkChainID.Ropsten,
+      MOCK_CHAIN,
       populatedTransaction,
       gasDetails,
     );
@@ -130,20 +133,20 @@ describe('execute-transaction', () => {
 
   it.skip('Should set wallet unavailable while processing tx', async () => {
     createGasBalanceStub(BigNumber.from(10).pow(18));
-    expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
-      .true;
+    expect(await isWalletAvailableWithEnoughFunds(activeWallet, MOCK_CHAIN)).to
+      .be.true;
     waitForTx(
       activeWallet,
       ethersWallet,
-      NetworkChainID.Ropsten,
+      MOCK_CHAIN,
       {} as TransactionResponse,
       0,
     );
-    expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
-      .false;
+    expect(await isWalletAvailableWithEnoughFunds(activeWallet, MOCK_CHAIN)).to
+      .be.false;
     // Delay of 10 set in waitTxStub
     await delay(50);
-    expect(await isWalletAvailable(activeWallet, NetworkChainID.Ropsten)).to.be
-      .true;
+    expect(await isWalletAvailableWithEnoughFunds(activeWallet, MOCK_CHAIN)).to
+      .be.true;
   });
 }).timeout(120000);

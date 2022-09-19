@@ -1,59 +1,91 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { NetworkChainID } from '../../config/config-chain-ids';
+import { NetworkChainID } from '../../config/config-chains';
 import {
   getPrivateTokenBalanceCache,
-  updateCachedShieldedBalances,
+  parseRailBalanceAddress,
+  ShieldedCachedBalance,
 } from '../shielded-balance-cache';
 import { setupSingleTestWallet } from '../../../test/setup.test';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet';
+import { throwErr } from '../../../util/promise-utils';
+import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+import { TokenAmount } from '../../../models/token-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getRailgunWallet } from '../../wallets/active-wallets';
 import { getMockToken } from '../../../test/mocks.test';
-import {
-  createLeptonWalletBalancesStub,
-  restoreLeptonStubs,
-} from '../../../test/stubs/lepton-stubs.test';
+import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { RelayerChain } from '../../../models/chain-models';
 import { initLepton } from '../../lepton/lepton-init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-let railWallet: RailgunWallet;
-
-const MOCK_CHAIN_ID = NetworkChainID.Ethereum;
-
-const MOCK_TOKEN_ADDRESS = getMockToken().address;
-
-const MOCK_TOKEN_AMOUNT = {
-  tokenAddress: MOCK_TOKEN_ADDRESS,
-  amount: BigNumber.from('1000000000000000000000'),
+const MOCK_CHAIN = {
+  type: ChainType.EVM,
+  id: NetworkChainID.Ethereum,
 };
 
-const TREE = 0;
+type NumMapType<T> = {
+  [index: number]: T;
+};
 
-describe('shielded-token-balance-cache', () => {
+const MOCK_TOKEN_AMOUNT = BigNumber.from('1200000000000000000');
+
+const shieldedTokenBalanceCache: NumMapType<ShieldedCachedBalance[]> = {};
+
+const mockUpdateCachedShieldedBalances = async (
+  wallet: RailgunWallet,
+  chain: RelayerChain,
+): Promise<void> => {
+  if (shieldedTokenBalanceCache[chain.id] === undefined) {
+    shieldedTokenBalanceCache[chain.id] = [];
+  }
+  const balances = await wallet.balances(chain).catch(throwErr);
+  const tokenAddresses = Object.keys(balances);
+  tokenAddresses.forEach((railBalanceAddress) => {
+    const parsedAddress =
+      parseRailBalanceAddress(railBalanceAddress).toLowerCase();
+    const tokenAmount: TokenAmount = {
+      tokenAddress: parsedAddress,
+      amount: BigNumber.from(balances[railBalanceAddress].balance.toString()),
+    };
+    shieldedTokenBalanceCache[chain.id].push({
+      tokenAmount,
+      updatedAt: Date.now(),
+    });
+  });
+  const mockTokenAmount: TokenAmount = {
+    tokenAddress: getMockToken().address,
+    amount: MOCK_TOKEN_AMOUNT,
+  };
+  shieldedTokenBalanceCache[chain.id].push({
+    tokenAmount: mockTokenAmount,
+    updatedAt: Date.now(),
+  });
+};
+
+export const mockGetPrivateTokenBalanceCache = (
+  chainID: NetworkChainID,
+): ShieldedCachedBalance[] => {
+  return shieldedTokenBalanceCache[chainID];
+};
+
+describe('shielded-balance-cache', () => {
   before(async () => {
     initLepton();
-    // initSettingsDB();
-    // clearSettingsDB();
     await setupSingleTestWallet();
-    railWallet = getRailgunWallet();
     await setupSingleTestWallet();
-  });
-  after(() => {
-    restoreLeptonStubs();
   });
 
   it('Should find no private token balances', () => {
-    expect(getPrivateTokenBalanceCache(MOCK_CHAIN_ID)).to.be.undefined;
+    expect(getPrivateTokenBalanceCache(MOCK_CHAIN)).to.deep.equal([]);
   });
 
   it('Should pull private token balance of live wallet', async () => {
-    createLeptonWalletBalancesStub(MOCK_TOKEN_AMOUNT.tokenAddress, TREE);
-    await updateCachedShieldedBalances(railWallet, MOCK_CHAIN_ID);
+    const wallet = getRailgunWallet();
+    await mockUpdateCachedShieldedBalances(wallet, MOCK_CHAIN);
     const mockBalance =
-      getPrivateTokenBalanceCache(MOCK_CHAIN_ID)[0].tokenAmount.amount;
-    expect(mockBalance.toBigInt).to.equal(MOCK_TOKEN_AMOUNT.amount.toBigInt);
+      getPrivateTokenBalanceCache(MOCK_CHAIN)[0].tokenAmount.amount;
+    expect(mockBalance.toBigInt()).to.equal(MOCK_TOKEN_AMOUNT.toBigInt());
   });
 }).timeout(30000);

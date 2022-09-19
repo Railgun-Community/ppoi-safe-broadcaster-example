@@ -18,6 +18,7 @@ import { initNetworkProviders } from '../../providers/active-network-providers';
 import configTokens from '../../config/config-tokens';
 import { initTokens } from '../../tokens/network-tokens';
 import { ErrorMessage } from '../../../util/errors';
+import { testChainEthereum } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -25,13 +26,15 @@ const { expect } = chai;
 const MOCK_TOKEN_ADDRESS = '0x0013533';
 let gasTokenAddress: string;
 
+const MOCK_CHAIN = testChainEthereum();
+
 const validatePackagedFee = (
   feeCacheID: string,
   packagedFee: BigNumber,
   maximumGas: BigNumber,
 ) => {
   return validateFee(
-    CHAIN_ID,
+    MOCK_CHAIN,
     MOCK_TOKEN_ADDRESS,
     maximumGas,
     feeCacheID,
@@ -39,16 +42,14 @@ const validatePackagedFee = (
   );
 };
 
-const CHAIN_ID = 1;
-
 describe('fee-validator', () => {
   before(async () => {
     const network = getMockNetwork();
-    configNetworks[CHAIN_ID] = network;
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = network;
     gasTokenAddress = network.gasToken.wrappedAddress;
     initNetworkProviders();
-    configTokens[CHAIN_ID] = {};
-    configTokens[CHAIN_ID][MOCK_TOKEN_ADDRESS] = {
+    configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id] = {};
+    configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'TOKEN',
     };
     await initTokens();
@@ -60,7 +61,7 @@ describe('fee-validator', () => {
   });
 
   it('Should validate if packaged fee > cached fee', () => {
-    const feeCacheID = cacheUnitFeesForTokens(CHAIN_ID, {
+    const feeCacheID = cacheUnitFeesForTokens(MOCK_CHAIN, {
       [MOCK_TOKEN_ADDRESS]: BigNumber.from(10),
     });
     expect(() =>
@@ -69,7 +70,7 @@ describe('fee-validator', () => {
   });
 
   it('Should invalidate if packaged fee < cached fee', () => {
-    const feeCacheID = cacheUnitFeesForTokens(CHAIN_ID, {
+    const feeCacheID = cacheUnitFeesForTokens(MOCK_CHAIN, {
       [MOCK_TOKEN_ADDRESS]: BigNumber.from(10),
     });
     expect(() =>
@@ -86,13 +87,13 @@ describe('fee-validator', () => {
   it('Should validate if packaged fee > calculated fee', () => {
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      CHAIN_ID,
+      MOCK_CHAIN,
       MOCK_TOKEN_ADDRESS,
       { price: 2, updatedAt: Date.now() },
     );
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      CHAIN_ID,
+      MOCK_CHAIN,
       gasTokenAddress,
       { price: 20, updatedAt: Date.now() },
     );
@@ -105,13 +106,13 @@ describe('fee-validator', () => {
   it('Should validate if packaged fee > calculated fee, with slippage', () => {
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      CHAIN_ID,
+      MOCK_CHAIN,
       MOCK_TOKEN_ADDRESS,
       { price: 2, updatedAt: Date.now() },
     );
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      CHAIN_ID,
+      MOCK_CHAIN,
       gasTokenAddress,
       { price: 20, updatedAt: Date.now() },
     );

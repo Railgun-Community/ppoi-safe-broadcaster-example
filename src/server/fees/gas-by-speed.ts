@@ -26,10 +26,12 @@
 //
 
 import { BigNumber } from '@ethersproject/bignumber';
+import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
 import Web3, { Eth, FeeHistoryResult } from 'web3-eth';
+import { RelayerChain } from '../../models/chain-models';
 import { EVMGasType } from '../../models/network-models';
 import { maxBigNumber } from '../../util/utils';
-import { NetworkChainID } from '../config/config-chain-ids';
+import { NetworkChainID } from '../config/config-chains';
 import configNetworks from '../config/config-networks';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { web3ProviderFromChainID } from '../providers/web3-providers';
@@ -142,33 +144,37 @@ const getMedianBigNumber = (feeHistoryOutputs: BigNumber[]): BigNumber => {
 
 // WARNING: TRANSACTIONS RISK BEING REVERTED IF YOU MODIFY THIS.
 const gasHistoryPercentileForChain = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): GasHistoryPercentile => {
-  switch (chainID) {
-    case NetworkChainID.Ethereum:
-      return GasHistoryPercentile.Low;
-    case NetworkChainID.HardHat:
-      return GasHistoryPercentile.Medium;
-    case NetworkChainID.BNBSmartChain:
-    case NetworkChainID.PolygonPOS:
-    case NetworkChainID.Ropsten:
-      return GasHistoryPercentile.High;
+  switch (chain.type) {
+    case ChainType.EVM: {
+      switch (chain.id) {
+        case NetworkChainID.Ethereum:
+          return GasHistoryPercentile.Low;
+        case NetworkChainID.HardHat:
+          return GasHistoryPercentile.Medium;
+        case NetworkChainID.BNBSmartChain:
+        case NetworkChainID.PolygonPOS:
+        case NetworkChainID.Ropsten:
+          return GasHistoryPercentile.High;
+      }
+    }
   }
-  throw new Error(`Chain ${chainID} unhandled for gas speeds.`);
+  throw new Error(`Chain ${chain.type}:${chain.id} unhandled for gas speeds.`);
 };
 
-export const getStandardGasDetails = async (chainID: NetworkChainID) => {
-  const { evmGasType } = configNetworks[chainID];
+export const getStandardGasDetails = async (chain: RelayerChain) => {
+  const { evmGasType } = configNetworks[chain.type][chain.id];
 
   let gasDetailsBySpeed: GasDetailsBySpeed;
   switch (evmGasType) {
     case EVMGasType.Type0:
-      gasDetailsBySpeed = await getGasPricesBySpeed(evmGasType, chainID);
+      gasDetailsBySpeed = await getGasPricesBySpeed(evmGasType, chain);
       break;
     case EVMGasType.Type2:
       gasDetailsBySpeed = await getHistoricalGasDetailsBySpeed(
         evmGasType,
-        chainID,
+        chain,
       );
       break;
   }
@@ -177,7 +183,7 @@ export const getStandardGasDetails = async (chainID: NetworkChainID) => {
     throw new Error('Unhandled gas type.');
   }
 
-  const percentile = gasHistoryPercentileForChain(chainID);
+  const percentile = gasHistoryPercentileForChain(chain);
   return gasDetailsBySpeed[percentile];
 };
 
@@ -191,9 +197,9 @@ const gasPriceForPercentile = (
 
 const getGasPricesBySpeed = async (
   evmGasType: EVMGasType.Type0,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<GasDetailsBySpeed> => {
-  const provider = getProviderForNetwork(chainID);
+  const provider = getProviderForNetwork(chain);
   const gasPrice = await provider.getGasPrice();
 
   const gasPricesBySpeed: GasDetailsBySpeed = {
@@ -262,10 +268,10 @@ const getFeeHistory = (
 
 const getHistoricalGasDetailsBySpeed = async (
   evmGasType: EVMGasType.Type2,
-  chainID: NetworkChainID,
+  chain: RelayerChain,
 ): Promise<GasDetailsBySpeed> => {
   const web3Eth = new Web3Eth();
-  const provider = web3ProviderFromChainID(chainID);
+  const provider = web3ProviderFromChainID(chain);
   web3Eth.setProvider(provider);
 
   const recentBlock = (await web3Eth.getBlockNumber()) - 1;

@@ -6,7 +6,6 @@ import { CoingeckoNetworkID } from '../../../../models/api-constants';
 import { CoingeckoApiEndpoint, getCoingeckoData } from '../coingecko-fetch';
 import * as coingeckoFetchModule from '../coingecko-fetch';
 import configTokenPriceRefresher from '../../../config/config-token-price-refresher';
-import { NetworkChainID } from '../../../config/config-chain-ids';
 import {
   cacheTokenPriceForNetwork,
   getTokenPriceCache,
@@ -23,6 +22,11 @@ import configTokens from '../../../config/config-tokens';
 import { initTokens } from '../../../tokens/network-tokens';
 import { initNetworkProviders } from '../../../providers/active-network-providers';
 import { coingeckoUpdatePricesByAddresses } from '../coingecko-price';
+import { RelayerChain } from '../../../../models/chain-models';
+import {
+  testChainEthereum,
+  testChainRopsten,
+} from '../../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -32,6 +36,8 @@ const TOKEN_ADDRESS_2 = '0x73829';
 const TOKEN_ADDRESSES = [TOKEN_ADDRESS_1, TOKEN_ADDRESS_2];
 
 const ropstenNetwork = getMockRopstenNetwork();
+const chainEthereum = testChainEthereum();
+const chainRopsten = testChainRopsten();
 
 const TOKEN_PRICE_SOURCE = TokenPriceSource.CoinGecko;
 
@@ -49,11 +55,11 @@ const expectedCoingeckoPriceOutput = (nowTimestamp: number) => {
 };
 
 const validatePriceRefresherOutput = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   nowTimestamp: number,
 ) => {
   const tokenAddressesToPrice =
-    getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainID];
+    getTokenPriceCache()[TOKEN_PRICE_SOURCE][chain.type][chain.id];
   TOKEN_ADDRESSES.forEach((address) => {
     const priceData = tokenAddressesToPrice[address];
     expect(priceData).to.be.an('object');
@@ -64,8 +70,8 @@ const validatePriceRefresherOutput = (
 
 describe('coingecko-price', () => {
   before(async () => {
-    configNetworks[NetworkChainID.Ethereum] = getMockNetwork();
-    configNetworks[NetworkChainID.Ropsten] = ropstenNetwork;
+    configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
+    configNetworks[chainRopsten.type][chainRopsten.id] = ropstenNetwork;
     initNetworkProviders();
 
     resetTokenPriceCache();
@@ -75,8 +81,12 @@ describe('coingecko-price', () => {
       [TOKEN_ADDRESS_2]: getMockTokenConfig(),
     };
 
-    configTokens[NetworkChainID.Ethereum] = tokenConfigs;
-    configTokens[NetworkChainID.Ropsten] = tokenConfigs;
+    // @ts-ignore
+    configTokens[chainEthereum.type] ??= {};
+    // @ts-ignore
+    configTokens[chainRopsten.type] ??= {};
+    configTokens[chainEthereum.type][chainEthereum.id] = tokenConfigs;
+    configTokens[chainRopsten.type][chainRopsten.id] = tokenConfigs;
     await initTokens();
   });
 
@@ -115,12 +125,12 @@ describe('coingecko-price', () => {
       (tokenAddress, tokenPrice) =>
         cacheTokenPriceForNetwork(
           TOKEN_PRICE_SOURCE,
-          NetworkChainID.Ethereum,
+          chainEthereum,
           tokenAddress,
           tokenPrice,
         ),
     );
-    validatePriceRefresherOutput(NetworkChainID.Ethereum, nowTimestamp);
+    validatePriceRefresherOutput(chainEthereum, nowTimestamp);
 
     stubGetCoingeckoData.restore();
   });
@@ -139,7 +149,7 @@ describe('coingecko-price', () => {
       (tokenAddress, tokenPrice) =>
         cacheTokenPriceForNetwork(
           TOKEN_PRICE_SOURCE,
-          NetworkChainID.Ethereum,
+          chainEthereum,
           tokenAddress,
           tokenPrice,
         ),
@@ -179,8 +189,8 @@ describe('coingecko-price', () => {
 
     await configTokenPriceRefresher.tokenPriceRefreshers[
       TOKEN_PRICE_SOURCE
-    ].refresher(NetworkChainID.Ethereum, TOKEN_ADDRESSES);
-    validatePriceRefresherOutput(NetworkChainID.Ethereum, nowTimestamp);
+    ].refresher(chainEthereum, TOKEN_ADDRESSES);
+    validatePriceRefresherOutput(chainEthereum, nowTimestamp);
 
     stubGetCoingeckoData.restore();
   });
@@ -188,9 +198,11 @@ describe('coingecko-price', () => {
   it('Should run CoinGecko configured price refresher for Ropsten', async () => {
     await configTokenPriceRefresher.tokenPriceRefreshers[
       TOKEN_PRICE_SOURCE
-    ].refresher(NetworkChainID.Ropsten, TOKEN_ADDRESSES);
+    ].refresher(chainRopsten, TOKEN_ADDRESSES);
     const tokenAddressesToPrice =
-      getTokenPriceCache()[TOKEN_PRICE_SOURCE][NetworkChainID.Ropsten];
+      getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainRopsten.type][
+        chainRopsten.id
+      ];
     expect(Object.keys(tokenAddressesToPrice).length).to.equal(3);
     expect(
       tokenAddressesToPrice[ropstenNetwork.gasToken.wrappedAddress]?.price,

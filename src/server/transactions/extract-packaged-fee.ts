@@ -9,7 +9,6 @@ import { BigNumber, Contract } from 'ethers';
 import { Note } from '@railgun-community/lepton';
 import { getSharedSymmetricKey } from '@railgun-community/lepton/dist/utils/keys-utils';
 import { TransactionRequest } from '@ethersproject/providers';
-import { NetworkChainID } from '../config/config-chain-ids';
 import configNetworks from '../config/config-networks';
 import { abiForProxyContract, abiForRelayAdaptContract } from '../abi/abi';
 import { getProviderForNetwork } from '../providers/active-network-providers';
@@ -18,6 +17,7 @@ import {
   getRailgunWallet,
 } from '../wallets/active-wallets';
 import { Ciphertext } from '@railgun-community/lepton/dist/models/formatted-types';
+import { RelayerChain } from '../../models/chain-models';
 
 const parseFormattedTokenAddress = (formattedTokenAddress: string) => {
   return `0x${trim(formattedTokenAddress, 20)}`;
@@ -58,27 +58,27 @@ enum TransactionName {
 }
 
 export const extractPackagedFeeFromTransaction = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   transactionRequest: TransactionRequest,
   useRelayAdapt: boolean,
 ): Promise<PackagedFee> => {
   if (useRelayAdapt) {
     return extractPackagedFeeFromRelayAdaptTransaction(
-      chainID,
+      chain,
       transactionRequest,
     );
   }
 
-  return extractPackagedFeeFromProxyTransaction(chainID, transactionRequest);
+  return extractPackagedFeeFromProxyTransaction(chain, transactionRequest);
 };
 
 const extractPackagedFeeFromProxyTransaction = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   transactionRequest: TransactionRequest,
 ): Promise<PackagedFee> => {
-  const network = configNetworks[chainID];
+  const network = configNetworks[chain.type][chain.id];
   return extractPackagedFee(
-    chainID,
+    chain,
     transactionRequest,
     TransactionName.Proxy,
     network.proxyContract,
@@ -87,12 +87,12 @@ const extractPackagedFeeFromProxyTransaction = (
 };
 
 const extractPackagedFeeFromRelayAdaptTransaction = (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   transactionRequest: TransactionRequest,
 ): Promise<PackagedFee> => {
-  const network = configNetworks[chainID];
+  const network = configNetworks[chain.type][chain.id];
   return extractPackagedFee(
-    chainID,
+    chain,
     transactionRequest,
     TransactionName.RelayAdapt,
     network.relayAdaptContract,
@@ -101,7 +101,7 @@ const extractPackagedFeeFromRelayAdaptTransaction = (
 };
 
 const extractPackagedFee = async (
-  chainID: NetworkChainID,
+  chain: RelayerChain,
   transactionRequest: TransactionRequest,
   transactionName: TransactionName,
   contractAddress: string,
@@ -112,11 +112,11 @@ const extractPackagedFee = async (
     transactionRequest.to.toLowerCase() !== contractAddress.toLowerCase()
   ) {
     throw new Error(
-      `Invalid contract address: got ${transactionRequest.to}, expected ${contractAddress} for chain ${chainID}`,
+      `Invalid contract address: got ${transactionRequest.to}, expected ${contractAddress} for chain ${chain}`,
     );
   }
 
-  const provider = getProviderForNetwork(chainID);
+  const provider = getProviderForNetwork(chain);
   const contract = new Contract(contractAddress, abi, provider);
 
   const parsedTransaction = contract.interface.parseTransaction({
@@ -170,13 +170,19 @@ const getSharedKeySafe = (
   }
 };
 
-const decryptSenderNoteSafe = (
+const decryptReceiverNoteSafe = (
   encryptedNote: Ciphertext,
   sharedKey: Uint8Array,
 ) => {
   try {
     const memoField: string[] = [];
-    return Note.decrypt(encryptedNote, sharedKey , memoField );
+    return Note.decrypt(
+      encryptedNote,
+      sharedKey,
+      memoField,
+      undefined, // ephemeralKeySender
+      undefined, // senderBlindingKey
+    );
   } catch (err) {
     return null;
   }
@@ -195,14 +201,14 @@ const extractFeesFromRailgunTransactions = async (
   const hash = commitments[index];
   const ciphertext = railgunTx.boundParams.commitmentCiphertext[index];
 
-  const ephemeralKeySenderBytes = nToBytes(
+  const ephemeralKeyReceiverBytes = nToBytes(
     BigInt(ciphertext.ephemeralKeys[0].toHexString()),
     ByteLength.UINT_256,
   );
 
   const sharedKey = await getSharedKeySafe(
     viewingPrivateKey,
-    ephemeralKeySenderBytes,
+    ephemeralKeyReceiverBytes,
   );
   if (sharedKey == null) {
     // Not addressed to us.
@@ -218,14 +224,17 @@ const extractFeesFromRailgunTransactions = async (
     tag: ivTag.substring(32),
     data: ciphertextHexlified.slice(1),
   };
-  const decryptedSenderNote = decryptSenderNoteSafe(encryptedNote, sharedKey);
-  if (decryptedSenderNote == null) {
+  const decryptedReceiverNote = decryptReceiverNoteSafe(
+    encryptedNote,
+    sharedKey,
+  );
+  if (decryptedReceiverNote == null) {
     // Addressed to us, but different note than fee.
     return;
   }
 
-  if (decryptedSenderNote.masterPublicKey === masterPublicKey) {
-    const noteHash = nToHex(decryptedSenderNote.hash, ByteLength.UINT_256);
+  if (decryptedReceiverNote.masterPublicKey === masterPublicKey) {
+    const noteHash = nToHex(decryptedReceiverNote.hash, ByteLength.UINT_256);
     const commitHash = formatToByteLength(
       hash.toHexString(),
       ByteLength.UINT_256,
@@ -236,13 +245,13 @@ const extractFeesFromRailgunTransactions = async (
       );
     }
 
-    if (!tokenPaymentAmounts[decryptedSenderNote.token]) {
+    if (!tokenPaymentAmounts[decryptedReceiverNote.token]) {
       // eslint-disable-next-line no-param-reassign
-      tokenPaymentAmounts[decryptedSenderNote.token] = BigNumber.from(0);
+      tokenPaymentAmounts[decryptedReceiverNote.token] = BigNumber.from(0);
     }
     // eslint-disable-next-line no-param-reassign
-    tokenPaymentAmounts[decryptedSenderNote.token] = tokenPaymentAmounts[
-      decryptedSenderNote.token
-    ].add(decryptedSenderNote.value.toString());
+    tokenPaymentAmounts[decryptedReceiverNote.token] = tokenPaymentAmounts[
+      decryptedReceiverNote.token
+    ].add(decryptedReceiverNote.value.toString());
   }
 };
