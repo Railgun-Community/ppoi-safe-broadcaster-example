@@ -10,13 +10,13 @@ import {
   getRailgunWallet,
 } from '../wallets/active-wallets';
 import { setWalletAvailability } from '../wallets/available-wallets';
-import configTopup from '../config/config-topup';
+import configTopup from '../config/config-top-up';
 import { getRailgunEngine } from '../lepton/lepton-init';
 import { unshieldTokens } from './unshield-tokens';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getCurrentNonce, waitForTx, waitForTxs } from './execute-transaction';
 import { approveZeroX } from './approve-spender';
-import configWalletTopUpRefresher from '../config/config-wallet-topup-refresher';
+import configWalletTopUpRefresher from '../config/config-wallet-top-up-refresher';
 import configDefaults from '../config/config-defaults';
 import { swapZeroX } from './0x-swap';
 import {
@@ -27,7 +27,7 @@ import {
 import { removeUndefineds } from '../../util/utils';
 import { RelayerChain } from '../../models/chain-models';
 
-const dbg = debug('relayer:topup');
+const dbg = debug('relayer:top-up');
 
 const getPublicTokenAmountsAfterUnwrap = async (
   wallet: ActiveWallet,
@@ -94,7 +94,7 @@ export const topUpWallet = async (
   topUpWallet: ActiveWallet,
   chain: RelayerChain,
 ) => {
-  // begin topup
+  // begin top-up
   dbg(
     `Begin top up for wallet with address ${topUpWallet.address} and index ${topUpWallet.index} on chain ${chain.type}:${chain.id}`,
   );
