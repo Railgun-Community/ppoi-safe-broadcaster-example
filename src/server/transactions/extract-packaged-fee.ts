@@ -4,10 +4,9 @@ import {
   nToBytes,
   nToHex,
   trim,
-} from '@railgun-community/lepton/dist/utils/bytes';
+} from '@railgun-community/engine/dist/utils/bytes';
 import { BigNumber, Contract } from 'ethers';
-import { Note } from '@railgun-community/lepton';
-import { getSharedSymmetricKey } from '@railgun-community/lepton/dist/utils/keys-utils';
+import { getSharedSymmetricKey } from '@railgun-community/engine/dist/utils/keys-utils';
 import { TransactionRequest } from '@ethersproject/providers';
 import configNetworks from '../config/config-networks';
 import { abiForProxyContract, abiForRelayAdaptContract } from '../abi/abi';
@@ -16,8 +15,9 @@ import {
   getRailgunAddressData,
   getRailgunWallet,
 } from '../wallets/active-wallets';
-import { Ciphertext } from '@railgun-community/lepton/dist/models/formatted-types';
+import { Ciphertext } from '@railgun-community/engine/dist/models/formatted-types';
 import { RelayerChain } from '../../models/chain-models';
+import { Note } from '@railgun-community/engine/dist/note/note';
 
 const parseFormattedTokenAddress = (formattedTokenAddress: string) => {
   return `0x${trim(formattedTokenAddress, 20)}`;

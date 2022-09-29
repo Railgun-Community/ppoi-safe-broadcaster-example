@@ -24,7 +24,7 @@ export default {
     logLevel: DebugLevel.VerboseLogs,
 
     /**
-     * Whether to show verbose Lepton debugging logs.
+     * Whether to show verbose RailgunEngine debugging logs.
      */
     lepton: false,
   },
@@ -86,12 +86,12 @@ export default {
 
   lepton: {
     /**
-     * Key used to encrypt wallets in the Lepton database.
+     * Key used to encrypt wallets in the RailgunEngine database.
      */
     dbEncryptionKey: secrets.dbEncryptionKey,
 
     /**
-     * Directory and file where Lepton leveldown db will be stored.
+     * Directory and file where RailgunEngine leveldown db will be stored.
      * */
     dbDir: process.env.LEPTON_DB ?? 'server.db',
   },

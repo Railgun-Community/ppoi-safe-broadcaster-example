@@ -1,23 +1,23 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { RailgunProxyContract } from '@railgun-community/lepton/dist/contracts/railgun-proxy';
+import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy/railgun-proxy';
+import { Chain } from '@railgun-community/engine/dist/models/engine-types';
 import {
   SerializedTransaction,
   TokenType,
-} from '@railgun-community/lepton/dist/models/formatted-types';
-import { Chain } from '@railgun-community/lepton/dist/models/lepton-types';
-import { Prover } from '@railgun-community/lepton/dist/prover';
-import { TransactionBatch } from '@railgun-community/lepton/dist/transaction/transaction-batch';
-import { Wallet } from '@railgun-community/lepton/dist/wallet/wallet';
+} from '@railgun-community/engine/dist/models/formatted-types';
+import { Prover } from '@railgun-community/engine/dist/prover/prover';
+import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import { PopulatedTransaction } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { TokenAmount } from '../../models/token-models';
 import { getEstimateGasDetails } from '../fees/gas-estimate';
-import { getLepton } from '../lepton/lepton-init';
+import { getRailgunEngine } from '../lepton/lepton-init';
 import { executeTransaction } from './execute-transaction';
 
 export const generateUnshieldTransactions = async (
   prover: Prover,
-  railWallet: Wallet,
+  railgunWallet: RailgunWallet,
   encryptionKey: string,
   toWalletAddress: string,
   allowOverride: boolean,
@@ -41,7 +41,7 @@ export const generateUnshieldTransactions = async (
     txBatchPromises.push(
       transactionBatch.generateSerializedTransactions(
         prover,
-        railWallet,
+        railgunWallet,
         encryptionKey,
         () => {}, // progressCallback
       ),
@@ -64,7 +64,7 @@ export const generatePopulatedUnshieldTransact = async (
 export const getProxyContractForNetwork = (
   chain: RelayerChain,
 ): RailgunProxyContract => {
-  const proxyContract = getLepton().proxyContracts[chain.type][chain.id];
+  const proxyContract = getRailgunEngine().proxyContracts[chain.type][chain.id];
   if (!proxyContract) {
     throw new Error(
       `Proxy contract not yet loaded for network with chain ${chain.type}:${chain.id}`,
@@ -75,7 +75,7 @@ export const getProxyContractForNetwork = (
 
 export const unshieldTokens = async (
   prover: Prover,
-  railWallet: Wallet,
+  railgunWallet: RailgunWallet,
   encryptionKey: string,
   toWalletAddress: string,
   allowOverride: boolean,
@@ -84,7 +84,7 @@ export const unshieldTokens = async (
 ): Promise<TransactionResponse> => {
   const serializedTransactions = await generateUnshieldTransactions(
     prover,
-    railWallet,
+    railgunWallet,
     encryptionKey,
     toWalletAddress,
     allowOverride,

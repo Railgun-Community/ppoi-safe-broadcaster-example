@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import { getMockProvider } from '../../../test/mocks.test';
 import {
   createEthersWallet,
@@ -8,14 +7,15 @@ import {
   getRailgunAnyAddress,
 } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
-import { initLepton } from '../../lepton/lepton-init';
+import { initEngine } from '../../lepton/lepton-init';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('active-wallets', () => {
   before(async () => {
-    initLepton();
+    initEngine();
     await setupSingleTestWallet();
   });
 
@@ -42,8 +42,10 @@ describe('active-wallets', () => {
   });
 
   it('Should check pubkey value matches across networks', () => {
-    const viewingPublicKeyAll = decode(getRailgunAnyAddress()).viewingPublicKey;
-    const viewingPublicKeyRopsten = decode(
+    const viewingPublicKeyAll = RailgunEngine.decodeAddress(
+      getRailgunAnyAddress(),
+    ).viewingPublicKey;
+    const viewingPublicKeyRopsten = RailgunEngine.decodeAddress(
       getRailgunAnyAddress(),
     ).viewingPublicKey;
     expect(viewingPublicKeyAll).to.deep.equal(

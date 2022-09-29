@@ -2,7 +2,7 @@ import { FallbackProvider } from '@ethersproject/providers';
 import configNetworks from '../config/config-networks';
 import { createFallbackProviderFromJsonConfig } from './fallback-providers';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
-import { initLeptonNetwork } from '../lepton/lepton-init';
+import { initEngineNetwork } from '../lepton/lepton-init';
 import { logger } from '../../util/logger';
 import { RelayerChain } from '../../models/chain-models';
 
@@ -45,7 +45,7 @@ const initNetworkProvider = async (chain: RelayerChain) => {
     activeNetworkProviders[chain.type] = {};
   }
   activeNetworkProviders[chain.type][chain.id] = fallbackProvider;
-  await initLeptonNetwork(chain, fallbackProvider);
+  await initEngineNetwork(chain, fallbackProvider);
   logger.log(`Loaded network ${chain.type}:${chain.id}`);
 };
 

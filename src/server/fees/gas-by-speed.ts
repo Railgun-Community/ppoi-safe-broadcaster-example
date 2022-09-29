@@ -26,7 +26,7 @@
 //
 
 import { BigNumber } from '@ethersproject/bignumber';
-import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 import Web3, { Eth, FeeHistoryResult } from 'web3-eth';
 import { RelayerChain } from '../../models/chain-models';
 import { EVMGasType } from '../../models/network-models';

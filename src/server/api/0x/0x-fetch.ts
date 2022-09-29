@@ -1,4 +1,4 @@
-import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 import axios from 'axios';
 import { RelayerChain } from '../../../models/chain-models';
 import { logger } from '../../../util/logger';

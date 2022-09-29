@@ -14,7 +14,7 @@ import {
 import { NetworkChainID } from './config-chains';
 import { NetworksConfig } from '../../models/config-models';
 import { EVMGasType } from '../../models/network-models';
-import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 
 // 10 minute timeout on ticket prices retrieved from API.
 // Shorter is safer, but Coingecko free tier can lag by 15-30 minutes.

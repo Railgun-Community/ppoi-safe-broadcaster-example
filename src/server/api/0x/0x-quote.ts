@@ -6,7 +6,7 @@ import { TokenAmount } from '../../../models/token-models';
 import { NetworkChainID } from '../../config/config-chains';
 import { logger } from '../../../util/logger';
 import { RelayerChain } from '../../../models/chain-models';
-import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 
 export const ZERO_X_PRICE_DECIMALS = 18;
 

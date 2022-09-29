@@ -1,6 +1,5 @@
 import { BaseProvider } from '@ethersproject/providers';
 import { PopulatedTransaction } from 'ethers';
-import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import {
@@ -15,9 +14,10 @@ import {
   TokenConfig,
 } from '../models/token-models';
 import { RelayerChain } from '../models/chain-models';
-import { ViewingKeyPair } from '@railgun-community/lepton/dist/keyderivation/wallet-node';
-import { getPublicViewingKey } from '@railgun-community/lepton/dist/utils/keys-utils';
+import { getPublicViewingKey } from '@railgun-community/engine/dist/utils/keys-utils';
 import { randomBytes } from 'ethers/lib/utils';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
+import { ViewingKeyPair } from '@railgun-community/engine/dist/key-derivation/wallet-node';
 
 export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
   // @ts-ignore
@@ -142,7 +142,7 @@ export const getMockWalletAddress = (): string => {
 };
 
 export const getMockWalletViewingPublicKey = (): Uint8Array => {
-  return decode(getMockWalletAddress()).viewingPublicKey;
+  return RailgunEngine.decodeAddress(getMockWalletAddress()).viewingPublicKey;
 };
 
 export const mockViewingKeys = async () => {

@@ -1,16 +1,11 @@
 import { BaseProvider } from '@ethersproject/providers';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
 import { Wallet as EthersWallet } from 'ethers';
 import { isValidMnemonic } from 'ethers/lib/utils';
-import {
-  AddressData,
-  decode,
-} from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import debug from 'debug';
 import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
 import { resetArray } from '../../util/utils';
-import { getLepton } from '../lepton/lepton-init';
+import { getRailgunEngine } from '../lepton/lepton-init';
 import { isWalletAvailableWithEnoughFunds } from './available-wallets';
 import {
   convertToReadableGasTokenBalanceMap,
@@ -20,6 +15,11 @@ import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configNetworks from '../config/config-networks';
 import { subscribeToShieldedBalanceEvents } from '../balances/shielded-balance-cache';
 import { RelayerChain } from '../../models/chain-models';
+import {
+  AddressData,
+  decodeAddress,
+} from '@railgun-community/engine/dist/key-derivation/bech32';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -37,7 +37,7 @@ export const derivationPathForIndex = (index: number) => {
 };
 
 const initRailgunWallet = async (mnemonic: string) => {
-  const lepton = getLepton();
+  const lepton = getRailgunEngine();
   const encryptionKey = configDefaults.lepton.dbEncryptionKey;
   if (!encryptionKey) {
     throw Error(
@@ -111,7 +111,7 @@ export const getRailgunAnyAddress = () => {
 };
 
 export const getRailgunAddressData = (): AddressData => {
-  return decode(getRailgunAnyAddress());
+  return decodeAddress(getRailgunAnyAddress());
 };
 
 export const getRailgunPrivateViewingKey = () => {

@@ -1,6 +1,6 @@
-import ABI_RAILGUN_LOGIC from '@railgun-community/lepton/dist/abi/RailgunLogic.json';
-import ABI_RELAY_ADAPT from '@railgun-community/lepton/dist/abi/RelayAdapt.json';
-import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import ABI_RAILGUN_LOGIC from '@railgun-community/engine/dist/abi/RailgunLogic.json';
+import ABI_RELAY_ADAPT from '@railgun-community/engine/dist/abi/RelayAdapt.json';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 import { RelayerChain } from '../../models/chain-models';
 import { NetworkChainID } from '../config/config-chains';
 import ABI_ERC20 from './json/erc20.json';

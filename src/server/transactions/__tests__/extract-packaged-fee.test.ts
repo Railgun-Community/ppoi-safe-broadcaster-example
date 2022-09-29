@@ -1,24 +1,19 @@
 import { FallbackProvider } from '@ethersproject/providers';
-import { Note, Lepton } from '@railgun-community/lepton';
-import { RailgunProxyContract } from '@railgun-community/lepton/dist/contracts/railgun-proxy';
-import { RelayAdaptContract } from '@railgun-community/lepton/dist/contracts/relay-adapt';
 import {
   hexlify,
   padToLength,
   randomHex,
-} from '@railgun-community/lepton/dist/utils/bytes';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+} from '@railgun-community/engine/dist/utils/bytes';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
-import { AddressData } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
 import configDefaults from '../../config/config-defaults';
 import {
   getMockRopstenNetwork,
   getMockToken,
   mockViewingKeys,
 } from '../../../test/mocks.test';
-import { getLepton, initLepton } from '../../lepton/lepton-init';
+import { getRailgunEngine, initEngine } from '../../lepton/lepton-init';
 import {
   getProviderForNetwork,
   initNetworkProviders,
@@ -31,22 +26,28 @@ import {
 } from '../../wallets/active-wallets';
 import { extractPackagedFeeFromTransaction } from '../extract-packaged-fee';
 import {
-  createLeptonVerifyProofStub,
-  createLeptonWalletBalancesStub,
-  restoreLeptonStubs,
+  createEngineVerifyProofStub,
+  createEngineWalletBalancesStub,
+  restoreEngineStubs,
 } from '../../../test/stubs/lepton-stubs.test';
 import {
   OutputType,
   SerializedTransaction,
   TokenType,
-} from '@railgun-community/lepton/dist/models/formatted-types';
-import { TransactionBatch } from '@railgun-community/lepton/dist/transaction/transaction-batch';
+} from '@railgun-community/engine/dist/models/formatted-types';
+import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
 import { testChainHardhat, testChainRopsten } from '../../../test/setup.test';
+import { AddressData } from '@railgun-community/engine/dist/key-derivation/bech32';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
+import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy/railgun-proxy';
+import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+import { Note } from '@railgun-community/engine/dist/note/note';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-let lepton: Lepton;
+let lepton: RailgunEngine;
 let proxyContract: RailgunProxyContract;
 let relayAdaptContract: RelayAdaptContract;
 let railgunWallet: RailgunWallet;
@@ -119,8 +120,8 @@ const createRopstenRelayAdaptWithdrawTransactions = async (
 
 describe('extract-packaged-fee', () => {
   before(async () => {
-    initLepton();
-    lepton = getLepton();
+    initEngine();
+    lepton = getRailgunEngine();
 
     configDefaults.wallet.mnemonic = MOCK_MNEMONIC_1;
     await initWallets();
@@ -154,12 +155,12 @@ describe('extract-packaged-fee', () => {
     railgunWallet = getRailgunWallet();
 
     const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));
-    createLeptonWalletBalancesStub(tokenAddressHexlify, TREE);
-    createLeptonVerifyProofStub();
+    createEngineWalletBalancesStub(tokenAddressHexlify, TREE);
+    createEngineVerifyProofStub();
   });
 
   after(() => {
-    restoreLeptonStubs();
+    restoreEngineStubs();
   });
 
   it('Should extract fee correctly - transfer', async () => {
@@ -182,7 +183,7 @@ describe('extract-packaged-fee', () => {
 
   it('Should fail for incorrect receiver address - transfer', async () => {
     const fee = BigNumber.from('1000');
-    const addressData = Lepton.decodeAddress(
+    const addressData = RailgunEngine.decodeAddress(
       '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
     );
     const transactions = await createRopstenTransferTransactions(
@@ -225,7 +226,7 @@ describe('extract-packaged-fee', () => {
 
   it('Should fail for incorrect receiver address - relay adapt', async () => {
     const fee = BigNumber.from('1000');
-    const addressData = Lepton.decodeAddress(
+    const addressData = RailgunEngine.decodeAddress(
       '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
     );
     const transactions = await createRopstenRelayAdaptWithdrawTransactions(

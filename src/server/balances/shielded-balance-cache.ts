@@ -1,14 +1,14 @@
 import {
-  LeptonEvent,
+  EngineEvent,
   ScannedEventData,
-} from '@railgun-community/lepton/dist/models/event-types';
-import { bytes } from '@railgun-community/lepton/dist/utils';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+} from '@railgun-community/engine/dist/models/event-types';
 import { resetMapObject } from '../../util/utils';
 import { TokenAmount } from '../../models/token-models';
 import { BigNumber } from 'ethers';
 import { throwErr } from '../../util/promise-utils';
 import { RelayerChain } from '../../models/chain-models';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+import { trim } from '@railgun-community/engine/dist/utils/bytes';
 import debug from 'debug';
 
 const dbg = debug('relayer:shielded-cache');
@@ -17,6 +17,7 @@ export type ShieldedCachedBalance = {
   tokenAmount: TokenAmount;
   updatedAt: number;
 };
+
 // {chainType: {chainID: {token: balance}[]}}
 const shieldedTokenBalanceCache: NumMapType<
   NumMapType<ShieldedCachedBalance[]>
@@ -27,13 +28,13 @@ export const resetShieldedTokenBalanceCache = () => {
 };
 
 export const subscribeToShieldedBalanceEvents = (wallet: RailgunWallet) => {
-  wallet.on(LeptonEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>
+  wallet.on(EngineEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>
     updateCachedShieldedBalances(wallet, chain),
   );
 };
 
 export const parseRailBalanceAddress = (tokenAddress: string): string => {
-  return `0x${bytes.trim(tokenAddress, 20)}`;
+  return `0x${trim(tokenAddress, 20)}`;
 };
 
 export const updateCachedShieldedBalances = async (

@@ -1,9 +1,11 @@
 import debug from 'debug';
 import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
-import { Wallet } from '@railgun-community/lepton/dist/wallet/wallet';
-import { bytes } from '@railgun-community/lepton/dist/utils';
-import { hexStringToBytes } from '@railgun-community/lepton/dist/utils/bytes';
+import {
+  fromUTF8String,
+  hexlify,
+  hexStringToBytes,
+} from '@railgun-community/engine/dist/utils/bytes';
 import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
@@ -16,6 +18,7 @@ import { WakuMethodResponse } from './waku-response';
 import configNetworks from '../config/config-networks';
 import configDefaults from '../config/config-defaults';
 import { RelayerChain } from '../../models/chain-models';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 
@@ -59,7 +62,7 @@ export class WakuRelayer {
 
   options: WakuRelayerOptions;
 
-  wallet: Wallet;
+  wallet: RailgunWallet;
 
   methods: MapType<JsonRPCMessageHandler> = {
     [WakuMethodNames.Transact]: transactMethod,
@@ -69,7 +72,7 @@ export class WakuRelayer {
 
   constructor(
     client: WakuApiClient,
-    wallet: Wallet,
+    wallet: RailgunWallet,
     options: WakuRelayerOptions,
   ) {
     const chainIDs = configuredNetworkChains();
@@ -86,7 +89,7 @@ export class WakuRelayer {
 
   static async init(
     client: WakuApiClient,
-    wallet: Wallet,
+    wallet: RailgunWallet,
     options: WakuRelayerOptions,
   ): Promise<WakuRelayer> {
     const relayer = new WakuRelayer(client, wallet, options);
@@ -171,8 +174,8 @@ export class WakuRelayer {
         ? configNetworks[chain.type][chain.id].relayAdaptContract
         : '',
     };
-    const message = bytes.fromUTF8String(JSON.stringify(data));
-    const signature = bytes.hexlify(
+    const message = fromUTF8String(JSON.stringify(data));
+    const signature = hexlify(
       await this.wallet.signWithViewingKey(hexStringToBytes(message)),
     );
     this.dbg(

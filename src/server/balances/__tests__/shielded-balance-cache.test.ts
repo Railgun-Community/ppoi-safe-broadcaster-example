@@ -8,14 +8,14 @@ import {
 } from '../shielded-balance-cache';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { throwErr } from '../../../util/promise-utils';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
 import { TokenAmount } from '../../../models/token-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getRailgunWallet } from '../../wallets/active-wallets';
 import { getMockToken } from '../../../test/mocks.test';
-import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
 import { RelayerChain } from '../../../models/chain-models';
-import { initLepton } from '../../lepton/lepton-init';
+import { initEngine } from '../../lepton/lepton-init';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -72,7 +72,7 @@ export const mockGetPrivateTokenBalanceCache = (
 
 describe('shielded-balance-cache', () => {
   before(async () => {
-    initLepton();
+    initEngine();
     await setupSingleTestWallet();
     await setupSingleTestWallet();
   });

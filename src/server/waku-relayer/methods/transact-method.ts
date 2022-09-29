@@ -1,12 +1,12 @@
 import * as ed from '@noble/ed25519';
 import { TransactionResponse } from '@ethersproject/providers';
-import { hexlify } from '@railgun-community/lepton/dist/utils/bytes';
+import { hexlify } from '@railgun-community/engine/dist/utils/bytes';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
 import {
   encryptJSONDataWithSharedKey,
   tryDecryptJSONDataWithSharedKey,
-} from '@railgun-community/lepton/dist/utils/ecies';
+} from '@railgun-community/engine/dist/utils/ecies';
 import { processTransaction } from '../../transactions/process-transaction';
 import {
   getRailgunAddressData,
@@ -17,7 +17,7 @@ import { WakuMethodResponse } from '../waku-response';
 import { ErrorMessage } from '../../../util/errors';
 import configDefaults from '../../config/config-defaults';
 import { recognizesFeeCacheID } from '../../fees/transaction-fee-cache';
-import { EncryptedData } from '@railgun-community/lepton/dist/models/formatted-types';
+import { EncryptedData } from '@railgun-community/engine/dist/models/formatted-types';
 import { RelayerChain } from '../../../models/chain-models';
 import configNetworks from '../../config/config-networks';
 

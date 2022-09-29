@@ -1,4 +1,4 @@
-import { getLepton, initLepton } from '../lepton/lepton-init';
+import { getRailgunEngine, initEngine } from '../lepton/lepton-init';
 import { initWallets } from '../wallets/active-wallets';
 import { initNetworkProviders } from '../providers/active-network-providers';
 import {
@@ -20,7 +20,7 @@ export const initRelayerModules = async (forTest = false) => {
     myConfigOverrides && myConfigOverrides();
   }
   initSettingsDB();
-  initLepton();
+  initEngine();
   await initNetworkProviders();
   await Promise.all([initWallets(), initTokens()]);
   initPricePoller();
@@ -35,6 +35,6 @@ export const uninitRelayerModules = () => {
   logger.log('stopping wallet top up polling');
   closeSettingsDB();
   logger.log('closed settings db');
-  getLepton().unload();
+  getRailgunEngine().unload();
   logger.log('unloaded lepton');
 };

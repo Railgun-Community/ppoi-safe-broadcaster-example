@@ -1,4 +1,4 @@
-import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 import { NetworkChainID } from '../server/config/config-chains';
 import { Network } from './network-models';
 import { TokenConfig } from './token-models';

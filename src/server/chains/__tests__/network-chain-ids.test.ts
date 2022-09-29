@@ -1,4 +1,4 @@
-import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { setupTestNetwork } from '../../../test/setup.test';

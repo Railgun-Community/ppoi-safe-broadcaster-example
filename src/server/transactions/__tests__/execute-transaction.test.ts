@@ -26,7 +26,7 @@ import {
   setupSingleTestWallet,
   testChainRopsten,
 } from '../../../test/setup.test';
-import { initLepton } from '../../lepton/lepton-init';
+import { initEngine } from '../../lepton/lepton-init';
 import {
   clearSettingsDB,
   getSettingsNumber,
@@ -62,7 +62,7 @@ const MOCK_CHAIN = testChainRopsten();
 
 describe('execute-transaction', () => {
   before(async () => {
-    initLepton();
+    initEngine();
     initSettingsDB();
     clearSettingsDB();
     await setupSingleTestWallet();

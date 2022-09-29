@@ -5,7 +5,7 @@ import {
   setupSingleTestWallet,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { initLepton } from '../../lepton/lepton-init';
+import { initEngine } from '../../lepton/lepton-init';
 import {
   isWalletAvailableWithEnoughFunds,
   setWalletAvailability,
@@ -23,7 +23,7 @@ const { expect } = chai;
 
 describe('available-wallets', () => {
   before(async () => {
-    initLepton();
+    initEngine();
     await setupSingleTestWallet();
     initNetworkProviders();
     resetGasTokenBalanceCache();

@@ -1,11 +1,11 @@
 import { Secrets } from 'models/config-models';
 import { getSecret } from 'docker-secret';
 import _prompt from 'prompt-sync';
-import { hash } from '@railgun-community/lepton/dist/utils';
+import { sha256 } from '@railgun-community/engine/dist/utils/hash';
 import {
   fromUTF8String,
   hexlify,
-} from '@railgun-community/lepton/dist/utils/bytes';
+} from '@railgun-community/engine/dist/utils/bytes';
 
 const prompt = _prompt({ sigint: true });
 
@@ -17,7 +17,7 @@ const getEncryptionKey = (): string => {
   }
   // hash input to 32 bytes if it's > 6 characters long
   if (input.length > 6) {
-    return hash.sha256(fromUTF8String(input));
+    return sha256(fromUTF8String(input));
   }
   throw new Error('Invalid passphrase');
 };

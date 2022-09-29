@@ -6,13 +6,12 @@ import {
   getActiveWallets,
   getRailgunWallet,
 } from '../../wallets/active-wallets';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
 import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
 import {
   setupSingleTestWallet,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { getLepton, initLepton } from '../../lepton/lepton-init';
+import { getRailgunEngine, initEngine } from '../../lepton/lepton-init';
 import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
 import * as BestWalletMatchModule from '../../wallets/best-match-wallet';
 import { ActiveWallet } from '../../../models/wallet-models';
@@ -27,15 +26,16 @@ import {
 } from '../unshield-tokens';
 import configDefaults from '../../config/config-defaults';
 import {
-  createLeptonWalletTreeBalancesStub,
-  restoreLeptonStubs,
+  createEngineWalletTreeBalancesStub,
+  restoreEngineStubs,
 } from '../../../test/stubs/lepton-stubs.test';
-import { ByteLength, nToHex } from '@railgun-community/lepton/dist/utils/bytes';
+import { ByteLength, nToHex } from '@railgun-community/engine/dist/utils/bytes';
 import {
   Proof,
   Prover,
   PublicInputs,
-} from '@railgun-community/lepton/dist/prover';
+} from '@railgun-community/engine/dist/prover/prover';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -75,7 +75,7 @@ const zeroProof = (): Proof => {
 
 describe('unshield-tokens', () => {
   before(async () => {
-    initLepton();
+    initEngine();
     initSettingsDB();
     clearSettingsDB();
     await setupSingleTestWallet();
@@ -90,7 +90,7 @@ describe('unshield-tokens', () => {
       .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')
       .resolves(activeWallet);
 
-    createLeptonWalletTreeBalancesStub(MOCK_TOKEN_AMOUNT_1.tokenAddress, TREE);
+    createEngineWalletTreeBalancesStub(MOCK_TOKEN_AMOUNT_1.tokenAddress, TREE);
     railProveStub = sinon
       .stub(Prover.prototype, 'prove')
       // eslint-disable-next-line require-await
@@ -108,12 +108,12 @@ describe('unshield-tokens', () => {
   after(() => {
     walletGetTransactionCountStub.restore();
     getBestMatchWalletForNetwork.restore();
-    restoreLeptonStubs();
+    restoreEngineStubs();
     railProveStub?.restore();
   });
 
   it('Should generate the correct number of serialized transactions', async () => {
-    const { prover } = getLepton();
+    const { prover } = getRailgunEngine();
 
     const unshieldTransactions = await generateUnshieldTransactions(
       prover,
@@ -128,7 +128,7 @@ describe('unshield-tokens', () => {
   });
 
   it('Should fail with insufficient token balance', () => {
-    const { prover } = getLepton();
+    const { prover } = getRailgunEngine();
 
     expect(
       generateUnshieldTransactions(
@@ -144,7 +144,7 @@ describe('unshield-tokens', () => {
   });
 
   it.skip('Should generate populated transaction to railgun contract ready for execute transaction', async () => {
-    const { prover } = getLepton();
+    const { prover } = getRailgunEngine();
 
     const unshieldTransactions = await generateUnshieldTransactions(
       prover,

@@ -2,8 +2,8 @@ import { NetworkChainID } from '../config/config-chains';
 import configNetworks from '../config/config-networks';
 import configDefaults from '../config/config-defaults';
 import { RelayerChain } from '../../models/chain-models';
-import { ChainType } from '@railgun-community/lepton/dist/models/lepton-types';
 import { removeUndefineds } from '../../util/utils';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 
 export const configuredNetworkChains = (): RelayerChain[] => {
   const chainTypes: ChainType[] = removeUndefineds(

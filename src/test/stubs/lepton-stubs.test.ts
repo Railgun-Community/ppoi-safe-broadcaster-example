@@ -1,13 +1,13 @@
-import { Note } from '@railgun-community/lepton';
-import { ViewingKeyPair } from '@railgun-community/lepton/dist/keyderivation/wallet-node';
-import { OutputType } from '@railgun-community/lepton/dist/models/formatted-types';
-import { Prover } from '@railgun-community/lepton/dist/prover';
+import { ViewingKeyPair } from '@railgun-community/engine/dist/key-derivation/wallet-node';
+import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
+import { Note } from '@railgun-community/engine/dist/note/note';
+import { Prover } from '@railgun-community/engine/dist/prover/prover';
 import {
   ByteLength,
   formatToByteLength,
-} from '@railgun-community/lepton/dist/utils/bytes';
-import { getPublicViewingKey } from '@railgun-community/lepton/dist/utils/keys-utils';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+} from '@railgun-community/engine/dist/utils/bytes';
+import { getPublicViewingKey } from '@railgun-community/engine/dist/utils/keys-utils';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import { randomBytes } from 'ethers/lib/utils';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
@@ -49,7 +49,7 @@ const getMockBalanceData = async (tokenAddress: string, tree: number) => {
   };
 };
 
-export const createLeptonWalletBalancesStub = async (
+export const createEngineWalletBalancesStub = async (
   tokenAddress: string,
   tree: number,
 ) => {
@@ -58,7 +58,7 @@ export const createLeptonWalletBalancesStub = async (
     .resolves({ [tokenAddress]: await getMockBalanceData(tokenAddress, tree) });
 };
 
-export const createLeptonWalletTreeBalancesStub = async (
+export const createEngineWalletTreeBalancesStub = async (
   tokenAddress: string,
   tree: number,
 ) => {
@@ -73,11 +73,11 @@ export const createLeptonWalletTreeBalancesStub = async (
     });
 };
 
-export const createLeptonVerifyProofStub = () => {
+export const createEngineVerifyProofStub = () => {
   verifyProofStub = sinon.stub(Prover.prototype, 'verify').resolves(true);
 };
 
-export const restoreLeptonStubs = () => {
+export const restoreEngineStubs = () => {
   balancesStub?.restore();
   treeBalancesStub?.restore();
   verifyProofStub?.restore();

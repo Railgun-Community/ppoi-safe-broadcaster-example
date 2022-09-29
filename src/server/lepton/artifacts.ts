@@ -1,7 +1,7 @@
 import {
   ArtifactsGetter,
   PublicInputs,
-} from '@railgun-community/lepton/dist/prover';
+} from '@railgun-community/engine/dist/prover/prover';
 // @ts-ignore
 import artifacts from '@railgun-community/test-artifacts';
 

@@ -7,14 +7,14 @@ import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
 import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
-import { bytes } from '@railgun-community/lepton/dist/utils';
-import { verifyED25519 } from '@railgun-community/lepton/dist/utils/keys-utils';
-import { decode } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
+import { verifyED25519 } from '@railgun-community/engine/dist/utils/keys-utils';
 import {
   hexlify,
   hexStringToBytes,
-} from '@railgun-community/lepton/dist/utils/bytes';
-import { tryDecryptJSONDataWithSharedKey } from '@railgun-community/lepton/dist/utils/ecies';
+  randomHex,
+  toUTF8String,
+} from '@railgun-community/engine/dist/utils/bytes';
+import { tryDecryptJSONDataWithSharedKey } from '@railgun-community/engine/dist/utils/ecies';
 import {
   FeeMessage,
   FeeMessageData,
@@ -38,7 +38,7 @@ import {
   setupTestNetwork,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { initLepton } from '../../lepton/lepton-init';
+import { initEngine } from '../../lepton/lepton-init';
 import configDefaults from '../../config/config-defaults';
 import {
   cacheTokenPriceForNetwork,
@@ -68,6 +68,7 @@ import {
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -95,7 +96,7 @@ const handleHTTPPost = async (url: string, data?: unknown) => {
 describe('waku-relayer', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
-    initLepton();
+    initEngine();
     await setupSingleTestWallet();
     network = setupTestNetwork();
     configNetworks[chain.type][chain.id] = getMockNetwork();
@@ -191,7 +192,7 @@ describe('waku-relayer', () => {
 
     const utf8 = Buffer.from(requestParams.payload, 'hex').toString('utf8');
     const message = JSON.parse(utf8) as FeeMessage;
-    const data = JSON.parse(bytes.toUTF8String(message.data)) as FeeMessageData;
+    const data = JSON.parse(toUTF8String(message.data)) as FeeMessageData;
     const { signature } = message;
     expect(data).to.be.an('object');
     expect(data.fees[MOCK_TOKEN_ADDRESS]).to.be.a(
@@ -205,7 +206,7 @@ describe('waku-relayer', () => {
     expect(data.railAddress).to.equal(
       '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53lama02nutwtcqc979wnce0qwly4y7w4rls5cq040g7z8eagshxrw5ajy990',
     );
-    const decodedRailAddress = decode(data.railAddress);
+    const decodedRailAddress = RailgunEngine.decodeAddress(data.railAddress);
     const isValid = await verifyED25519(
       hexStringToBytes(message.data),
       hexStringToBytes(signature),
@@ -227,7 +228,7 @@ describe('waku-relayer', () => {
       relayerViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
     };
-    const randomPrivKey = bytes.randomHex(32);
+    const randomPrivKey = randomHex(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
     const encryptedData = encryptResponseData(data, sharedKey);
@@ -261,7 +262,7 @@ describe('waku-relayer', () => {
       relayerViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
     };
-    const randomPrivKey = bytes.randomHex(32);
+    const randomPrivKey = randomHex(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
     const clientPubKey = hexlify(randomPubKeyUint8Array);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);

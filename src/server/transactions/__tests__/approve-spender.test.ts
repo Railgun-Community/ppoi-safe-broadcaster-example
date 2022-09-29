@@ -12,7 +12,7 @@ import {
   setupSingleTestWallet,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { initLepton } from '../../lepton/lepton-init';
+import { initEngine } from '../../lepton/lepton-init';
 import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
 import { delay } from '../../../util/promise-utils';
 import * as ExecuteTransactionModule from '../execute-transaction';
@@ -53,7 +53,7 @@ const MOCK_CHAIN = testChainEthereum();
 
 describe('approve-spender', () => {
   before(async () => {
-    initLepton();
+    initEngine();
     initSettingsDB();
     clearSettingsDB();
     await setupSingleTestWallet();

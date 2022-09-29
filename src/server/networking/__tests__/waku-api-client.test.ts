@@ -6,7 +6,7 @@ import {
   setupSingleTestWallet,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { initLepton } from '../../lepton/lepton-init';
+import { initEngine } from '../../lepton/lepton-init';
 import configDefaults from '../../config/config-defaults';
 import { resetTokenPriceCache } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
@@ -26,7 +26,7 @@ const MOCK_CHAIN = testChainEthereum();
 describe('waku-api-client', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
-    initLepton();
+    initEngine();
     await setupSingleTestWallet();
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',

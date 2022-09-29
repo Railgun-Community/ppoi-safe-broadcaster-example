@@ -11,7 +11,7 @@ import {
 } from '../wallets/active-wallets';
 import { setWalletAvailability } from '../wallets/available-wallets';
 import configTopup from '../config/config-topup';
-import { getLepton } from '../lepton/lepton-init';
+import { getRailgunEngine } from '../lepton/lepton-init';
 import { unshieldTokens } from './unshield-tokens';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getCurrentNonce, waitForTx, waitForTxs } from './execute-transaction';
@@ -101,7 +101,7 @@ export const topUpWallet = async (
 
   // get relevant data for transactions
   const railWallet = getRailgunWallet();
-  const { prover } = getLepton();
+  const { prover } = getRailgunEngine();
 
   setWalletAvailability(topUpWallet, chain, false);
   const topUpTokens = await getTopUpTokenAmountsForChain(chain);

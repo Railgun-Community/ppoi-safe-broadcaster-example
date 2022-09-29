@@ -1,4 +1,3 @@
-import { Lepton } from '@railgun-community/lepton';
 import leveldown from 'leveldown';
 import { FallbackProvider } from '@ethersproject/providers';
 import { logger } from '../../util/logger';
@@ -6,52 +5,53 @@ import { artifactsGetter } from './artifacts';
 import { quickSync } from '../api/railgun-events/quick-sync';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
-import { LeptonDebugger } from '@railgun-community/lepton/dist/models/lepton-types';
 import { RelayerChain } from '../../models/chain-models';
-import  { groth16 } from 'snarkjs';
-import { Groth16 } from '@railgun-community/lepton/dist/prover';
+import { groth16 } from 'snarkjs';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
+import { EngineDebugger } from '@railgun-community/engine/dist/models/engine-types';
+import { Groth16 } from '@railgun-community/engine/dist/prover/prover';
 
-let lepton: Lepton;
+let lepton: RailgunEngine;
 
-export const getLepton = () => {
+export const getRailgunEngine = () => {
   if (!lepton) {
-    throw new Error('Lepton not yet init.');
+    throw new Error('RAILGUN RailgunEngine not yet init.');
   }
   return lepton;
 };
 
-export const initLepton = (optDebugger?: LeptonDebugger) => {
+export const initEngine = (optDebugger?: EngineDebugger) => {
   if (lepton) {
     return;
   }
   const levelDB = leveldown(configDefaults.lepton.dbDir);
-  const leptonDebugger: LeptonDebugger = optDebugger ?? {
+  const leptonDebugger: EngineDebugger = optDebugger ?? {
     log: (msg: string) => logger.log(msg),
     error: (error: Error) => {
       logger.warn('leptonDebugger error');
       logger.error(error);
     },
   };
-  lepton = new Lepton(
+  lepton = new RailgunEngine(
     'relayer',
     levelDB,
     artifactsGetter,
     quickSync,
     configDefaults.debug.lepton ? leptonDebugger : undefined,
   );
-  lepton.prover.setGroth16(groth16 as Groth16)
+  lepton.prover.setSnarkJSGroth16(groth16 as Groth16);
 };
 
 /**
  * Note: This call is async, but you may call it synchronously
  * so it will run the slow scan in the background.
  */
-export const initLeptonNetwork = async (
+export const initEngineNetwork = async (
   chain: RelayerChain,
   provider: FallbackProvider,
 ) => {
   if (!lepton) {
-    // No Lepton instance (might be in unit test).
+    // No RailgunEngine instance (might be in unit test).
     return;
   }
 
@@ -68,7 +68,7 @@ export const initLeptonNetwork = async (
     );
   } catch (err: any) {
     logger.warn(
-      `Could not load network ${chain.id} in Lepton: ${err.message}.`,
+      `Could not load network ${chain.id} in RailgunEngine: ${err.message}.`,
     );
   }
 };

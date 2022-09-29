@@ -1,4 +1,4 @@
-import { QuickSync } from '@railgun-community/lepton/dist/models/event-types';
+import { QuickSync } from '@railgun-community/engine/dist/models/event-types';
 import { RelayerChain } from '../../../models/chain-models';
 import configNetworks from '../../config/config-networks';
 import { getRailgunEventLog, QuickSyncEventLog } from './railgun-event-log';
@@ -10,7 +10,7 @@ export const quickSync: QuickSync = async (
 ): Promise<QuickSyncEventLog> => {
   const network = configNetworks[chain.type][chain.id];
   if (network.skipQuickScan) {
-    // Return empty logs, Lepton will default to full scan.
+    // Return empty logs, RailgunEngine will default to full scan.
     return {
       commitmentEvents: [],
       nullifierEvents: [],
