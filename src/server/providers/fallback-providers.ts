@@ -4,6 +4,7 @@ import {
   WebSocketProvider,
 } from '@ethersproject/providers';
 import { FallbackProviderJsonConfig } from '../../models/provider-models';
+import { providerDebugListener } from './provider-debug';
 
 export const createFallbackProviderFromJsonConfig = (
   config: FallbackProviderJsonConfig,
@@ -13,6 +14,7 @@ export const createFallbackProviderFromJsonConfig = (
     const provider = isWebsocket
       ? new WebSocketProvider(json.provider, Number(config.chainId))
       : new StaticJsonRpcProvider(json.provider, Number(config.chainId));
+    provider.on('debug', providerDebugListener);
     return {
       ...json,
       provider,
