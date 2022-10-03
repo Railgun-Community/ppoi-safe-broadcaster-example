@@ -3,8 +3,10 @@
  */
 
 import { DebugLevel } from './models/debug-models';
-import { NetworkChainID } from './server/config/config-chain-ids';
+import { NetworkChainID } from './server/config/config-chains';
 import configDefaults from './server/config/config-defaults';
+import configTokens from './server/config/config-tokens';
+import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 
 export const myConfigOverrides = () => {
   // Use these indices to configure HD wallets from the same mnemonic.
@@ -20,16 +22,16 @@ export const myConfigOverrides = () => {
   //
   configDefaults.debug.logLevel = DebugLevel.WarningsErrors;
   //
-  configDefaults.networks.active = [
+  configDefaults.networks.EVM = [
     NetworkChainID.Ethereum,
     NetworkChainID.Ropsten,
     NetworkChainID.BNBSmartChain,
     NetworkChainID.PolygonPOS,
   ];
-  //
-  // configTokens[NetworkChainID.Ethereum] = {
-  //   '0x_token_address': {
-  //     symbol: 'TOKEN1',
-  //   },
-  // };
+
+  configTokens[ChainType.EVM][NetworkChainID.Ethereum] = {
+    '0x_token_address': {
+      symbol: 'TOKEN1',
+    },
+  };
 };
