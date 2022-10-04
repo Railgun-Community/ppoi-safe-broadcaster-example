@@ -46,6 +46,7 @@
     "npm": "^8.10.0",
     "prompt-sync": "^4.2.0",
     "snarkjs": "^0.5.0",
+    "tslib": "^2.4.0",
     "web3-eth": "^1.7.3"
   },
   "devDependencies": {
