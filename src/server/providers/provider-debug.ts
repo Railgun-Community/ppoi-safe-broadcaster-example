@@ -13,6 +13,15 @@ type EthersError = Error & {
   url: string;
 };
 
+type RPCError = {
+  jsonrpc: string;
+  id: number;
+  error: {
+    code: number;
+    message: string;
+  };
+};
+
 type RPCRequest = {
   method: string;
   jsonrpc: string;
@@ -37,6 +46,15 @@ export const providerDebugListener = (debugEvent: ProviderDebugEvent) => {
       request: debugEvent.error.requestBody,
       code: debugEvent.error.code,
     };
-    dbg(info);
+    let body: RPCError | undefined;
+    try {
+      body = JSON.parse(info.body);
+    } catch (e: any) {
+      /* noop */
+    }
+    if (body && body?.error?.message === 'already known') {
+      return;
+    }
+    dbg(JSON.stringify(info));
   }
 };
