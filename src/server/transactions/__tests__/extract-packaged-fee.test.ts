@@ -1,4 +1,4 @@
-import { FallbackProvider } from '@ethersproject/providers';
+import { FallbackProvider, Provider } from '@ethersproject/providers';
 import {
   hexlify,
   padToLength,
@@ -141,16 +141,16 @@ describe('extract-packaged-fee', () => {
       ROPSTEN_CHAIN,
       ropstenProxyContractAddress,
       ropstenRelayAdaptContractAddress,
-      provider as FallbackProvider,
+      provider,
       0, // deploymentBlock
     );
     proxyContract = new RailgunProxyContract(
       ropstenProxyContractAddress,
-      provider,
+      provider as Provider,
     );
     relayAdaptContract = new RelayAdaptContract(
       ropstenRelayAdaptContractAddress,
-      provider,
+      provider as Provider,
     );
     railgunWallet = getRailgunWallet();
 
