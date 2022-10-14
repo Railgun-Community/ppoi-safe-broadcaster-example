@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { DebugLevel } from '../../models/debug-models';
 import { GAS_TOKEN_DECIMALS } from '../../models/token-models';
 import { NetworkChainID } from './config-chains';
@@ -118,16 +118,33 @@ export default {
 
   topUps: {
     /**
-     * Enable regular top-ups for each wallet when their gas tokens run low (ie. below networkConfig.gasToken.minimumBalanceForAvailability).
+     * Enablse regular top-ups for each wallet when their gas tokens run low (ie. below networkConfig.gasToken.minimumBalanceForAvailability).
      * Automatically unshields ERC-20 tokens from private balance and swaps for gas token.
      */
-    shouldTopUp: true,
+    shouldTopUp: false,
 
-    /* Minimum gas amount gained from token swap in order to trigger a top-up: Default is 1.5 [ETH] */
-    minimumGasSwapAmountForTopUp: BigNumber.from(10)
+    /**
+     * How often poller attempts to top-up wallets.
+     */
+    refreshDelayInMS: 10 * 60 * 1000,
+
+    /**
+     * Default slippage for swap transactions.
+     */
+    toleratedSlippage: 0.01,
+
+    /**
+     * Minimum gas amount gained from token swap in order to trigger a top-up: Default is 1.5 [ETH]
+     */
+    swapThresholdIntoGasToken: BigNumber.from(10)
       .pow(GAS_TOKEN_DECIMALS)
       .mul(15000)
       .div(10000),
+
+    /**
+     * Tokens not to top-up 
+     */
+    // shouldNotSwap: ,
   },
 
   waku: {

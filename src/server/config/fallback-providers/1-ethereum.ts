@@ -10,16 +10,6 @@ const config: FallbackProviderJsonConfig = {
       weight: 1,
     },
     {
-      provider: 'https://eth.railgun.ch',
-      priority: 2,
-      weight: 1,
-    },
-    {
-      provider: 'https://eth.railgun.org',
-      priority: 2,
-      weight: 1,
-    },
-    {
       provider: 'https://mainnet.infura.io/v3/84842078b09946638c03157f83405213',
       priority: 3,
       weight: 1,

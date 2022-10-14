@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {
   getTopUpWallet,
   initTopUpPoller,
+  shouldPollTopUp,
   stopTopUpPolling,
 } from '../wallet-top-up-poller';
 import { delay } from '../../../util/promise-utils';
@@ -20,6 +21,7 @@ import {
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { initEngine } from '../../lepton/lepton-init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -33,6 +35,7 @@ describe('wallet-top-up-poller', () => {
     configDefaults.topUps.shouldTopUp = true;
     resetGasTokenBalanceCache();
     resetAvailableWallets(MOCK_CHAIN);
+    initEngine();
     await setupSingleTestWallet();
   });
 
@@ -63,5 +66,10 @@ describe('wallet-top-up-poller', () => {
     stopTopUpPolling();
     expect(getActiveWallets.length).to.equal(0);
     restoreGasBalanceStub();
+  });
+
+  it('Should not poll for top up if less than two active wallets', async () => {
+    initTopUpPoller();
+    expect(shouldPollTopUp).to.equal(false);
   });
 }).timeout(20000);

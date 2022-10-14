@@ -8,12 +8,15 @@ import {
 import { Prover } from '@railgun-community/engine/dist/prover/prover';
 import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
 import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+import debug from 'debug';
 import { PopulatedTransaction } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { TokenAmount } from '../../models/token-models';
 import { getEstimateGasDetails } from '../fees/gas-estimate';
 import { getRailgunEngine } from '../lepton/lepton-init';
 import { executeTransaction } from './execute-transaction';
+
+const dbg = debug('relayer:unshield-tokens');
 
 export const generateUnshieldTransactions = async (
   prover: Prover,
@@ -47,8 +50,20 @@ export const generateUnshieldTransactions = async (
       ),
     );
   }
+  const txBatches: SerializedTransaction[][] = [];
 
-  const txBatches = await Promise.all(txBatchPromises);
+  // do not require success of *all* batch unshields; return succesful and report failures
+  const results = await Promise.allSettled(txBatchPromises);
+  results.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      txBatches.push(result.value);
+    } else if (result.status === 'rejected') {
+      dbg(
+        `Error generating batch unshield tx of ${tokenAmounts[index].tokenAddress}: ${result.reason}`,
+      );
+    }
+  });
+
   return txBatches.flat();
 };
 

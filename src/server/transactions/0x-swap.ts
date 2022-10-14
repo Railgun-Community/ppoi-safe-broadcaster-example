@@ -10,10 +10,10 @@ import { getEstimateGasDetails } from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
 import { ActiveWallet } from '../../models/wallet-models';
 import configNetworks from '../config/config-networks';
-import configWalletTopUpRefresher from '../config/config-wallet-top-up-refresher';
 import debug from 'debug';
 import { removeUndefineds } from '../../util/utils';
 import { RelayerChain } from '../../models/chain-models';
+import configDefaults from '../config/config-defaults';
 
 const dbg = debug('relayer:swaps');
 
@@ -29,7 +29,7 @@ export const generateSwapTransactions = async (
             chain,
             tokenAmount,
             configNetworks[chain.type][chain.id].gasToken.symbol,
-            configWalletTopUpRefresher.toleratedSlippage,
+            configDefaults.topUps.toleratedSlippage,
           );
           if (!swapQuote.quote) {
             dbg(
@@ -44,7 +44,7 @@ export const generateSwapTransactions = async (
           return populatedSwap;
         } catch (err: any) {
           dbg(
-            `Could not populate transaction for some token being swapped for top up: ${err.message}`,
+            `Could not populate transaction for token ${tokenAmount.tokenAddress} being swapped for top up: ${err.message}`,
           );
           return undefined;
         }

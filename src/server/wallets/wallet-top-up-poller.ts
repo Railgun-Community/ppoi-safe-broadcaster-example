@@ -2,15 +2,17 @@ import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { topUpWallet } from '../transactions/top-up-wallet';
-import configWalletTopUpRefresher from '../config/config-wallet-top-up-refresher';
 import { shouldTopUpWallet } from './available-wallets';
 import { getActiveWallets } from './active-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
 import configDefaults from '../config/config-defaults';
 import { RelayerChain } from '../../models/chain-models';
 import { removeUndefineds } from '../../util/utils';
+import debug from 'debug';
 
-let shouldPoll = true;
+const dbg = debug('relayer:top-up-poller');
+
+export let shouldPollTopUp = true;
 
 const pollTopUp = async () => {
   try {
@@ -27,20 +29,25 @@ const pollTopUp = async () => {
     logger.warn('top up error');
     logger.error(err);
   } finally {
-    await delay(configWalletTopUpRefresher.refreshDelayInMS);
-    if (shouldPoll) {
+    await delay(configDefaults.topUps.refreshDelayInMS);
+    if (shouldPollTopUp) {
       pollTopUp();
     }
   }
 };
 
 export const stopTopUpPolling = () => {
-  shouldPoll = false;
+  shouldPollTopUp = false;
 };
 
 export const initTopUpPoller = () => {
   if (!configDefaults.topUps.shouldTopUp) {
     return;
+  }
+  if (getActiveWallets().length < 2) {
+    dbg("must have at least two active wallets to enable top up functionality");
+    stopTopUpPolling();
+    return; 
   }
   pollTopUp();
 };

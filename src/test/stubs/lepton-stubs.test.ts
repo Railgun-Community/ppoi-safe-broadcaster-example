@@ -7,6 +7,7 @@ import {
   formatToByteLength,
 } from '@railgun-community/engine/dist/utils/bytes';
 import { getPublicViewingKey } from '@railgun-community/engine/dist/utils/keys-utils';
+import { AbstractWallet } from '@railgun-community/engine/dist/wallet/abstract-wallet';
 import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import { randomBytes } from 'ethers/lib/utils';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -57,6 +58,17 @@ export const createEngineWalletBalancesStub = async (
     .stub(RailgunWallet.prototype, 'balances')
     .resolves({ [tokenAddress]: await getMockBalanceData(tokenAddress, tree) });
 };
+
+export const createAbstractWalletBalancesStub = async (
+  tokenAddress: string,
+  tree: number,
+) => {
+  balancesStub = sinon
+    .stub(AbstractWallet.prototype, 'balances')
+    .resolves({ [tokenAddress]: await getMockBalanceData(tokenAddress, tree) });
+};
+ 
+
 
 export const createEngineWalletTreeBalancesStub = async (
   tokenAddress: string,

@@ -8,7 +8,6 @@ import {
 } from '@railgun-community/engine/dist/utils/bytes';
 
 const prompt = _prompt({ sigint: true });
-
 const getEncryptionKey = (): string => {
   const input = prompt('Enter passphrase to encrypt database: ');
   // input was already 32 bytes; don't hash

@@ -40,6 +40,7 @@ export const initEngine = (optDebugger?: EngineDebugger) => {
     configDefaults.debug.lepton ? leptonDebugger : undefined,
   );
   lepton.prover.setSnarkJSGroth16(groth16 as Groth16);
+  
 };
 
 /**

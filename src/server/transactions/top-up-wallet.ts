@@ -1,4 +1,3 @@
-import debug from 'debug';
 import { TokenAmount } from '../../models/token-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { zeroXGetSwapQuote } from '../api/0x/0x-quote';
@@ -15,7 +14,6 @@ import { unshieldTokens } from './unshield-tokens';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getCurrentNonce, waitForTx, waitForTxs } from './execute-transaction';
 import { approveZeroX } from './approve-spender';
-import configWalletTopUpRefresher from '../config/config-wallet-top-up-refresher';
 import configDefaults from '../config/config-defaults';
 import { swapZeroX } from './0x-swap';
 import {
@@ -25,8 +23,9 @@ import {
 } from '../balances/shielded-balance-cache';
 import { removeUndefineds } from '../../util/utils';
 import { RelayerChain } from '../../models/chain-models';
+import debug from 'debug';
 
-const dbg = debug('relayer:top-up');
+const dbg = debug('relayer:topup');
 
 const getPublicTokenAmountsAfterUnwrap = async (
   wallet: ActiveWallet,
@@ -55,6 +54,21 @@ const getShieldedTokenAmountsForChain = async (
   return shieldedBalancesForChain;
 };
 
+export const filterTopUpTokens = (
+  topUpTokens: TokenAmount[]
+): TokenAmount[] => {
+  // const desiredTopUpTokens = [];
+  // const desiredTopUpTokens: Optiona<TokenAmount>[] = await Promise.all (
+  //   topUpTokens.map( async (tokenAmount) => {
+  //       if (!configDefaults.topUps.shouldNotSwap.includes(tokenAmount.tokenAddress)){
+  //         return
+  //       }
+  //     }
+  //   )
+  // )
+  return [topUpTokens[0]]
+}
+
 export const getTopUpTokenAmountsForChain = async (
   chain: RelayerChain,
 ): Promise<TokenAmount[]> => {
@@ -69,12 +83,12 @@ export const getTopUpTokenAmountsForChain = async (
         chain,
         shieldedTokenCache.tokenAmount,
         gasTokenSymbol,
-        configWalletTopUpRefresher.toleratedSlippage,
+        configDefaults.topUps.toleratedSlippage,
       );
       try {
         if (
           tokenAmountInGasToken.quote?.buyTokenAmount.amount.gt(
-            configDefaults.topUps.minimumGasSwapAmountForTopUp,
+            configDefaults.topUps.swapThresholdIntoGasToken,
           )
         ) {
           return shieldedTokenCache.tokenAmount;
@@ -86,6 +100,7 @@ export const getTopUpTokenAmountsForChain = async (
       }
     }),
   );
+  const topUpTokensForChainDefined = removeUndefineds(topUpTokenAmountsForChain);
   return removeUndefineds(topUpTokenAmountsForChain);
 };
 
@@ -93,7 +108,16 @@ export const topUpWallet = async (
   topUpWallet: ActiveWallet,
   chain: RelayerChain,
 ) => {
-  // begin top-up
+  const topUpTokens = await getTopUpTokenAmountsForChain(chain);
+
+  if (topUpTokens.length === 0) {
+    dbg(
+      `No tokens to top up wallet ${topUpWallet.address} on chain ${chain.id}`,
+    );
+    return;
+  }
+
+  // begin topup
   dbg(
     `Begin top up for wallet with address ${topUpWallet.address} and index ${topUpWallet.index} on chain ${chain.type}:${chain.id}`,
   );
@@ -103,11 +127,10 @@ export const topUpWallet = async (
   const { prover } = getRailgunEngine();
 
   setWalletAvailability(topUpWallet, chain, false);
-  const topUpTokens = await getTopUpTokenAmountsForChain(chain);
   const provider = getProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(topUpWallet, provider);
   const nonce = await getCurrentNonce(chain, ethersWallet);
-
+  
   // unshield tokens intended to swap
   const batchResponse = await unshieldTokens(
     prover,

@@ -5,6 +5,7 @@ import {
   getPrivateTokenBalanceCache,
   parseRailBalanceAddress,
   ShieldedCachedBalance,
+  updateCachedShieldedBalances,
 } from '../shielded-balance-cache';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { throwErr } from '../../../util/promise-utils';
@@ -16,6 +17,7 @@ import { RelayerChain } from '../../../models/chain-models';
 import { initEngine } from '../../lepton/lepton-init';
 import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+import { restoreEngineStubs, createEngineWalletBalancesStub} from '../../../test/stubs/lepton-stubs.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -25,55 +27,12 @@ const MOCK_CHAIN = {
   id: NetworkChainID.Ethereum,
 };
 
-type NumMapType<T> = {
-  [index: number]: T;
-};
 
-const MOCK_TOKEN_AMOUNT = BigNumber.from('1200000000000000000');
-
-const shieldedTokenBalanceCache: NumMapType<ShieldedCachedBalance[]> = {};
-
-const mockUpdateCachedShieldedBalances = async (
-  wallet: RailgunWallet,
-  chain: RelayerChain,
-): Promise<void> => {
-  if (shieldedTokenBalanceCache[chain.id] === undefined) {
-    shieldedTokenBalanceCache[chain.id] = [];
-  }
-  const balances = await wallet.balances(chain).catch(throwErr);
-  const tokenAddresses = Object.keys(balances);
-  tokenAddresses.forEach((railBalanceAddress) => {
-    const parsedAddress =
-      parseRailBalanceAddress(railBalanceAddress).toLowerCase();
-    const tokenAmount: TokenAmount = {
-      tokenAddress: parsedAddress,
-      amount: BigNumber.from(balances[railBalanceAddress].balance.toString()),
-    };
-    shieldedTokenBalanceCache[chain.id].push({
-      tokenAmount,
-      updatedAt: Date.now(),
-    });
-  });
-  const mockTokenAmount: TokenAmount = {
-    tokenAddress: getMockToken().address,
-    amount: MOCK_TOKEN_AMOUNT,
-  };
-  shieldedTokenBalanceCache[chain.id].push({
-    tokenAmount: mockTokenAmount,
-    updatedAt: Date.now(),
-  });
-};
-
-export const mockGetPrivateTokenBalanceCache = (
-  chainID: NetworkChainID,
-): ShieldedCachedBalance[] => {
-  return shieldedTokenBalanceCache[chainID];
-};
+const MOCK_TOKEN_AMOUNT = BigNumber.from('1000000000000000000000');
 
 describe('shielded-balance-cache', () => {
   before(async () => {
     initEngine();
-    await setupSingleTestWallet();
     await setupSingleTestWallet();
   });
 
@@ -83,9 +42,11 @@ describe('shielded-balance-cache', () => {
 
   it('Should pull private token balance of live wallet', async () => {
     const wallet = getRailgunWallet();
-    await mockUpdateCachedShieldedBalances(wallet, MOCK_CHAIN);
+    await createEngineWalletBalancesStub(getMockToken().address, 0);
+    await updateCachedShieldedBalances(wallet, MOCK_CHAIN);    
     const mockBalance =
       getPrivateTokenBalanceCache(MOCK_CHAIN)[0].tokenAmount.amount;
     expect(mockBalance.toBigInt()).to.equal(MOCK_TOKEN_AMOUNT.toBigInt());
+    restoreEngineStubs();
   });
 }).timeout(30000);
