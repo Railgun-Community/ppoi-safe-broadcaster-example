@@ -24,9 +24,10 @@ export const myConfigOverrides = () => {
   //
   configDefaults.networks.EVM = [
     NetworkChainID.Ethereum,
-    NetworkChainID.Ropsten,
+    NetworkChainID.EthereumGoerli,
     NetworkChainID.BNBChain,
     NetworkChainID.PolygonPOS,
+    NetworkChainID.PolygonMumbai,
   ];
 
   configTokens[ChainType.EVM][NetworkChainID.Ethereum] = {
