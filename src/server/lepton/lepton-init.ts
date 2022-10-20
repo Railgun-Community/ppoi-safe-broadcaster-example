@@ -7,9 +7,9 @@ import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
 import { groth16 } from 'snarkjs';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
-import { EngineDebugger } from '@railgun-community/engine/dist/models/engine-types';
-import { Groth16 } from '@railgun-community/engine/dist/prover/prover';
+import { RailgunEngine } from '@railgun-community/engine';
+import { EngineDebugger } from '@railgun-community/engine';
+import { Groth16 } from '@railgun-community/engine';
 
 let lepton: RailgunEngine;
 
@@ -40,7 +40,6 @@ export const initEngine = (optDebugger?: EngineDebugger) => {
     configDefaults.debug.lepton ? leptonDebugger : undefined,
   );
   lepton.prover.setSnarkJSGroth16(groth16 as Groth16);
-  
 };
 
 /**

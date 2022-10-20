@@ -1,4 +1,4 @@
-import { PublicInputs } from '@railgun-community/engine/dist/prover/prover';
+import { PublicInputs } from '@railgun-community/engine';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { artifactsGetter } from '../artifacts';

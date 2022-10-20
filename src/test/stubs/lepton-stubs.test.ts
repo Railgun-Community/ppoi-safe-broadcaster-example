@@ -1,14 +1,14 @@
-import { ViewingKeyPair } from '@railgun-community/engine/dist/key-derivation/wallet-node';
-import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
-import { Note } from '@railgun-community/engine/dist/note/note';
-import { Prover } from '@railgun-community/engine/dist/prover/prover';
 import {
-  ByteLength,
+  ViewingKeyPair,
+  OutputType,
+  Note,
+  Prover,
   formatToByteLength,
-} from '@railgun-community/engine/dist/utils/bytes';
-import { getPublicViewingKey } from '@railgun-community/engine/dist/utils/keys-utils';
-import { AbstractWallet } from '@railgun-community/engine/dist/wallet/abstract-wallet';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+  getPublicViewingKey,
+  AbstractWallet,
+  RailgunWallet,
+  ByteLength,
+} from '@railgun-community/engine';
 import { randomBytes } from 'ethers/lib/utils';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
@@ -67,8 +67,6 @@ export const createAbstractWalletBalancesStub = async (
     .stub(AbstractWallet.prototype, 'balances')
     .resolves({ [tokenAddress]: await getMockBalanceData(tokenAddress, tree) });
 };
- 
-
 
 export const createEngineWalletTreeBalancesStub = async (
   tokenAddress: string,

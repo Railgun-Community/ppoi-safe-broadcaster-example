@@ -7,14 +7,14 @@ import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
 import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
-import { verifyED25519 } from '@railgun-community/engine/dist/utils/keys-utils';
+import { verifyED25519 } from '@railgun-community/engine';
 import {
   hexlify,
   hexStringToBytes,
   randomHex,
   toUTF8String,
-} from '@railgun-community/engine/dist/utils/bytes';
-import { tryDecryptJSONDataWithSharedKey } from '@railgun-community/engine/dist/utils/ecies';
+} from '@railgun-community/engine';
+import { tryDecryptJSONDataWithSharedKey } from '@railgun-community/engine';
 import {
   FeeMessage,
   FeeMessageData,
@@ -68,7 +68,7 @@ import {
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
+import { RailgunEngine } from '@railgun-community/engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

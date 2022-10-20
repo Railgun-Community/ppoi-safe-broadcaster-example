@@ -12,7 +12,7 @@ import configTokens from '../server/config/config-tokens';
 import { resetMapObject } from '../util/utils';
 import * as NetworkTokensModule from '../server/tokens/network-tokens';
 import { RelayerChain } from '../models/chain-models';
-import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
+import { ChainType } from '@railgun-community/engine';
 
 export const LEPTON_TEST_DB = 'lepton.test.db';
 const SETTINGS_TEST_DB = 'settings.test.db';

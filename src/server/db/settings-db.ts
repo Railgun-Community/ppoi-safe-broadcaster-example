@@ -1,5 +1,5 @@
-import { Database } from '@railgun-community/engine/dist/database/database';
-import { BytesData } from '@railgun-community/engine/dist/models/formatted-types';
+import { Database } from '@railgun-community/engine';
+import { BytesData } from '@railgun-community/engine';
 import leveldown from 'leveldown';
 import { logger } from '../../util/logger';
 import configDefaults from '../config/config-defaults';

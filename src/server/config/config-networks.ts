@@ -15,7 +15,7 @@ import {
 import { NetworkChainID } from './config-chains';
 import { NetworksConfig } from '../../models/config-models';
 import { EVMGasType } from '../../models/network-models';
-import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
+import { ChainType } from '@railgun-community/engine';
 import { NO_GAS_TOKEN_ADDRESS } from '../../models/token-models';
 
 // 10 minute timeout on ticket prices retrieved from API.

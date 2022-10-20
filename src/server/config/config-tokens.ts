@@ -13,7 +13,7 @@ import {
   BLUECHIP_POLY,
 } from './config-token-sets';
 import { NetworkChainID } from './config-chains';
-import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
+import { ChainType } from '@railgun-community/engine';
 
 /**
  *

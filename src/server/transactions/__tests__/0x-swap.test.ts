@@ -54,7 +54,7 @@ const TO_SWAP = [MOCK_TOKEN_AMOUNT_1, MOCK_TOKEN_AMOUNT_2];
 const MOCK_LOW_LIQUIDITY_CHAIN = testChainGoerli();
 const MOCK_CHAIN = testChainEthereum();
 
-describe.skip('swap', () => {
+describe('swap', () => {
   before(async () => {
     initEngine();
     initSettingsDB();

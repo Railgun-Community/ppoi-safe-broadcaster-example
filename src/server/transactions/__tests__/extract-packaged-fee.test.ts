@@ -1,9 +1,19 @@
 import { Provider } from '@ethersproject/providers';
 import {
+  AddressData,
   hexlify,
+  Note,
+  OutputType,
   padToLength,
+  RailgunEngine,
+  RailgunProxyContract,
+  RailgunWallet,
   randomHex,
-} from '@railgun-community/engine/dist/utils/bytes';
+  RelayAdaptContract,
+  SerializedTransaction,
+  TokenType,
+  TransactionBatch,
+} from '@railgun-community/engine';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
@@ -30,19 +40,7 @@ import {
   createEngineWalletBalancesStub,
   restoreEngineStubs,
 } from '../../../test/stubs/lepton-stubs.test';
-import {
-  OutputType,
-  SerializedTransaction,
-  TokenType,
-} from '@railgun-community/engine/dist/models/formatted-types';
-import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
 import { testChainHardhat, testChainGoerli } from '../../../test/setup.test';
-import { AddressData } from '@railgun-community/engine/dist/key-derivation/bech32';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
-import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy/railgun-proxy';
-import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
-import { Note } from '@railgun-community/engine/dist/note/note';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -147,6 +145,7 @@ describe('extract-packaged-fee', () => {
     proxyContract = new RailgunProxyContract(
       ropstenProxyContractAddress,
       provider as Provider,
+      ROPSTEN_CHAIN,
     );
     relayAdaptContract = new RelayAdaptContract(
       ropstenRelayAdaptContractAddress,

@@ -12,6 +12,7 @@ import debug from 'debug';
 
 const dbg = debug('relayer:top-up-poller');
 
+// eslint-disable-next-line import/no-mutable-exports
 export let shouldPollTopUp = true;
 
 const pollTopUp = async () => {
@@ -45,9 +46,9 @@ export const initTopUpPoller = () => {
     return;
   }
   if (getActiveWallets().length < 2) {
-    dbg("must have at least two active wallets to enable top up functionality");
+    dbg('must have at least two active wallets to enable top up functionality');
     stopTopUpPolling();
-    return; 
+    return;
   }
   pollTopUp();
 };

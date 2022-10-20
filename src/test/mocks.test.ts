@@ -11,10 +11,12 @@ import { EVMGasType, Network } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 import { Token, TokenConfig } from '../models/token-models';
 import { RelayerChain } from '../models/chain-models';
-import { getPublicViewingKey } from '@railgun-community/engine/dist/utils/keys-utils';
 import { randomBytes } from 'ethers/lib/utils';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
-import { ViewingKeyPair } from '@railgun-community/engine/dist/key-derivation/wallet-node';
+import {
+  RailgunEngine,
+  ViewingKeyPair,
+  getPublicViewingKey,
+} from '@railgun-community/engine';
 
 export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
   // @ts-ignore

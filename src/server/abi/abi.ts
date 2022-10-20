@@ -1,17 +1,19 @@
-import ABI_RAILGUN_LOGIC from '@railgun-community/engine/dist/abi/RailgunLogic.json';
-import ABI_RELAY_ADAPT from '@railgun-community/engine/dist/abi/RelayAdapt.json';
-import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
+import {
+  ABIRailgunLogic,
+  ABIRelayAdapt,
+  ChainType,
+} from '@railgun-community/engine';
 import { RelayerChain } from '../../models/chain-models';
 import { NetworkChainID } from '../config/config-chains';
 import ABI_ERC20 from './json/erc20.json';
 import ZERO_X_ABI from './json/zerox.json';
 
 export const abiForProxyContract = () => {
-  return ABI_RAILGUN_LOGIC;
+  return ABIRailgunLogic;
 };
 
 export const abiForRelayAdaptContract = () => {
-  return ABI_RELAY_ADAPT;
+  return ABIRelayAdapt;
 };
 
 export const zeroXAbiForChain = (chain: RelayerChain): Array<any> => {

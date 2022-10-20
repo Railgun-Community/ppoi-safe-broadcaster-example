@@ -1,4 +1,4 @@
-import { QuickSync } from '@railgun-community/engine/dist/models/event-types';
+import { QuickSync } from '@railgun-community/engine';
 import { RelayerChain } from '../../../models/chain-models';
 import configNetworks from '../../config/config-networks';
 import { getRailgunEventLog, QuickSyncEventLog } from './railgun-event-log';

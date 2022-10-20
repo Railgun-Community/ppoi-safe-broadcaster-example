@@ -8,7 +8,7 @@ import {
 } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { initEngine } from '../../lepton/lepton-init';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
+import { RailgunEngine } from '@railgun-community/engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

@@ -1,7 +1,4 @@
-import {
-  ArtifactsGetter,
-  PublicInputs,
-} from '@railgun-community/engine/dist/prover/prover';
+import { ArtifactsGetter, PublicInputs } from '@railgun-community/engine';
 // @ts-ignore
 import artifacts from '@railgun-community/test-artifacts';
 

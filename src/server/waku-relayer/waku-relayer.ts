@@ -5,7 +5,7 @@ import {
   fromUTF8String,
   hexlify,
   hexStringToBytes,
-} from '@railgun-community/engine/dist/utils/bytes';
+} from '@railgun-community/engine';
 import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
@@ -18,7 +18,7 @@ import { WakuMethodResponse } from './waku-response';
 import configNetworks from '../config/config-networks';
 import configDefaults from '../config/config-defaults';
 import { RelayerChain } from '../../models/chain-models';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+import { RailgunWallet } from '@railgun-community/engine';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 

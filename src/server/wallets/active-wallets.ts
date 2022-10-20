@@ -18,8 +18,8 @@ import { RelayerChain } from '../../models/chain-models';
 import {
   AddressData,
   decodeAddress,
-} from '@railgun-community/engine/dist/key-derivation/bech32';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+  RailgunWallet,
+} from '@railgun-community/engine';
 
 const activeWallets: ActiveWallet[] = [];
 

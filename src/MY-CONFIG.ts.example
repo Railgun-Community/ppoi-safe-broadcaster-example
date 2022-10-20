@@ -6,7 +6,7 @@ import { DebugLevel } from './models/debug-models';
 import { NetworkChainID } from './server/config/config-chains';
 import configDefaults from './server/config/config-defaults';
 import configTokens from './server/config/config-tokens';
-import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
+import { ChainType } from '@railgun-community/engine';
 
 export const myConfigOverrides = () => {
   // Use these indices to configure HD wallets from the same mnemonic.

@@ -15,9 +15,12 @@ import { getRailgunWallet } from '../../wallets/active-wallets';
 import { getMockToken } from '../../../test/mocks.test';
 import { RelayerChain } from '../../../models/chain-models';
 import { initEngine } from '../../lepton/lepton-init';
-import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
-import { restoreEngineStubs, createEngineWalletBalancesStub} from '../../../test/stubs/lepton-stubs.test';
+import { ChainType } from '@railgun-community/engine';
+import { RailgunWallet } from '@railgun-community/engine';
+import {
+  restoreEngineStubs,
+  createEngineWalletBalancesStub,
+} from '../../../test/stubs/lepton-stubs.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -26,7 +29,6 @@ const MOCK_CHAIN = {
   type: ChainType.EVM,
   id: NetworkChainID.Ethereum,
 };
-
 
 const MOCK_TOKEN_AMOUNT = BigNumber.from('1000000000000000000000');
 
@@ -43,7 +45,7 @@ describe('shielded-balance-cache', () => {
   it('Should pull private token balance of live wallet', async () => {
     const wallet = getRailgunWallet();
     await createEngineWalletBalancesStub(getMockToken().address, 0);
-    await updateCachedShieldedBalances(wallet, MOCK_CHAIN);    
+    await updateCachedShieldedBalances(wallet, MOCK_CHAIN);
     const mockBalance =
       getPrivateTokenBalanceCache(MOCK_CHAIN)[0].tokenAmount.amount;
     expect(mockBalance.toBigInt()).to.equal(MOCK_TOKEN_AMOUNT.toBigInt());
