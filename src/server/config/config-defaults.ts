@@ -118,7 +118,7 @@ export default {
 
   topUps: {
     /**
-     * Enablse regular top-ups for each wallet when their gas tokens run low (ie. below networkConfig.gasToken.minimumBalanceForAvailability).
+     * Enables regular top-ups for each wallet when their gas tokens run low (ie. below networkConfig.gasToken.minimumBalanceForAvailability).
      * Automatically unshields ERC-20 tokens from private balance and swaps for gas token.
      */
     shouldTopUp: false,
@@ -140,11 +140,6 @@ export default {
       .pow(GAS_TOKEN_DECIMALS)
       .mul(15000)
       .div(10000),
-
-    /**
-     * Tokens not to top-up 
-     */
-    // shouldNotSwap: ,
   },
 
   waku: {
