@@ -15,13 +15,15 @@ const zeroXApiUrl = (chain: RelayerChain): string => {
       switch (chain.id) {
         case NetworkChainID.Ethereum:
           return 'https://api.0x.org/';
-        case NetworkChainID.Ropsten:
-          return 'https://ropsten.api.0x.org/';
-        case NetworkChainID.BNBSmartChain:
+        case NetworkChainID.EthereumGoerli:
+          return 'https://goerli.api.0x.org/';
+        case NetworkChainID.BNBChain:
           return 'https://bsc.api.0x.org/';
         case NetworkChainID.PolygonPOS:
           return 'https://polygon.api.0x.org/';
-        case NetworkChainID.HardHat:
+        case NetworkChainID.PolygonMumbai:
+          return 'https://mumbai.api.0x.org/';
+        case NetworkChainID.Hardhat:
           throw new Error(`No 0x API URL for chain ${chain}`);
       }
     }

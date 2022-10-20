@@ -15,7 +15,7 @@ import {
 import configNetworks from '../../../config/config-networks';
 import {
   getMockNetwork,
-  getMockRopstenNetwork,
+  getMockGoerliNetwork,
   getMockTokenConfig,
 } from '../../../../test/mocks.test';
 import configTokens from '../../../config/config-tokens';
@@ -25,7 +25,7 @@ import { coingeckoUpdatePricesByAddresses } from '../coingecko-price';
 import { RelayerChain } from '../../../../models/chain-models';
 import {
   testChainEthereum,
-  testChainRopsten,
+  testChainGoerli,
 } from '../../../../test/setup.test';
 
 chai.use(chaiAsPromised);
@@ -35,9 +35,9 @@ const TOKEN_ADDRESS_1 = '0x013573';
 const TOKEN_ADDRESS_2 = '0x73829';
 const TOKEN_ADDRESSES = [TOKEN_ADDRESS_1, TOKEN_ADDRESS_2];
 
-const ropstenNetwork = getMockRopstenNetwork();
+const ropstenNetwork = getMockGoerliNetwork();
 const chainEthereum = testChainEthereum();
-const chainRopsten = testChainRopsten();
+const chainRopsten = testChainGoerli();
 
 const TOKEN_PRICE_SOURCE = TokenPriceSource.CoinGecko;
 

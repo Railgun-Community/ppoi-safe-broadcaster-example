@@ -16,7 +16,7 @@ import { initTokens } from '../network-tokens';
 import { RelayerChain } from '../../../models/chain-models';
 import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
 import { NetworkChainID } from '../../config/config-chains';
-import { testChainEthereum, testChainRopsten } from '../../../test/setup.test';
+import { testChainEthereum, testChainGoerli } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -96,7 +96,7 @@ describe('token-price-poller', () => {
     stopTokenPricePolling();
 
     expect(() =>
-      lookUpCachedTokenPrice(testChainRopsten(), MOCK_TOKEN_ADDRESS_1),
+      lookUpCachedTokenPrice(testChainGoerli(), MOCK_TOKEN_ADDRESS_1),
     ).to.throw(`No cached price for token: ${MOCK_TOKEN_ADDRESS_1}`);
     expect(
       lookUpCachedTokenPrice(testChainEthereum(), MOCK_TOKEN_ADDRESS_1),

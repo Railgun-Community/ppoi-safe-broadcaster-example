@@ -1,4 +1,4 @@
-export enum TokenAddressEth {
+export enum TokenAddressEthereum {
   USDT = '0xdac17f958d2ee523a2206206994597c13d831ec7',
   WETH = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   WBTC = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
@@ -14,10 +14,9 @@ export enum TokenAddressEth {
   RENDOGE = '0x3832d2f059e55934220881f831be501d180671a7',
   RENFIL = '0xd5147bc8e386d91cc5dbe72099dac6c9b99276f5',
 }
-export enum TokenAddressRopsten {
-  WETH = '0xc778417e063141139fce010982780140aa0cd5ab',
-  TESTERC20 = '0xAa753fb4e77ea8Adb16200865839ffB1d86BAE5E',
-  RAILLEGACY = '0x784dbb737703225a6d5defffc7b395d59e348e3d',
+export enum TokenAddressGoerli {
+  WETH = '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+  DAI = '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F',
 }
 export enum TokenAddressBSC {
   WBNB = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
@@ -30,7 +29,7 @@ export enum TokenAddressBSC {
   // Unused until more liquidity and price stability:
   // RAILBSC = '0x3F847b01d4d498a293e3197B186356039eCd737F',
 }
-export enum TokenAddressPoly {
+export enum TokenAddressPolygonPOS {
   WMATIC = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
   DAI = '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063',
   BNB = '0xA649325Aa7C5093d12D6F98EB4378deAe68CE23F',
@@ -40,4 +39,7 @@ export enum TokenAddressPoly {
   WBTC = '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
   // Unused until more liquidity and price stability:
   // RAILPOLY = '0x92A9C92C215092720C731c96D4Ff508c831a714f',
+}
+export enum TokenAddressPolygonMumbai {
+  WMATIC = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
 }

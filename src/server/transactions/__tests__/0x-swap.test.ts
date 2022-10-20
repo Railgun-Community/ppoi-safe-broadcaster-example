@@ -7,11 +7,11 @@ import {
   TransactionResponse,
 } from '@ethersproject/providers';
 import { getActiveWallets } from '../../wallets/active-wallets';
-import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
+import { getMockGoerliNetwork, getMockToken } from '../../../test/mocks.test';
 import {
   setupSingleTestWallet,
   testChainEthereum,
-  testChainRopsten,
+  testChainGoerli,
 } from '../../../test/setup.test';
 import { initEngine } from '../../lepton/lepton-init';
 import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
@@ -51,7 +51,7 @@ const MOCK_TOKEN_AMOUNT_2 = {
 };
 const TO_SWAP = [MOCK_TOKEN_AMOUNT_1, MOCK_TOKEN_AMOUNT_2];
 
-const MOCK_LOW_LIQUIDITY_CHAIN = testChainRopsten();
+const MOCK_LOW_LIQUIDITY_CHAIN = testChainGoerli();
 const MOCK_CHAIN = testChainEthereum();
 
 describe.skip('swap', () => {
@@ -61,8 +61,8 @@ describe.skip('swap', () => {
     clearSettingsDB();
     await setupSingleTestWallet();
     [activeWallet] = getActiveWallets();
-    configNetworks[testChainRopsten().type][testChainRopsten().id] =
-      getMockRopstenNetwork();
+    configNetworks[testChainGoerli().type][testChainGoerli().id] =
+      getMockGoerliNetwork();
     initNetworkProviders();
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getTransactionCount')

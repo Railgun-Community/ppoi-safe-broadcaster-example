@@ -10,7 +10,6 @@ import {
   getRailgunWallet,
 } from '../wallets/active-wallets';
 import { setWalletAvailability } from '../wallets/available-wallets';
-import configTopup from '../config/config-top-up';
 import { getRailgunEngine } from '../lepton/lepton-init';
 import { unshieldTokens } from './unshield-tokens';
 import { getProviderForNetwork } from '../providers/active-network-providers';
@@ -75,7 +74,7 @@ export const getTopUpTokenAmountsForChain = async (
       try {
         if (
           tokenAmountInGasToken.quote?.buyTokenAmount.amount.gt(
-            configTopup.amountInGasToken,
+            configDefaults.topUps.minimumGasSwapAmountForTopUp,
           )
         ) {
           return shieldedTokenCache.tokenAmount;

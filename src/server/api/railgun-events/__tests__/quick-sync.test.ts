@@ -4,7 +4,7 @@ import sinon, { SinonStub } from 'sinon';
 import axios from 'axios';
 import { quickSync } from '../quick-sync';
 import configNetworks from '../../../config/config-networks';
-import { getMockRopstenNetwork } from '../../../../test/mocks.test';
+import { getMockGoerliNetwork } from '../../../../test/mocks.test';
 import { testChainEthereum } from '../../../../test/setup.test';
 
 chai.use(chaiAsPromised);
@@ -15,10 +15,10 @@ const MOCK_CHAIN_ETHEREUM = testChainEthereum();
 describe('quick-sync', () => {
   before(() => {
     configNetworks[MOCK_CHAIN_ETHEREUM.type][MOCK_CHAIN_ETHEREUM.id] =
-      getMockRopstenNetwork();
+      getMockGoerliNetwork();
   });
 
-  it('Should run live Railgun Event Log fetch for Ropsten', async () => {
+  it('Should run live Railgun Event Log fetch for Ethereum', async () => {
     const eventLog = await quickSync(MOCK_CHAIN_ETHEREUM, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');

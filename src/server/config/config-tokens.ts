@@ -1,5 +1,8 @@
 import { NetworkTokensConfig } from '../../models/config-models';
-import { TokenAddressRopsten } from './config-token-addresses';
+import {
+  TokenAddressGoerli,
+  TokenAddressPolygonMumbai,
+} from './config-token-addresses';
 import {
   STABLES_ETH,
   STABLES_BSC,
@@ -23,38 +26,40 @@ import { ChainType } from '@railgun-community/engine/dist/models/engine-types';
  *
  */
 
-export default {
+const tokensConfig: NetworkTokensConfig = {
   [ChainType.EVM]: {
     [NetworkChainID.Ethereum]: {
       ...STABLES_ETH,
       ...BLUECHIP_ETH,
       ...REN_TOKENS_ETH,
     },
+    [NetworkChainID.EthereumGoerli]: {
+      [TokenAddressGoerli.WETH]: {
+        symbol: 'WETH',
+      },
+      [TokenAddressGoerli.DAI]: {
+        symbol: 'DAI',
+      },
+    },
+    [NetworkChainID.BNBChain]: {
+      ...BLUECHIP_BSC,
+      ...STABLES_BSC,
+    },
     [NetworkChainID.PolygonPOS]: {
       ...STABLES_POLY,
       ...BLUECHIP_POLY,
     },
-    [NetworkChainID.BNBSmartChain]: {
-      ...BLUECHIP_BSC,
-      ...STABLES_BSC,
-    },
-
-    [NetworkChainID.Ropsten]: {
-      [TokenAddressRopsten.WETH]: {
-        symbol: 'WETH',
-      },
-      [TokenAddressRopsten.TESTERC20]: {
-        symbol: 'TESTERC20',
-      },
-      [TokenAddressRopsten.RAILLEGACY]: {
-        symbol: 'RAILLEGACY',
+    [NetworkChainID.PolygonMumbai]: {
+      [TokenAddressPolygonMumbai.WMATIC]: {
+        symbol: 'WMATIC',
       },
     },
-
-    [NetworkChainID.HardHat]: {
+    [NetworkChainID.Hardhat]: {
       '0x5FbDB2315678afecb367f032d93F642f64180aa3': {
         symbol: 'TESTERC20',
       },
     },
   },
-} as NetworkTokensConfig;
+};
+
+export default tokensConfig;

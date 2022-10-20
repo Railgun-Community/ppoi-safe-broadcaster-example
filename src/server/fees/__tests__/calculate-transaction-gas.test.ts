@@ -3,7 +3,6 @@ import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { assert } from 'console';
 import configNetworks from '../../config/config-networks';
-import { GasTokenWrappedAddress } from '../../../models/token-models';
 import {
   getMockNetwork,
   getMockPopulatedTransaction,
@@ -30,12 +29,13 @@ import {
 import { initTokens } from '../../tokens/network-tokens';
 import { EVMGasType } from '../../../models/network-models';
 import { testChainEthereum } from '../../../test/setup.test';
+import { BaseTokenWrappedAddress } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const MOCK_CHAIN = testChainEthereum();
-const MOCK_GAS_TOKEN = GasTokenWrappedAddress.EthereumWETH;
+const MOCK_GAS_TOKEN = BaseTokenWrappedAddress.EthereumWETH;
 const MOCK_TOKEN_ADDRESS = '0x001';
 
 // 0.10 estimate (est * price), 0.12 ETH total (gas limit).

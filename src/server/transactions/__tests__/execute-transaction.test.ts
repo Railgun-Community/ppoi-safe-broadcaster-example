@@ -20,11 +20,11 @@ import {
 import {
   getMockPopulatedTransaction,
   getMockProvider,
-  getMockRopstenNetwork,
+  getMockGoerliNetwork,
 } from '../../../test/mocks.test';
 import {
   setupSingleTestWallet,
-  testChainRopsten,
+  testChainGoerli,
 } from '../../../test/setup.test';
 import { initEngine } from '../../lepton/lepton-init';
 import {
@@ -58,7 +58,7 @@ let sendTransactionStub: SinonStub;
 let waitTxStub: SinonStub;
 let getBestMatchWalletForNetwork: SinonStub;
 
-const MOCK_CHAIN = testChainRopsten();
+const MOCK_CHAIN = testChainGoerli();
 
 describe('execute-transaction', () => {
   before(async () => {
@@ -67,8 +67,8 @@ describe('execute-transaction', () => {
     clearSettingsDB();
     await setupSingleTestWallet();
     [activeWallet] = getActiveWallets();
-    configNetworks[testChainRopsten().type][testChainRopsten().id] =
-      getMockRopstenNetwork();
+    configNetworks[testChainGoerli().type][testChainGoerli().id] =
+      getMockGoerliNetwork();
     initNetworkProviders();
     ethersWallet = createEthersWallet(activeWallet, getMockProvider());
     walletGetTransactionCountStub = sinon

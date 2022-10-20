@@ -1,4 +1,4 @@
-import { FallbackProvider, Provider } from '@ethersproject/providers';
+import { Provider } from '@ethersproject/providers';
 import {
   hexlify,
   padToLength,
@@ -9,7 +9,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import configDefaults from '../../config/config-defaults';
 import {
-  getMockRopstenNetwork,
+  getMockGoerliNetwork,
   getMockToken,
   mockViewingKeys,
 } from '../../../test/mocks.test';
@@ -36,7 +36,7 @@ import {
   TokenType,
 } from '@railgun-community/engine/dist/models/formatted-types';
 import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
-import { testChainHardhat, testChainRopsten } from '../../../test/setup.test';
+import { testChainHardhat, testChainGoerli } from '../../../test/setup.test';
 import { AddressData } from '@railgun-community/engine/dist/key-derivation/bech32';
 import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy/railgun-proxy';
@@ -55,7 +55,7 @@ const RANDOM = randomHex(16);
 const MOCK_TOKEN_ADDRESS = getMockToken().address;
 
 const TREE = 0;
-const ROPSTEN_CHAIN = testChainRopsten();
+const ROPSTEN_CHAIN = testChainGoerli();
 const HARDHAT_CHAIN = testChainHardhat();
 const MOCK_MNEMONIC_1 =
   'test test test test test test test test test test test junk';
@@ -126,7 +126,7 @@ describe('extract-packaged-fee', () => {
     configDefaults.wallet.mnemonic = MOCK_MNEMONIC_1;
     await initWallets();
 
-    const ropstenNetwork = getMockRopstenNetwork();
+    const ropstenNetwork = getMockGoerliNetwork();
     const {
       proxyContract: ropstenProxyContractAddress,
       relayAdaptContract: ropstenRelayAdaptContractAddress,

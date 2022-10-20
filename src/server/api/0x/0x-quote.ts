@@ -46,19 +46,19 @@ export const zeroXExchangeProxyContractAddress = (chain: RelayerChain) => {
   switch (chain.type) {
     case ChainType.EVM: {
       switch (chain.id) {
-        case NetworkChainID.Ropsten:
         case NetworkChainID.Ethereum:
         case NetworkChainID.PolygonPOS:
-        case NetworkChainID.BNBSmartChain:
+        case NetworkChainID.BNBChain:
           return '0xdef1c0ded9bec7f1a1670819833240f027b25eff';
-        case NetworkChainID.HardHat:
+        case NetworkChainID.EthereumGoerli:
+          return '0xf91bb752490473b8342a3e964e855b9f9a2a668e';
+        case NetworkChainID.PolygonMumbai:
+          return '0xf471d32cb40837bf24529fcf17418fc1a4807626';
+        case NetworkChainID.Hardhat:
           throw new Error('Unsupported network for 0x Exchange');
       }
     }
   }
-  throw new Error(
-    `Unsupported network for 0x Exchange: ${chain.type}:${chain.id}`,
-  );
 };
 
 // const validateZeroXDataField = (

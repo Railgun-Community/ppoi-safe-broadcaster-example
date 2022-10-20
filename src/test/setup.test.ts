@@ -71,16 +71,16 @@ export const resetConfigDefaults = () => {
   }
 };
 
-export const testChainRopsten = (): RelayerChain => {
+export const testChainGoerli = (): RelayerChain => {
   return {
     type: ChainType.EVM,
-    id: NetworkChainID.Ropsten,
+    id: NetworkChainID.EthereumGoerli,
   };
 };
 export const testChainHardhat = (): RelayerChain => {
   return {
     type: ChainType.EVM,
-    id: NetworkChainID.HardHat,
+    id: NetworkChainID.Hardhat,
   };
 };
 

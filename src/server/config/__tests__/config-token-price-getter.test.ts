@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { getMockRopstenNetwork } from '../../../test/mocks.test';
-import { testChainRopsten } from '../../../test/setup.test';
+import { getMockGoerliNetwork } from '../../../test/mocks.test';
+import { testChainGoerli } from '../../../test/setup.test';
 import { initTokens } from '../../tokens/network-tokens';
 import {
   getTokenPriceCache,
@@ -14,9 +14,9 @@ import configTokens from '../config-tokens';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const testNetwork = getMockRopstenNetwork();
+const testNetwork = getMockGoerliNetwork();
 const MOCK_TOKEN_ADDRESS = '0x123';
-const MOCK_CHAIN = testChainRopsten();
+const MOCK_CHAIN = testChainGoerli();
 
 describe('config-token-price-refresher', () => {
   before(async () => {

@@ -6,7 +6,7 @@ import {
   getActiveWallets,
   getRailgunWallet,
 } from '../../wallets/active-wallets';
-import { getMockRopstenNetwork, getMockToken } from '../../../test/mocks.test';
+import { getMockGoerliNetwork, getMockToken } from '../../../test/mocks.test';
 import {
   setupSingleTestWallet,
   testChainEthereum,
@@ -81,7 +81,7 @@ describe('unshield-tokens', () => {
     await setupSingleTestWallet();
     railWallet = getRailgunWallet();
     [activeWallet] = getActiveWallets();
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockRopstenNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockGoerliNetwork();
     initNetworkProviders();
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getTransactionCount')

@@ -49,7 +49,7 @@ import {NetworkChainID} from './server/config/config-chain-ids';
 configDefaults.networks.active = [
     NetworkChainID.Ropsten,
     NetworkChainID.Ethereum,
-    NetworkChainID.BNBSmartChain,
+    NetworkChainID.BNBChain,
   ];
 ```
 

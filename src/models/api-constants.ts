@@ -1,5 +1,5 @@
 export enum CoingeckoNetworkID {
   Ethereum = 'ethereum',
-  BNBSmartChain = 'binance-smart-chain',
+  BNBChain = 'binance-smart-chain',
   PolygonPOS = 'polygon-pos',
 }

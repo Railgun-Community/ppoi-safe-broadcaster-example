@@ -20,7 +20,7 @@ export const updateTestNetworkDefaultPrices = (
   updater: TokenPriceUpdater,
 ): void => {
   // Assigns simple values for test nets without
-  // price lookups available (eg. Ropsten, HardHat).
+  // price lookups available (eg. Ropsten, Hardhat).
   const network = configNetworks[chain.type][chain.id];
   const tokenAddresses = allTokenAddressesForNetwork(chain);
   tokenAddresses.forEach((tokenAddress) => {

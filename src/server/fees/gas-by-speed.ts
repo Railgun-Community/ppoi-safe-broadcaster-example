@@ -151,11 +151,12 @@ const gasHistoryPercentileForChain = (
       switch (chain.id) {
         case NetworkChainID.Ethereum:
           return GasHistoryPercentile.Low;
-        case NetworkChainID.HardHat:
+        case NetworkChainID.Hardhat:
           return GasHistoryPercentile.Medium;
-        case NetworkChainID.BNBSmartChain:
+        case NetworkChainID.EthereumGoerli:
+        case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
-        case NetworkChainID.Ropsten:
+        case NetworkChainID.PolygonMumbai:
           return GasHistoryPercentile.High;
       }
     }

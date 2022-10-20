@@ -19,11 +19,15 @@ export const zeroXAbiForChain = (chain: RelayerChain): Array<any> => {
     case ChainType.EVM: {
       switch (chain.id) {
         case NetworkChainID.Ethereum:
-        case NetworkChainID.BNBSmartChain:
+        case NetworkChainID.EthereumGoerli:
+        case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
-        case NetworkChainID.Ropsten:
-        case NetworkChainID.HardHat:
+        case NetworkChainID.PolygonMumbai:
           return ZERO_X_ABI;
+        case NetworkChainID.Hardhat:
+          throw new Error(
+            `0x API not available on chain ${chain.type}:${chain.id}`,
+          );
       }
     }
   }
@@ -34,10 +38,11 @@ export const abiForChainToken = (chain: RelayerChain): Array<any> => {
     case ChainType.EVM: {
       switch (chain.id) {
         case NetworkChainID.Ethereum:
-        case NetworkChainID.BNBSmartChain:
+        case NetworkChainID.EthereumGoerli:
+        case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
-        case NetworkChainID.Ropsten:
-        case NetworkChainID.HardHat:
+        case NetworkChainID.PolygonMumbai:
+        case NetworkChainID.Hardhat:
           return ABI_ERC20;
       }
     }

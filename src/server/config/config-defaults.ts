@@ -1,4 +1,6 @@
+import { BigNumber } from 'ethers';
 import { DebugLevel } from '../../models/debug-models';
+import { GAS_TOKEN_DECIMALS } from '../../models/token-models';
 import { NetworkChainID } from './config-chains';
 import secrets from './config-secrets';
 
@@ -6,13 +8,15 @@ export default {
   networks: {
     /*
      * Blockchain networks to activate.
+     * All active by default.
      */
     EVM: [
       NetworkChainID.Ethereum,
-      NetworkChainID.Ropsten,
-      NetworkChainID.BNBSmartChain,
+      NetworkChainID.EthereumGoerli,
+      NetworkChainID.BNBChain,
       NetworkChainID.PolygonPOS,
-      NetworkChainID.HardHat,
+      NetworkChainID.PolygonMumbai,
+      NetworkChainID.Hardhat,
     ],
   },
 
@@ -118,6 +122,12 @@ export default {
      * Automatically unshields ERC-20 tokens from private balance and swaps for gas token.
      */
     shouldTopUp: true,
+
+    /* Minimum gas amount gained from token swap in order to trigger a top-up: Default is 1.5 [ETH] */
+    minimumGasSwapAmountForTopUp: BigNumber.from(10)
+      .pow(GAS_TOKEN_DECIMALS)
+      .mul(15000)
+      .div(10000),
   },
 
   waku: {

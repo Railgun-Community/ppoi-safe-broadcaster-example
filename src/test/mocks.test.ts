@@ -3,16 +3,13 @@ import { PopulatedTransaction } from 'ethers';
 import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import {
-  RailProxyContract,
+  BaseTokenWrappedAddress,
+  RailgunProxyContract,
   RelayAdaptContract,
-} from '../models/contract-constants';
+} from '@railgun-community/shared-models';
 import { EVMGasType, Network } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
-import {
-  GasTokenWrappedAddress,
-  Token,
-  TokenConfig,
-} from '../models/token-models';
+import { Token, TokenConfig } from '../models/token-models';
 import { RelayerChain } from '../models/chain-models';
 import { getPublicViewingKey } from '@railgun-community/engine/dist/utils/keys-utils';
 import { randomBytes } from 'ethers/lib/utils';
@@ -47,26 +44,25 @@ export const getMockFallbackProviderConfig = (): FallbackProviderJsonConfig => {
   };
 };
 
-export const getMockRopstenFallbackProviderConfig =
-  (): FallbackProviderJsonConfig => {
-    return {
-      chainId: 3,
-      providers: [
-        {
-          provider:
-            'https://ropsten.infura.io/v3/84842078b09946638c03157f83405213',
-          priority: 1,
-          weight: 1,
-        },
-        {
-          provider:
-            'https://eth-rinkeby.gateway.pokt.network/v1/6004bd4d0040261633ade991',
-          priority: 1,
-          weight: 1,
-        },
-      ],
-    };
+const getMockGoerliFallbackProviderConfig = (): FallbackProviderJsonConfig => {
+  return {
+    chainId: 5,
+    providers: [
+      {
+        provider:
+          'https://eth-goerli.gateway.pokt.network/v1/lb/627a4b6e18e53a003a6b6c26',
+        priority: 1,
+        weight: 1,
+      },
+      {
+        provider:
+          'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+        priority: 2,
+        weight: 1,
+      },
+    ],
   };
+};
 
 export const getMockProvider = (): BaseProvider => {
   return new BaseProvider({ name: 'Ethereum', chainId: 1 });
@@ -77,14 +73,14 @@ export const getMockNetwork = (): Network => {
     name: 'Ethereum',
     gasToken: {
       symbol: 'ETH',
-      wrappedAddress: GasTokenWrappedAddress.EthereumWETH,
+      wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
       minimumBalanceForAvailability: 0.1,
     },
     fees: {
       slippageBuffer: 0.03,
       profit: 0.07,
     },
-    proxyContract: '0x00' as RailProxyContract,
+    proxyContract: '0x00' as RailgunProxyContract,
     relayAdaptContract: '0x00' as RelayAdaptContract,
     coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: getMockFallbackProviderConfig(),
@@ -93,9 +89,9 @@ export const getMockNetwork = (): Network => {
   };
 };
 
-export const getMockRopstenNetwork = (): Network => {
+export const getMockGoerliNetwork = (): Network => {
   return {
-    name: 'Ropsten',
+    name: 'Görli Testnet',
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: '0x00',
@@ -105,9 +101,9 @@ export const getMockRopstenNetwork = (): Network => {
       slippageBuffer: 0.05,
       profit: 0.05,
     },
-    proxyContract: RailProxyContract.Ropsten,
-    relayAdaptContract: RelayAdaptContract.Ropsten,
-    fallbackProviderConfig: getMockRopstenFallbackProviderConfig(),
+    proxyContract: RailgunProxyContract.EthereumGoerli,
+    relayAdaptContract: RelayAdaptContract.EthereumGoerli,
+    fallbackProviderConfig: getMockGoerliFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,
     evmGasType: EVMGasType.Type2,

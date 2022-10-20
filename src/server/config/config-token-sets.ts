@@ -1,39 +1,39 @@
 import { AddressToTokenMap } from '../../models/config-models';
 import {
-  TokenAddressEth,
+  TokenAddressEthereum,
   TokenAddressBSC,
-  TokenAddressPoly,
+  TokenAddressPolygonPOS,
 } from './config-token-addresses';
 
 export const STABLES_ETH: AddressToTokenMap = {
-  [TokenAddressEth.USDT]: {
+  [TokenAddressEthereum.USDT]: {
     symbol: 'USDT',
   },
-  [TokenAddressEth.DAI]: {
+  [TokenAddressEthereum.DAI]: {
     symbol: 'DAI',
   },
-  [TokenAddressEth.USDC]: {
+  [TokenAddressEthereum.USDC]: {
     symbol: 'USDC',
   },
-  [TokenAddressEth.FRAX]: {
+  [TokenAddressEthereum.FRAX]: {
     symbol: 'FRAX',
   },
-  [TokenAddressEth.FEI]: {
+  [TokenAddressEthereum.FEI]: {
     symbol: 'FEI',
   },
-  [TokenAddressEth.RAI]: {
+  [TokenAddressEthereum.RAI]: {
     symbol: 'RAI',
   },
 };
 
 export const BLUECHIP_ETH: AddressToTokenMap = {
-  [TokenAddressEth.WETH]: {
+  [TokenAddressEthereum.WETH]: {
     symbol: 'WETH',
   },
-  [TokenAddressEth.WBTC]: {
+  [TokenAddressEthereum.WBTC]: {
     symbol: 'WBTC',
   },
-  [TokenAddressEth.RAIL]: {
+  [TokenAddressEthereum.RAIL]: {
     symbol: 'RAIL',
   },
 };
@@ -48,16 +48,16 @@ export const BLUECHIP_BSC: AddressToTokenMap = {
   },
 };
 export const BLUECHIP_POLY: AddressToTokenMap = {
-  [TokenAddressPoly.WETH]: {
+  [TokenAddressPolygonPOS.WETH]: {
     symbol: 'WETH',
   },
-  [TokenAddressPoly.BNB]: {
+  [TokenAddressPolygonPOS.BNB]: {
     symbol: 'WETH',
   },
-  [TokenAddressPoly.WMATIC]: {
+  [TokenAddressPolygonPOS.WMATIC]: {
     symbol: 'WMATIC',
   },
-  [TokenAddressPoly.WBTC]: {
+  [TokenAddressPolygonPOS.WBTC]: {
     symbol: 'WBTC',
   },
 };
@@ -76,31 +76,31 @@ export const STABLES_BSC: AddressToTokenMap = {
   },
 };
 export const STABLES_POLY: AddressToTokenMap = {
-  [TokenAddressPoly.DAI]: {
+  [TokenAddressPolygonPOS.DAI]: {
     symbol: 'DAI',
   },
-  [TokenAddressPoly.USDC]: {
+  [TokenAddressPolygonPOS.USDC]: {
     symbol: 'USDC',
   },
-  [TokenAddressPoly.USDT]: {
+  [TokenAddressPolygonPOS.USDT]: {
     symbol: 'USDT',
   },
 };
 
 export const REN_TOKENS_ETH: AddressToTokenMap = {
-  [TokenAddressEth.REN]: {
+  [TokenAddressEthereum.REN]: {
     symbol: 'REN',
   },
-  [TokenAddressEth.RENBTC]: {
+  [TokenAddressEthereum.RENBTC]: {
     symbol: 'RENBTC',
   },
-  [TokenAddressEth.RENZEC]: {
+  [TokenAddressEthereum.RENZEC]: {
     symbol: 'RENZEC',
   },
-  [TokenAddressEth.RENDOGE]: {
+  [TokenAddressEthereum.RENDOGE]: {
     symbol: 'RENDOGE',
   },
-  [TokenAddressEth.RENFIL]: {
+  [TokenAddressEthereum.RENFIL]: {
     symbol: 'RENFIL',
   },
 };
