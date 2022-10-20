@@ -1,6 +1,6 @@
 {
   "name": "@railgun-community/relayer",
-  "version": "2.5.16",
+  "version": "2.6.0",
   "description": "",
   "main": "dist/main.js",
   "engines": {
