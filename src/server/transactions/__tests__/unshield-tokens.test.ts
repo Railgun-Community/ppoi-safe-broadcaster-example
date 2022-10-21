@@ -121,7 +121,7 @@ describe('unshield-tokens', () => {
       MOCK_CHAIN,
     );
     expect(unshieldTransactions.length).to.equal(1);
-  });
+  }).timeout(10000);
 
   it('Should fail with insufficient token balance', () => {
     const { prover } = getRailgunEngine();
