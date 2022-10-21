@@ -3,10 +3,9 @@ import { parseUnits } from '@ethersproject/units';
 import { AxiosError } from 'axios';
 import { ZeroXApiEndpoint, getZeroXData } from './0x-fetch';
 import { TokenAmount } from '../../../models/token-models';
-import { NetworkChainID } from '../../config/config-chains';
 import { logger } from '../../../util/logger';
 import { RelayerChain } from '../../../models/chain-models';
-import { ChainType } from '@railgun-community/engine';
+import { getContractAddressesForChainOrThrow } from '@0x/contract-addresses';
 
 export const ZERO_X_PRICE_DECIMALS = 18;
 
@@ -43,22 +42,8 @@ export type ZeroXFormattedQuoteData = {
 };
 
 export const zeroXExchangeProxyContractAddress = (chain: RelayerChain) => {
-  switch (chain.type) {
-    case ChainType.EVM: {
-      switch (chain.id) {
-        case NetworkChainID.Ethereum:
-        case NetworkChainID.PolygonPOS:
-        case NetworkChainID.BNBChain:
-          return '0xdef1c0ded9bec7f1a1670819833240f027b25eff';
-        case NetworkChainID.EthereumGoerli:
-          return '0xf91bb752490473b8342a3e964e855b9f9a2a668e';
-        case NetworkChainID.PolygonMumbai:
-          return '0xf471d32cb40837bf24529fcf17418fc1a4807626';
-        case NetworkChainID.Hardhat:
-          throw new Error('Unsupported network for 0x Exchange');
-      }
-    }
-  }
+  const addresses = getContractAddressesForChainOrThrow(chain.id as number);
+  return addresses.exchangeProxy;
 };
 
 // const validateZeroXDataField = (
