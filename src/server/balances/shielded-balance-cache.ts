@@ -1,11 +1,14 @@
-import { EngineEvent, ScannedEventData } from '@railgun-community/engine';
+import {
+  EngineEvent,
+  ScannedEventData,
+  trim,
+  RailgunWallet,
+} from '@railgun-community/engine';
 import { resetMapObject } from '../../util/utils';
 import { TokenAmount } from '../../models/token-models';
 import { BigNumber } from 'ethers';
 import { throwErr } from '../../util/promise-utils';
 import { RelayerChain } from '../../models/chain-models';
-import { RailgunWallet } from '@railgun-community/engine';
-import { trim } from '@railgun-community/engine';
 import debug from 'debug';
 
 const dbg = debug('relayer:shielded-cache');

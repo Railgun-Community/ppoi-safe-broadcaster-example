@@ -3,20 +3,14 @@ import chaiAsPromised from 'chai-as-promised';
 import { NetworkChainID } from '../../config/config-chains';
 import {
   getPrivateTokenBalanceCache,
-  parseRailBalanceAddress,
-  ShieldedCachedBalance,
   updateCachedShieldedBalances,
 } from '../shielded-balance-cache';
 import { setupSingleTestWallet } from '../../../test/setup.test';
-import { throwErr } from '../../../util/promise-utils';
-import { TokenAmount } from '../../../models/token-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getRailgunWallet } from '../../wallets/active-wallets';
 import { getMockToken } from '../../../test/mocks.test';
-import { RelayerChain } from '../../../models/chain-models';
 import { initEngine } from '../../lepton/lepton-init';
 import { ChainType } from '@railgun-community/engine';
-import { RailgunWallet } from '@railgun-community/engine';
 import {
   restoreEngineStubs,
   createEngineWalletBalancesStub,

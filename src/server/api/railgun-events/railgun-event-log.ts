@@ -1,5 +1,4 @@
-import { CommitmentEvent } from '@railgun-community/engine';
-import { Nullifier } from '@railgun-community/engine';
+import { CommitmentEvent, Nullifier } from '@railgun-community/engine';
 import axios from 'axios';
 import { logger } from '../../../util/logger';
 

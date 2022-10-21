@@ -68,7 +68,7 @@ describe('wallet-top-up-poller', () => {
     restoreGasBalanceStub();
   });
 
-  it('Should not poll for top up if less than two active wallets', async () => {
+  it('Should not poll for top up if less than two active wallets', () => {
     initTopUpPoller();
     expect(shouldPollTopUp).to.equal(false);
   });

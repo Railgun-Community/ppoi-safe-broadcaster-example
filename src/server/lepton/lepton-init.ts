@@ -7,9 +7,11 @@ import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
 import { groth16 } from 'snarkjs';
-import { RailgunEngine } from '@railgun-community/engine';
-import { EngineDebugger } from '@railgun-community/engine';
-import { Groth16 } from '@railgun-community/engine';
+import {
+  RailgunEngine,
+  EngineDebugger,
+  Groth16,
+} from '@railgun-community/engine';
 
 let lepton: RailgunEngine;
 

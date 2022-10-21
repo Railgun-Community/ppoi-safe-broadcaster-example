@@ -1,5 +1,4 @@
-import { Database } from '@railgun-community/engine';
-import { BytesData } from '@railgun-community/engine';
+import { Database, BytesData } from '@railgun-community/engine';
 import leveldown from 'leveldown';
 import { logger } from '../../util/logger';
 import configDefaults from '../config/config-defaults';

@@ -55,7 +55,7 @@ const getShieldedTokenAmountsForChain = async (
 };
 
 export const filterTopUpTokens = (
-  topUpTokens: TokenAmount[]
+  topUpTokens: TokenAmount[],
 ): TokenAmount[] => {
   // const desiredTopUpTokens = [];
   // const desiredTopUpTokens: Optiona<TokenAmount>[] = await Promise.all (
@@ -66,8 +66,8 @@ export const filterTopUpTokens = (
   //     }
   //   )
   // )
-  return [topUpTokens[0]]
-}
+  return [topUpTokens[0]];
+};
 
 export const getTopUpTokenAmountsForChain = async (
   chain: RelayerChain,
@@ -100,7 +100,6 @@ export const getTopUpTokenAmountsForChain = async (
       }
     }),
   );
-  const topUpTokensForChainDefined = removeUndefineds(topUpTokenAmountsForChain);
   return removeUndefineds(topUpTokenAmountsForChain);
 };
 
@@ -130,7 +129,7 @@ export const topUpWallet = async (
   const provider = getProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(topUpWallet, provider);
   const nonce = await getCurrentNonce(chain, ethersWallet);
-  
+
   // unshield tokens intended to swap
   const batchResponse = await unshieldTokens(
     prover,

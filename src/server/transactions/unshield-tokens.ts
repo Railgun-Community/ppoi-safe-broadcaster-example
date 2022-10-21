@@ -1,10 +1,13 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { RailgunProxyContract } from '@railgun-community/engine';
-import { Chain } from '@railgun-community/engine';
-import { SerializedTransaction, TokenType } from '@railgun-community/engine';
-import { Prover } from '@railgun-community/engine';
-import { TransactionBatch } from '@railgun-community/engine';
-import { RailgunWallet } from '@railgun-community/engine';
+import {
+  Prover,
+  RailgunWallet,
+  SerializedTransaction,
+  TransactionBatch,
+  TokenType,
+  RailgunProxyContract,
+} from '@railgun-community/engine';
+import { Chain } from '@railgun-community/shared-models';
 import debug from 'debug';
 import { PopulatedTransaction } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';

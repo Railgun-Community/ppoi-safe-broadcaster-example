@@ -29,9 +29,14 @@ import {
   createEngineWalletTreeBalancesStub,
   restoreEngineStubs,
 } from '../../../test/stubs/lepton-stubs.test';
-import { ByteLength, nToHex } from '@railgun-community/engine';
-import { Proof, Prover, PublicInputs } from '@railgun-community/engine';
-import { RailgunWallet } from '@railgun-community/engine';
+import {
+  ByteLength,
+  nToHex,
+  Proof,
+  Prover,
+  PublicInputs,
+  RailgunWallet,
+} from '@railgun-community/engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
