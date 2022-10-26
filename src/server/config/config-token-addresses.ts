@@ -16,7 +16,7 @@ export enum TokenAddressEthereum {
 }
 export enum TokenAddressGoerli {
   WETH = '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
-  DAI = '0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F',
+  DAI = '0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60',
 }
 export enum TokenAddressBSC {
   WBNB = '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
