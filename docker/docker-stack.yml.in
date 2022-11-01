@@ -17,8 +17,8 @@ services:
       - relayer
     ports:
       - 60000:60000
-    #  - 8000:8000 # wss proxied through swag
-      - 8546:8546
+      - 9000:9000
+      #- 8000:8000 # wss proxied through swag
     volumes:
       - nwaku:/data
       - ./appdata/swag/etc/letsencrypt:/ssl

@@ -1,20 +1,14 @@
-### install yarn and modules
-FROM ubuntu:22.04 as module-install-stage
-RUN apt update
-
-# Install curl
-RUN apt install -y curl
+FROM ubuntu:22.04 as base
+RUN apt update && apt install -y curl
 
 # Add Nodesource Node.JS repositories
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+
 # Install Node.JS 16
-RUN apt install -y nodejs
+RUN apt install -y nodejs git jq netcat
 
-# Install Git
-RUN apt install -y git
-
-# Install NPM
-RUN npm install -g npm
+### install modules
+FROM base as module-install-stage
 
 # Setup the environment
 WORKDIR /app
@@ -26,16 +20,7 @@ RUN npm ci --ignore-scripts
 COPY scripts/ ./scripts
 
 ### build app using cached modules
-FROM ubuntu:22.04 as build-stage
-RUN apt update
-
-# Install curl
-RUN apt install -y curl
-
-# Add Nodesource Node.JS repositories
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-# Install Node.JS 16
-RUN apt install -y nodejs
+FROM base as build-stage
 
 COPY --from=module-install-stage /app/node_modules/ /app/node_modules
 WORKDIR /app
@@ -43,19 +28,9 @@ COPY . .
 RUN npm run compile
 
 ### run relayer
-FROM ubuntu:22.04
-RUN apt update
-
-# Install curl
-RUN apt install -y curl
-
-# Add Nodesource Node.JS repositories
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-# Install Node.JS 16
-RUN apt install -y nodejs
+FROM base
 
 # Copy everything into place for the relayer
-RUN apt install -y bash jq netcat
 COPY --from=build-stage /app/dist/ /app/dist
 COPY --from=module-install-stage /app/node_modules/ /app/node_modules
 COPY --from=module-install-stage /app/scripts/ /app/scripts
