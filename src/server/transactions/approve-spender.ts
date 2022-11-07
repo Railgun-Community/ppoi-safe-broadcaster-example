@@ -53,7 +53,11 @@ export const approveZeroX = async (
   );
   const TransactionResponses: TransactionResponse[] = await Promise.all(
     populatedApprovalTXs.map(async (populatedApproval) => {
-      const gasDetails = await getEstimateGasDetails(chain, populatedApproval);
+      const gasDetails = await getEstimateGasDetails(
+        chain,
+        undefined, // minGasPrice
+        populatedApproval,
+      );
       const txResponse = await executeTransaction(
         chain,
         populatedApproval,

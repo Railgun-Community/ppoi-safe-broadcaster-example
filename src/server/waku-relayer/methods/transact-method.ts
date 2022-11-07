@@ -29,6 +29,7 @@ export type WakuMethodParamsTransact = {
 export type RawParamsTransact = {
   serializedTransaction: string;
   chainType: number;
+  minGasPrice?: string;
   chainID: number;
   feesID: string;
   relayerViewingKey: string;
@@ -66,6 +67,7 @@ export const transactMethod = async (
   const {
     chainType,
     chainID,
+    minGasPrice,
     feesID: feeCacheID,
     serializedTransaction,
     relayerViewingKey,
@@ -108,6 +110,7 @@ export const transactMethod = async (
     const txResponse = await processTransaction(
       chain,
       feeCacheID,
+      minGasPrice,
       serializedTransaction,
       useRelayAdapt ?? false,
       devLog,

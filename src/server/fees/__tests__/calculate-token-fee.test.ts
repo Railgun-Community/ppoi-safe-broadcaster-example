@@ -138,6 +138,7 @@ describe('calculate-token-fee', () => {
 
     const gasEstimateDetails = await getEstimateGasDetails(
       chain,
+      undefined, // minGasPrice
       MOCK_TRANSACTION,
     );
     const maximumGas = calculateMaximumGas(gasEstimateDetails);
@@ -148,8 +149,7 @@ describe('calculate-token-fee', () => {
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal(
-      '127274226804000000000000',
-      // '152729072164800000000000', // +20%
+      '114546804123600000000000',
     );
   });
 
@@ -170,6 +170,7 @@ describe('calculate-token-fee', () => {
 
     const gasEstimateDetails = await getEstimateGasDetails(
       chain,
+      undefined, // minGasPrice
       MOCK_TRANSACTION,
     );
     const maximumGas = calculateMaximumGas(gasEstimateDetails);
@@ -180,7 +181,7 @@ describe('calculate-token-fee', () => {
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal(
-      '127274226804',
+      '114546804123',
       // '152729072164', // +20%
     );
   });
@@ -216,6 +217,7 @@ describe('calculate-token-fee', () => {
 
     const gasEstimateDetails = await getEstimateGasDetails(
       chain,
+      undefined, // minGasPrice
       MOCK_TRANSACTION,
     );
     const maximumGas = calculateMaximumGas(gasEstimateDetails);

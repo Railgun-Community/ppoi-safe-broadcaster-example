@@ -110,7 +110,11 @@ export const unshieldTokens = async (
     serializedTransactions,
     chain,
   );
-  const gasDetails = await getEstimateGasDetails(chain, populatedTransaction);
+  const gasDetails = await getEstimateGasDetails(
+    chain,
+    undefined, // minGasPrice
+    populatedTransaction,
+  );
   const batchResponse = await executeTransaction(
     chain,
     populatedTransaction,

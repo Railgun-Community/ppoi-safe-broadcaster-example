@@ -37,6 +37,7 @@ describe('gas-estimate', () => {
 
     const estimateGasDetails = await getEstimateGasDetails(
       MOCK_CHAIN,
+      undefined, // minGasPrice
       getMockPopulatedTransaction(),
     );
     const maximumGas = calculateMaximumGas(estimateGasDetails);
@@ -44,6 +45,6 @@ describe('gas-estimate', () => {
     // (Gas estimate + 20%) * gas price.
     // expect(maximumGas.toNumber()).to.equal(120000);
 
-    expect(maximumGas.toNumber()).to.equal(100000);
+    expect(maximumGas.toNumber()).to.equal(90000);
   });
 }).timeout(10000);

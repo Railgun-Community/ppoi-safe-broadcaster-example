@@ -78,7 +78,7 @@ const Web3Eth = Web3 as unknown as typeof Web3.Eth;
 // };
 //
 
-type GasDetails =
+export type GasDetails =
   | {
       evmGasType: EVMGasType.Type0;
       gasPrice: BigNumber;

@@ -74,7 +74,11 @@ export const swapZeroX = async (
   const populatedSwapTXs = await generateSwapTransactions(tokenAmounts, chain);
   const TransactionResponses: TransactionResponse[] = await Promise.all(
     populatedSwapTXs.map(async (populatedSwap) => {
-      const gasDetails = await getEstimateGasDetails(chain, populatedSwap);
+      const gasDetails = await getEstimateGasDetails(
+        chain,
+        undefined, // minGasPrice
+        populatedSwap,
+      );
       const txResponse = await executeTransaction(
         chain,
         populatedSwap,

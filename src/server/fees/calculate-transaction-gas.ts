@@ -14,6 +14,7 @@ import { calculateGasLimit, TransactionGasDetails } from './gas-estimate';
 export const createTransactionGasDetails = (
   chain: RelayerChain,
   gasEstimateDetails: TransactionGasDetails,
+  minGasPrice: Optional<string>,
   tokenAddress: string,
   tokenFee: BigNumber,
 ): TransactionGasDetails => {
@@ -49,7 +50,9 @@ export const createTransactionGasDetails = (
       return {
         evmGasType,
         gasEstimate,
-        gasPrice: translatedGasPrice,
+        gasPrice: minGasPrice
+          ? BigNumber.from(minGasPrice)
+          : translatedGasPrice,
       };
     }
     case EVMGasType.Type2: {

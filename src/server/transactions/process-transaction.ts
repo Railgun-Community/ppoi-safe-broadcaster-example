@@ -21,6 +21,7 @@ const dbg = debug('relayer:transact:validate');
 export const processTransaction = async (
   chain: RelayerChain,
   feeCacheID: string,
+  minGasPrice: Optional<string>,
   serializedTransaction: string,
   useRelayAdapt: boolean,
   devLog?: boolean,
@@ -46,6 +47,7 @@ export const processTransaction = async (
 
   const gasEstimateDetails = await getEstimateGasDetails(
     chain,
+    minGasPrice,
     transactionRequestForGasEstimate,
     devLog,
   );
@@ -65,6 +67,7 @@ export const processTransaction = async (
   const transactionGasDetails = createTransactionGasDetails(
     chain,
     gasEstimateDetails,
+    minGasPrice,
     tokenAddress,
     packagedFeeAmount,
   );

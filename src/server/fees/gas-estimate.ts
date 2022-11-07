@@ -6,7 +6,7 @@ import { ErrorMessage } from '../../util/errors';
 import { logger } from '../../util/logger';
 import { throwErr } from '../../util/promise-utils';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { getStandardGasDetails } from './gas-by-speed';
+import { GasDetails, getStandardGasDetails } from './gas-by-speed';
 
 export type TransactionGasDetails =
   | TransactionGasDetailsType0
@@ -27,6 +27,7 @@ export type TransactionGasDetailsType2 = {
 
 export const getEstimateGasDetails = async (
   chain: RelayerChain,
+  minGasPrice: Optional<string>,
   transactionRequest: TransactionRequest,
   devLog?: boolean,
 ): Promise<TransactionGasDetails> => {
@@ -34,7 +35,7 @@ export const getEstimateGasDetails = async (
     const provider = getProviderForNetwork(chain);
     const [gasEstimate, gasDetailsBySpeed] = await Promise.all([
       provider.estimateGas(transactionRequest).catch(throwErr),
-      getStandardGasDetails(chain),
+      getGasPriceDetails(minGasPrice, chain),
     ]);
 
     return { gasEstimate, ...gasDetailsBySpeed };
@@ -45,6 +46,20 @@ export const getEstimateGasDetails = async (
     }
     throw new Error(ErrorMessage.GAS_ESTIMATE_ERROR);
   }
+};
+
+const getGasPriceDetails = (
+  minGasPrice: Optional<string>,
+  chain: RelayerChain,
+): Promise<GasDetails> => {
+  if (minGasPrice) {
+    // MinGasPrice is only Type0.
+    return Promise.resolve({
+      evmGasType: EVMGasType.Type0,
+      gasPrice: BigNumber.from(minGasPrice),
+    });
+  }
+  return getStandardGasDetails(chain);
 };
 
 export const calculateGasLimit = (gasEstimate: BigNumber): BigNumber => {
@@ -60,8 +75,8 @@ const getGasPrice = (gasDetails: TransactionGasDetails) => {
       return gasDetails.gasPrice;
     }
     case EVMGasType.Type2: {
-      const { maxFeePerGas, maxPriorityFeePerGas } = gasDetails;
-      return maxFeePerGas.add(maxPriorityFeePerGas);
+      const { maxFeePerGas } = gasDetails;
+      return maxFeePerGas;
     }
   }
   throw new Error('Unrecognized gas type.');

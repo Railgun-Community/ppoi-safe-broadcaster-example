@@ -98,6 +98,7 @@ describe('calculate-transaction-gas', () => {
     const gasDetails = createTransactionGasDetails(
       MOCK_CHAIN,
       mockGasDetails,
+      undefined, // minGasPrice
       MOCK_TOKEN_ADDRESS,
       tokenFee,
     );
@@ -123,6 +124,7 @@ describe('calculate-transaction-gas', () => {
     const gasDetails = createTransactionGasDetails(
       MOCK_CHAIN,
       mockGasDetails,
+      undefined, // minGasPrice
       MOCK_TOKEN_6_DECIMALS,
       tokenFee,
     );
@@ -148,6 +150,7 @@ describe('calculate-transaction-gas', () => {
 
     const estimateGasDetails = await getEstimateGasDetails(
       MOCK_CHAIN,
+      undefined, // minGasPrice
       populatedTransaction,
     );
     const maximumGas = calculateMaximumGas(estimateGasDetails);
@@ -155,6 +158,7 @@ describe('calculate-transaction-gas', () => {
     const gasDetails = createTransactionGasDetails(
       MOCK_CHAIN,
       mockGasDetails,
+      undefined, // minGasPrice
       MOCK_TOKEN_ADDRESS,
       tokenFee,
     );
@@ -165,7 +169,7 @@ describe('calculate-transaction-gas', () => {
     }
 
     expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
-    expect(gasDetails.maxFeePerGas.toString()).to.equal('250000');
+    expect(gasDetails.maxFeePerGas.toString()).to.equal('240000');
     expect(gasDetails.maxPriorityFeePerGas.toString()).to.equal('10000');
   });
 }).timeout(10000);
