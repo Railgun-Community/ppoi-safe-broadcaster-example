@@ -2,7 +2,7 @@ import { Provider } from '@ethersproject/providers';
 import {
   AddressData,
   hexlify,
-  Note,
+  TransactNote,
   OutputType,
   padToLength,
   RailgunEngine,
@@ -10,7 +10,7 @@ import {
   RailgunWallet,
   randomHex,
   RelayAdaptContract,
-  SerializedTransaction,
+  TransactionStruct,
   TokenType,
   TransactionBatch,
 } from '@railgun-community/engine';
@@ -49,67 +49,72 @@ let lepton: RailgunEngine;
 let proxyContract: RailgunProxyContract;
 let relayAdaptContract: RelayAdaptContract;
 let railgunWallet: RailgunWallet;
-const RANDOM = randomHex(16);
+const RANDOM_TRANSACT = randomHex(16);
+const RANDOM_RELAY_ADAPT = randomHex(31);
 const MOCK_TOKEN_ADDRESS = getMockToken().address;
 
 const TREE = 0;
-const ROPSTEN_CHAIN = testChainGoerli();
+const GOERLI_CHAIN = testChainGoerli();
 const HARDHAT_CHAIN = testChainHardhat();
 const MOCK_MNEMONIC_1 =
   'test test test test test test test test test test test junk';
 
-const createRopstenTransferTransactions = async (
-  addressData: AddressData,
+const createGoerliTransferTransactions = async (
+  receiverAddressData: AddressData,
+  senderAddressData: AddressData,
   fee: BigNumber,
   tokenAddress: string,
-): Promise<SerializedTransaction[]> => {
+): Promise<TransactionStruct[]> => {
   const transaction = new TransactionBatch(
     tokenAddress,
     TokenType.ERC20,
-    ROPSTEN_CHAIN,
+    GOERLI_CHAIN,
   );
   transaction.addOutput(
-    Note.create(
-      addressData,
-      RANDOM,
-      fee.toHexString(),
+    TransactNote.create(
+      receiverAddressData,
+      senderAddressData,
+      RANDOM_TRANSACT,
+      BigInt(fee.toHexString()),
       tokenAddress,
       await mockViewingKeys(),
-      undefined, // senderBlindingKey
+      false, // shouldShowSender
       OutputType.Transfer,
       undefined, // memoText
     ),
   );
-  return transaction.generateDummySerializedTransactions(
+  return transaction.generateDummyTransactions(
     lepton.prover,
     railgunWallet,
     configDefaults.lepton.dbEncryptionKey,
   );
 };
 
-const createRopstenRelayAdaptWithdrawTransactions = async (
-  addressData: AddressData,
+const createGoerliRelayAdaptUnshieldTransactions = async (
+  receiverAddressData: AddressData,
+  senderAddressData: AddressData,
   fee: BigNumber,
   tokenAddress: string,
-): Promise<SerializedTransaction[]> => {
+): Promise<TransactionStruct[]> => {
   const transaction = new TransactionBatch(
     tokenAddress,
     TokenType.ERC20,
-    ROPSTEN_CHAIN,
+    GOERLI_CHAIN,
   );
   transaction.addOutput(
-    Note.create(
-      addressData,
-      RANDOM,
-      fee.toHexString(),
+    TransactNote.create(
+      receiverAddressData,
+      senderAddressData,
+      RANDOM_TRANSACT,
+      BigInt(fee.toHexString()),
       tokenAddress,
       await mockViewingKeys(),
-      undefined, // senderBlindingKey
+      false, // shouldShowSender
       OutputType.Transfer,
       undefined, // memoText
     ),
   );
-  return transaction.generateDummySerializedTransactions(
+  return transaction.generateDummyTransactions(
     lepton.prover,
     railgunWallet,
     configDefaults.lepton.dbEncryptionKey,
@@ -124,19 +129,19 @@ describe('extract-packaged-fee', () => {
     configDefaults.wallet.mnemonic = MOCK_MNEMONIC_1;
     await initWallets();
 
-    const ropstenNetwork = getMockGoerliNetwork();
+    const goerliNetwork = getMockGoerliNetwork();
     const {
       proxyContract: ropstenProxyContractAddress,
       relayAdaptContract: ropstenRelayAdaptContractAddress,
-    } = ropstenNetwork;
+    } = goerliNetwork;
     // Async call - run sync
-    initNetworkProviders([ROPSTEN_CHAIN, HARDHAT_CHAIN]);
-    const provider = getProviderForNetwork(ROPSTEN_CHAIN);
+    initNetworkProviders([GOERLI_CHAIN, HARDHAT_CHAIN]);
+    const provider = getProviderForNetwork(GOERLI_CHAIN);
 
     // Note: this call is typically async but we won't wait for the full call.
     // We just need to load the merkletrees.
     lepton.loadNetwork(
-      ROPSTEN_CHAIN,
+      GOERLI_CHAIN,
       ropstenProxyContractAddress,
       ropstenRelayAdaptContractAddress,
       provider,
@@ -145,7 +150,7 @@ describe('extract-packaged-fee', () => {
     proxyContract = new RailgunProxyContract(
       ropstenProxyContractAddress,
       provider as Provider,
-      ROPSTEN_CHAIN,
+      GOERLI_CHAIN,
     );
     relayAdaptContract = new RelayAdaptContract(
       ropstenRelayAdaptContractAddress,
@@ -164,15 +169,19 @@ describe('extract-packaged-fee', () => {
 
   it('Should extract fee correctly - transfer', async () => {
     const fee = BigNumber.from('1000');
-    const addressData = getRailgunAddressData();
-    const transactions = await createRopstenTransferTransactions(
-      addressData,
+    const receiverAddressData = getRailgunAddressData();
+    const senderAddressData = RailgunEngine.decodeAddress(
+      '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+    );
+    const transactions = await createGoerliTransferTransactions(
+      receiverAddressData,
+      senderAddressData,
       fee,
       MOCK_TOKEN_ADDRESS,
     );
     const populatedTransaction = await proxyContract.transact(transactions);
     const packagedFee = await extractPackagedFeeFromTransaction(
-      ROPSTEN_CHAIN,
+      GOERLI_CHAIN,
       populatedTransaction,
       false, // useRelayAdapt
     );
@@ -182,40 +191,48 @@ describe('extract-packaged-fee', () => {
 
   it('Should fail for incorrect receiver address - transfer', async () => {
     const fee = BigNumber.from('1000');
-    const addressData = RailgunEngine.decodeAddress(
+    const receiverAddressData = RailgunEngine.decodeAddress(
       '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
     );
-    const transactions = await createRopstenTransferTransactions(
-      addressData,
+    const senderAddressData = RailgunEngine.decodeAddress(
+      '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+    );
+    const transactions = await createGoerliTransferTransactions(
+      receiverAddressData,
+      senderAddressData,
       fee,
       MOCK_TOKEN_ADDRESS,
     );
     const populatedTransaction = await proxyContract.transact(transactions);
     await expect(
       extractPackagedFeeFromTransaction(
-        ROPSTEN_CHAIN,
+        GOERLI_CHAIN,
         populatedTransaction,
         false, // useRelayAdapt
       ),
-    ).to.be.rejectedWith('No Relayer payment included in transaction.');
+    ).to.be.rejectedWith('No Relayer Fee included in transaction.');
   }).timeout(60000);
 
   it('Should extract fee correctly - relay adapt', async () => {
     const fee = BigNumber.from('1000');
-    const addressData = getRailgunAddressData();
-    const transactions = await createRopstenRelayAdaptWithdrawTransactions(
-      addressData,
+    const receiverAddressData = getRailgunAddressData();
+    const senderAddressData = RailgunEngine.decodeAddress(
+      '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+    );
+    const transactions = await createGoerliRelayAdaptUnshieldTransactions(
+      receiverAddressData,
+      senderAddressData,
       fee,
       MOCK_TOKEN_ADDRESS,
     );
     const populatedTransaction =
-      await relayAdaptContract.populateWithdrawBaseToken(
+      await relayAdaptContract.populateUnshieldBaseToken(
         transactions,
         getActiveWallets()[0].address,
-        RANDOM,
+        RANDOM_RELAY_ADAPT,
       );
     const packagedFee = await extractPackagedFeeFromTransaction(
-      ROPSTEN_CHAIN,
+      GOERLI_CHAIN,
       populatedTransaction,
       true, // useRelayAdapt
     );
@@ -225,26 +242,30 @@ describe('extract-packaged-fee', () => {
 
   it('Should fail for incorrect receiver address - relay adapt', async () => {
     const fee = BigNumber.from('1000');
-    const addressData = RailgunEngine.decodeAddress(
+    const receiverAddressData = RailgunEngine.decodeAddress(
       '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
     );
-    const transactions = await createRopstenRelayAdaptWithdrawTransactions(
-      addressData,
+    const senderAddressData = RailgunEngine.decodeAddress(
+      '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+    );
+    const transactions = await createGoerliRelayAdaptUnshieldTransactions(
+      receiverAddressData,
+      senderAddressData,
       fee,
       MOCK_TOKEN_ADDRESS,
     );
     const populatedTransaction =
-      await relayAdaptContract.populateWithdrawBaseToken(
+      await relayAdaptContract.populateUnshieldBaseToken(
         transactions,
         getActiveWallets()[0].address,
-        RANDOM,
+        RANDOM_RELAY_ADAPT,
       );
     await expect(
       extractPackagedFeeFromTransaction(
-        ROPSTEN_CHAIN,
+        GOERLI_CHAIN,
         populatedTransaction,
         true, // useRelayAdapt
       ),
-    ).to.be.rejectedWith('No Relayer payment included in transaction.');
+    ).to.be.rejectedWith('No Relayer Fee included in transaction.');
   }).timeout(60000);
 }).timeout(120000);

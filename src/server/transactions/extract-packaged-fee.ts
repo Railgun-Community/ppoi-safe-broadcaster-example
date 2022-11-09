@@ -1,12 +1,13 @@
 import {
   ByteLength,
   formatToByteLength,
-  nToBytes,
   nToHex,
   trim,
   getSharedSymmetricKey,
   Ciphertext,
-  Note,
+  TransactNote,
+  hexStringToBytes,
+  formatCommitmentCiphertext,
 } from '@railgun-community/engine';
 import { BigNumber, Contract } from 'ethers';
 import { TransactionRequest } from '@ethersproject/providers';
@@ -18,6 +19,10 @@ import {
   getRailgunWallet,
 } from '../wallets/active-wallets';
 import { RelayerChain } from '../../models/chain-models';
+import { CommitmentCiphertextStructOutput } from '@railgun-community/engine/dist/typechain-types/contracts/logic/RailgunLogic';
+import debug from 'debug';
+
+const dbg = debug('relayer:transact:extract-packaged-fee');
 
 const parseFormattedTokenAddress = (formattedTokenAddress: string) => {
   return `0x${trim(formattedTokenAddress, 20)}`;
@@ -29,24 +34,23 @@ type PackagedFee = {
 };
 
 type CommitmentCiphertext = {
-  ciphertext: BigNumber[];
-  ephemeralKeys: BigNumber[];
-  memo: BigNumber;
+  ciphertext: Ciphertext;
+  blindedSenderViewingKey: string;
+  blindedReceiverViewingKey: string;
+  annotationData: string;
+  memo: string;
 };
 
 type BoundParams = {
-  // uint16 treeNumber;
-  // WithdrawType withdraw;
-  // address adaptContract;
-  // bytes32 adaptParams;
-  commitmentCiphertext: CommitmentCiphertext[];
+  // ...
+  commitmentCiphertext: CommitmentCiphertextStructOutput[];
 };
 
 type TransactionData = {
   // SnarkProof proof;
   // uint256 merkleRoot;
   // uint256[] nullifiers;
-  commitments: BigNumber[];
+  commitments: string[];
   boundParams: BoundParams;
   // CommitmentPreimage withdrawPreimage;
   // address overrideOutput;
@@ -149,7 +153,7 @@ const extractPackagedFee = async (
 
   const tokens = Object.keys(tokenPaymentAmounts);
   if (tokens.length < 1) {
-    throw new Error('No Relayer payment included in transaction.');
+    throw new Error('No Relayer Fee included in transaction.');
   }
 
   // Return first payment.
@@ -159,31 +163,39 @@ const extractPackagedFee = async (
   };
 };
 
-const getSharedKeySafe = (
+const decryptReceiverNoteSafe = async (
+  commitmentCiphertext: CommitmentCiphertext,
   viewingPrivateKey: Uint8Array,
-  ephemeralKey: Uint8Array,
 ) => {
   try {
-    return getSharedSymmetricKey(viewingPrivateKey, ephemeralKey);
-  } catch (err) {
-    return null;
-  }
-};
-
-const decryptReceiverNoteSafe = (
-  encryptedNote: Ciphertext,
-  sharedKey: Uint8Array,
-) => {
-  try {
-    const memoField: string[] = [];
-    return Note.decrypt(
-      encryptedNote,
+    const blindedSenderViewingKey = hexStringToBytes(
+      commitmentCiphertext.blindedSenderViewingKey,
+    );
+    const blindedReceiverViewingKey = hexStringToBytes(
+      commitmentCiphertext.blindedReceiverViewingKey,
+    );
+    const sharedKey = await getSharedSymmetricKey(
+      viewingPrivateKey,
+      blindedSenderViewingKey,
+    );
+    if (!sharedKey) {
+      dbg('invalid sharedKey');
+      return null;
+    }
+    return TransactNote.decrypt(
+      getRailgunAddressData(),
+      commitmentCiphertext.ciphertext,
       sharedKey,
-      memoField,
-      undefined, // ephemeralKeySender
-      undefined, // senderBlindingKey
+      commitmentCiphertext.memo,
+      commitmentCiphertext.annotationData,
+      blindedReceiverViewingKey, // blindedReceiverViewingKey
+      blindedSenderViewingKey, // blindedSenderViewingKey
+      undefined, // senderRandom - not used
+      false, // isSentNote
+      false, // isLegacyDecryption
     );
   } catch (err) {
+    dbg('Decryption error', err.message);
     return null;
   }
 };
@@ -198,60 +210,40 @@ const extractFeesFromRailgunTransactions = async (
 
   // First commitment should always be the fee.
   const index = 0;
-  const hash = commitments[index];
+  const hash: string = commitments[index];
   const ciphertext = railgunTx.boundParams.commitmentCiphertext[index];
 
-  const ephemeralKeyReceiverBytes = nToBytes(
-    BigInt(ciphertext.ephemeralKeys[0].toHexString()),
-    ByteLength.UINT_256,
-  );
-
-  const sharedKey = await getSharedKeySafe(
+  const decryptedReceiverNote = await decryptReceiverNoteSafe(
+    formatCommitmentCiphertext(ciphertext),
     viewingPrivateKey,
-    ephemeralKeyReceiverBytes,
-  );
-  if (sharedKey == null) {
-    // Not addressed to us.
-    return;
-  }
-
-  const ciphertextHexlified = ciphertext.ciphertext.map((el) =>
-    formatToByteLength(el.toHexString(), ByteLength.UINT_256),
-  );
-  const ivTag = ciphertextHexlified[0];
-  const encryptedNote: Ciphertext = {
-    iv: ivTag.substring(0, 32),
-    tag: ivTag.substring(32),
-    data: ciphertextHexlified.slice(1),
-  };
-  const decryptedReceiverNote = decryptReceiverNoteSafe(
-    encryptedNote,
-    sharedKey,
   );
   if (decryptedReceiverNote == null) {
     // Addressed to us, but different note than fee.
+    dbg('invalid decryptedReceiverNote');
     return;
   }
 
-  if (decryptedReceiverNote.masterPublicKey === masterPublicKey) {
-    const noteHash = nToHex(decryptedReceiverNote.hash, ByteLength.UINT_256);
-    const commitHash = formatToByteLength(
-      hash.toHexString(),
-      ByteLength.UINT_256,
-    );
-    if (noteHash !== commitHash) {
-      throw new Error(
-        `Client attempted to steal from relayer via invalid ciphertext: Note hash mismatch ${noteHash} vs ${commitHash}.`,
-      );
-    }
-
-    if (!tokenPaymentAmounts[decryptedReceiverNote.token]) {
-      // eslint-disable-next-line no-param-reassign
-      tokenPaymentAmounts[decryptedReceiverNote.token] = BigNumber.from(0);
-    }
-    // eslint-disable-next-line no-param-reassign
-    tokenPaymentAmounts[decryptedReceiverNote.token] = tokenPaymentAmounts[
-      decryptedReceiverNote.token
-    ].add(decryptedReceiverNote.value.toString());
+  if (
+    decryptedReceiverNote.receiverAddressData.masterPublicKey !==
+    masterPublicKey
+  ) {
+    dbg('invalid masterPublicKey');
+    return;
   }
+
+  const noteHash = nToHex(decryptedReceiverNote.hash, ByteLength.UINT_256);
+  const commitHash = formatToByteLength(hash, ByteLength.UINT_256);
+  if (noteHash !== commitHash) {
+    dbg('invalid commitHash');
+    return;
+  }
+
+  if (!tokenPaymentAmounts[decryptedReceiverNote.token]) {
+    // eslint-disable-next-line no-param-reassign
+    tokenPaymentAmounts[decryptedReceiverNote.token] = BigNumber.from(0);
+  }
+  // eslint-disable-next-line no-param-reassign
+  tokenPaymentAmounts[decryptedReceiverNote.token] = tokenPaymentAmounts[
+    decryptedReceiverNote.token
+  ].add(decryptedReceiverNote.value.toString());
 };

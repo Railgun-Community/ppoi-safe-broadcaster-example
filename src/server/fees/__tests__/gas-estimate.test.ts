@@ -1,7 +1,10 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
-import { getEstimateGasDetails, calculateMaximumGas } from '../gas-estimate';
+import {
+  getEstimateGasDetailsPublic,
+  calculateMaximumGasRelayer,
+} from '../gas-estimate';
 import {
   getMockNetwork,
   getMockPopulatedTransaction,
@@ -13,6 +16,10 @@ import {
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { testChainEthereum } from '../../../test/setup.test';
+import {
+  getEVMGasTypeForTransaction,
+  NetworkName,
+} from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -31,20 +38,42 @@ describe('gas-estimate', () => {
 
   it('Should calculate maximum gas based on gas estimate', async () => {
     const gasEstimate = BigNumber.from(1000);
-    const maxFeePerGas = BigNumber.from(90);
+    const maxFeePerGas = BigNumber.from(100);
     const maxPriorityFeePerGas = BigNumber.from(10);
     createGasEstimateStubs(gasEstimate, maxFeePerGas, maxPriorityFeePerGas);
 
-    const estimateGasDetails = await getEstimateGasDetails(
+    const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
+
+    const estimateGasDetails = await getEstimateGasDetailsPublic(
       MOCK_CHAIN,
-      undefined, // minGasPrice
+      evmGasType,
       getMockPopulatedTransaction(),
     );
-    const maximumGas = calculateMaximumGas(estimateGasDetails);
+    const maximumGas = calculateMaximumGasRelayer(estimateGasDetails);
 
-    // (Gas estimate + 20%) * gas price.
-    // expect(maximumGas.toNumber()).to.equal(120000);
+    // (Gas estimate + 20%) * gas price (maxFeePerGas).
+    expect(maximumGas.toNumber()).to.equal(120000);
+  });
 
-    expect(maximumGas.toNumber()).to.equal(90000);
+  it('Should calculate maximum gas based on gas estimate with minGasPrice', async () => {
+    const gasEstimate = BigNumber.from(1000);
+    const minGasPrice = BigNumber.from(100);
+    createGasEstimateStubs(
+      gasEstimate,
+      minGasPrice, // unused
+      minGasPrice, // unused
+    );
+
+    const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
+
+    const estimateGasDetails = await getEstimateGasDetailsPublic(
+      MOCK_CHAIN,
+      evmGasType,
+      getMockPopulatedTransaction(),
+    );
+    const maximumGas = calculateMaximumGasRelayer(estimateGasDetails);
+
+    // 20% added by gasLimit.
+    expect(maximumGas.toNumber()).to.equal(120000);
   });
 }).timeout(10000);

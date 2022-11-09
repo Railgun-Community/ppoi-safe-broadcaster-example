@@ -7,7 +7,7 @@ import {
   RailgunProxyContract,
   RelayAdaptContract,
 } from '@railgun-community/shared-models';
-import { EVMGasType, Network } from '../models/network-models';
+import { Network } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 import { Token, TokenConfig } from '../models/token-models';
 import { RelayerChain } from '../models/chain-models';
@@ -76,7 +76,7 @@ export const getMockNetwork = (): Network => {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
-      minimumBalanceForAvailability: 0.1,
+      decimals: 18,
     },
     fees: {
       slippageBuffer: 0.03,
@@ -87,7 +87,6 @@ export const getMockNetwork = (): Network => {
     coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: getMockFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
-    evmGasType: EVMGasType.Type2,
   };
 };
 
@@ -97,7 +96,7 @@ export const getMockGoerliNetwork = (): Network => {
     gasToken: {
       symbol: 'ETH',
       wrappedAddress: '0x00',
-      minimumBalanceForAvailability: 0.1,
+      decimals: 18,
     },
     fees: {
       slippageBuffer: 0.05,
@@ -108,7 +107,6 @@ export const getMockGoerliNetwork = (): Network => {
     fallbackProviderConfig: getMockGoerliFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,
-    evmGasType: EVMGasType.Type2,
   };
 };
 

@@ -8,7 +8,7 @@ export const NO_GAS_TOKEN_ADDRESS = 'NO_GAS_TOKEN_ADDRESS';
 export type GasTokenConfig = {
   wrappedAddress: BaseTokenWrappedAddress | string;
   symbol: string;
-  minimumBalanceForAvailability: number;
+  decimals: number;
 };
 
 export type TokenConfig = {

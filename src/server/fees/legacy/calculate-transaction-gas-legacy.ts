@@ -1,25 +1,31 @@
+import {
+  TransactionGasDetails,
+  EVMGasType,
+} from '@railgun-community/shared-models';
 import { BigNumber } from 'ethers';
-import { RelayerChain } from '../../models/chain-models';
-import { EVMGasType } from '../../models/network-models';
-import configDefaults from '../config/config-defaults';
-import configNetworks from '../config/config-networks';
-import { getTransactionTokens } from '../tokens/network-tokens';
-import { getTransactionTokenPrices } from '../tokens/token-price-cache';
+import { RelayerChain } from '../../../models/chain-models';
+import configDefaults from '../../config/config-defaults';
+import configNetworks from '../../config/config-networks';
+import { getTransactionTokens } from '../../tokens/network-tokens';
+import { getTransactionTokenPrices } from '../../tokens/token-price-cache';
 import {
   getRoundedTokenToGasPriceRatio,
   getTransactionTokenToGasDecimalRatio,
-} from './calculate-token-fee';
-import { calculateGasLimit, TransactionGasDetails } from './gas-estimate';
+} from '../calculate-token-fee';
+import { calculateGasLimitRelayer } from '../gas-estimate';
 
-export const createTransactionGasDetails = (
+/**
+ * This is a legacy operation, now that we have minGasPrice in every Relayed transaction.
+ * Retaining the code for posterity.
+ */
+export const createTransactionGasDetailsLegacy = (
   chain: RelayerChain,
   gasEstimateDetails: TransactionGasDetails,
-  minGasPrice: Optional<string>,
   tokenAddress: string,
   tokenFee: BigNumber,
 ): TransactionGasDetails => {
   const { evmGasType, gasEstimate } = gasEstimateDetails;
-  const gasLimit = calculateGasLimit(gasEstimate);
+  const gasLimit = calculateGasLimitRelayer(gasEstimate);
   const { token, gasToken } = getTransactionTokens(chain, tokenAddress);
   const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
     chain,
@@ -46,13 +52,12 @@ export const createTransactionGasDetails = (
   const translatedGasPrice = translatedTotalGas.div(gasLimit);
 
   switch (evmGasType) {
-    case EVMGasType.Type0: {
+    case EVMGasType.Type0:
+    case EVMGasType.Type1: {
       return {
         evmGasType,
         gasEstimate,
-        gasPrice: minGasPrice
-          ? BigNumber.from(minGasPrice)
-          : translatedGasPrice,
+        gasPrice: translatedGasPrice,
       };
     }
     case EVMGasType.Type2: {

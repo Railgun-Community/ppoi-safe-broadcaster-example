@@ -2,20 +2,22 @@ import {
   TransactionRequest,
   TransactionResponse,
 } from '@ethersproject/providers';
+import {
+  EVMGasType,
+  TransactionGasDetails,
+} from '@railgun-community/shared-models';
 import debug from 'debug';
 import { Wallet as EthersWallet } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
-import { EVMGasType } from '../../models/network-models';
 import { ActiveWallet } from '../../models/wallet-models';
-import { ErrorMessage } from '../../util/errors';
+import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
 import { minBigNumber } from '../../util/utils';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import {
-  calculateGasLimit,
-  calculateMaximumGas,
-  TransactionGasDetails,
+  calculateGasLimitRelayer,
+  calculateMaximumGasRelayer,
 } from '../fees/gas-estimate';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
@@ -77,14 +79,14 @@ export const executeTransaction = async (
 ): Promise<TransactionResponse> => {
   dbg('Execute transaction');
 
-  const maximumGas = calculateMaximumGas(gasDetails);
+  const maximumGas = calculateMaximumGasRelayer(gasDetails);
   const activeWallet =
     wallet ?? (await getBestMatchWalletForNetwork(chain, maximumGas));
 
   const provider = getProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(activeWallet, provider);
   const nonce = await getCurrentWalletNonce(ethersWallet);
-  const gasLimit = calculateGasLimit(gasDetails.gasEstimate);
+  const gasLimit = calculateGasLimitRelayer(gasDetails.gasEstimate);
   dbg('Nonce', nonce);
 
   const finalTransaction: TransactionRequest = {
@@ -96,25 +98,25 @@ export const executeTransaction = async (
 
   dbg(`Gas limit: ${gasLimit.toString()}`);
 
+  dbg(`Gas details: ${JSON.stringify(gasDetails)}`);
+
+  finalTransaction.type = gasDetails.evmGasType;
+
   switch (gasDetails.evmGasType) {
-    case EVMGasType.Type0: {
+    case EVMGasType.Type0:
+    case EVMGasType.Type1: {
       const { gasPrice } = gasDetails;
-      finalTransaction.type = 0;
       finalTransaction.gasPrice = gasPrice;
-      delete finalTransaction.maxFeePerGas;
-      delete finalTransaction.maxPriorityFeePerGas;
       dbg(`Gas price: ${gasPrice.toString()}`);
       break;
     }
     case EVMGasType.Type2: {
       const { maxFeePerGas, maxPriorityFeePerGas } = gasDetails;
-      finalTransaction.type = 2;
       finalTransaction.maxFeePerGas = maxFeePerGas;
       finalTransaction.maxPriorityFeePerGas = minBigNumber(
         maxFeePerGas,
         maxPriorityFeePerGas,
       );
-      delete finalTransaction.gasPrice;
       dbg(`Max fee per gas: ${maxFeePerGas.toString()}`);
       dbg(`Max priority fee: ${maxPriorityFeePerGas.toString()}`);
       break;
@@ -141,7 +143,7 @@ export const executeTransaction = async (
     }
 
     dbg(err);
-    throw new Error('Could not send transaction.');
+    throw sanitizeRelayerError(err);
   }
 };
 

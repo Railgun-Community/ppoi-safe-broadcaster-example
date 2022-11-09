@@ -80,9 +80,11 @@ const getZeroXQuoteInvalidError = (
   buyTokenAddress: string,
 ): Optional<string> => {
   try {
+    const toLowerCase = to.toLowerCase();
+
     // Validate "to" address.
     const expectedAddress = zeroXExchangeProxyContractAddress(chain);
-    if (to === expectedAddress) {
+    if (toLowerCase === expectedAddress.toLowerCase()) {
       // Validate "data" and "value" for 0x exchange.
       // TODO: Re-enable the below. Disabled because currently we pass 'ETH' in for sellTokenAddress or buyTokenAddress if it is a base token. And argsString that is produced within validateZeroXDataField returns 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee for the base token
       // const provider = ProviderService.getProvider(networkName);
@@ -94,11 +96,16 @@ const getZeroXQuoteInvalidError = (
       //   sellTokenAddress,
       //   buyTokenAddress,
       // );
-    } else if (to === sellTokenAddress || to === buyTokenAddress) {
+    } else if (
+      toLowerCase === sellTokenAddress.toLowerCase() ||
+      toLowerCase === buyTokenAddress.toLowerCase()
+    ) {
       // Wrapped contract.
       // Do nothing.
     } else {
-      throw new Error(`Invalid 0x Exchange contract address: ${to}`);
+      throw new Error(
+        `Invalid 0x Exchange contract address: ${toLowerCase} vs ${expectedAddress}`,
+      );
     }
 
     return undefined;

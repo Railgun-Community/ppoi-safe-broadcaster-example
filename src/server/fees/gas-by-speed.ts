@@ -27,12 +27,11 @@
 
 import { BigNumber } from '@ethersproject/bignumber';
 import { ChainType } from '@railgun-community/engine';
+import { EVMGasType } from '@railgun-community/shared-models';
 import Web3, { Eth, FeeHistoryResult } from 'web3-eth';
 import { RelayerChain } from '../../models/chain-models';
-import { EVMGasType } from '../../models/network-models';
-import { maxBigNumber } from '../../util/utils';
+import { maxBigNumber, minBigNumber } from '../../util/utils';
 import { NetworkChainID } from '../config/config-chains';
-import configNetworks from '../config/config-networks';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { web3ProviderFromChainID } from '../providers/web3-providers';
 
@@ -78,9 +77,16 @@ const Web3Eth = Web3 as unknown as typeof Web3.Eth;
 // };
 //
 
+export enum GasHistoryPercentile {
+  Low = 10,
+  Medium = 20,
+  High = 30,
+  VeryHigh = 40,
+}
+
 export type GasDetails =
   | {
-      evmGasType: EVMGasType.Type0;
+      evmGasType: EVMGasType.Type0 | EVMGasType.Type1;
       gasPrice: BigNumber;
     }
   | {
@@ -89,13 +95,9 @@ export type GasDetails =
       maxPriorityFeePerGas: BigNumber;
     };
 
-export type GasDetailsBySpeed = NumMapType<GasDetails>;
-
-enum GasHistoryPercentile {
-  Low = 10,
-  Medium = 20,
-  High = 30,
-}
+export type GasDetailsBySpeed = {
+  [percentile in GasHistoryPercentile]: GasDetails;
+};
 
 type SuggestedGasDetails = {
   maxFeePerGas: BigNumber;
@@ -107,6 +109,7 @@ const REWARD_PERCENTILES: number[] = [
   GasHistoryPercentile.Low,
   GasHistoryPercentile.Medium,
   GasHistoryPercentile.High,
+  GasHistoryPercentile.VeryHigh,
 ];
 
 // WARNING: TRANSACTIONS RISK BEING REVERTED IF YOU MODIFY THIS.
@@ -125,6 +128,11 @@ const SETTINGS_BY_PRIORITY_LEVEL = {
     baseFeePercentageMultiplier: BigNumber.from(250),
     priorityFeePercentageMultiplier: BigNumber.from(125),
     minSuggestedMaxPriorityFeePerGas: BigNumber.from(3_000_000_000),
+  },
+  [GasHistoryPercentile.VeryHigh]: {
+    baseFeePercentageMultiplier: BigNumber.from(1000),
+    priorityFeePercentageMultiplier: BigNumber.from(200),
+    minSuggestedMaxPriorityFeePerGas: BigNumber.from(4000000000), // 4_000_000_000
   },
 };
 
@@ -156,20 +164,23 @@ const gasHistoryPercentileForChain = (
         case NetworkChainID.EthereumGoerli:
         case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
-        case NetworkChainID.PolygonMumbai:
           return GasHistoryPercentile.High;
+        case NetworkChainID.PolygonMumbai:
+          return GasHistoryPercentile.VeryHigh;
       }
     }
   }
   throw new Error(`Chain ${chain.type}:${chain.id} unhandled for gas speeds.`);
 };
 
-export const getStandardGasDetails = async (chain: RelayerChain) => {
-  const { evmGasType } = configNetworks[chain.type][chain.id];
-
+export const getStandardGasDetails = async (
+  chain: RelayerChain,
+  evmGasType: EVMGasType,
+): Promise<GasDetails> => {
   let gasDetailsBySpeed: GasDetailsBySpeed;
   switch (evmGasType) {
     case EVMGasType.Type0:
+    case EVMGasType.Type1:
       gasDetailsBySpeed = await getGasPricesBySpeed(evmGasType, chain);
       break;
     case EVMGasType.Type2:
@@ -197,7 +208,7 @@ const gasPriceForPercentile = (
 };
 
 const getGasPricesBySpeed = async (
-  evmGasType: EVMGasType.Type0,
+  evmGasType: EVMGasType.Type0 | EVMGasType.Type1,
   chain: RelayerChain,
 ): Promise<GasDetailsBySpeed> => {
   const provider = getProviderForNetwork(chain);
@@ -215,6 +226,10 @@ const getGasPricesBySpeed = async (
     [GasHistoryPercentile.High]: {
       evmGasType,
       gasPrice: gasPriceForPercentile(gasPrice, GasHistoryPercentile.High),
+    },
+    [GasHistoryPercentile.VeryHigh]: {
+      evmGasType,
+      gasPrice: gasPriceForPercentile(gasPrice, GasHistoryPercentile.VeryHigh),
     },
   };
 
@@ -281,7 +296,9 @@ const getHistoricalGasDetailsBySpeed = async (
   const baseFees: BigNumber[] = feeHistory.baseFeePerGas.map((feeHex) =>
     BigNumber.from(feeHex),
   );
-  const priorityFeePercentile: NumMapType<BigNumber[]> = {
+  const priorityFeePercentile: {
+    [percentile in GasHistoryPercentile]: BigNumber[];
+  } = {
     [GasHistoryPercentile.Low]: feeHistory.reward.map((feePriorityGroup) =>
       BigNumber.from(feePriorityGroup[0]),
     ),
@@ -291,10 +308,15 @@ const getHistoricalGasDetailsBySpeed = async (
     [GasHistoryPercentile.High]: feeHistory.reward.map((feePriorityGroup) =>
       BigNumber.from(feePriorityGroup[2]),
     ),
+    [GasHistoryPercentile.VeryHigh]: feeHistory.reward.map((feePriorityGroup) =>
+      BigNumber.from(feePriorityGroup[2]),
+    ),
   };
 
   const baseFeesMedian: BigNumber = getMedianBigNumber(baseFees);
-  const priorityFeePercentileMedians: NumMapType<BigNumber> = {
+  const priorityFeePercentileMedians: {
+    [percentile in GasHistoryPercentile]: BigNumber;
+  } = {
     [GasHistoryPercentile.Low]: getMedianBigNumber(
       priorityFeePercentile[GasHistoryPercentile.Low],
     ),
@@ -304,9 +326,14 @@ const getHistoricalGasDetailsBySpeed = async (
     [GasHistoryPercentile.High]: getMedianBigNumber(
       priorityFeePercentile[GasHistoryPercentile.High],
     ),
+    [GasHistoryPercentile.VeryHigh]: getMedianBigNumber(
+      priorityFeePercentile[GasHistoryPercentile.VeryHigh],
+    ),
   };
 
-  const suggestedGasDetails: NumMapType<SuggestedGasDetails> = {
+  const suggestedGasDetails: {
+    [percentile in GasHistoryPercentile]: SuggestedGasDetails;
+  } = {
     [GasHistoryPercentile.Low]: getSuggestedGasDetails(
       baseFeesMedian,
       priorityFeePercentileMedians,
@@ -321,6 +348,11 @@ const getHistoricalGasDetailsBySpeed = async (
       baseFeesMedian,
       priorityFeePercentileMedians,
       GasHistoryPercentile.High,
+    ),
+    [GasHistoryPercentile.VeryHigh]: getSuggestedGasDetails(
+      baseFeesMedian,
+      priorityFeePercentileMedians,
+      GasHistoryPercentile.VeryHigh,
     ),
   };
 
@@ -339,6 +371,10 @@ const getHistoricalGasDetailsBySpeed = async (
           evmGasType,
           ...suggestedGasDetails[GasHistoryPercentile.High],
         },
+        [GasHistoryPercentile.VeryHigh]: {
+          evmGasType,
+          ...suggestedGasDetails[GasHistoryPercentile.VeryHigh],
+        },
       };
     }
   }
@@ -348,21 +384,29 @@ const getHistoricalGasDetailsBySpeed = async (
 
 const getSuggestedGasDetails = (
   baseFeesMedian: BigNumber,
-  priorityFeePercentileMedians: NumMapType<BigNumber>,
+  priorityFeePercentileMedians: {
+    [percentile in GasHistoryPercentile]: BigNumber;
+  },
   percentile: GasHistoryPercentile,
 ): SuggestedGasDetails => {
   const settings = SETTINGS_BY_PRIORITY_LEVEL[percentile];
-  const baseFeePerGas = baseFeesMedian
+  const maxBaseFeePerGas = baseFeesMedian
     .mul(settings.baseFeePercentageMultiplier)
     .div(100);
-  const maxPriorityFee = priorityFeePercentileMedians[percentile]
-    .mul(settings.priorityFeePercentageMultiplier)
-    .div(100);
+
+  // Ensure no lower than min suggested priority fee.
+  const priorityFee = maxBigNumber(
+    priorityFeePercentileMedians[percentile]
+      .mul(settings.priorityFeePercentageMultiplier)
+      .div(100),
+    settings.minSuggestedMaxPriorityFeePerGas,
+  );
+
+  // Ensure no higher than maxFeePerGas.
+  const maxPriorityFeePerGas = minBigNumber(priorityFee, maxBaseFeePerGas);
+
   return {
-    maxPriorityFeePerGas: maxBigNumber(
-      maxPriorityFee,
-      settings.minSuggestedMaxPriorityFeePerGas,
-    ),
-    maxFeePerGas: baseFeePerGas.add(maxPriorityFee),
+    maxPriorityFeePerGas,
+    maxFeePerGas: maxBaseFeePerGas.add(maxPriorityFeePerGas),
   };
 };

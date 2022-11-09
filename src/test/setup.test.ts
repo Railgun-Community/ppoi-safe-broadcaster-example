@@ -91,6 +91,13 @@ export const testChainEthereum = (): RelayerChain => {
   };
 };
 
+export const testChainPolygon = (): RelayerChain => {
+  return {
+    type: ChainType.EVM,
+    id: NetworkChainID.PolygonPOS,
+  };
+};
+
 export const setupTestNetwork = (): Network => {
   const testNetwork = getMockNetwork();
   const chain = testChainEthereum();

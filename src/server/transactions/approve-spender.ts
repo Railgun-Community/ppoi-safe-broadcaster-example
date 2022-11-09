@@ -5,11 +5,15 @@ import { abiForChainToken } from '../abi/abi';
 import { zeroXExchangeProxyContractAddress } from '../api/0x/0x-quote';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { ActiveWallet } from '../../models/wallet-models';
-import { getEstimateGasDetails } from '../fees/gas-estimate';
+import { getEstimateGasDetailsPublic } from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
 import { removeUndefineds } from '../../util/utils';
 import debug from 'debug';
 import { RelayerChain } from '../../models/chain-models';
+import {
+  getEVMGasTypeForTransaction,
+  networkForChain,
+} from '@railgun-community/shared-models';
 
 const dbg = debug('relayer:approvals');
 
@@ -53,9 +57,21 @@ export const approveZeroX = async (
   );
   const TransactionResponses: TransactionResponse[] = await Promise.all(
     populatedApprovalTXs.map(async (populatedApproval) => {
-      const gasDetails = await getEstimateGasDetails(
+      const network = networkForChain(chain);
+      if (!network) {
+        throw new Error(
+          `Unsupported network for chain ${chain.type}:${chain.id}`,
+        );
+      }
+      const sendWithPublicWallet = true;
+      const evmGasType = getEVMGasTypeForTransaction(
+        network.name,
+        sendWithPublicWallet,
+      );
+
+      const gasDetails = await getEstimateGasDetailsPublic(
         chain,
-        undefined, // minGasPrice
+        evmGasType,
         populatedApproval,
       );
       const txResponse = await executeTransaction(

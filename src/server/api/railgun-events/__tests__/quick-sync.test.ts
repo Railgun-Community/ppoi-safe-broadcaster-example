@@ -2,24 +2,24 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
 import axios from 'axios';
-import { quickSync } from '../quick-sync';
+import { quickSyncLegacy } from '../quick-sync-legacy';
 import configNetworks from '../../../config/config-networks';
-import { getMockGoerliNetwork } from '../../../../test/mocks.test';
-import { testChainEthereum } from '../../../../test/setup.test';
+import { getMockNetwork } from '../../../../test/mocks.test';
+import { testChainPolygon } from '../../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MOCK_CHAIN_ETHEREUM = testChainEthereum();
+const MOCK_CHAIN_POLYGON = testChainPolygon();
 
 describe('quick-sync', () => {
   before(() => {
-    configNetworks[MOCK_CHAIN_ETHEREUM.type][MOCK_CHAIN_ETHEREUM.id] =
-      getMockGoerliNetwork();
+    configNetworks[MOCK_CHAIN_POLYGON.type][MOCK_CHAIN_POLYGON.id] =
+      getMockNetwork();
   });
 
   it('Should run live Railgun Event Log fetch for Ethereum', async () => {
-    const eventLog = await quickSync(MOCK_CHAIN_ETHEREUM, 0);
+    const eventLog = await quickSyncLegacy(MOCK_CHAIN_POLYGON, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
@@ -29,31 +29,39 @@ describe('quick-sync', () => {
 
   it('Should retry Railgun Event Log API fetch on error', async () => {
     const stubAxiosGet = sinon.stub(axios, 'get').throws();
-    await expect(quickSync(MOCK_CHAIN_ETHEREUM, 0)).to.be.rejected;
+    await expect(quickSyncLegacy(MOCK_CHAIN_POLYGON, 0)).to.be.rejected;
     expect(stubAxiosGet.callCount).to.equal(3);
     stubAxiosGet.restore();
   });
 
-  it('Should error if invalid type', async () => {
+  it('[legacy] Should error if invalid type', async () => {
     let stubAxiosGet: SinonStub;
     stubAxiosGet = sinon.stub(axios, 'get').resolves({ data: null });
-    await expect(quickSync(MOCK_CHAIN_ETHEREUM, 0)).to.be.rejectedWith(
+    await expect(quickSyncLegacy(MOCK_CHAIN_POLYGON, 0)).to.be.rejectedWith(
       'Expected object `eventLog` response.',
     );
     stubAxiosGet.restore();
 
     stubAxiosGet = sinon
       .stub(axios, 'get')
-      .resolves({ data: { nullifierEvents: [] } });
-    await expect(quickSync(MOCK_CHAIN_ETHEREUM, 0)).to.be.rejectedWith(
+      .resolves({ data: { unshieldEvents: [], nullifierEvents: [] } });
+    await expect(quickSyncLegacy(MOCK_CHAIN_POLYGON, 0)).to.be.rejectedWith(
       'Expected object `commitmentEvents` response.',
     );
     stubAxiosGet.restore();
 
+    // stubAxiosGet = sinon
+    //   .stub(axios, 'get')
+    //   .resolves({ data: { commitmentEvents: [], nullifierEvents: [] } });
+    // await expect(quickSyncLegacy(MOCK_CHAIN_POLYGON, 0)).to.be.rejectedWith(
+    //   'Expected object `unshieldEvents` response.',
+    // );
+    // stubAxiosGet.restore();
+
     stubAxiosGet = sinon
       .stub(axios, 'get')
-      .resolves({ data: { commitmentEvents: [] } });
-    await expect(quickSync(MOCK_CHAIN_ETHEREUM, 0)).to.be.rejectedWith(
+      .resolves({ data: { commitmentEvents: [], unshieldEvents: [] } });
+    await expect(quickSyncLegacy(MOCK_CHAIN_POLYGON, 0)).to.be.rejectedWith(
       'Expected object `nullifierEvents` response.',
     );
     stubAxiosGet.restore();

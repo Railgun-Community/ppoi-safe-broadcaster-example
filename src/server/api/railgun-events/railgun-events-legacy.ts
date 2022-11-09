@@ -1,27 +1,23 @@
-import { CommitmentEvent, Nullifier } from '@railgun-community/engine';
 import axios from 'axios';
+import { AccumulatedEvents } from '@railgun-community/engine';
 import { logger } from '../../../util/logger';
 
-const NUM_RETRIES = 2;
+const MAX_NUM_RETRIES = 3;
 
-export type QuickSyncEventLog = {
-  commitmentEvents: CommitmentEvent[];
-  nullifierEvents: Nullifier[];
-};
-
-export const getRailgunEventLog = async (
-  quickSyncURL?: string,
-): Promise<QuickSyncEventLog> => {
-  if (!quickSyncURL) {
-    throw new Error('Could not load historical transactions: No URL.');
-  }
-
-  const eventLog = await fetchEventLog(quickSyncURL);
+export const getRailgunEventLogLegacy = async (
+  quickSyncURL: string,
+): Promise<AccumulatedEvents> => {
+  const eventLog = await fetchEventLog<AccumulatedEvents>(quickSyncURL);
   if (eventLog == null) {
     throw new Error('Expected object `eventLog` response.');
   }
   if (typeof eventLog.commitmentEvents !== 'object') {
     throw new Error('Expected object `commitmentEvents` response.');
+  }
+  if (typeof eventLog.unshieldEvents !== 'object') {
+    // TODO: Add when available.
+    eventLog.unshieldEvents = [];
+    // throw new Error('Expected object `unshieldEvents` response.');
   }
   if (typeof eventLog.nullifierEvents !== 'object') {
     throw new Error('Expected object `nullifierEvents` response.');
@@ -30,10 +26,10 @@ export const getRailgunEventLog = async (
   return eventLog;
 };
 
-export const fetchEventLog = async (
+const fetchEventLog = async <ReturnType>(
   url: string,
-  retryCount = 0,
-): Promise<QuickSyncEventLog> => {
+  retryCount = 1,
+): Promise<ReturnType> => {
   try {
     const rsp = await axios.get(url, {
       method: 'GET',
@@ -43,12 +39,11 @@ export const fetchEventLog = async (
       },
     });
     return rsp.data;
-  } catch (error: any) {
-    if (retryCount < NUM_RETRIES) {
+  } catch (err) {
+    if (retryCount < MAX_NUM_RETRIES) {
       return fetchEventLog(url, retryCount + 1);
     }
-    logger.warn('fetchEventLog error');
-    logger.error(error);
+    logger.error(err);
     throw new Error(
       'Could not pull historical transactions. Please try again.',
     );

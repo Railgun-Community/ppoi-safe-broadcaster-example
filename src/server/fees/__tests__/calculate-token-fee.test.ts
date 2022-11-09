@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { BigNumber, utils } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import configTokens from '../../config/config-tokens';
-import { EVMGasType, Network } from '../../../models/network-models';
+import { Network } from '../../../models/network-models';
 import {
   getMockPopulatedTransaction,
   MOCK_TOKEN_6_DECIMALS,
@@ -20,9 +20,17 @@ import {
   getTokenFee,
 } from '../calculate-token-fee';
 import * as estimateGasModule from '../gas-estimate';
-import { getEstimateGasDetails, calculateMaximumGas } from '../gas-estimate';
+import {
+  getEstimateGasDetailsPublic,
+  calculateMaximumGasRelayer,
+} from '../gas-estimate';
 import { initTokens } from '../../tokens/network-tokens';
 import { initNetworkProviders } from '../../providers/active-network-providers';
+import {
+  EVMGasType,
+  getEVMGasTypeForTransaction,
+  NetworkName,
+} from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -39,7 +47,7 @@ const stubEstimateGasDetails = (
   maxPriorityFeePerGas: BigNumber,
 ) => {
   estimateMaximumGasStub = sinon
-    .stub(estimateGasModule, 'getEstimateGasDetails')
+    .stub(estimateGasModule, 'getEstimateGasDetailsPublic')
     .resolves({
       evmGasType: EVMGasType.Type2,
       gasEstimate,
@@ -136,12 +144,14 @@ describe('calculate-token-fee', () => {
       maxPriorityFeePerGas,
     );
 
-    const gasEstimateDetails = await getEstimateGasDetails(
+    const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
+
+    const gasEstimateDetails = await getEstimateGasDetailsPublic(
       chain,
-      undefined, // minGasPrice
+      evmGasType,
       MOCK_TRANSACTION,
     );
-    const maximumGas = calculateMaximumGas(gasEstimateDetails);
+    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails);
     const maximumGasFeeForToken = getTokenFee(
       chain,
       maximumGas,
@@ -149,7 +159,7 @@ describe('calculate-token-fee', () => {
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal(
-      '114546804123600000000000',
+      '137456164948320000000000',
     );
   });
 
@@ -168,12 +178,14 @@ describe('calculate-token-fee', () => {
       maxPriorityFeePerGas,
     );
 
-    const gasEstimateDetails = await getEstimateGasDetails(
+    const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
+
+    const gasEstimateDetails = await getEstimateGasDetailsPublic(
       chain,
-      undefined, // minGasPrice
+      evmGasType,
       MOCK_TRANSACTION,
     );
-    const maximumGas = calculateMaximumGas(gasEstimateDetails);
+    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails);
     const maximumGasFeeForToken = getTokenFee(
       chain,
       maximumGas,
@@ -181,8 +193,7 @@ describe('calculate-token-fee', () => {
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal(
-      '114546804123',
-      // '152729072164', // +20%
+      '137456164948', // +20%
     );
   });
 
@@ -215,12 +226,14 @@ describe('calculate-token-fee', () => {
       maxPriorityFeePerGas,
     );
 
-    const gasEstimateDetails = await getEstimateGasDetails(
+    const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
+
+    const gasEstimateDetails = await getEstimateGasDetailsPublic(
       chain,
-      undefined, // minGasPrice
+      evmGasType,
       MOCK_TRANSACTION,
     );
-    const maximumGas = calculateMaximumGas(gasEstimateDetails);
+    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails);
     expect(() => getTokenFee(chain, maximumGas, MOCK_TOKEN_ADDRESS)).to.throw();
   });
 }).timeout(10000);

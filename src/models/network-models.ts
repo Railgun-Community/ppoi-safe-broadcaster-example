@@ -7,11 +7,6 @@ import { CoingeckoNetworkID } from './api-constants';
 import { FallbackProviderJsonConfig } from './provider-models';
 import { GasTokenConfig } from './token-models';
 
-export enum EVMGasType {
-  Type0 = 'Type0',
-  Type2 = 'Type2',
-}
-
 export type NetworkFeeSettings = {
   // Slippage is a percentage of the estimated gas fee. Recommended at 0.03 - 0.05.
   // A low buffer means that your Relayer may cancel execution for proven
@@ -34,5 +29,4 @@ export type Network = {
   fees: NetworkFeeSettings;
   isTestNetwork?: boolean;
   skipQuickScan?: boolean;
-  evmGasType: EVMGasType;
 };

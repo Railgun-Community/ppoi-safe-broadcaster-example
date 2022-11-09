@@ -1,7 +1,7 @@
 import {
   ViewingKeyPair,
   OutputType,
-  Note,
+  TransactNote,
   Prover,
   formatToByteLength,
   getPublicViewingKey,
@@ -35,13 +35,14 @@ const getMockBalanceData = async (tokenAddress: string, tree: number) => {
         position: 0,
         txid: '123',
         spendtxid: '123',
-        note: Note.create(
-          addressData,
-          '12345678901234561234567890123456',
-          '1000000000000000000000',
-          tokenAddress,
+        note: TransactNote.create(
+          addressData, // receiver
+          addressData, // sender
+          '12345678901234561234567890123456', // random
+          1000000000000000000000n, // value
+          tokenAddress, // token
           senderViewingKeys,
-          undefined, // senderBlindingKey
+          false, // shouldShowSender
           OutputType.Transfer,
           undefined, // memoText
         ),

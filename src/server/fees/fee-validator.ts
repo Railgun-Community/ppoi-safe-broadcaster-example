@@ -25,7 +25,9 @@ export const validateFee = (
   feeCacheID: string,
   packagedFee: BigNumber,
 ) => {
-  logger.log(`validateFee: ${tokenAddress} (chain ${chain.type}:${chain.id})`);
+  logger.log(
+    `validateFee: token ${tokenAddress} (chain ${chain.type}:${chain.id})`,
+  );
 
   // Check packaged fee against cached fee.
   // Cache expires with TTL setting: transactionFees.feeExpirationInMS.

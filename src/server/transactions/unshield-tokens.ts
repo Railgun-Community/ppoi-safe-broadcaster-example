@@ -2,17 +2,21 @@ import { TransactionResponse } from '@ethersproject/providers';
 import {
   Prover,
   RailgunWallet,
-  SerializedTransaction,
+  TransactionStruct,
   TransactionBatch,
   TokenType,
   RailgunProxyContract,
 } from '@railgun-community/engine';
-import { Chain } from '@railgun-community/shared-models';
+import {
+  Chain,
+  getEVMGasTypeForTransaction,
+  networkForChain,
+} from '@railgun-community/shared-models';
 import debug from 'debug';
 import { PopulatedTransaction } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { TokenAmount } from '../../models/token-models';
-import { getEstimateGasDetails } from '../fees/gas-estimate';
+import { getEstimateGasDetailsPublic } from '../fees/gas-estimate';
 import { getRailgunEngine } from '../lepton/lepton-init';
 import { executeTransaction } from './execute-transaction';
 
@@ -26,8 +30,8 @@ export const generateUnshieldTransactions = async (
   allowOverride: boolean,
   tokenAmounts: TokenAmount[],
   chain: RelayerChain,
-): Promise<SerializedTransaction[]> => {
-  const txBatchPromises: Promise<SerializedTransaction[]>[] = [];
+): Promise<TransactionStruct[]> => {
+  const txBatchPromises: Promise<TransactionStruct[]>[] = [];
 
   for (const tokenAmount of tokenAmounts) {
     const transactionBatch = new TransactionBatch(
@@ -39,10 +43,10 @@ export const generateUnshieldTransactions = async (
     const withdrawAmount = tokenAmount.amount;
     const value = withdrawAmount.toHexString();
 
-    transactionBatch.setWithdraw(toWalletAddress, value, allowOverride);
+    transactionBatch.setUnshield(toWalletAddress, value, allowOverride);
 
     txBatchPromises.push(
-      transactionBatch.generateSerializedTransactions(
+      transactionBatch.generateTransactions(
         prover,
         railgunWallet,
         encryptionKey,
@@ -50,7 +54,7 @@ export const generateUnshieldTransactions = async (
       ),
     );
   }
-  const txBatches: SerializedTransaction[][] = [];
+  const txBatches: TransactionStruct[][] = [];
 
   // do not require success of *all* batch unshields; return succesful and report failures
   const results = await Promise.allSettled(txBatchPromises);
@@ -68,7 +72,7 @@ export const generateUnshieldTransactions = async (
 };
 
 export const generatePopulatedUnshieldTransact = async (
-  txs: SerializedTransaction[],
+  txs: TransactionStruct[],
   chain: Chain,
 ): Promise<PopulatedTransaction> => {
   const railContract = getProxyContractForNetwork(chain);
@@ -110,9 +114,18 @@ export const unshieldTokens = async (
     serializedTransactions,
     chain,
   );
-  const gasDetails = await getEstimateGasDetails(
+  const network = networkForChain(chain);
+  if (!network) {
+    throw new Error(`Unsupported network for chain ${chain.type}:${chain.id}`);
+  }
+  const sendWithPublicWallet = true;
+  const evmGasType = getEVMGasTypeForTransaction(
+    network.name,
+    sendWithPublicWallet,
+  );
+  const gasDetails = await getEstimateGasDetailsPublic(
     chain,
-    undefined, // minGasPrice
+    evmGasType,
     populatedTransaction,
   );
   const batchResponse = await executeTransaction(

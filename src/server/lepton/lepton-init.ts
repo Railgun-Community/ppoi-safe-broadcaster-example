@@ -2,7 +2,7 @@ import leveldown from 'leveldown';
 import { FallbackProvider } from '@ethersproject/providers';
 import { logger } from '../../util/logger';
 import { artifactsGetter } from './artifacts';
-import { quickSync } from '../api/railgun-events/quick-sync';
+import { quickSyncLegacy } from '../api/railgun-events/quick-sync-legacy';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
@@ -38,7 +38,7 @@ export const initEngine = (optDebugger?: EngineDebugger) => {
     'relayer',
     levelDB,
     artifactsGetter,
-    quickSync,
+    quickSyncLegacy,
     configDefaults.debug.lepton ? leptonDebugger : undefined,
   );
   lepton.prover.setSnarkJSGroth16(groth16 as Groth16);

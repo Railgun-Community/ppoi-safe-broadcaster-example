@@ -1,8 +1,8 @@
 import { BaseProvider } from '@ethersproject/providers';
+import { EVMGasType } from '@railgun-community/shared-models';
 import { BigNumber } from 'ethers';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
-import { EVMGasType } from '../../models/network-models';
 import * as GasHistoryModule from '../../server/fees/gas-by-speed';
 
 let estimateGasStub: SinonStub;

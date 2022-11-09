@@ -16,13 +16,7 @@ import {
   tryDecryptJSONDataWithSharedKey,
   RailgunEngine,
 } from '@railgun-community/engine';
-import {
-  FeeMessage,
-  FeeMessageData,
-  WakuMethodNames,
-  WakuRelayer,
-  WAKU_TOPIC,
-} from '../waku-relayer';
+import { WakuMethodNames, WakuRelayer, WAKU_TOPIC } from '../waku-relayer';
 import {
   WakuApiClient,
   WakuRelayMessage,
@@ -30,9 +24,7 @@ import {
 } from '../../networking/waku-api-client';
 import {
   encryptResponseData,
-  RawParamsTransact,
   tryDecryptData,
-  WakuMethodParamsTransact,
 } from '../methods/transact-method';
 import {
   setupSingleTestWallet,
@@ -69,6 +61,13 @@ import {
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import {
+  RelayerFeeMessage,
+  RelayerFeeMessageData,
+  RelayerMethodParamsTransact,
+  RelayerRawParamsTransact,
+} from '@railgun-community/shared-models';
+import { getRelayerVersion } from '../../../util/versions';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -191,8 +190,10 @@ describe('waku-relayer', () => {
     expect(requestParams?.payload).to.be.a('string');
 
     const utf8 = Buffer.from(requestParams.payload, 'hex').toString('utf8');
-    const message = JSON.parse(utf8) as FeeMessage;
-    const data = JSON.parse(toUTF8String(message.data)) as FeeMessageData;
+    const message = JSON.parse(utf8) as RelayerFeeMessage;
+    const data = JSON.parse(
+      toUTF8String(message.data),
+    ) as RelayerFeeMessageData;
     const { signature } = message;
     expect(data).to.be.an('object');
     expect(data.fees[MOCK_TOKEN_ADDRESS]).to.be.a(
@@ -203,14 +204,16 @@ describe('waku-relayer', () => {
       '1272742268040000000000',
     );
     expect(data.feeExpiration).to.be.a('number');
-    expect(data.railAddress).to.equal(
+    expect(data.railgunAddress).to.equal(
       '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53lama02nutwtcqc979wnce0qwly4y7w4rls5cq040g7z8eagshxrw5ajy990',
     );
-    const decodedRailAddress = RailgunEngine.decodeAddress(data.railAddress);
+    const decodedRailgunAddress = RailgunEngine.decodeAddress(
+      data.railgunAddress,
+    );
     const isValid = await verifyED25519(
       hexStringToBytes(message.data),
       hexStringToBytes(signature),
-      decodedRailAddress.viewingPublicKey,
+      decodedRailgunAddress.viewingPublicKey,
     );
     expect(isValid).to.be.true;
   }).timeout(5000);
@@ -220,13 +223,17 @@ describe('waku-relayer', () => {
     const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
     const { viewingPublicKey } = getRailgunAddressData();
 
-    const data: RawParamsTransact = {
+    const data: RelayerRawParamsTransact = {
       chainID: chain.id,
       chainType: chain.type,
       feesID: '468abc',
+      minGasPrice: '0x1000',
       serializedTransaction: getMockSerializedTransaction(),
       relayerViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
+      devLog: true,
+      minVersion: getRelayerVersion(),
+      maxVersion: getRelayerVersion(),
     };
     const randomPrivKey = randomHex(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
@@ -254,20 +261,24 @@ describe('waku-relayer', () => {
     const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
     const { viewingPublicKey } = getRailgunAddressData();
 
-    const data: RawParamsTransact = {
+    const data: RelayerRawParamsTransact = {
       chainID: chain.id,
       chainType: chain.type,
       feesID: '468abc',
+      minGasPrice: '0x1000',
       serializedTransaction: getMockSerializedTransaction(),
       relayerViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
+      devLog: true,
+      minVersion: getRelayerVersion(),
+      maxVersion: getRelayerVersion(),
     };
     const randomPrivKey = randomHex(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
     const clientPubKey = hexlify(randomPubKeyUint8Array);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
     const encryptedData = encryptResponseData(data, sharedKey);
-    const params: WakuMethodParamsTransact = {
+    const params: RelayerMethodParamsTransact = {
       encryptedData,
       pubkey: clientPubKey,
     };

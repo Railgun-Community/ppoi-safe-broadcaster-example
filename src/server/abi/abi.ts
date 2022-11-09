@@ -1,5 +1,5 @@
 import {
-  ABIRailgunLogic,
+  ABIRailgunSmartWallet,
   ABIRelayAdapt,
   ChainType,
 } from '@railgun-community/engine';
@@ -9,7 +9,7 @@ import ABI_ERC20 from './json/erc20.json';
 import ZERO_X_ABI from './json/zerox.json';
 
 export const abiForProxyContract = () => {
-  return ABIRailgunLogic;
+  return ABIRailgunSmartWallet;
 };
 
 export const abiForRelayAdaptContract = () => {

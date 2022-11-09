@@ -19,23 +19,13 @@ import { WakuMethodResponse } from './waku-response';
 import configNetworks from '../config/config-networks';
 import configDefaults from '../config/config-defaults';
 import { RelayerChain } from '../../models/chain-models';
+import {
+  RelayerFeeMessage,
+  RelayerFeeMessageData,
+} from '@railgun-community/shared-models';
+import { getRelayerVersion } from '../../util/versions';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
-
-export type FeeMessageData = {
-  fees: MapType<string>;
-  feeExpiration: number;
-  feesID: string;
-  railAddress: string;
-  availableWallets: number;
-  version: string;
-  relayAdapt: string;
-};
-
-export type FeeMessage = {
-  data: string; // hex encoded FeeMessageData
-  signature: string; // hex encoded signature
-};
 
 type JsonRPCMessageHandler = (
   params: any,
@@ -58,7 +48,7 @@ export class WakuRelayer {
 
   subscribedContentTopics: string[];
 
-  walletRailAddress: string;
+  walletRailgunAddress: string;
 
   options: WakuRelayerOptions;
 
@@ -83,7 +73,7 @@ export class WakuRelayer {
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
     this.wallet = wallet;
-    this.walletRailAddress = wallet.getAddress();
+    this.walletRailgunAddress = wallet.getAddress();
     this.dbg(this.subscribedContentTopics);
   }
 
@@ -152,7 +142,7 @@ export class WakuRelayer {
     fees: MapType<BigNumber>,
     feeCacheID: string,
     chain: RelayerChain,
-  ): Promise<FeeMessage> => {
+  ): Promise<RelayerFeeMessage> => {
     const tokenAddresses = Object.keys(fees);
     const feesHex: MapType<string> = {};
     tokenAddresses.forEach((tokenAddress) => {
@@ -162,14 +152,14 @@ export class WakuRelayer {
     // Availability must be accurate or Relayer risks automatic blocking by clients.
     const availableWallets = await numAvailableWallets(chain);
 
-    const data: FeeMessageData = {
+    const data: RelayerFeeMessageData = {
       fees: feesHex,
       // client can't rely on message timestamp to calculate expiration
       feeExpiration: Date.now() + this.options.feeExpiration,
       feesID: feeCacheID,
-      railAddress: this.walletRailAddress,
+      railgunAddress: this.walletRailgunAddress,
       availableWallets,
-      version: process.env.npm_package_version ?? '0.0.0',
+      version: getRelayerVersion(),
       relayAdapt: configDefaults.featureFlags.enableRelayAdapt
         ? configNetworks[chain.type][chain.id].relayAdaptContract
         : '',
@@ -179,8 +169,9 @@ export class WakuRelayer {
       await this.wallet.signWithViewingKey(hexStringToBytes(message)),
     );
     this.dbg(
-      `Broadcasting fees for chain ${chain.type}:${chain.id}:`,
-      Object.keys(fees).length,
+      `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${
+        Object.keys(fees).length
+      }, Available Wallets ${availableWallets}`,
     );
     return {
       data: message,

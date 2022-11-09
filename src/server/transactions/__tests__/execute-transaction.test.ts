@@ -39,13 +39,15 @@ import { ActiveWallet } from '../../../models/wallet-models';
 import { isWalletAvailableWithEnoughFunds } from '../../wallets/available-wallets';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import configNetworks from '../../config/config-networks';
-import { TransactionGasDetails } from '../../fees/gas-estimate';
 import {
   createGasBalanceStub,
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
-import { EVMGasType } from '../../../models/network-models';
+import {
+  TransactionGasDetails,
+  EVMGasType,
+} from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

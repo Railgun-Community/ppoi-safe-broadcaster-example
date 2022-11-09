@@ -2,34 +2,39 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from 'ethers';
 import { assert } from 'console';
-import configNetworks from '../../config/config-networks';
+import configNetworks from '../../../config/config-networks';
 import {
   getMockNetwork,
   getMockPopulatedTransaction,
   mockTokenConfig,
   MOCK_TOKEN_6_DECIMALS,
-} from '../../../test/mocks.test';
+} from '../../../../test/mocks.test';
 import {
   createGasEstimateStubs,
   restoreGasEstimateStubs,
-} from '../../../test/stubs/ethers-provider-stubs.test';
-import { initNetworkProviders } from '../../providers/active-network-providers';
+} from '../../../../test/stubs/ethers-provider-stubs.test';
+import { initNetworkProviders } from '../../../providers/active-network-providers';
 import {
   cacheTokenPriceForNetwork,
   resetTokenPriceCache,
   TokenPriceSource,
-} from '../../tokens/token-price-cache';
-import { createTransactionGasDetails } from '../calculate-transaction-gas';
-import { getTokenFee } from '../calculate-token-fee';
+} from '../../../tokens/token-price-cache';
+import { createTransactionGasDetailsLegacy } from '../calculate-transaction-gas-legacy';
+import { getTokenFee } from '../../calculate-token-fee';
 import {
-  getEstimateGasDetails,
-  calculateMaximumGas,
+  calculateMaximumGasRelayer,
+  getEstimateGasDetailsPublic,
+  getEstimateGasDetailsRelayed,
+} from '../../gas-estimate';
+import { initTokens } from '../../../tokens/network-tokens';
+import { testChainEthereum } from '../../../../test/setup.test';
+import {
+  BaseTokenWrappedAddress,
+  EVMGasType,
+  getEVMGasTypeForTransaction,
+  NetworkName,
   TransactionGasDetails,
-} from '../gas-estimate';
-import { initTokens } from '../../tokens/network-tokens';
-import { EVMGasType } from '../../../models/network-models';
-import { testChainEthereum } from '../../../test/setup.test';
-import { BaseTokenWrappedAddress } from '@railgun-community/shared-models';
+} from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -49,7 +54,7 @@ const mockGasDetails: TransactionGasDetails = {
   maxPriorityFeePerGas: MOCK_MAX_PRIORITY_FEE_PER_GAS,
 };
 
-describe('calculate-transaction-gas', () => {
+describe('calculate-transaction-gas-legacy', () => {
   before(async () => {
     resetTokenPriceCache();
     mockTokenConfig(MOCK_CHAIN, MOCK_TOKEN_ADDRESS);
@@ -95,10 +100,9 @@ describe('calculate-transaction-gas', () => {
     );
 
     const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(18)); // $390 "USDC" (0.12 ETH) + 10% profit/buffer fee.
-    const gasDetails = createTransactionGasDetails(
+    const gasDetails = createTransactionGasDetailsLegacy(
       MOCK_CHAIN,
       mockGasDetails,
-      undefined, // minGasPrice
       MOCK_TOKEN_ADDRESS,
       tokenFee,
     );
@@ -109,7 +113,7 @@ describe('calculate-transaction-gas', () => {
     }
 
     expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
-    expect(gasDetails.maxFeePerGas.toString()).to.equal('300000');
+    expect(gasDetails.maxFeePerGas.toString()).to.equal('250000');
     expect(gasDetails.maxPriorityFeePerGas.toString()).to.equal('10000');
   });
 
@@ -121,10 +125,9 @@ describe('calculate-transaction-gas', () => {
     );
 
     const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(6)); // $390 "USDT" (0.12 ETH) + 10% profit/buffer fee.
-    const gasDetails = createTransactionGasDetails(
+    const gasDetails = createTransactionGasDetailsLegacy(
       MOCK_CHAIN,
       mockGasDetails,
-      undefined, // minGasPrice
       MOCK_TOKEN_6_DECIMALS,
       tokenFee,
     );
@@ -135,11 +138,11 @@ describe('calculate-transaction-gas', () => {
     }
 
     expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
-    expect(gasDetails.maxFeePerGas.toString()).to.equal('300000');
+    expect(gasDetails.maxFeePerGas.toString()).to.equal('250000');
     expect(gasDetails.maxPriorityFeePerGas.toString()).to.equal('10000');
   });
 
-  it('[e2e] Should calculate token fee, then calculate equivalent gas fee', async () => {
+  it('[e2e] Should calculate token fee, then calculate equivalent gas fee (Public)', async () => {
     createGasEstimateStubs(
       MOCK_GAS_ESTIMATE,
       MOCK_MAX_FEE_PER_GAS,
@@ -148,17 +151,54 @@ describe('calculate-transaction-gas', () => {
 
     const populatedTransaction = getMockPopulatedTransaction();
 
-    const estimateGasDetails = await getEstimateGasDetails(
+    const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
+
+    const estimateGasDetails = await getEstimateGasDetailsPublic(
       MOCK_CHAIN,
-      undefined, // minGasPrice
+      evmGasType,
       populatedTransaction,
     );
-    const maximumGas = calculateMaximumGas(estimateGasDetails);
+    const maximumGas = calculateMaximumGasRelayer(estimateGasDetails);
     const tokenFee = getTokenFee(MOCK_CHAIN, maximumGas, MOCK_TOKEN_ADDRESS);
-    const gasDetails = createTransactionGasDetails(
+    const gasDetails = createTransactionGasDetailsLegacy(
       MOCK_CHAIN,
       mockGasDetails,
-      undefined, // minGasPrice
+      MOCK_TOKEN_ADDRESS,
+      tokenFee,
+    );
+
+    if (gasDetails.evmGasType !== EVMGasType.Type2) {
+      assert(false, 'gas details must be type 2 for test');
+      return;
+    }
+
+    expect(gasDetails.gasEstimate.toString()).to.equal('400000000000');
+    expect(gasDetails.maxFeePerGas.toString()).to.equal('240000');
+    expect(gasDetails.maxPriorityFeePerGas.toString()).to.equal('10000');
+  });
+
+  it('[e2e] Should calculate token fee, then calculate equivalent gas fee (Relayed)', async () => {
+    createGasEstimateStubs(
+      MOCK_GAS_ESTIMATE,
+      MOCK_MAX_FEE_PER_GAS,
+      MOCK_MAX_PRIORITY_FEE_PER_GAS,
+    );
+
+    const populatedTransaction = getMockPopulatedTransaction();
+
+    const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
+
+    const estimateGasDetails = await getEstimateGasDetailsRelayed(
+      MOCK_CHAIN,
+      evmGasType,
+      MOCK_MAX_FEE_PER_GAS.toHexString(), // minGasPrice
+      populatedTransaction,
+    );
+    const maximumGas = calculateMaximumGasRelayer(estimateGasDetails);
+    const tokenFee = getTokenFee(MOCK_CHAIN, maximumGas, MOCK_TOKEN_ADDRESS);
+    const gasDetails = createTransactionGasDetailsLegacy(
+      MOCK_CHAIN,
+      mockGasDetails,
       MOCK_TOKEN_ADDRESS,
       tokenFee,
     );
