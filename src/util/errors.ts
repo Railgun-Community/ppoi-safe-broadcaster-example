@@ -2,10 +2,12 @@ import { sanitizeError } from '@railgun-community/shared-models';
 
 export enum ErrorMessage {
   BAD_TOKEN_FEE = 'Bad token fee.',
+  GAS_PRICE_TOO_LOW = 'Gas price rejected as too low.',
   GAS_ESTIMATE_ERROR = 'Gas estimate error. Possible connection failure.',
   TRANSACTION_SEND_TIMEOUT_ERROR = `WARNING: Timed out while sending to the blockchain. The transaction may be processing on-chain, but we can't find the receipt. This can occur when a Relayer has a connection issue. You will not see this transaction in your history, but your balance will reflect it if successful. We recommend waiting at least one hour before trying again.`,
   UNSUPPORTED_NETWORK = `Relayer does not support this network.`,
   MISSING_REQUIRED_FIELD = `Missing required field.`,
+  NO_RELAYER_FEE = 'No Relayer Fee included in transaction.',
   UNKNOWN_ERROR = 'Unknown Relayer error.',
 }
 

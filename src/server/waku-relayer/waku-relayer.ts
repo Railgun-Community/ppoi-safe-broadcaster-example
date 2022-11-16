@@ -17,7 +17,6 @@ import { numAvailableWallets } from '../wallets/active-wallets';
 import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
 import configNetworks from '../config/config-networks';
-import configDefaults from '../config/config-defaults';
 import { RelayerChain } from '../../models/chain-models';
 import {
   RelayerFeeMessage,
@@ -160,9 +159,7 @@ export class WakuRelayer {
       railgunAddress: this.walletRailgunAddress,
       availableWallets,
       version: getRelayerVersion(),
-      relayAdapt: configDefaults.featureFlags.enableRelayAdapt
-        ? configNetworks[chain.type][chain.id].relayAdaptContract
-        : '',
+      relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
     };
     const message = fromUTF8String(JSON.stringify(data));
     const signature = hexlify(

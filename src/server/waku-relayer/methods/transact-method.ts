@@ -166,16 +166,17 @@ const replaceErrorMessageNonDev = (
   if (devLog) {
     return errMsg;
   }
-  switch (errMsg) {
+  const knownError = errMsg as ErrorMessage;
+  switch (knownError) {
     case ErrorMessage.BAD_TOKEN_FEE:
-    case 'No Relayer payment included in transaction.':
-      return ErrorMessage.BAD_TOKEN_FEE;
+    case ErrorMessage.NO_RELAYER_FEE:
     case ErrorMessage.GAS_ESTIMATE_ERROR:
-      return ErrorMessage.GAS_ESTIMATE_ERROR;
     case ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR:
-      return ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR;
     case ErrorMessage.UNSUPPORTED_NETWORK:
-      return ErrorMessage.UNSUPPORTED_NETWORK;
+    case ErrorMessage.GAS_PRICE_TOO_LOW:
+    case ErrorMessage.MISSING_REQUIRED_FIELD:
+    case ErrorMessage.UNKNOWN_ERROR:
+      return errMsg;
   }
   return ErrorMessage.UNKNOWN_ERROR;
 };

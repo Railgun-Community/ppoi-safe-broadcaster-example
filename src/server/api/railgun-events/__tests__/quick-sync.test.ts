@@ -18,7 +18,7 @@ describe('quick-sync', () => {
       getMockNetwork();
   });
 
-  it('Should run live Railgun Event Log fetch for Ethereum', async () => {
+  it.skip('Should run live Railgun Event Log fetch for Ethereum', async () => {
     const eventLog = await quickSyncLegacy(MOCK_CHAIN_POLYGON, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');

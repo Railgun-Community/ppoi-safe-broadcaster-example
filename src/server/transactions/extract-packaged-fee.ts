@@ -21,6 +21,7 @@ import {
 import { RelayerChain } from '../../models/chain-models';
 import { CommitmentCiphertextStructOutput } from '@railgun-community/engine/dist/typechain-types/contracts/logic/RailgunLogic';
 import debug from 'debug';
+import { ErrorMessage } from '../../util/errors';
 
 const dbg = debug('relayer:transact:extract-packaged-fee');
 
@@ -153,7 +154,7 @@ const extractPackagedFee = async (
 
   const tokens = Object.keys(tokenPaymentAmounts);
   if (tokens.length < 1) {
-    throw new Error('No Relayer Fee included in transaction.');
+    throw new Error(ErrorMessage.NO_RELAYER_FEE);
   }
 
   // Return first payment.

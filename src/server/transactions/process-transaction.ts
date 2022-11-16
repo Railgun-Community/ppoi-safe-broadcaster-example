@@ -15,6 +15,7 @@ import {
   calculateMaximumGasRelayer,
   getEstimateGasDetailsRelayed,
 } from '../fees/gas-estimate';
+import { validateMinGasPrice } from '../fees/gas-price-validator';
 import { minimumGasBalanceForAvailability } from '../wallets/available-wallets';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import { executeTransaction } from './execute-transaction';
@@ -51,6 +52,9 @@ export const processTransaction = async (
     network.name,
     sendWithPublicWallet,
   );
+  if (evmGasType === EVMGasType.Type2) {
+    throw new Error('Invalid gas type for Relayer transaction.');
+  }
 
   if (evmGasType === EVMGasType.Type0) {
     delete transactionRequest.accessList;
@@ -87,6 +91,8 @@ export const processTransaction = async (
   validateFee(chain, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
   dbg('Fee validated:', packagedFeeAmount, tokenAddress);
   dbg('Transaction gas details:', transactionGasDetails);
+
+  await validateMinGasPrice(chain, minGasPrice, evmGasType);
 
   return executeTransaction(chain, transactionRequest, transactionGasDetails);
 };

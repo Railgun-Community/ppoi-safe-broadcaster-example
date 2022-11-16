@@ -207,7 +207,7 @@ const gasPriceForPercentile = (
   return gasPrice.mul(settings.baseFeePercentageMultiplier).div(100);
 };
 
-const getGasPricesBySpeed = async (
+export const getGasPricesBySpeed = async (
   evmGasType: EVMGasType.Type0 | EVMGasType.Type1,
   chain: RelayerChain,
 ): Promise<GasDetailsBySpeed> => {
