@@ -42,4 +42,5 @@ export enum TokenAddressPolygonPOS {
 }
 export enum TokenAddressPolygonMumbai {
   WMATIC = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
+  DERC20 = '0xfe4f5145f6e09952a5ba9e956ed0c25e3fa4c7f1',
 }

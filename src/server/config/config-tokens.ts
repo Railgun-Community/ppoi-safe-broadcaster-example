@@ -53,6 +53,9 @@ const tokensConfig: NetworkTokensConfig = {
       [TokenAddressPolygonMumbai.WMATIC]: {
         symbol: 'WMATIC',
       },
+      [TokenAddressPolygonMumbai.DERC20]: {
+        symbol: 'DERC20',
+      },
     },
     [NetworkChainID.Hardhat]: {
       '0x5FbDB2315678afecb367f032d93F642f64180aa3': {
