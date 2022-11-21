@@ -71,26 +71,6 @@ export const transactMethod = async (
     id: chainID,
   };
 
-  if (
-    chainType == null ||
-    chainID == null ||
-    minGasPrice == null ||
-    feeCacheID == null ||
-    serializedTransaction == null ||
-    relayerViewingKey == null ||
-    useRelayAdapt == null ||
-    minVersion == null ||
-    maxVersion == null
-  ) {
-    return errorResponse(
-      id,
-      chain,
-      sharedKey,
-      new Error(ErrorMessage.MISSING_REQUIRED_FIELD),
-      devLog,
-    );
-  }
-
   try {
     dbg('Decrypted - attempting to transact');
 
@@ -107,6 +87,26 @@ export const transactMethod = async (
         `Cannot process tx - Relayer version ${relayerVersion} outside range ${minVersion}-${maxVersion}`,
       );
       return;
+    }
+
+    if (
+      chainType == null ||
+      chainID == null ||
+      minGasPrice == null ||
+      feeCacheID == null ||
+      serializedTransaction == null ||
+      relayerViewingKey == null ||
+      useRelayAdapt == null ||
+      minVersion == null ||
+      maxVersion == null
+    ) {
+      return errorResponse(
+        id,
+        chain,
+        sharedKey,
+        new Error(ErrorMessage.MISSING_REQUIRED_FIELD),
+        devLog,
+      );
     }
 
     if (!configNetworks[chain.type] || !configNetworks[chain.type][chain.id]) {
