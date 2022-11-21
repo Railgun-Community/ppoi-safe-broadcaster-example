@@ -76,6 +76,7 @@ export const transactMethod = async (
 
     if (!minVersion || !maxVersion) {
       dbg(`Cannot process tx - Requires params minVersion, maxVersion`);
+      // Do nothing. No error response.
       return;
     }
     const relayerVersion = getRelayerVersion();
@@ -86,8 +87,37 @@ export const transactMethod = async (
       dbg(
         `Cannot process tx - Relayer version ${relayerVersion} outside range ${minVersion}-${maxVersion}`,
       );
+      // Do nothing. No error response.
       return;
     }
+
+    if (!relayerViewingKey) {
+      dbg(`Cannot process tx - Requires params relayerViewingKey`);
+      // Do nothing. No error response.
+      return;
+    }
+    const { viewingPublicKey } = getRailgunAddressData();
+    if (relayerViewingKey !== hexlify(viewingPublicKey)) {
+      return undefined;
+    }
+
+    if (!feeCacheID) {
+      dbg(`Cannot process tx - Requires params feeCacheID`);
+      // Do nothing. No error response.
+      return;
+    }
+    if (
+      configDefaults.transactionFees.requireMatchingFeeCacheID &&
+      !recognizesFeeCacheID(chain, feeCacheID)
+    ) {
+      dbg(
+        'Fee cache ID unrecognized. Transaction sent to another Relayer with same Rail Address.',
+      );
+      // Do nothing. No error response.
+      return undefined;
+    }
+
+    // Relayer validated. Begin error responses.
 
     if (
       chainType == null ||
@@ -96,9 +126,7 @@ export const transactMethod = async (
       feeCacheID == null ||
       serializedTransaction == null ||
       relayerViewingKey == null ||
-      useRelayAdapt == null ||
-      minVersion == null ||
-      maxVersion == null
+      useRelayAdapt == null
     ) {
       return errorResponse(
         id,
@@ -117,21 +145,6 @@ export const transactMethod = async (
         new Error(ErrorMessage.UNSUPPORTED_NETWORK),
         devLog,
       );
-    }
-
-    const { viewingPublicKey } = getRailgunAddressData();
-    if (relayerViewingKey !== hexlify(viewingPublicKey)) {
-      return undefined;
-    }
-
-    if (
-      configDefaults.transactionFees.requireMatchingFeeCacheID &&
-      !recognizesFeeCacheID(chain, feeCacheID)
-    ) {
-      dbg(
-        'Fee cache ID unrecognized. Transaction sent to another Relayer with same Rail Address.',
-      );
-      return undefined;
     }
 
     const txResponse = await processTransaction(
