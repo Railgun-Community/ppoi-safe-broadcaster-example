@@ -1,4 +1,4 @@
-FROM ghcr.io/railgun-community/nwaku:v0.12.0
+FROM statusteam/nim-waku:v0.13.0
 
 RUN apk add curl
 COPY ./config.toml /app

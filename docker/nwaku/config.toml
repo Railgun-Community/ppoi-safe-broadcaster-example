@@ -1,5 +1,4 @@
 # envsubst < config.toml.in > config.toml
-log-level='debug'
 relay=true
 store=true
 filter=true
@@ -11,9 +10,6 @@ rpc-address='0.0.0.0'
 rpc-port=8546
 relay-peer-exchange=false
 keep-alive=true
-persist-peers=false
-persist-messages=false
-db-path='/data/nwaku.db'
 ports-shift=0
 staticnode=[
   '/dns4/relayer.railgun.org/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD',
