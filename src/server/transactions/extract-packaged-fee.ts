@@ -8,6 +8,7 @@ import {
   hexStringToBytes,
   formatCommitmentCiphertext,
   TokenDataGetter,
+  TokenType,
 } from '@railgun-community/engine';
 import { BigNumber, Contract } from 'ethers';
 import { TransactionRequest } from '@ethersproject/providers';
@@ -247,14 +248,19 @@ const extractFeesFromRailgunTransactions = async (
     return;
   }
 
-  if (!tokenPaymentAmounts[decryptedReceiverNote.tokenData.tokenAddress]) {
+  const { tokenData } = decryptedReceiverNote;
+  if (tokenData.tokenType !== TokenType.ERC20) {
+    dbg('not an erc20');
+    return;
+  }
+
+  const { tokenAddress } = tokenData;
+  if (!tokenPaymentAmounts[tokenAddress]) {
     // eslint-disable-next-line no-param-reassign
-    tokenPaymentAmounts[decryptedReceiverNote.tokenData.tokenAddress] =
-      BigNumber.from(0);
+    tokenPaymentAmounts[tokenAddress] = BigNumber.from(0);
   }
   // eslint-disable-next-line no-param-reassign
-  tokenPaymentAmounts[decryptedReceiverNote.tokenData.tokenAddress] =
-    tokenPaymentAmounts[decryptedReceiverNote.tokenData.tokenAddress].add(
-      decryptedReceiverNote.value.toString(),
-    );
+  tokenPaymentAmounts[tokenAddress] = tokenPaymentAmounts[tokenAddress].add(
+    decryptedReceiverNote.value.toString(),
+  );
 };
