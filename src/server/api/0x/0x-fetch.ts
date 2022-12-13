@@ -23,10 +23,20 @@ const zeroXApiUrl = (chain: RelayerChain): string => {
           return 'https://polygon.api.0x.org/';
         case NetworkChainID.PolygonMumbai:
           return 'https://mumbai.api.0x.org/';
+        case NetworkChainID.ArbitrumGoerli:
         case NetworkChainID.Hardhat:
           throw new Error(`No 0x API URL for chain ${chain}`);
       }
     }
+  }
+};
+
+export const zeroXSupportsNetwork = (chain: RelayerChain): boolean => {
+  try {
+    zeroXApiUrl(chain);
+    return true;
+  } catch {
+    return false;
   }
 };
 

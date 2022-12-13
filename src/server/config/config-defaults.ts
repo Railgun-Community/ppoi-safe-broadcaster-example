@@ -16,6 +16,7 @@ export default {
       NetworkChainID.BNBChain,
       NetworkChainID.PolygonPOS,
       NetworkChainID.PolygonMumbai,
+      NetworkChainID.ArbitrumGoerli,
       NetworkChainID.Hardhat,
     ],
   },

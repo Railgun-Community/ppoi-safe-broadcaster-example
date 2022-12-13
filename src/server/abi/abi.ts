@@ -26,6 +26,7 @@ export const zeroXAbiForChain = (chain: RelayerChain): Array<any> => {
         case NetworkChainID.PolygonPOS:
         case NetworkChainID.PolygonMumbai:
           return ZERO_X_ABI;
+        case NetworkChainID.ArbitrumGoerli:
         case NetworkChainID.Hardhat:
           throw new Error(
             `0x API not available on chain ${chain.type}:${chain.id}`,
@@ -44,6 +45,7 @@ export const abiForChainToken = (chain: RelayerChain): Array<any> => {
         case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
         case NetworkChainID.PolygonMumbai:
+        case NetworkChainID.ArbitrumGoerli:
         case NetworkChainID.Hardhat:
           return ABI_ERC20;
       }

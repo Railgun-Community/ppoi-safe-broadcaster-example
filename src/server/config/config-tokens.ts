@@ -1,5 +1,6 @@
 import { NetworkTokensConfig } from '../../models/config-models';
 import {
+  TokenAddressArbitrumGoerli,
   TokenAddressGoerli,
   TokenAddressPolygonMumbai,
 } from './config-token-addresses';
@@ -55,6 +56,14 @@ const tokensConfig: NetworkTokensConfig = {
       },
       [TokenAddressPolygonMumbai.DERC20]: {
         symbol: 'DERC20',
+      },
+    },
+    [NetworkChainID.ArbitrumGoerli]: {
+      [TokenAddressArbitrumGoerli.WETH]: {
+        symbol: 'WETH',
+      },
+      [TokenAddressArbitrumGoerli.USDC]: {
+        symbol: 'USDC',
       },
     },
     [NetworkChainID.Hardhat]: {

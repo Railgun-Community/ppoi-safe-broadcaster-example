@@ -4,6 +4,7 @@ import fallbackProvidersBNBChain from './fallback-providers/56-binance-smart-cha
 import fallbackProvidersPolygon from './fallback-providers/137-polygon-pos';
 import fallbackProvidersPolygonMumbai from './fallback-providers/80001-polygon-mumbai';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
+import fallbackProvidersArbitrumGoerli from './fallback-providers/421613-arbitrum-goerli';
 import configFees from './config-fees';
 import { CoingeckoNetworkID } from '../../models/api-constants';
 import {
@@ -95,6 +96,21 @@ const networksConfig: NetworksConfig = {
       relayAdaptContract: RelayAdaptContract.PolygonMumbai,
       deploymentBlock: RailgunProxyDeploymentBlock.PolygonMumbai,
       fallbackProviderConfig: fallbackProvidersPolygonMumbai,
+      priceTTLInMS: defaultTokenPriceTTL,
+      isTestNetwork: true,
+    },
+    [NetworkChainID.ArbitrumGoerli]: {
+      name: 'Arbitrum Görli Testnet',
+      gasToken: {
+        symbol: 'ETH',
+        wrappedAddress: BaseTokenWrappedAddress.ArbitrumGoerliWETH,
+        decimals: 18,
+      },
+      fees: configFees,
+      proxyContract: RailgunProxyContract.ArbitrumGoerli,
+      relayAdaptContract: RelayAdaptContract.ArbitrumGoerli,
+      deploymentBlock: RailgunProxyDeploymentBlock.ArbitrumGoerli,
+      fallbackProviderConfig: fallbackProvidersArbitrumGoerli,
       priceTTLInMS: defaultTokenPriceTTL,
       isTestNetwork: true,
     },

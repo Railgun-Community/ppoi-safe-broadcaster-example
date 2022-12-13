@@ -44,3 +44,7 @@ export enum TokenAddressPolygonMumbai {
   WMATIC = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
   DERC20 = '0xfe4f5145f6e09952a5ba9e956ed0c25e3fa4c7f1',
 }
+export enum TokenAddressArbitrumGoerli {
+  WETH = '0xe39Ab88f8A4777030A534146A9Ca3B52bd5D43A3',
+  USDC = '0x179522635726710Dd7D2035a81d856de4Aa7836c',
+}
