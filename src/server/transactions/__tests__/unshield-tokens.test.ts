@@ -11,7 +11,7 @@ import {
   setupSingleTestWallet,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { getRailgunEngine, initEngine } from '../../lepton/lepton-init';
+import { getRailgunEngine, initEngine } from '../../engine/engine-init';
 import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
 import * as BestWalletMatchModule from '../../wallets/best-match-wallet';
 import { ActiveWallet } from '../../../models/wallet-models';
@@ -22,13 +22,13 @@ import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 import {
   generatePopulatedUnshieldTransact,
   generateUnshieldTransactions,
-  getProxyContractForNetwork,
+  getRailgunSmartWalletContractForNetwork,
 } from '../unshield-tokens';
 import configDefaults from '../../config/config-defaults';
 import {
   createEngineWalletTreeBalancesStub,
   restoreEngineStubs,
-} from '../../../test/stubs/lepton-stubs.test';
+} from '../../../test/stubs/engine-stubs.test';
 import {
   ByteLength,
   nToHex,
@@ -119,7 +119,7 @@ describe('unshield-tokens', () => {
     const unshieldTransactions = await generateUnshieldTransactions(
       prover,
       railWallet,
-      configDefaults.lepton.dbEncryptionKey,
+      configDefaults.engine.dbEncryptionKey,
       activeWallet.address,
       false, // allowOveride
       [MOCK_TOKEN_AMOUNT_1],
@@ -135,7 +135,7 @@ describe('unshield-tokens', () => {
       generateUnshieldTransactions(
         prover,
         railWallet,
-        configDefaults.lepton.dbEncryptionKey,
+        configDefaults.engine.dbEncryptionKey,
         activeWallet.address,
         false, // allowOveride
         [MOCK_TOKEN_AMOUNT_2],
@@ -150,7 +150,7 @@ describe('unshield-tokens', () => {
     const unshieldTransactions = await generateUnshieldTransactions(
       prover,
       railWallet,
-      configDefaults.lepton.dbEncryptionKey,
+      configDefaults.engine.dbEncryptionKey,
       activeWallet.address,
       false, // allowOveride
       [MOCK_TOKEN_AMOUNT_1],
@@ -160,7 +160,8 @@ describe('unshield-tokens', () => {
       unshieldTransactions,
       MOCK_CHAIN,
     );
-    const contractAddress = getProxyContractForNetwork(MOCK_CHAIN).address;
+    const contractAddress =
+      getRailgunSmartWalletContractForNetwork(MOCK_CHAIN).address;
 
     expect(populatedTransaction.to?.toLowerCase()).to.equal(contractAddress);
 

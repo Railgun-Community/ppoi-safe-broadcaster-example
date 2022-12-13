@@ -4,8 +4,8 @@ import {
   RailgunWallet,
   TransactionStruct,
   TransactionBatch,
-  TokenType,
-  RailgunProxyContract,
+  RailgunSmartWalletContract,
+  getTokenDataERC20,
 } from '@railgun-community/engine';
 import {
   Chain,
@@ -17,7 +17,7 @@ import { PopulatedTransaction } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { TokenAmount } from '../../models/token-models';
 import { getEstimateGasDetailsPublic } from '../fees/gas-estimate';
-import { getRailgunEngine } from '../lepton/lepton-init';
+import { getRailgunEngine } from '../engine/engine-init';
 import { executeTransaction } from './execute-transaction';
 
 const dbg = debug('relayer:unshield-tokens');
@@ -34,16 +34,14 @@ export const generateUnshieldTransactions = async (
   const txBatchPromises: Promise<TransactionStruct[]>[] = [];
 
   for (const tokenAmount of tokenAmounts) {
-    const transactionBatch = new TransactionBatch(
-      tokenAmount.tokenAddress,
-      TokenType.ERC20,
-      chain,
-    );
+    const transactionBatch = new TransactionBatch(chain);
 
-    const withdrawAmount = tokenAmount.amount;
-    const value = withdrawAmount.toHexString();
-
-    transactionBatch.setUnshield(toWalletAddress, value, allowOverride);
+    transactionBatch.addUnshieldData({
+      toAddress: toWalletAddress,
+      value: tokenAmount.amount.toBigInt(),
+      tokenData: getTokenDataERC20(tokenAmount.tokenAddress),
+      allowOverride,
+    });
 
     txBatchPromises.push(
       transactionBatch.generateTransactions(
@@ -75,18 +73,19 @@ export const generatePopulatedUnshieldTransact = async (
   txs: TransactionStruct[],
   chain: Chain,
 ): Promise<PopulatedTransaction> => {
-  const railContract = getProxyContractForNetwork(chain);
+  const railContract = getRailgunSmartWalletContractForNetwork(chain);
   const populatedTransaction = await railContract.transact(txs);
   return populatedTransaction;
 };
 
-export const getProxyContractForNetwork = (
+export const getRailgunSmartWalletContractForNetwork = (
   chain: RelayerChain,
-): RailgunProxyContract => {
-  const proxyContract = getRailgunEngine().proxyContracts[chain.type][chain.id];
+): RailgunSmartWalletContract => {
+  const proxyContract =
+    getRailgunEngine().railgunSmartWalletContracts[chain.type][chain.id];
   if (!proxyContract) {
     throw new Error(
-      `Proxy contract not yet loaded for network with chain ${chain.type}:${chain.id}`,
+      `RAILGUN Smart Wallet contract not yet loaded for network with chain ${chain.type}:${chain.id}`,
     );
   }
   return proxyContract;

@@ -5,7 +5,7 @@ import debug from 'debug';
 import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
 import { resetArray } from '../../util/utils';
-import { getRailgunEngine } from '../lepton/lepton-init';
+import { getRailgunEngine } from '../engine/engine-init';
 import { isWalletAvailableWithEnoughFunds } from './available-wallets';
 import {
   convertToReadableGasTokenBalanceMap,
@@ -37,14 +37,14 @@ export const derivationPathForIndex = (index: number) => {
 };
 
 const initRailgunWallet = async (mnemonic: string) => {
-  const lepton = getRailgunEngine();
-  const encryptionKey = configDefaults.lepton.dbEncryptionKey;
+  const engine = getRailgunEngine();
+  const encryptionKey = configDefaults.engine.dbEncryptionKey;
   if (!encryptionKey) {
     throw Error(
       'DB_ENCRYPTION_KEY not set (use docker secret, or env-cmdrc for insecure testing)',
     );
   }
-  railgunWallet = await lepton.createWalletFromMnemonic(
+  railgunWallet = await engine.createWalletFromMnemonic(
     encryptionKey,
     mnemonic,
   );

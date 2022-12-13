@@ -1,4 +1,4 @@
-import { getRailgunEngine, initEngine } from '../lepton/lepton-init';
+import { getRailgunEngine, initEngine } from '../engine/engine-init';
 import { initWallets } from '../wallets/active-wallets';
 import { initNetworkProviders } from '../providers/active-network-providers';
 import {
@@ -36,5 +36,5 @@ export const uninitRelayerModules = () => {
   closeSettingsDB();
   logger.log('closed settings db');
   getRailgunEngine().unload();
-  logger.log('unloaded lepton');
+  logger.log('unloaded engine');
 };

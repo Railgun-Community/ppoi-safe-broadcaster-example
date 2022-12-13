@@ -26,7 +26,7 @@ import {
   setupSingleTestWallet,
   testChainGoerli,
 } from '../../../test/setup.test';
-import { initEngine } from '../../lepton/lepton-init';
+import { initEngine } from '../../engine/engine-init';
 import {
   clearSettingsDB,
   getSettingsNumber,

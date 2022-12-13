@@ -5,7 +5,7 @@ import {
   setupSingleTestWallet,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { initEngine } from '../../lepton/lepton-init';
+import { initEngine } from '../../engine/engine-init';
 import {
   isWalletAvailableWithEnoughFunds,
   setWalletAvailability,

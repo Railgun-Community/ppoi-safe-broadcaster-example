@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import { initRelayerModules } from '../relayer-init';
-import * as leptonInitModule from '../../lepton/lepton-init';
+import * as engineInitModule from '../../engine/engine-init';
 import * as activeWalletsModule from '../../wallets/active-wallets';
 import * as activeProvidersModule from '../../providers/active-network-providers';
 import * as activeTokenPricePollerModule from '../../tokens/token-price-poller';
@@ -20,7 +20,7 @@ describe('relayer-init', () => {
   });
 
   it('Should run init scripts', async () => {
-    const stubInitEngine = sinon.stub(leptonInitModule, 'initEngine').returns();
+    const stubInitEngine = sinon.stub(engineInitModule, 'initEngine').returns();
     const stubInitWallets = sinon
       .stub(activeWalletsModule, 'initWallets')
       .resolves();

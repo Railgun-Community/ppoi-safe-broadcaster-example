@@ -17,7 +17,7 @@ import {
 import { getMockWalletAddress } from '../../../test/mocks.test';
 import { getActiveWallets, initWallets } from '../../wallets/active-wallets';
 import { delay } from '../../../util/promise-utils';
-import { initEngine } from '../../lepton/lepton-init';
+import { initEngine } from '../../engine/engine-init';
 import { testChainEthereum } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);

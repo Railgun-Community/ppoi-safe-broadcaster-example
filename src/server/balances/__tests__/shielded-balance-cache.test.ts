@@ -9,12 +9,12 @@ import { setupSingleTestWallet } from '../../../test/setup.test';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getRailgunWallet } from '../../wallets/active-wallets';
 import { getMockToken } from '../../../test/mocks.test';
-import { initEngine } from '../../lepton/lepton-init';
+import { initEngine } from '../../engine/engine-init';
 import { ChainType } from '@railgun-community/engine';
 import {
   restoreEngineStubs,
   createEngineWalletBalancesStub,
-} from '../../../test/stubs/lepton-stubs.test';
+} from '../../../test/stubs/engine-stubs.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

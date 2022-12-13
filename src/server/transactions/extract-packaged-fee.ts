@@ -2,12 +2,12 @@ import {
   ByteLength,
   formatToByteLength,
   nToHex,
-  trim,
   getSharedSymmetricKey,
   Ciphertext,
   TransactNote,
   hexStringToBytes,
   formatCommitmentCiphertext,
+  TokenDataGetter,
 } from '@railgun-community/engine';
 import { BigNumber, Contract } from 'ethers';
 import { TransactionRequest } from '@ethersproject/providers';
@@ -22,11 +22,12 @@ import { RelayerChain } from '../../models/chain-models';
 import { CommitmentCiphertextStructOutput } from '@railgun-community/engine/dist/typechain-types/contracts/logic/RailgunLogic';
 import debug from 'debug';
 import { ErrorMessage } from '../../util/errors';
+import { getRailgunEngine } from '../engine/engine-init';
 
 const dbg = debug('relayer:transact:extract-packaged-fee');
 
 const parseFormattedTokenAddress = (formattedTokenAddress: string) => {
-  return `0x${trim(formattedTokenAddress, 20)}`;
+  return formatToByteLength(formattedTokenAddress, ByteLength.Address, true);
 };
 
 type PackagedFee = {
@@ -148,6 +149,7 @@ const extractPackagedFee = async (
         tokenPaymentAmounts,
         viewingPrivateKey,
         masterPublicKey,
+        chain,
       ),
     ),
   );
@@ -167,7 +169,8 @@ const extractPackagedFee = async (
 const decryptReceiverNoteSafe = async (
   commitmentCiphertext: CommitmentCiphertext,
   viewingPrivateKey: Uint8Array,
-) => {
+  chain: RelayerChain,
+): Promise<Optional<TransactNote>> => {
   try {
     const blindedSenderViewingKey = hexStringToBytes(
       commitmentCiphertext.blindedSenderViewingKey,
@@ -181,9 +184,10 @@ const decryptReceiverNoteSafe = async (
     );
     if (!sharedKey) {
       dbg('invalid sharedKey');
-      return null;
+      return undefined;
     }
-    return TransactNote.decrypt(
+    const tokenDataGetter = new TokenDataGetter(getRailgunEngine().db, chain);
+    const note = await TransactNote.decrypt(
       getRailgunAddressData(),
       commitmentCiphertext.ciphertext,
       sharedKey,
@@ -194,10 +198,12 @@ const decryptReceiverNoteSafe = async (
       undefined, // senderRandom - not used
       false, // isSentNote
       false, // isLegacyDecryption
+      tokenDataGetter,
     );
+    return note;
   } catch (err) {
     dbg('Decryption error', err.message);
-    return null;
+    return undefined;
   }
 };
 
@@ -206,6 +212,7 @@ const extractFeesFromRailgunTransactions = async (
   tokenPaymentAmounts: MapType<BigNumber>,
   viewingPrivateKey: Uint8Array,
   masterPublicKey: bigint,
+  chain: RelayerChain,
 ) => {
   const { commitments } = railgunTx;
 
@@ -217,8 +224,9 @@ const extractFeesFromRailgunTransactions = async (
   const decryptedReceiverNote = await decryptReceiverNoteSafe(
     formatCommitmentCiphertext(ciphertext),
     viewingPrivateKey,
+    chain,
   );
-  if (decryptedReceiverNote == null) {
+  if (!decryptedReceiverNote) {
     // Addressed to us, but different note than fee.
     dbg('invalid decryptedReceiverNote');
     return;
@@ -239,12 +247,14 @@ const extractFeesFromRailgunTransactions = async (
     return;
   }
 
-  if (!tokenPaymentAmounts[decryptedReceiverNote.token]) {
+  if (!tokenPaymentAmounts[decryptedReceiverNote.tokenData.tokenAddress]) {
     // eslint-disable-next-line no-param-reassign
-    tokenPaymentAmounts[decryptedReceiverNote.token] = BigNumber.from(0);
+    tokenPaymentAmounts[decryptedReceiverNote.tokenData.tokenAddress] =
+      BigNumber.from(0);
   }
   // eslint-disable-next-line no-param-reassign
-  tokenPaymentAmounts[decryptedReceiverNote.token] = tokenPaymentAmounts[
-    decryptedReceiverNote.token
-  ].add(decryptedReceiverNote.value.toString());
+  tokenPaymentAmounts[decryptedReceiverNote.tokenData.tokenAddress] =
+    tokenPaymentAmounts[decryptedReceiverNote.tokenData.tokenAddress].add(
+      decryptedReceiverNote.value.toString(),
+    );
 };

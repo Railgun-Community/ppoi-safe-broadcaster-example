@@ -8,6 +8,8 @@ import {
   AbstractWallet,
   RailgunWallet,
   ByteLength,
+  getTokenDataERC20,
+  TreeBalance,
 } from '@railgun-community/engine';
 import { randomBytes } from 'ethers/lib/utils';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -18,7 +20,10 @@ let balancesStub: SinonStub;
 let treeBalancesStub: SinonStub;
 let verifyProofStub: SinonStub;
 
-const getMockBalanceData = async (tokenAddress: string, tree: number) => {
+const getMockBalanceData = async (
+  tokenAddress: string,
+  tree: number,
+): Promise<TreeBalance> => {
   const addressData = getRailgunAddressData();
   const privateViewingKey = randomBytes(32);
   const publicViewingKey = await getPublicViewingKey(privateViewingKey);
@@ -26,21 +31,23 @@ const getMockBalanceData = async (tokenAddress: string, tree: number) => {
     privateKey: privateViewingKey,
     pubkey: publicViewingKey,
   };
+  const tokenData = getTokenDataERC20(tokenAddress);
 
   return {
     balance: BigInt('1000000000000000000000'),
+    tokenData,
     utxos: [
       {
         tree,
         position: 0,
         txid: '123',
         spendtxid: '123',
-        note: TransactNote.create(
+        note: TransactNote.createTransfer(
           addressData, // receiver
           addressData, // sender
           '12345678901234561234567890123456', // random
           1000000000000000000000n, // value
-          tokenAddress, // token
+          tokenData, // tokenData
           senderViewingKeys,
           false, // shouldShowSender
           OutputType.Transfer,

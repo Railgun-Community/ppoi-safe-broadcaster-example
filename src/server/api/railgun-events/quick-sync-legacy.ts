@@ -17,7 +17,7 @@ export const quickSyncLegacy: QuickSync = async (
 ): Promise<AccumulatedEvents> => {
   const quickSyncURL = quickSyncURLForEVMChain(chain);
   if (!quickSyncURL) {
-    // Return empty logs, Lepton will default to full scan.
+    // Return empty logs, Engine will default to full scan.
     return {
       commitmentEvents: [],
       unshieldEvents: [],

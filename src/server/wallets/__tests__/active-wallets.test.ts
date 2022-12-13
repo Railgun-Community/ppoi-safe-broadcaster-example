@@ -7,7 +7,7 @@ import {
   getRailgunAnyAddress,
 } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
-import { initEngine } from '../../lepton/lepton-init';
+import { initEngine } from '../../engine/engine-init';
 import { RailgunEngine } from '@railgun-community/engine';
 
 chai.use(chaiAsPromised);

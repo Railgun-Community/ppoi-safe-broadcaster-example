@@ -21,7 +21,7 @@ import {
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
-import { initEngine } from '../../lepton/lepton-init';
+import { initEngine } from '../../engine/engine-init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

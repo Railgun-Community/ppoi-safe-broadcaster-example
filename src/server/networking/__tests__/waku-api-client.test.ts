@@ -6,7 +6,7 @@ import {
   setupSingleTestWallet,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { initEngine } from '../../lepton/lepton-init';
+import { initEngine } from '../../engine/engine-init';
 import configDefaults from '../../config/config-defaults';
 import { resetTokenPriceCache } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';

@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber, Wallet as EthersWallet } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
-import { initEngine } from '../../lepton/lepton-init';
+import { initEngine } from '../../engine/engine-init';
 import {
   createEthersWallet,
   derivationPathForIndex,

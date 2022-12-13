@@ -6,13 +6,13 @@ import {
   OutputType,
   padToLength,
   RailgunEngine,
-  RailgunProxyContract,
+  RailgunSmartWalletContract,
   RailgunWallet,
   randomHex,
   RelayAdaptContract,
   TransactionStruct,
-  TokenType,
   TransactionBatch,
+  getTokenDataERC20,
 } from '@railgun-community/engine';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -23,7 +23,7 @@ import {
   getMockToken,
   mockViewingKeys,
 } from '../../../test/mocks.test';
-import { getRailgunEngine, initEngine } from '../../lepton/lepton-init';
+import { getRailgunEngine, initEngine } from '../../engine/engine-init';
 import {
   getProviderForNetwork,
   initNetworkProviders,
@@ -39,14 +39,14 @@ import {
   createEngineVerifyProofStub,
   createEngineWalletBalancesStub,
   restoreEngineStubs,
-} from '../../../test/stubs/lepton-stubs.test';
+} from '../../../test/stubs/engine-stubs.test';
 import { testChainHardhat, testChainGoerli } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-let lepton: RailgunEngine;
-let proxyContract: RailgunProxyContract;
+let engine: RailgunEngine;
+let proxyContract: RailgunSmartWalletContract;
 let relayAdaptContract: RelayAdaptContract;
 let railgunWallet: RailgunWallet;
 const RANDOM_TRANSACT = randomHex(16);
@@ -65,18 +65,14 @@ const createGoerliTransferTransactions = async (
   fee: BigNumber,
   tokenAddress: string,
 ): Promise<TransactionStruct[]> => {
-  const transaction = new TransactionBatch(
-    tokenAddress,
-    TokenType.ERC20,
-    GOERLI_CHAIN,
-  );
+  const transaction = new TransactionBatch(GOERLI_CHAIN);
   transaction.addOutput(
-    TransactNote.create(
+    TransactNote.createTransfer(
       receiverAddressData,
       senderAddressData,
       RANDOM_TRANSACT,
       BigInt(fee.toHexString()),
-      tokenAddress,
+      getTokenDataERC20(tokenAddress),
       await mockViewingKeys(),
       false, // shouldShowSender
       OutputType.Transfer,
@@ -84,9 +80,9 @@ const createGoerliTransferTransactions = async (
     ),
   );
   return transaction.generateDummyTransactions(
-    lepton.prover,
+    engine.prover,
     railgunWallet,
-    configDefaults.lepton.dbEncryptionKey,
+    configDefaults.engine.dbEncryptionKey,
   );
 };
 
@@ -96,18 +92,14 @@ const createGoerliRelayAdaptUnshieldTransactions = async (
   fee: BigNumber,
   tokenAddress: string,
 ): Promise<TransactionStruct[]> => {
-  const transaction = new TransactionBatch(
-    tokenAddress,
-    TokenType.ERC20,
-    GOERLI_CHAIN,
-  );
+  const transaction = new TransactionBatch(GOERLI_CHAIN);
   transaction.addOutput(
-    TransactNote.create(
+    TransactNote.createTransfer(
       receiverAddressData,
       senderAddressData,
       RANDOM_TRANSACT,
       BigInt(fee.toHexString()),
-      tokenAddress,
+      getTokenDataERC20(tokenAddress),
       await mockViewingKeys(),
       false, // shouldShowSender
       OutputType.Transfer,
@@ -115,16 +107,16 @@ const createGoerliRelayAdaptUnshieldTransactions = async (
     ),
   );
   return transaction.generateDummyTransactions(
-    lepton.prover,
+    engine.prover,
     railgunWallet,
-    configDefaults.lepton.dbEncryptionKey,
+    configDefaults.engine.dbEncryptionKey,
   );
 };
 
 describe('extract-packaged-fee', () => {
   before(async () => {
     initEngine();
-    lepton = getRailgunEngine();
+    engine = getRailgunEngine();
 
     configDefaults.wallet.mnemonic = MOCK_MNEMONIC_1;
     await initWallets();
@@ -140,14 +132,14 @@ describe('extract-packaged-fee', () => {
 
     // Note: this call is typically async but we won't wait for the full call.
     // We just need to load the merkletrees.
-    lepton.loadNetwork(
+    engine.loadNetwork(
       GOERLI_CHAIN,
       ropstenProxyContractAddress,
       ropstenRelayAdaptContractAddress,
       provider,
       0, // deploymentBlock
     );
-    proxyContract = new RailgunProxyContract(
+    proxyContract = new RailgunSmartWalletContract(
       ropstenProxyContractAddress,
       provider as Provider,
       GOERLI_CHAIN,

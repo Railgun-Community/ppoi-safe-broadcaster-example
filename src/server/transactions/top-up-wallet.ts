@@ -9,7 +9,7 @@ import {
   getRailgunWallet,
 } from '../wallets/active-wallets';
 import { setWalletAvailability } from '../wallets/available-wallets';
-import { getRailgunEngine } from '../lepton/lepton-init';
+import { getRailgunEngine } from '../engine/engine-init';
 import { unshieldTokens } from './unshield-tokens';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getCurrentNonce, waitForTx, waitForTxs } from './execute-transaction';
@@ -134,7 +134,7 @@ export const topUpWallet = async (
   const batchResponse = await unshieldTokens(
     prover,
     railWallet,
-    configDefaults.lepton.dbEncryptionKey,
+    configDefaults.engine.dbEncryptionKey,
     topUpWallet.address,
     false, // allowOveride
     topUpTokens,

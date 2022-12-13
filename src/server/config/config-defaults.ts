@@ -30,7 +30,7 @@ export default {
     /**
      * Whether to show verbose RailgunEngine debugging logs.
      */
-    lepton: false,
+    engine: false,
   },
 
   transactionFees: {
@@ -88,7 +88,7 @@ export default {
     dbDir: process.env.SETTINGS_DB ?? 'settings.db',
   },
 
-  lepton: {
+  engine: {
     /**
      * Key used to encrypt wallets in the RailgunEngine database.
      */

@@ -14,7 +14,7 @@ import * as NetworkTokensModule from '../server/tokens/network-tokens';
 import { RelayerChain } from '../models/chain-models';
 import { ChainType } from '@railgun-community/engine';
 
-export const LEPTON_TEST_DB = 'lepton.test.db';
+export const LEPTON_TEST_DB = 'engine.test.db';
 const SETTINGS_TEST_DB = 'settings.test.db';
 
 let savedConfigDefaults: any;
@@ -23,7 +23,7 @@ let stubERC20Decimals: SinonStub;
 
 const setupTests = () => {
   configDefaults.debug.logLevel = DebugLevel.None;
-  configDefaults.lepton.dbDir = LEPTON_TEST_DB;
+  configDefaults.engine.dbDir = LEPTON_TEST_DB;
   configDefaults.settings.dbDir = SETTINGS_TEST_DB;
   savedConfigDefaults = JSON.parse(JSON.stringify(configDefaults));
   resetMapObject(configTokens);

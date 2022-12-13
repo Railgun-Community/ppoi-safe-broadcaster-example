@@ -13,35 +13,35 @@ import {
   Groth16,
 } from '@railgun-community/engine';
 
-let lepton: RailgunEngine;
+let engine: RailgunEngine;
 
 export const getRailgunEngine = () => {
-  if (!lepton) {
+  if (!engine) {
     throw new Error('RAILGUN RailgunEngine not yet init.');
   }
-  return lepton;
+  return engine;
 };
 
 export const initEngine = (optDebugger?: EngineDebugger) => {
-  if (lepton) {
+  if (engine) {
     return;
   }
-  const levelDB = leveldown(configDefaults.lepton.dbDir);
-  const leptonDebugger: EngineDebugger = optDebugger ?? {
+  const levelDB = leveldown(configDefaults.engine.dbDir);
+  const engineDebugger: EngineDebugger = optDebugger ?? {
     log: (msg: string) => logger.log(msg),
     error: (error: Error) => {
-      logger.warn('leptonDebugger error');
+      logger.warn('engineDebugger error');
       logger.error(error);
     },
   };
-  lepton = new RailgunEngine(
+  engine = new RailgunEngine(
     'relayer',
     levelDB,
     artifactsGetter,
     quickSyncLegacy,
-    configDefaults.debug.lepton ? leptonDebugger : undefined,
+    configDefaults.debug.engine ? engineDebugger : undefined,
   );
-  lepton.prover.setSnarkJSGroth16(groth16 as Groth16);
+  engine.prover.setSnarkJSGroth16(groth16 as Groth16);
 };
 
 /**
@@ -52,7 +52,7 @@ export const initEngineNetwork = async (
   chain: RelayerChain,
   provider: FallbackProvider,
 ) => {
-  if (!lepton) {
+  if (!engine) {
     // No RailgunEngine instance (might be in unit test).
     return;
   }
@@ -61,7 +61,7 @@ export const initEngineNetwork = async (
   const deploymentBlock = network.deploymentBlock ?? 0;
 
   try {
-    await lepton.loadNetwork(
+    await engine.loadNetwork(
       chain,
       network.proxyContract,
       network.relayAdaptContract,
