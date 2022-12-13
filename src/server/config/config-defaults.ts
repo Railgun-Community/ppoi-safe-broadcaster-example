@@ -159,4 +159,12 @@ export default {
      */
     broadcastFeesDelayInMS: 15 * 1000,
   },
+
+  api: {
+    /**
+     * API Key for BlockNative gas estimator.
+     * Leave blank to use free tier, which is quite generous.
+     */
+    blockNativeApiKey: '',
+  },
 };

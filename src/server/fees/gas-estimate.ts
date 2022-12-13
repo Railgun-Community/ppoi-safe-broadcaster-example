@@ -22,7 +22,7 @@ export const getEstimateGasDetailsPublic = async (
     const provider = getProviderForNetwork(chain);
     const [gasEstimate, gasDetails] = await Promise.all([
       provider.estimateGas(transactionRequest).catch(throwErr),
-      getStandardGasDetails(chain, evmGasType),
+      getStandardGasDetails(evmGasType, chain),
     ]);
 
     return { gasEstimate, ...gasDetails };

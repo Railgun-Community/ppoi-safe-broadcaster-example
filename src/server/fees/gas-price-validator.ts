@@ -1,25 +1,10 @@
 import { logger } from '../../util/logger';
 import { ErrorMessage } from '../../util/errors';
 import { RelayerChain } from '../../models/chain-models';
-import { GasHistoryPercentile, getGasPricesBySpeed } from './gas-by-speed';
 import { EVMGasType } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
-
-// Lower bound is 40% of standard gas price.
-const MIN_GAS_PRICE_VALIDATION_THRESHOLD_BASIS_POINTS = 4000;
-
-const isValidMinGasPrice = (
-  standardGasPrice: BigNumber,
-  packagedGasPrice: BigNumber,
-) => {
-  // Ensure that packaged gas price is no less than 40% of standard gas price.
-  const basisPointsStandardGasPrice = BigNumber.from(10000)
-    .mul(packagedGasPrice)
-    .div(standardGasPrice);
-  return basisPointsStandardGasPrice.gte(
-    MIN_GAS_PRICE_VALIDATION_THRESHOLD_BASIS_POINTS,
-  );
-};
+import { getGasDetailsForSpeed } from './gas-by-speed';
+import { GasHistoryPercentile } from '../../models/gas-models';
 
 export const validateMinGasPrice = async (
   chain: RelayerChain,
@@ -31,14 +16,20 @@ export const validateMinGasPrice = async (
   );
 
   try {
-    const gasDetailsBySpeed = await getGasPricesBySpeed(evmGasType, chain);
-    const standardGasDetails = gasDetailsBySpeed[GasHistoryPercentile.Medium];
-    if (standardGasDetails.evmGasType === EVMGasType.Type2) {
+    // Low speed is 95th percentile to include in the next block.
+    // Block gas submissions below this level.
+    const slowestGasDetails = await getGasDetailsForSpeed(
+      evmGasType,
+      chain,
+      GasHistoryPercentile.Low,
+    );
+    if (slowestGasDetails.evmGasType === EVMGasType.Type2) {
       throw new Error('Incorrect EVMGasType for gas price.');
     }
-    const standardGasPrice = standardGasDetails.gasPrice;
+    const slowGasPrice = slowestGasDetails.gasPrice;
 
-    if (isValidMinGasPrice(standardGasPrice, BigNumber.from(minGasPrice))) {
+    if (BigNumber.from(minGasPrice).gte(slowGasPrice)) {
+      // Valid gas price.
       return;
     }
   } catch (err: any) {

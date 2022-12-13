@@ -30,7 +30,16 @@ import { ChainType } from '@railgun-community/engine';
 import { EVMGasType } from '@railgun-community/shared-models';
 import Web3, { Eth, FeeHistoryResult } from 'web3-eth';
 import { RelayerChain } from '../../models/chain-models';
+import {
+  GasHistoryPercentile,
+  GasDetailsBySpeed,
+  GasDetails,
+} from '../../models/gas-models';
 import { maxBigNumber, minBigNumber } from '../../util/utils';
+import {
+  getGasDetailsBySpeedBlockNative,
+  supportsBlockNativeGasEstimates,
+} from '../api/block-native/gas-by-speed-block-native';
 import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { web3ProviderFromChainID } from '../providers/web3-providers';
@@ -76,28 +85,6 @@ const Web3Eth = Web3 as unknown as typeof Web3.Eth;
 //   },
 // };
 //
-
-export enum GasHistoryPercentile {
-  Low = 10,
-  Medium = 20,
-  High = 30,
-  VeryHigh = 40,
-}
-
-export type GasDetails =
-  | {
-      evmGasType: EVMGasType.Type0 | EVMGasType.Type1;
-      gasPrice: BigNumber;
-    }
-  | {
-      evmGasType: EVMGasType.Type2;
-      maxFeePerGas: BigNumber;
-      maxPriorityFeePerGas: BigNumber;
-    };
-
-export type GasDetailsBySpeed = {
-  [percentile in GasHistoryPercentile]: GasDetails;
-};
 
 type SuggestedGasDetails = {
   maxFeePerGas: BigNumber;
@@ -170,33 +157,48 @@ const gasHistoryPercentileForChain = (
       }
     }
   }
-  throw new Error(`Chain ${chain.type}:${chain.id} unhandled for gas speeds.`);
 };
 
-export const getStandardGasDetails = async (
-  chain: RelayerChain,
+export const getGasDetailsForSpeed = async (
   evmGasType: EVMGasType,
+  chain: RelayerChain,
+  percentile: GasHistoryPercentile,
 ): Promise<GasDetails> => {
-  let gasDetailsBySpeed: GasDetailsBySpeed;
+  if (supportsBlockNativeGasEstimates(chain)) {
+    const gasDetailsBySpeedBlockNative = await getGasDetailsBySpeedBlockNative(
+      evmGasType,
+      chain,
+    );
+    if (gasDetailsBySpeedBlockNative) {
+      return gasDetailsBySpeedBlockNative[percentile];
+    }
+  }
+
   switch (evmGasType) {
     case EVMGasType.Type0:
-    case EVMGasType.Type1:
-      gasDetailsBySpeed = await getGasPricesBySpeed(evmGasType, chain);
-      break;
-    case EVMGasType.Type2:
-      gasDetailsBySpeed = await getHistoricalGasDetailsBySpeed(
+    case EVMGasType.Type1: {
+      const gasDetailsBySpeed = await estimateGasPricesBySpeedUsingHeuristic(
         evmGasType,
         chain,
       );
-      break;
+      return gasDetailsBySpeed[percentile];
+    }
+    case EVMGasType.Type2: {
+      const gasDetailsBySpeed = await estimateGasMaxFeesBySpeedUsingHeuristic(
+        evmGasType,
+        chain,
+      );
+      return gasDetailsBySpeed[percentile];
+    }
   }
+};
 
-  if (!gasDetailsBySpeed) {
-    throw new Error('Unhandled gas type.');
-  }
-
+export const getStandardGasDetails = (
+  evmGasType: EVMGasType,
+  chain: RelayerChain,
+): Promise<GasDetails> => {
   const percentile = gasHistoryPercentileForChain(chain);
-  return gasDetailsBySpeed[percentile];
+  return getGasDetailsForSpeed(evmGasType, chain, percentile);
 };
 
 const gasPriceForPercentile = (
@@ -207,7 +209,7 @@ const gasPriceForPercentile = (
   return gasPrice.mul(settings.baseFeePercentageMultiplier).div(100);
 };
 
-export const getGasPricesBySpeed = async (
+export const estimateGasPricesBySpeedUsingHeuristic = async (
   evmGasType: EVMGasType.Type0 | EVMGasType.Type1,
   chain: RelayerChain,
 ): Promise<GasDetailsBySpeed> => {
@@ -263,6 +265,9 @@ const getFeeHistory = (
       REWARD_PERCENTILES,
     )
     .catch(async (err) => {
+      if (!(err instanceof Error)) {
+        throw err;
+      }
       if (err.message && err.message.includes('request beyond head block')) {
         if (retryCount > 5) {
           throw new Error(
@@ -274,15 +279,19 @@ const getFeeHistory = (
           return getFeeHistory(web3Eth, headBlock, retryCount + 1);
         }
 
-        // eslint-disable-next-line no-param-reassign
-        recentBlock = recentBlock ?? (await web3Eth.getBlockNumber()) - 1;
-        return getFeeHistory(web3Eth, recentBlock - 1, retryCount + 1);
+        const newRecentBlock =
+          recentBlock ?? (await web3Eth.getBlockNumber()) - 1;
+        return getFeeHistory(web3Eth, newRecentBlock - 1, retryCount + 1);
       }
       throw err;
     });
 };
 
-const getHistoricalGasDetailsBySpeed = async (
+/**
+ * This heuristic is based on Metamask's gas price implementation.
+ * We should always use BlockNative as first priority (only available for Ethereum/Polygon).
+ */
+const estimateGasMaxFeesBySpeedUsingHeuristic = async (
   evmGasType: EVMGasType.Type2,
   chain: RelayerChain,
 ): Promise<GasDetailsBySpeed> => {
@@ -308,8 +317,8 @@ const getHistoricalGasDetailsBySpeed = async (
     [GasHistoryPercentile.High]: feeHistory.reward.map((feePriorityGroup) =>
       BigNumber.from(feePriorityGroup[2]),
     ),
-    [GasHistoryPercentile.VeryHigh]: feeHistory.reward.map((feePriorityGroup) =>
-      BigNumber.from(feePriorityGroup[2]),
+    [GasHistoryPercentile.VeryHigh]: feeHistory.reward.map(
+      (feePriorityGroup) => BigNumber.from(feePriorityGroup[2]), // Note: same as High
     ),
   };
 
@@ -356,30 +365,24 @@ const getHistoricalGasDetailsBySpeed = async (
     ),
   };
 
-  switch (evmGasType) {
-    case EVMGasType.Type2: {
-      return {
-        [GasHistoryPercentile.Low]: {
-          evmGasType,
-          ...suggestedGasDetails[GasHistoryPercentile.Low],
-        },
-        [GasHistoryPercentile.Medium]: {
-          evmGasType,
-          ...suggestedGasDetails[GasHistoryPercentile.Medium],
-        },
-        [GasHistoryPercentile.High]: {
-          evmGasType,
-          ...suggestedGasDetails[GasHistoryPercentile.High],
-        },
-        [GasHistoryPercentile.VeryHigh]: {
-          evmGasType,
-          ...suggestedGasDetails[GasHistoryPercentile.VeryHigh],
-        },
-      };
-    }
-  }
-
-  throw new Error('Unknown gas type for historical gas estimates');
+  return {
+    [GasHistoryPercentile.Low]: {
+      evmGasType,
+      ...suggestedGasDetails[GasHistoryPercentile.Low],
+    },
+    [GasHistoryPercentile.Medium]: {
+      evmGasType,
+      ...suggestedGasDetails[GasHistoryPercentile.Medium],
+    },
+    [GasHistoryPercentile.High]: {
+      evmGasType,
+      ...suggestedGasDetails[GasHistoryPercentile.High],
+    },
+    [GasHistoryPercentile.VeryHigh]: {
+      evmGasType,
+      ...suggestedGasDetails[GasHistoryPercentile.VeryHigh],
+    },
+  };
 };
 
 const getSuggestedGasDetails = (
