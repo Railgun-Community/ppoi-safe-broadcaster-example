@@ -12,6 +12,7 @@ import { getRailgunWallet } from 'server/wallets/active-wallets';
 import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
 import { WakuApiClient } from 'server/networking/waku-api-client';
+import { RailgunEngine, ViewOnlyWallet } from '@railgun-community/engine';
 
 const dbg = debug('relayer:main');
 
