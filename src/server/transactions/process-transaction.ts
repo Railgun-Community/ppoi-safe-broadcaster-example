@@ -68,6 +68,8 @@ export const processTransaction = async (
     from: walletForGasEstimate.address,
   };
 
+  dbg('minGasPrice:', minGasPrice);
+
   const transactionGasDetails = await getEstimateGasDetailsRelayed(
     chain,
     evmGasType,
@@ -76,8 +78,7 @@ export const processTransaction = async (
     devLog,
   );
 
-  dbg(minGasPrice);
-  dbg(transactionGasDetails);
+  dbg('transactionGasDetails:', transactionGasDetails);
 
   const maximumGas = calculateMaximumGasRelayer(transactionGasDetails);
   dbg('Maximum gas:', maximumGas);

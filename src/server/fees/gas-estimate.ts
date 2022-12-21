@@ -48,9 +48,9 @@ export const getEstimateGasDetailsRelayed = async (
   }
   try {
     const gasPrice = BigNumber.from(minGasPrice);
-    const transactionRequestWithOptionalMinGas = {
+    const transactionRequestWithOptionalMinGas: TransactionRequest = {
       ...transactionRequest,
-      gasPrice,
+      gasPrice: 1000000000000,
     };
 
     const provider = getProviderForNetwork(chain);

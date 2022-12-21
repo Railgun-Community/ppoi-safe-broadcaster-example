@@ -41,7 +41,9 @@ export const cacheTokenPriceForNetwork = (
     updatedAt: tokenPrice.updatedAt,
   };
   logger.log(
-    `${source} [${chain.type}:${chain.id}]: Cache price $${tokenPrice.price} for token ${tokenAddress}`,
+    `${source} [${chain.type}:${chain.id}]: Cache price $${
+      tokenPrice.price
+    } for token ${tokenAddress.toLowerCase()}`,
   );
 };
 
