@@ -45,6 +45,7 @@ module.exports = {
     '@typescript-eslint/switch-exhaustiveness-check': 2,
     '@typescript-eslint/no-unused-vars': 1,
     'consistent-return': 0,
+    'require-await': 0,
     camelcase: 0,
   },
   ignorePatterns: ['dist'],

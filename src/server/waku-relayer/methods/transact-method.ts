@@ -34,6 +34,9 @@ export const transactMethod = async (
   params: RelayerMethodParamsTransact,
   id: number,
 ): Promise<Optional<WakuMethodResponse>> => {
+  dbg('got transact');
+  dbg(params);
+
   const { pubkey: clientPubKey, encryptedData } = params;
 
   if (handledClientPubKeys.includes(clientPubKey)) {
