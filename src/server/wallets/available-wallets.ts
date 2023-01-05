@@ -8,8 +8,8 @@ import configNetworks from '../config/config-networks';
 import debug from 'debug';
 import { BigNumber } from '@ethersproject/bignumber';
 
-// 0.2 ETH minimum for availability.
-const MINIMUM_BALANCE_FOR_AVAILABILITY = 0.2;
+// 0.1 ETH minimum for availability.
+const MINIMUM_BALANCE_FOR_AVAILABILITY = 0.1;
 
 const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
