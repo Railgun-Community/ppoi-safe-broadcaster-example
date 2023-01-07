@@ -17,9 +17,9 @@ const dbg = debug('relayer:railgun-events-ipns');
 const CHAIN_PAGE_METADATA_TIMEOUT = 2000;
 
 const GATEWAY_URLS = [
-  'https://railgun1.b-cdn.net',
-  'https://railgun2.b-cdn.net',
-  'https://railgun3.b-cdn.net',
+  'https://mex.ipfs-lb.com',
+  'https://ams.ipfs-lb.com',
+  'https://sin.ipfs-lb.com',
 ];
 
 const IPNS_HASH =
