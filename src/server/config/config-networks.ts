@@ -5,7 +5,7 @@ import fallbackProvidersPolygon from './fallback-providers/137-polygon-pos';
 import fallbackProvidersPolygonMumbai from './fallback-providers/80001-polygon-mumbai';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
 import fallbackProvidersArbitrumGoerli from './fallback-providers/421613-arbitrum-goerli';
-import configFees from './config-fees';
+import { feeConfigL1, feeConfigL2 } from './config-fees';
 import { CoingeckoNetworkID } from '../../models/api-constants';
 import {
   BaseTokenWrappedAddress,
@@ -31,7 +31,7 @@ const networksConfig: NetworksConfig = {
         wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
         decimals: 18,
       },
-      fees: configFees,
+      fees: feeConfigL1,
       proxyContract: RailgunProxyContract.Ethereum,
       relayAdaptContract: RelayAdaptContract.Ethereum,
       deploymentBlock: RailgunProxyDeploymentBlock.Ethereum,
@@ -46,7 +46,7 @@ const networksConfig: NetworksConfig = {
         wrappedAddress: BaseTokenWrappedAddress.EthereumGoerliWETH,
         decimals: 18,
       },
-      fees: configFees,
+      fees: feeConfigL1,
       proxyContract: RailgunProxyContract.EthereumGoerli,
       relayAdaptContract: RelayAdaptContract.EthereumGoerli,
       deploymentBlock: RailgunProxyDeploymentBlock.EthereumGoerli,
@@ -61,7 +61,7 @@ const networksConfig: NetworksConfig = {
         wrappedAddress: BaseTokenWrappedAddress.BinanceWBNB,
         decimals: 18,
       },
-      fees: configFees,
+      fees: feeConfigL1,
       proxyContract: RailgunProxyContract.BNBChain,
       relayAdaptContract: RelayAdaptContract.BNBChain,
       deploymentBlock: RailgunProxyDeploymentBlock.BNBChain,
@@ -76,7 +76,7 @@ const networksConfig: NetworksConfig = {
         wrappedAddress: BaseTokenWrappedAddress.PolygonWMATIC,
         decimals: 18,
       },
-      fees: configFees,
+      fees: feeConfigL1,
       proxyContract: RailgunProxyContract.PolygonPOS,
       relayAdaptContract: RelayAdaptContract.PolygonPOS,
       coingeckoNetworkId: CoingeckoNetworkID.PolygonPOS,
@@ -91,7 +91,7 @@ const networksConfig: NetworksConfig = {
         wrappedAddress: BaseTokenWrappedAddress.PolygonMumbaiWMATIC,
         decimals: 18,
       },
-      fees: configFees,
+      fees: feeConfigL1,
       proxyContract: RailgunProxyContract.PolygonMumbai,
       relayAdaptContract: RelayAdaptContract.PolygonMumbai,
       deploymentBlock: RailgunProxyDeploymentBlock.PolygonMumbai,
@@ -106,7 +106,7 @@ const networksConfig: NetworksConfig = {
         wrappedAddress: BaseTokenWrappedAddress.ArbitrumGoerliWETH,
         decimals: 18,
       },
-      fees: configFees,
+      fees: feeConfigL2,
       proxyContract: RailgunProxyContract.ArbitrumGoerli,
       relayAdaptContract: RelayAdaptContract.ArbitrumGoerli,
       deploymentBlock: RailgunProxyDeploymentBlock.ArbitrumGoerli,
@@ -121,7 +121,7 @@ const networksConfig: NetworksConfig = {
         wrappedAddress: NO_GAS_TOKEN_ADDRESS,
         decimals: 18,
       },
-      fees: configFees,
+      fees: feeConfigL1,
       proxyContract: RailgunProxyContract.Hardhat,
       relayAdaptContract: RelayAdaptContract.Hardhat,
       deploymentBlock: RailgunProxyDeploymentBlock.Hardhat,

@@ -31,13 +31,17 @@ export const validateFee = (
 
   // Check packaged fee against cached fee.
   // Cache expires with TTL setting: transactionFees.feeExpirationInMS.
-  const cachedFee = lookUpCachedUnitTokenFee(chain, feeCacheID, tokenAddress);
-  if (cachedFee) {
+  const cachedUnitTokenFee = lookUpCachedUnitTokenFee(
+    chain,
+    feeCacheID,
+    tokenAddress,
+  );
+  if (cachedUnitTokenFee) {
     if (
       comparePackagedFeeToCalculated(
         chain,
         packagedFee,
-        cachedFee.mul(maximumGas),
+        cachedUnitTokenFee.mul(maximumGas),
       )
     ) {
       return;
@@ -56,7 +60,7 @@ export const validateFee = (
   }
 
   logger.log(`maximumGas: ${maximumGas?.toString()}`);
-  logger.log(`cachedFee: ${cachedFee?.toString()}`);
+  logger.log(`cachedUnitTokenFee: ${cachedUnitTokenFee?.toString()}`);
   logger.log(`calculatedFee: ${calculatedFee?.toString()}`);
   logger.log(`packagedFee: ${packagedFee.toString()}`);
 
