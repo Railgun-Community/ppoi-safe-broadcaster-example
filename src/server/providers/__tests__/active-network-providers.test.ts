@@ -14,10 +14,10 @@ const { expect } = chai;
 const MOCK_CHAIN = testChainEthereum();
 
 describe('active-network-providers', () => {
-  before(() => {
+  before(async () => {
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fallbackProviderConfig =
       getMockFallbackProviderConfig();
-    initNetworkProviders();
+    await initNetworkProviders();
   });
 
   it('Should init viable fallback providers', async () => {

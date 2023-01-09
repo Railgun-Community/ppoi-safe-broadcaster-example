@@ -137,6 +137,7 @@ export const executeTransaction = async (
     dbg('Submitted transaction:', txResponse.hash);
 
     // Call wait synchronously. This will set wallet unavailable until the tx is finished.
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce);
     return txResponse;
   } catch (err) {

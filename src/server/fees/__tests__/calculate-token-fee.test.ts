@@ -86,7 +86,7 @@ const setupMocks = (
 describe('calculate-token-fee', () => {
   before(async () => {
     network = setupTestNetwork();
-    initNetworkProviders([chain]);
+    await initNetworkProviders([chain]);
     configTokens[chain.type][chain.id] = {
       [MOCK_TOKEN_ADDRESS]: {
         symbol: 'MOCK1',

@@ -66,12 +66,12 @@ describe('execute-transaction', () => {
   before(async () => {
     initEngine();
     initSettingsDB();
-    clearSettingsDB();
+    await clearSettingsDB();
     await setupSingleTestWallet();
     [activeWallet] = getActiveWallets();
     configNetworks[testChainGoerli().type][testChainGoerli().id] =
       getMockGoerliNetwork();
-    initNetworkProviders();
+    await initNetworkProviders();
     ethersWallet = createEthersWallet(activeWallet, getMockProvider());
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getTransactionCount')
@@ -137,6 +137,7 @@ describe('execute-transaction', () => {
     createGasBalanceStub(BigNumber.from(10).pow(18));
     expect(await isWalletAvailableWithEnoughFunds(activeWallet, MOCK_CHAIN)).to
       .be.true;
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     waitForTx(
       activeWallet,
       ethersWallet,

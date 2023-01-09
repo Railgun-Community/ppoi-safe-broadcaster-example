@@ -39,13 +39,13 @@ const addressForIndex = (index: number): string => {
 };
 
 describe('best-match-wallet', () => {
-  before(() => {
+  before(async () => {
     initEngine();
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
       .resolves(BigNumber.from(10).pow(18));
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
-    initNetworkProviders();
+    await initNetworkProviders();
   });
 
   afterEach(() => {

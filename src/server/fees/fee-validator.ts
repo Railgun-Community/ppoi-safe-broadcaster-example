@@ -55,6 +55,7 @@ export const validateFee = (
     logger.log(`error getting current token fee: ${err.message}`);
   }
 
+  logger.log(`maximumGas: ${maximumGas?.toString()}`);
   logger.log(`cachedFee: ${cachedFee?.toString()}`);
   logger.log(`calculatedFee: ${calculatedFee?.toString()}`);
   logger.log(`packagedFee: ${packagedFee.toString()}`);

@@ -46,6 +46,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 1,
     'consistent-return': 0,
     'require-await': 0,
+    '@typescript-eslint/no-floating-promises': 2,
     camelcase: 0,
   },
   ignorePatterns: ['dist'],

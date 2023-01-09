@@ -50,7 +50,7 @@ export const getEstimateGasDetailsRelayed = async (
     const gasPrice = BigNumber.from(minGasPrice);
     const transactionRequestWithOptionalMinGas: TransactionRequest = {
       ...transactionRequest,
-      gasPrice: 1000000000000,
+      gasPrice,
     };
 
     const provider = getProviderForNetwork(chain);
@@ -69,7 +69,7 @@ export const getEstimateGasDetailsRelayed = async (
 };
 
 export const calculateGasLimitRelayer = (gasEstimate: BigNumber): BigNumber => {
-  // Add 20% to gasEstimate * gasPrice.
+  // Add 20% to gasEstimate.
   return gasEstimate.mul(12000).div(10000);
 };
 

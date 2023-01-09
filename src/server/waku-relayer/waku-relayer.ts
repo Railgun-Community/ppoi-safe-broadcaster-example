@@ -197,6 +197,8 @@ export class WakuRelayer {
 
     await Promise.all(broadcastPromises);
     await delay(interval);
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.broadcastFeesOnInterval(interval);
   }
 
@@ -215,6 +217,8 @@ export class WakuRelayer {
       });
     await Promise.all(messages.map((message) => this.handleMessage(message)));
     await delay(frequency);
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.poll(frequency);
   }
 }

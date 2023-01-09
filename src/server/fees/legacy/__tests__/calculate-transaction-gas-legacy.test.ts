@@ -63,7 +63,7 @@ describe('calculate-transaction-gas-legacy', () => {
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fees.slippageBuffer = 0.05;
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fees.profit = 0.05;
-    initNetworkProviders();
+    await initNetworkProviders();
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
       MOCK_CHAIN,

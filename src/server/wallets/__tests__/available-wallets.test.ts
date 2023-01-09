@@ -25,7 +25,7 @@ describe('available-wallets', () => {
   before(async () => {
     initEngine();
     await setupSingleTestWallet();
-    initNetworkProviders();
+    await initNetworkProviders();
     resetGasTokenBalanceCache();
     createGasBalanceStub(
       BigNumber.from('100000000000000000000000000000000000'),

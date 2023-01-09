@@ -32,6 +32,7 @@ const pollTopUp = async () => {
   } finally {
     await delay(configDefaults.topUps.refreshDelayInMS);
     if (shouldPollTopUp) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       pollTopUp();
     }
   }
@@ -50,6 +51,8 @@ export const initTopUpPoller = () => {
     stopTopUpPolling();
     return;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   pollTopUp();
 };
 

@@ -99,7 +99,7 @@ describe('waku-relayer', () => {
     await setupSingleTestWallet();
     network = setupTestNetwork();
     configNetworks[chain.type][chain.id] = getMockNetwork();
-    initNetworkProviders();
+    await initNetworkProviders();
     configTokens[chain.type][chain.id] = {};
     configTokens[chain.type][chain.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',

@@ -78,12 +78,12 @@ describe('unshield-tokens', () => {
   before(async () => {
     initEngine();
     initSettingsDB();
-    clearSettingsDB();
+    await clearSettingsDB();
     await setupSingleTestWallet();
     railWallet = getRailgunWallet();
     [activeWallet] = getActiveWallets();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockGoerliNetwork();
-    initNetworkProviders();
+    await initNetworkProviders();
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getTransactionCount')
       .resolves(3);
@@ -91,7 +91,10 @@ describe('unshield-tokens', () => {
       .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')
       .resolves(activeWallet);
 
-    createEngineWalletTreeBalancesStub(MOCK_TOKEN_AMOUNT_1.tokenAddress, TREE);
+    await createEngineWalletTreeBalancesStub(
+      MOCK_TOKEN_AMOUNT_1.tokenAddress,
+      TREE,
+    );
     railProveStub = sinon
       .stub(Prover.prototype, 'prove')
       // eslint-disable-next-line require-await
@@ -128,10 +131,10 @@ describe('unshield-tokens', () => {
     expect(unshieldTransactions.length).to.equal(1);
   }).timeout(10000);
 
-  it('Should fail with insufficient token balance', () => {
+  it('Should fail with insufficient token balance', async () => {
     const { prover } = getRailgunEngine();
 
-    expect(
+    await expect(
       generateUnshieldTransactions(
         prover,
         railWallet,

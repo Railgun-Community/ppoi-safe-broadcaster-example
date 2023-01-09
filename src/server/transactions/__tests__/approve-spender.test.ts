@@ -55,11 +55,11 @@ describe('approve-spender', () => {
   before(async () => {
     initEngine();
     initSettingsDB();
-    clearSettingsDB();
+    await clearSettingsDB();
     await setupSingleTestWallet();
     [activeWallet] = getActiveWallets();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockGoerliNetwork();
-    initNetworkProviders();
+    await initNetworkProviders();
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getTransactionCount')
       .resolves(3);

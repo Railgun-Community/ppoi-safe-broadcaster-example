@@ -14,9 +14,9 @@ const MOCK_WALLET_ADDRESS = getMockWalletAddress();
 const MOCK_CHAIN = testChainEthereum();
 
 describe('gas-token-balance', () => {
-  before(() => {
+  before(async () => {
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
-    initNetworkProviders();
+    await initNetworkProviders();
   });
 
   it('Should pull gas token balance of live wallet', async () => {
