@@ -1,40 +1,53 @@
-FROM ubuntu:22.04 as base
-RUN apt update && apt install -y curl
+### base
+FROM node:lts-bullseye-slim as base
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Add Nodesource Node.JS repositories
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt update && apt install -y --no-install-recommends jq build-essential netcat python3 && rm -rf /var/lib/apt/lists/*
+RUN corepack prepare pnpm@latest --activate
 
-# Install Node.JS 16
-RUN apt install -y nodejs git jq netcat
+###
+FROM base as buildenv
 
-### install modules
-FROM base as module-install-stage
-
-# Setup the environment
+### fetch
+# fetch packages from network for later offline use
+FROM buildenv as fetch
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
+COPY pnpm-lock.yaml ./
 
-# Install modules
-COPY package*.json ./
-RUN npm ci --ignore-scripts
-COPY scripts/ ./scripts
+RUN corepack pnpm fetch
 
-### build app using cached modules
-FROM base as build-stage
-
-COPY --from=module-install-stage /app/node_modules/ /app/node_modules
+### install
+# install from lockfile; wont change unless packages have
+FROM fetch as install
 WORKDIR /app
-COPY . .
-RUN npm run compile
+COPY package.json ./
+RUN corepack pnpm install --offline --frozen-lockfile
 
-### run relayer
-FROM base
+### compile
+# compile typescript to /dist
+FROM install as compile
+WORKDIR /app
+COPY src ./src
+COPY ./tsconfig.json ./
 
-# Copy everything into place for the relayer
-COPY --from=build-stage /app/dist/ /app/dist
-COPY --from=module-install-stage /app/node_modules/ /app/node_modules
-COPY --from=module-install-stage /app/scripts/ /app/scripts
-COPY --from=module-install-stage /app/package.json /app/package.json
+RUN corepack pnpm tsc && corepack pnpm tsc-alias
+
+### install
+# reinstall prod-only dependencies
+FROM compile as install
 WORKDIR /app
 
-CMD npm run start
+RUN corepack pnpm install --prod --offline --frozen-lockfile
+
+### prod
+# copy compiled source and prod dependencies and run
+FROM base as prod
+
+WORKDIR /app
+
+COPY --from=compile /app/dist ./dist
+COPY --from=install /app/node_modules ./node_modules
+COPY package.json pnpm-lock.yaml ./
+COPY scripts ./scripts
+
+CMD corepack pnpm run start

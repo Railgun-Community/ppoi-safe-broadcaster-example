@@ -19,8 +19,7 @@
     "compile-test": "npm run clean && tsc --project tsconfig.test.json && tsc-alias",
     "test": "npm run compile-test && env-cmd --no-override -e all,test mocha 'src/**/__tests__/*.test.ts'",
     "test-coverage": "npm run compile-test && env-cmd --no-override -e all,test nyc mocha 'src/**/__tests__/*.test.ts'",
-    "copy-my-config": "./scripts/copy-my-config.sh",
-    "prepare": "npm run compile"
+    "copy-my-config": "./scripts/copy-my-config.sh"
   },
   "keywords": [],
   "author": "",
@@ -49,6 +48,7 @@
     "prompt-sync": "^4.2.0",
     "snarkjs": "^0.5.0",
     "tslib": "^2.4.0",
+    "web3-core": "^1.8.1",
     "web3-eth": "^1.8.0"
   },
   "devDependencies": {
