@@ -12,23 +12,24 @@ jobs:
       matrix:
         node-version: [16]
     steps:
-    - uses: actions/checkout@v3
-    - uses: pnpm/action-setup@v2
-      with:
-        version: 7
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-    - name: Install dependencies
-      run: pnpm install
-    - run: pnpm copy-my-config
-    - name: Run Test
-      run: pnpm test
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - run: pnpm copy-my-config
+      - name: Run Test
+        run: pnpm test
 
   fail-report:
-    if: ${{ failure() }}
+    if: ${{ failure() && github.ref == 'refs/heads/main' }}
     needs: unit-tests
     runs-on: ubuntu-latest
 
