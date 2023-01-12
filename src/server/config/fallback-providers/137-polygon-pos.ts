@@ -25,12 +25,6 @@ const config: FallbackProviderJsonConfig = {
       weight: 1,
     },
     {
-      provider:
-        'https://polygon-mainnet.g.alchemy.com/v2/mjJ4r5yqS3ouvBBKUbcAZGFYIrcyguVE',
-      priority: 3,
-      weight: 1,
-    },
-    {
       provider: 'https://rpc-mainnet.matic.quiknode.pro',
       priority: 3,
       weight: 1,
