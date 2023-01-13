@@ -18,23 +18,21 @@ RUN corepack pnpm fetch
 
 ### install
 # install from lockfile; wont change unless packages have
-FROM fetch as install
+FROM fetch as pnpmi
 WORKDIR /app
 COPY package.json ./
 RUN corepack pnpm install --offline --frozen-lockfile
 
 ### compile
 # compile typescript to /dist
-FROM install as compile
+FROM pnpmi as compile
 WORKDIR /app
 COPY src ./src
 COPY ./tsconfig.json ./
 
 RUN corepack pnpm tsc && corepack pnpm tsc-alias
 
-### install
-# reinstall prod-only dependencies
-FROM compile as install
+FROM compile as pnpmi-prod
 WORKDIR /app
 
 RUN corepack pnpm install --prod --offline --frozen-lockfile
@@ -46,7 +44,7 @@ FROM base as prod
 WORKDIR /app
 
 COPY --from=compile /app/dist ./dist
-COPY --from=install /app/node_modules ./node_modules
+COPY --from=pnpmi-prod /app/node_modules ./node_modules
 COPY package.json pnpm-lock.yaml ./
 COPY scripts ./scripts
 
