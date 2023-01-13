@@ -15,11 +15,6 @@
 //
 //     DO NOT MODIFY THE LOGIC IN THIS FILE.
 //
-//
-//   This logic comes from private RAILGUN contributor
-//   frontend repos, where the logic is managed.
-//
-//
 // *********************************************
 // *********************************************
 // *********************************************
