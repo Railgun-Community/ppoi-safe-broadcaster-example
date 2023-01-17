@@ -16,7 +16,6 @@ staticnode=[
   '/dns4/relayer.tibet.org/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD',
   '/ip4/18.117.34.173/tcp/60000/p2p/16Uiu2HAmEvDM3qLuS1fcAjwgDww9UqutSBCGX6yZEu9sVnLgUomj',
   '/dns4/relayer.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg',
-  '/dns4/railgun.railed.io/tcp/60000/p2p/16Uiu2HAm2jXWaRA9LQnyTwgVRSBz3hNpotRf77gKZNfV6auBwbDG',
   '/dns4/node-01.gc-us-central1-a.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAkwBp8T6G77kQXSNMnxgaMky1JeyML5yqoTHRM8dbeCBNb',
   '/dns4/node-01.do-ams3.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAm6HZZr7aToTvEBPpiys4UxajCTU97zj5v7RNR2gbniy1D'
 ]
