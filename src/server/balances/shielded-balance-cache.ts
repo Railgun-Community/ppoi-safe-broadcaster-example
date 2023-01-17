@@ -1,6 +1,6 @@
 import {
   EngineEvent,
-  ScannedEventData,
+  WalletScannedEventData,
   trim,
   RailgunWallet,
 } from '@railgun-community/engine';
@@ -28,8 +28,10 @@ export const resetShieldedTokenBalanceCache = () => {
 };
 
 export const subscribeToShieldedBalanceEvents = (wallet: RailgunWallet) => {
-  wallet.on(EngineEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>
-    updateCachedShieldedBalances(wallet, chain),
+  wallet.on(
+    EngineEvent.WalletScanComplete,
+    ({ chain }: WalletScannedEventData) =>
+      updateCachedShieldedBalances(wallet, chain),
   );
 };
 
