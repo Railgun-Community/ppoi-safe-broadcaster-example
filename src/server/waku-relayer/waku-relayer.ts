@@ -23,6 +23,7 @@ import {
   RelayerFeeMessageData,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../util/versions';
+import configDefaults from '../config/config-defaults';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 
@@ -48,6 +49,10 @@ export class WakuRelayer {
   subscribedContentTopics: string[];
 
   walletRailgunAddress: string;
+
+  identifier: Optional<string> = configDefaults.instanceIdentifier.length
+    ? configDefaults.instanceIdentifier
+    : undefined;
 
   options: WakuRelayerOptions;
 
@@ -159,6 +164,7 @@ export class WakuRelayer {
       feeExpiration: Date.now() + this.options.feeExpiration,
       feesID: feeCacheID,
       railgunAddress: this.walletRailgunAddress,
+      identifier: this.identifier,
       availableWallets,
       version: getRelayerVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,

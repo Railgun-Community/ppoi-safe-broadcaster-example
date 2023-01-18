@@ -5,6 +5,12 @@ import { NetworkChainID } from './config-chains';
 import secrets from './config-secrets';
 
 export default {
+  /*
+   * String to identify this relayer instance.
+   * Required if running multiple Relayer instances with the same RAILGUN wallet / balance.
+   */
+  instanceIdentifier: '',
+
   networks: {
     /*
      * Blockchain networks to activate.
