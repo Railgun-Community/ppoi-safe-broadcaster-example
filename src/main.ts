@@ -33,7 +33,9 @@ const main = async (): Promise<void> => {
   };
   relayer = await WakuRelayer.init(client, wallet, options);
 
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   relayer.poll(config.waku.pollFrequencyInMS);
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   relayer.broadcastFeesOnInterval(config.waku.broadcastFeesDelayInMS);
 
   // print multiaddress of nim-waku instance
@@ -48,4 +50,5 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();
