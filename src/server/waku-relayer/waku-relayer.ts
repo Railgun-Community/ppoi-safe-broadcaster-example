@@ -102,12 +102,15 @@ export class WakuRelayer {
   async publish(
     payload: Optional<JsonRpcPayload<string>> | object,
     contentTopic: string,
-  ) {
+  ): Promise<void> {
+    if (!payload) {
+      return;
+    }
     const msg = WakuMessage.fromUtf8String(
       JSON.stringify(payload),
       contentTopic,
     );
-    return await this.client.publish(msg, WAKU_TOPIC).catch((e) => {
+    return this.client.publish(msg, WAKU_TOPIC).catch((e) => {
       this.dbg('Error publishing message', e.message);
     });
   }
@@ -116,7 +119,7 @@ export class WakuRelayer {
     return Buffer.from(payload).toString('utf8');
   }
 
-  async handleMessage(message: WakuRelayMessage) {
+  async handleMessage(message: WakuRelayMessage): Promise<void> {
     const { payload, contentTopic } = message;
 
     try {
@@ -136,7 +139,6 @@ export class WakuRelayer {
     }
   }
 
-  // eslint-disable-next-line require-await
   private createFeeBroadcastData = async (
     fees: MapType<BigNumber>,
     feeCacheID: string,
@@ -176,7 +178,7 @@ export class WakuRelayer {
     };
   };
 
-  async broadcastFeesForChain(chain: RelayerChain) {
+  async broadcastFeesForChain(chain: RelayerChain): Promise<void> {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chain);
     const feeBroadcastData = await this.createFeeBroadcastData(
@@ -185,10 +187,10 @@ export class WakuRelayer {
       chain,
     );
     const contentTopic = contentTopics.fees(chain);
-    await this.publish(feeBroadcastData, contentTopic);
+    return this.publish(feeBroadcastData, contentTopic);
   }
 
-  async broadcastFeesOnInterval(interval: number) {
+  async broadcastFeesOnInterval(interval: number): Promise<void> {
     if (this.stopping) return;
     const chains = configuredNetworkChains();
     const broadcastPromises: Promise<void>[] = chains.map((chain) =>
@@ -202,7 +204,7 @@ export class WakuRelayer {
     this.broadcastFeesOnInterval(interval);
   }
 
-  async poll(frequency: number) {
+  async poll(frequency: number): Promise<void> {
     if (this.stopping) return;
     const messages = await this.client
       .getMessages(WAKU_TOPIC, this.subscribedContentTopics)
