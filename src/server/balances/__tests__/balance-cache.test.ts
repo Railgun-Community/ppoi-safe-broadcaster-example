@@ -37,7 +37,7 @@ describe('balance-cache', () => {
     // before running any test - initEngine (the sdk), init the wallets, init network providers, and some helperfunrctions
     initEngine();
     await initWallets();
-    initNetworkProviders();
+    await initNetworkProviders();
     resetGasTokenBalanceCache();
     createGasBalanceStub(BigNumber.from(5000)); //
   });

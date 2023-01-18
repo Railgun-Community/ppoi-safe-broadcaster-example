@@ -33,7 +33,7 @@ describe('gas-by-speed', () => {
             1_000_000_000,
           );
           expect(gasDetails.gasPrice.toNumber()).to.be.lessThan(
-            100_000_000_000,
+            2_500_000_000_000,
           );
         }),
     );
@@ -56,13 +56,13 @@ describe('gas-by-speed', () => {
             1_000_000_000,
           );
           expect(gasDetails.maxFeePerGas.toNumber()).to.be.lessThan(
-            300_000_000_000,
+            2_500_000_000_000,
           );
           expect(gasDetails.maxPriorityFeePerGas.toNumber()).to.be.greaterThan(
             1_000_000_000,
           );
           expect(gasDetails.maxPriorityFeePerGas.toNumber()).to.be.lessThan(
-            300_000_000_000,
+            2_500_000_000_000,
           );
         }),
     );

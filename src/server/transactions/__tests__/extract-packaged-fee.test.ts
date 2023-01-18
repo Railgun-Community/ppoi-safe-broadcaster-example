@@ -126,12 +126,12 @@ describe('extract-packaged-fee', () => {
       proxyContract: ropstenProxyContractAddress,
       relayAdaptContract: ropstenRelayAdaptContractAddress,
     } = goerliNetwork;
-    // Async call - run sync
-    initNetworkProviders([GOERLI_CHAIN, HARDHAT_CHAIN]);
+    await initNetworkProviders([GOERLI_CHAIN, HARDHAT_CHAIN]);
     const provider = getProviderForNetwork(GOERLI_CHAIN);
 
     // Note: this call is typically async but we won't wait for the full call.
     // We just need to load the merkletrees.
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     engine.loadNetwork(
       GOERLI_CHAIN,
       ropstenProxyContractAddress,
@@ -151,7 +151,7 @@ describe('extract-packaged-fee', () => {
     railgunWallet = getRailgunWallet();
 
     const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));
-    createEngineWalletBalancesStub(tokenAddressHexlify, TREE);
+    await createEngineWalletBalancesStub(tokenAddressHexlify, TREE);
     createEngineVerifyProofStub();
   });
 

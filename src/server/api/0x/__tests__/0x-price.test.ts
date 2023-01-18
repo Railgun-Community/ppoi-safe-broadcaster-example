@@ -68,7 +68,7 @@ describe('0x-price', () => {
   before(async () => {
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
     configNetworks[chainRopsten.type][chainRopsten.id] = ropstenNetwork;
-    initNetworkProviders();
+    await initNetworkProviders();
 
     resetTokenPriceCache();
 

@@ -18,9 +18,9 @@ const MOCK_WALLET_ADDRESS = getMockWalletAddress();
 const MOCK_CHAIN = testChainEthereum();
 
 describe('erc20-token-balance', () => {
-  before(() => {
+  before(async () => {
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
-    initNetworkProviders();
+    await initNetworkProviders();
   });
 
   it('Should pull erc20 token balance of live wallet', async () => {

@@ -42,6 +42,7 @@ const pollPrices = async (source: TokenPriceSource) => {
   } finally {
     await delay(tokenPriceRefresher.refreshDelayInMS);
     if (shouldPoll) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       pollPrices(source);
     }
   }
