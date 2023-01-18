@@ -40,13 +40,15 @@ export default {
      */
     precision: 10 ** 8,
 
-    /** Used when calculating the ratio of token price to gas token price.
+    /**
+     * Used when calculating the ratio of token price to gas token price.
      * We guard against price ratios under this amount, which are too imprecise.
      */
     priceRatioMinimum: 10 ** 3,
 
-    /** How long to enable the fee sent for a given transaction.
-     * Note that clients will have to prove a transaction before sending, which can take up to 20-30 seconds.
+    /**
+     * How long to enable the fee sent for a given transaction.
+     * Note that clients will have to prove a transaction before sending, which can take up to 30-40 seconds per token on mobile.
      * We recommend an expiration of 3+ minutes.
      */
     feeExpirationInMS: 3 * 60 * 1000,
@@ -111,7 +113,8 @@ export default {
 
   topUps: {
     /**
-     * Enables regular top-ups for each wallet when their gas tokens run low (ie. below networkConfig.gasToken.minimumBalanceForAvailability).
+     * Enables regular top-ups for each wallet when their gas tokens run low
+     *  (ie. below networkConfig.gasToken.minimumBalanceForAvailability).
      * Automatically unshields ERC-20 tokens from private balance and swaps for gas token.
      */
     shouldTopUp: false,
