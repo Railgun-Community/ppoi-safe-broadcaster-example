@@ -65,14 +65,6 @@ export default {
      * Number of times to retry price lookup.
      */
     priceLookupRetries: 1,
-
-    /**
-     * Configurable API Keys for Pricing APIs.
-     * Pro tiers are more stable and reliable.
-     */
-    api: {
-      coingeckoProApiKey: 'CG-zmXR1JBHNGdG98yZz7QUHUTr',
-    },
   },
 
   balances: {
@@ -166,5 +158,11 @@ export default {
      * Leave blank to use free tier, which is quite generous.
      */
     blockNativeApiKey: '',
+
+    /**
+     * Configurable API Keys for Pricing APIs.
+     * Pro tiers are more stable and reliable.
+     */
+    coingeckoProApiKey: 'CG-zmXR1JBHNGdG98yZz7QUHUTr',
   },
 };

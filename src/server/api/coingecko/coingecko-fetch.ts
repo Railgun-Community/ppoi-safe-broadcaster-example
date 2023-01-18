@@ -15,14 +15,13 @@ const coingeckoApiUrl = (): string => {
 };
 
 const coingeckoProApiKey = (): Optional<string> => {
-  return configDefaults.tokenPrices.api.coingeckoProApiKey;
+  return configDefaults.api.coingeckoProApiKey;
 };
 
 const paramString = (params?: MapType<any>) => {
   if (!params) {
     return '';
   }
-  // TODO: Add (opt) configurable Coingecko API key.
   const searchParams = new URLSearchParams(params);
 
   const proApiKey = coingeckoProApiKey();
