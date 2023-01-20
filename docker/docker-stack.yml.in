@@ -16,9 +16,9 @@ services:
     networks:
       - relayer
     ports:
-      - 60000:60000
-      - 9000:9000
-      #- 8000:8000 # wss proxied through swag
+      - 60000:60000 # p2p
+      - 9000:9000 # ENR
+      - 8000:8000 # wss
     volumes:
       - nwaku:/data
       - ./appdata/swag/etc/letsencrypt:/ssl
@@ -26,10 +26,10 @@ services:
       - swag
     healthcheck:
       test: curl --fail http://localhost:8546 || exit 1
-      interval: 60s
+      interval: 30s
       retries: 4
-      start_period: 20s
-      timeout: 10s
+      start_period: 10s
+      timeout: 5s
     entrypoint: >
       wakunode2
         --config-file=/app/config.toml
@@ -38,7 +38,10 @@ services:
         --dns4-domain-name="${SUBDOMAIN}.${BASEDOMAIN}"
         --nodekey="${NODEKEY}"
         --websocket-support=true
-        --websocket-secure-support=false
+        --websocket-secure-support=true
+        --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
+        --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
+
 
   relayer:
     image: relayer:latest
@@ -79,8 +82,7 @@ services:
       - ./swag/nwaku.subdomain.conf:/config/nginx/proxy-confs/nwaku.subdomain.conf
     ports:
       - 443:443
-      - 80:80
-      - 8000:8000 # wss proxied to nwaku
+      - 80:80 # must be available to obtain ssl cert from letsencrypt
 
 secrets:
   MNEMONIC:
