@@ -13,7 +13,7 @@ keep-alive=true
 ports-shift=0
 staticnode=[
   '/dns4/relayer.crabdance.com/tcp/60000/p2p/16Uiu2HAm9TiCU9ZRPoKMUyo6QQvZTSceSH5ZtX6u353NHgVCtr1W',
-  '/dns4/relayer.tibet.org/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD',
+  '/dns4/relayer.chickenkiller.com/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD',
   '/ip4/18.117.34.173/tcp/60000/p2p/16Uiu2HAmEvDM3qLuS1fcAjwgDww9UqutSBCGX6yZEu9sVnLgUomj',
   '/dns4/relayer.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg',
   '/dns4/node-01.gc-us-central1-a.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAkwBp8T6G77kQXSNMnxgaMky1JeyML5yqoTHRM8dbeCBNb',
