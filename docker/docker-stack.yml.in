@@ -22,6 +22,7 @@ services:
     volumes:
       - nwaku:/data
       - ./appdata/swag/etc/letsencrypt:/ssl
+      - ../scripts/nwaku:/app/scripts
     depends_on:
       - swag
     healthcheck:
@@ -41,7 +42,6 @@ services:
         --websocket-secure-support=true
         --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
         --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
-
 
   relayer:
     image: relayer:latest

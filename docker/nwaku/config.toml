@@ -1,8 +1,10 @@
 # envsubst < config.toml.in > config.toml
+log-level='DEBUG'
 relay=true
 store=false
 filter=false
 lightpush=false
+rln-relay=false
 rpc=true
 rpc-admin=true
 rpc-private=true
@@ -19,6 +21,6 @@ staticnode=[
   '/dns4/node-01.gc-us-central1-a.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAkwBp8T6G77kQXSNMnxgaMky1JeyML5yqoTHRM8dbeCBNb',
   '/dns4/node-01.do-ams3.status.prod.statusim.net/tcp/30303/p2p/16Uiu2HAm6HZZr7aToTvEBPpiys4UxajCTU97zj5v7RNR2gbniy1D'
 ]
-dns-discovery=true
+dns-discovery=false
 dns-discovery-url='enrtree://AOGECG2SPND25EEFMAJ5WF3KSGJNSGV356DSTL2YVLLZWIV6SAYBM@prod.waku.nodes.status.im'
-discv5-discovery=true
+discv5-discovery=false
