@@ -21,6 +21,8 @@ const zeroXApiUrl = (chain: RelayerChain): string => {
           return 'https://bsc.api.0x.org/';
         case NetworkChainID.PolygonPOS:
           return 'https://polygon.api.0x.org/';
+        case NetworkChainID.Arbitrum:
+          return 'https://arbitrum.api.0x.org/';
         case NetworkChainID.PolygonMumbai:
           return 'https://mumbai.api.0x.org/';
         case NetworkChainID.ArbitrumGoerli:

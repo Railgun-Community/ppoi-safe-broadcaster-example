@@ -12,6 +12,8 @@ import {
   REN_TOKENS_ETH,
   BLUECHIP_BSC,
   BLUECHIP_POLY,
+  BLUECHIP_ARBITRUM,
+  STABLES_ARBITRUM,
 } from './config-token-sets';
 import { NetworkChainID } from './config-chains';
 import { ChainType } from '@railgun-community/engine';
@@ -49,6 +51,10 @@ const tokensConfig: NetworkTokensConfig = {
     [NetworkChainID.PolygonPOS]: {
       ...STABLES_POLY,
       ...BLUECHIP_POLY,
+    },
+    [NetworkChainID.Arbitrum]: {
+      ...STABLES_ARBITRUM,
+      ...BLUECHIP_ARBITRUM,
     },
     [NetworkChainID.PolygonMumbai]: {
       [TokenAddressPolygonMumbai.WMATIC]: {

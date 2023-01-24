@@ -24,6 +24,7 @@ export const zeroXAbiForChain = (chain: RelayerChain): Array<any> => {
         case NetworkChainID.EthereumGoerli:
         case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
+        case NetworkChainID.Arbitrum:
         case NetworkChainID.PolygonMumbai:
           return ZERO_X_ABI;
         case NetworkChainID.ArbitrumGoerli:
@@ -44,6 +45,7 @@ export const abiForChainToken = (chain: RelayerChain): Array<any> => {
         case NetworkChainID.EthereumGoerli:
         case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
+        case NetworkChainID.Arbitrum:
         case NetworkChainID.PolygonMumbai:
         case NetworkChainID.ArbitrumGoerli:
         case NetworkChainID.Hardhat:

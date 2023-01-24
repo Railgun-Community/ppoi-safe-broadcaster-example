@@ -38,6 +38,24 @@ export const BLUECHIP_ETH: AddressToTokenMap = {
   },
 };
 
+export const REN_TOKENS_ETH: AddressToTokenMap = {
+  [TokenAddressEthereum.REN]: {
+    symbol: 'REN',
+  },
+  [TokenAddressEthereum.RENBTC]: {
+    symbol: 'RENBTC',
+  },
+  [TokenAddressEthereum.RENZEC]: {
+    symbol: 'RENZEC',
+  },
+  [TokenAddressEthereum.RENDOGE]: {
+    symbol: 'RENDOGE',
+  },
+  [TokenAddressEthereum.RENFIL]: {
+    symbol: 'RENFIL',
+  },
+};
+
 export const BLUECHIP_BSC: AddressToTokenMap = {
   [TokenAddressBSC.WBNB]: {
     symbol: 'WETH',
@@ -87,20 +105,10 @@ export const STABLES_POLY: AddressToTokenMap = {
   },
 };
 
-export const REN_TOKENS_ETH: AddressToTokenMap = {
-  [TokenAddressEthereum.REN]: {
-    symbol: 'REN',
-  },
-  [TokenAddressEthereum.RENBTC]: {
-    symbol: 'RENBTC',
-  },
-  [TokenAddressEthereum.RENZEC]: {
-    symbol: 'RENZEC',
-  },
-  [TokenAddressEthereum.RENDOGE]: {
-    symbol: 'RENDOGE',
-  },
-  [TokenAddressEthereum.RENFIL]: {
-    symbol: 'RENFIL',
-  },
+export const STABLES_ARBITRUM: AddressToTokenMap = {
+  // TODO: ADD TOKENS TO LIST
+};
+
+export const BLUECHIP_ARBITRUM: AddressToTokenMap = {
+  // TODO: ADD TOKENS TO LIST
 };
