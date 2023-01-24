@@ -47,6 +47,7 @@ module.exports = {
     'consistent-return': 0,
     'require-await': 0,
     '@typescript-eslint/no-floating-promises': 2,
+    '@typescript-eslint/no-non-null-assertion': 2,
     camelcase: 0,
   },
   ignorePatterns: ['dist'],
