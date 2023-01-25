@@ -76,6 +76,7 @@ export const executeTransaction = async (
   transactionRequest: TransactionRequest,
   gasDetails: TransactionGasDetails,
   wallet?: ActiveWallet,
+  overrideNonce?: number,
 ): Promise<TransactionResponse> => {
   dbg('Execute transaction');
 
@@ -85,7 +86,7 @@ export const executeTransaction = async (
 
   const provider = getProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(activeWallet, provider);
-  const nonce = await getCurrentWalletNonce(ethersWallet);
+  const nonce = overrideNonce ?? (await getCurrentWalletNonce(ethersWallet));
   const gasLimit = calculateGasLimitRelayer(gasDetails.gasEstimate);
   dbg('Nonce', nonce);
 
@@ -141,11 +142,23 @@ export const executeTransaction = async (
     waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce);
     return txResponse;
   } catch (err) {
+    dbg(err);
+
     if (err?.message?.includes('Timed out')) {
       throw new Error(ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR);
     }
 
-    dbg(err);
+    if (err?.message?.includes('Nonce already used')) {
+      // Try again with increased nonce.
+      return executeTransaction(
+        chain,
+        transactionRequest,
+        gasDetails,
+        wallet,
+        nonce + 1,
+      );
+    }
+
     throw sanitizeRelayerError(err);
   }
 };
