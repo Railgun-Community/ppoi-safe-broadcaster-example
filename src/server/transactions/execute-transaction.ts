@@ -128,21 +128,26 @@ export const executeTransaction = async (
     dbg('Submitting transaction');
     dbg(finalTransaction);
 
+    setWalletAvailability(activeWallet, chain, false);
+
     const txResponse = await promiseTimeout(
       ethersWallet.sendTransaction(finalTransaction),
-      // 60-second time-out. A shorter or longer timeout may cause issues with frontends.
+      // 45-second time-out. A shorter or longer timeout may cause issues with frontends.
       // Frontends submit to relayers with their own timeout; the frontend timeout may lapse before the Relayer timeout.
-      60000,
+      45000,
     );
 
     dbg('Submitted transaction:', txResponse.hash);
 
-    // Call wait synchronously. This will set wallet unavailable until the tx is finished.
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce);
+    await waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce);
+
+    setWalletAvailability(activeWallet, chain, true);
+
     return txResponse;
   } catch (err) {
     dbg(err);
+
+    setWalletAvailability(activeWallet, chain, true);
 
     if (err?.message?.includes('Timed out')) {
       throw new Error(ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR);
@@ -171,14 +176,12 @@ export const waitForTx = async (
   nonce: number,
 ) => {
   try {
-    setWalletAvailability(activeWallet, chain, false);
     await waitTx(txResponse);
     dbg(`Transaction completed/mined: ${txResponse.hash}`);
     await storeCurrentNonce(chain, nonce, ethersWallet);
   } catch (err) {
     dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
   } finally {
-    setWalletAvailability(activeWallet, chain, true);
     await updateCachedGasTokenBalance(chain, activeWallet.address);
   }
 };
