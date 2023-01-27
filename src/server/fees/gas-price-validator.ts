@@ -17,7 +17,7 @@ export const validateMinGasPrice = async (
 
   try {
     // Low speed is 95th percentile to include in the next block.
-    // Block gas submissions below this level.
+    // Block gas submissions that are 20% below this level.
     const slowestGasDetails = await getGasDetailsForSpeed(
       evmGasType,
       chain,
@@ -27,8 +27,9 @@ export const validateMinGasPrice = async (
       throw new Error('Incorrect EVMGasType for gas price.');
     }
     const slowGasPrice = slowestGasDetails.gasPrice;
+    const minimumAcceptableGasPrice = slowGasPrice.mul(8000).div(10000);
 
-    if (BigNumber.from(minGasPrice).gte(slowGasPrice)) {
+    if (BigNumber.from(minGasPrice).gte(minimumAcceptableGasPrice)) {
       // Valid gas price.
       return;
     }
