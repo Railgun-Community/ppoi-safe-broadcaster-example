@@ -67,7 +67,7 @@ import {
   RelayerMethodParamsTransact,
   RelayerRawParamsTransact,
 } from '@railgun-community/shared-models';
-import { getRelayerVersion } from '../../../util/versions';
+import { getRelayerVersion } from '../../../util/relayer-version';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

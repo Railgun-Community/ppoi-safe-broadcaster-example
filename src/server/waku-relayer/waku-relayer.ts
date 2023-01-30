@@ -22,7 +22,7 @@ import {
   RelayerFeeMessage,
   RelayerFeeMessageData,
 } from '@railgun-community/shared-models';
-import { getRelayerVersion } from '../../util/versions';
+import { getRelayerVersion } from '../../util/relayer-version';
 import configDefaults from '../config/config-defaults';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';

@@ -23,8 +23,9 @@ import configNetworks from '../../config/config-networks';
 import {
   RelayerMethodParamsTransact,
   RelayerRawParamsTransact,
+  versionCompare,
 } from '@railgun-community/shared-models';
-import { getRelayerVersion, versionCompare } from '../../../util/versions';
+import { getRelayerVersion } from '../../../util/relayer-version';
 
 const handledClientPubKeys: string[] = [];
 
