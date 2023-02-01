@@ -1,8 +1,8 @@
 ### base
-FROM node:lts-bullseye-slim as base
+FROM node:18-slim as base
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt install -y --no-install-recommends jq build-essential netcat python3 && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y --no-install-recommends jq build-essential netcat curl python3 && rm -rf /var/lib/apt/lists/*
 RUN corepack prepare pnpm@latest --activate
 
 ###

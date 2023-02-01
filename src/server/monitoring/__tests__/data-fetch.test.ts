@@ -17,8 +17,7 @@ const MOCK_TOKEN_AMOUNT_OVER_ONE = BigNumber.from(10)
   .pow(testNetwork.gasToken.decimals)
   .mul(3);
 
-describe
-  .only('data-fetcher', () => {
+describe('data-fetcher', () => {
     before(async () => {});
     it('Should normalize token balances greater than one whole token properly for gas token and on chain token', () => {
       const normalizedNumber = normalizeToChainUnit(

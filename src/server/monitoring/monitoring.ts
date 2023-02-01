@@ -12,8 +12,12 @@ let shouldServeMetrics = true;
 
 export const initMonitoring = () => {
   if (!configDefaults.monitoring.shouldMonitor) {
+    dbg(
+      'Monitoring is disabled. Set configDefaults.monitoring.shouldMonitor = true to enable.',
+    );
     return;
   }
+  dbg('Enabling metrics');
   initMetricEndpoint();
 };
 

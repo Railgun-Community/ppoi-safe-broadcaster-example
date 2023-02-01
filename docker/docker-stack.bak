@@ -16,32 +16,32 @@ services:
     networks:
       - relayer
     ports:
-      - 60000:60000 # p2p
-      - 9000:9000 # ENR
-      - 8000:8000 # wss
+      - 60000:60000
+      - 9000:9000
+      - 8000:8000 # wss proxied through swag
+      - 8546:8546
     volumes:
       - nwaku:/data
       - ./appdata/swag/etc/letsencrypt:/ssl
-      - ../scripts/nwaku:/app/scripts
     depends_on:
       - swag
     healthcheck:
       test: curl --fail http://localhost:8546 || exit 1
-      interval: 30s
+      interval: 60s
       retries: 4
       start_period: 10s
       timeout: 5s
     entrypoint: >
       wakunode2
         --config-file=/app/config.toml
-        --nat="extip:${EXTIP}"
-        --listen-address="${LISTENIP}"
-        --dns4-domain-name="${SUBDOMAIN}.${BASEDOMAIN}"
-        --nodekey="${NODEKEY}"
+        --nat="extip:68.58.173.20"
+        --listen-address="0.0.0.0"
+        --dns4-domain-name="dev.of.holdings"
+        --nodekey="0x017eef01f33881e2edba7e5e93656b1c09ec8ca88431b52a1a3dfb1c9056b0e5"
         --websocket-support=true
         --websocket-secure-support=true
-        --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
-        --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
+        --websocket-secure-key-path="/ssl/live/dev.of.holdings/privkey.pem"
+        --websocket-secure-cert-path="/ssl/live/dev.of.holdings/fullchain.pem"
 
   relayer:
     image: relayer:latest
@@ -72,42 +72,18 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=EST
-      - URL=${BASEDOMAIN}
+      - URL=of.holdings
       - ONLY_SUBDOMAINS=true
-      - SUBDOMAINS=${SUBDOMAIN}
+      - SUBDOMAINS=dev
       - VALIDATION=http
-      - EMAIL=${EMAIL}
+      - EMAIL=dylan.oliver@gmail.com
     volumes:
       - ./appdata/swag:/config
       - ./swag/nwaku.subdomain.conf:/config/nginx/proxy-confs/nwaku.subdomain.conf
     ports:
       - 443:443
-      - 80:80 # must be available to obtain ssl cert from letsencrypt
-
-  prometheus:
-    image: prom/prometheus:v2.36.2
-    user: '1000:1000'
-    networks:
-      - relayer
-    volumes:
-      - ./prometheus/:/etc/prometheus/
-      - ./prometheus/data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-
-  grafana:
-    image: grafana/grafana
-    user: '1000:1000'
-    networks:
-      - relayer
-    depends_on:
-      - prometheus
-    ports:
-      - 3000:3000
-    volumes:
-      - ./grafana/data:/var/lib/grafana
-      - ./grafana/config:/etc/grafana/
+      - 80:80
+      #- 8000:8000 # wss proxied to nwaku
 
 secrets:
   MNEMONIC:
