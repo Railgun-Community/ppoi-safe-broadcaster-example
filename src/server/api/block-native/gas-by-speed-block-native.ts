@@ -207,7 +207,7 @@ export const getGasDetailsBySpeedBlockNative = async (
     }
   } catch (err) {
     dbg(err);
-    if (retryCount > 1) {
+    if (retryCount > 3) {
       return undefined;
     }
     return getGasDetailsBySpeedBlockNative(evmGasType, chain, retryCount + 1);
