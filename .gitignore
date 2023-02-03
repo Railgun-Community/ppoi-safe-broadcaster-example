@@ -41,6 +41,7 @@ docker/appdata
 docker/custom.yml
 docker/prometheus/data/*
 docker/grafana/data/*
+*.bak
 
 # Exceptions
 
