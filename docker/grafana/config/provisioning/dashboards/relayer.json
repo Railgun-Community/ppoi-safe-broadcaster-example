@@ -65,14 +65,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -80,7 +82,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", address=\"$address_0\", derivation_index=\"0\"}",
+          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", address=\"$address_0\", derivation_index=\"0\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -127,14 +129,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -142,7 +146,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", address=\"$address_0\", derivation_index=\"0\"}",
+          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", address=\"$address_0\", derivation_index=\"0\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -188,14 +192,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -203,7 +209,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Binance Smart Chain\", address=\"$address_0\", derivation_index=\"0\"}",
+          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"BNB Chain\", address=\"$address_0\", derivation_index=\"0\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -249,14 +255,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -264,7 +272,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Goerli\", address=\"$address_0\", derivation_index=\"0\"}",
+          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Görli Testnet\", address=\"$address_0\", derivation_index=\"0\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -310,14 +318,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -371,14 +381,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -386,7 +398,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", address=\"$address_1\", derivation_index=\"1\"}",
+          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", address=\"$address_1\", derivation_index=\"1\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -433,14 +445,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -448,7 +462,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", address=\"$address_1\", derivation_index=\"1\"}",
+          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", address=\"$address_1\", derivation_index=\"1\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -494,14 +508,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -509,7 +525,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Binance Smart Chain\", address=\"$address_1\", derivation_index=\"1\"}",
+          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"BNB Chain\", address=\"$address_1\", derivation_index=\"1\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -555,14 +571,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -570,7 +588,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Goerli\", address=\"$address_1\", derivation_index=\"1\"}",
+          "expr": "gas_token_balance{chain_type=\"EVM\", chain_id=\"Görli Testnet\", address=\"$address_1\", derivation_index=\"1\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -616,14 +634,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -678,14 +698,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -693,7 +715,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0xdac17f958d2ee523a2206206994597c13d831ec7\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0xdac17f958d2ee523a2206206994597c13d831ec7\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -748,14 +770,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -763,7 +787,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -818,14 +842,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -833,7 +859,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0x2260fac5e5542a773aa44fbcfedf7c193bc2c599\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0x2260fac5e5542a773aa44fbcfedf7c193bc2c599\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -888,14 +914,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -903,7 +931,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0x6B175474E89094C44Da98b954EedeAC495271d0F\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0x6B175474E89094C44Da98b954EedeAC495271d0F\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -958,14 +986,16 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "9.3.6",
       "targets": [
         {
           "datasource": {
@@ -973,7 +1003,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1027,7 +1057,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1042,7 +1074,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0x03ab458634910aad20ef5f1c8ee96f1d6ac54919\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0x03ab458634910aad20ef5f1c8ee96f1d6ac54919\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1096,7 +1128,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1111,7 +1145,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0xe76C6c83af64e4C60245D8C7dE953DF673a7A33D\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0xe76C6c83af64e4C60245D8C7dE953DF673a7A33D\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1144,8 +1178,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1166,7 +1199,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1181,7 +1216,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0x853d955acef822db058eb8505911ed77f175b99e\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0x853d955acef822db058eb8505911ed77f175b99e\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1235,7 +1270,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1250,7 +1287,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0x956F47F50A910163D8BF957Cf5846D573E7f87CA\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0x956F47F50A910163D8BF957Cf5846D573E7f87CA\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1304,7 +1341,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1319,7 +1358,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0x3832d2f059e55934220881f831be501d180671a7\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0x3832d2f059e55934220881f831be501d180671a7\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1373,7 +1412,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1388,7 +1429,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0x408e41876cccdc0f92210600ef50372656052a38\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0x408e41876cccdc0f92210600ef50372656052a38\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1442,7 +1483,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1457,7 +1500,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0xd5147bc8e386d91cc5dbe72099dac6c9b99276f5\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0xd5147bc8e386d91cc5dbe72099dac6c9b99276f5\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1511,7 +1554,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1526,7 +1571,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Mainnet\", token_address=\"0xeb4c2781e4eba804ce9a9803c67d0893436bb27d\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum\", token_address=\"0xeb4c2781e4eba804ce9a9803c67d0893436bb27d\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1580,7 +1625,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1595,7 +1642,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Ethereum Goerli\", token_address=\"0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Görli Testnet\", token_address=\"0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1649,7 +1696,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1664,7 +1713,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Binance Smart Chain\", token_address=\"0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"BNB Chain\", token_address=\"0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1718,7 +1767,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1733,7 +1784,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", token_address=\"0xA649325Aa7C5093d12D6F98EB4378deAe68CE23F\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", token_address=\"0xA649325Aa7C5093d12D6F98EB4378deAe68CE23F\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1787,7 +1838,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1802,7 +1855,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Binance Smart Chain\", token_address=\"0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"BNB Chain\", token_address=\"0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1856,7 +1909,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1871,7 +1926,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Binance Smart Chain\", token_address=\"0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"BNB Chain\", token_address=\"0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1925,7 +1980,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -1940,7 +1997,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Binance Smart Chain\", token_address=\"0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"BNB Chain\", token_address=\"0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -1994,7 +2051,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -2009,7 +2068,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", token_address=\"0xA649325Aa7C5093d12D6F98EB4378deAe68CE23F\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", token_address=\"0xA649325Aa7C5093d12D6F98EB4378deAe68CE23F\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2063,7 +2122,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -2078,7 +2139,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", token_address=\"0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", token_address=\"0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2132,7 +2193,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -2147,7 +2210,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Binance Smart Chain\", token_address=\"0x55d398326f99059fF775485246999027B3197955\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"BNB Chain\", token_address=\"0x55d398326f99059fF775485246999027B3197955\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2201,7 +2264,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -2216,7 +2281,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Binance Smart Chain\", token_address=\"0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"BNB Chain\", token_address=\"0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2270,7 +2335,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -2285,7 +2352,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", token_address=\"0x8f3cf7ad23cd3cadbd9735aff958023239c6a063\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", token_address=\"0x8f3cf7ad23cd3cadbd9735aff958023239c6a063\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2339,7 +2406,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -2354,7 +2423,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", token_address=\"0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", token_address=\"0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2408,7 +2477,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -2423,7 +2494,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", token_address=\"0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", token_address=\"0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2477,7 +2548,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -2492,7 +2565,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", token_address=\"0xc2132D05D31c914a87C6611C10748AEb04B58e8F\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", token_address=\"0xc2132D05D31c914a87C6611C10748AEb04B58e8F\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2546,7 +2619,9 @@
       "options": {
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -2561,7 +2636,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "builder",
-          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon Mainnet\", token_address=\"0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889\"}",
+          "expr": "shielded_token_balance{chain_type=\"EVM\", chain_id=\"Polygon PoS\", token_address=\"0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -2587,40 +2662,40 @@
       {
         "current": {
           "selected": false,
-          "text": "0x65D54eEb3bebe4a99c620631e6744694C98b3262",
-          "value": "0x65D54eEb3bebe4a99c620631e6744694C98b3262"
+          "text": "0x423B61fb723Df2C95F80B152B96E6A8C30cD82ab",
+          "value": "0x423B61fb723Df2C95F80B152B96E6A8C30cD82ab"
         },
         "description": "First derivation of your address ",
         "hide": 0,
         "name": "address_0",
         "options": [
           {
-            "selected": true,
+            "selected": false,
             "text": "0x65D54eEb3bebe4a99c620631e6744694C98b3262",
             "value": "0x65D54eEb3bebe4a99c620631e6744694C98b3262"
           }
         ],
-        "query": "0x65D54eEb3bebe4a99c620631e6744694C98b3262",
+        "query": "0x423B61fb723Df2C95F80B152B96E6A8C30cD82ab",
         "skipUrlSync": false,
         "type": "textbox"
       },
       {
         "current": {
           "selected": false,
-          "text": "0xd75D689fdf6EB7b362119e29cA29b0a2869660aa",
-          "value": "0xd75D689fdf6EB7b362119e29cA29b0a2869660aa"
+          "text": "0x423B61fb723Df2C95F80B152B96E6A8C30cD82ab",
+          "value": "0x423B61fb723Df2C95F80B152B96E6A8C30cD82ab"
         },
         "description": "Address at the first derivation",
         "hide": 0,
         "name": "address_1",
         "options": [
           {
-            "selected": true,
+            "selected": false,
             "text": "0xd75D689fdf6EB7b362119e29cA29b0a2869660aa",
             "value": "0xd75D689fdf6EB7b362119e29cA29b0a2869660aa"
           }
         ],
-        "query": "0xd75D689fdf6EB7b362119e29cA29b0a2869660aa",
+        "query": "0x423B61fb723Df2C95F80B152B96E6A8C30cD82ab",
         "skipUrlSync": false,
         "type": "textbox"
       }
@@ -2637,4 +2712,3 @@
   "version": 1,
   "weekStart": ""
 }
-

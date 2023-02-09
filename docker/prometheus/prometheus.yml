@@ -16,4 +16,4 @@ scrape_configs:
     scrape_interval: 30s
 
     static_configs:
-      - targets: ['localhost:9991']
+      - targets: ['relayer:9991']
