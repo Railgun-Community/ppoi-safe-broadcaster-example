@@ -4,17 +4,20 @@ import { gas_token_balance, shielded_token_balance } from './metrics';
 import { getActiveWallets } from '../wallets/active-wallets';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { networkForChain } from '@railgun-community/shared-models';
-import { getPrivateTokenBalanceCache } from '../balances/shielded-balance-cache';
+import { getPrivateTokenBalanceCache, updateCachedShieldedBalances } from '../balances/shielded-balance-cache';
 import { BigNumber } from 'ethers';
 import { TokenAmount } from '../../models/token-models';
 import { networkTokens, tokenForAddress } from '../tokens/network-tokens';
 import { chainTypeToString } from '../config/config-chains';
 import configNetworks from '../config/config-networks';
 import { formatUnits } from '@ethersproject/units';
+import { getRailgunWallet } from 'server/wallets/active-wallets';
 
 const bigZero = BigNumber.from('0');
 
-export const fetchShieldedBalances = (chain: RelayerChain): TokenAmount[] => {
+export const fetchShieldedBalances = async (chain: RelayerChain): TokenAmount[] => {
+  const wallet = getRailgunWallet();
+  await updateCachedShieldedBalances(wallet,chain);	
   const privateTokenBalances = getPrivateTokenBalanceCache(chain);
   const tokensForChain = networkTokens[chain.type][chain.id];
   const shieldedAndZeroBalances: TokenAmount[] = tokensForChain.map((token) => {
@@ -87,7 +90,7 @@ export const collectMetrics = () => {
     });
 
     // collect shielded balances
-    const shieldedBalances = fetchShieldedBalances(chain);
+    const shieldedBalances = await fetchShieldedBalances(chain);
     shieldedBalances.forEach((balance) => {
       shielded_token_balance
         .labels(
