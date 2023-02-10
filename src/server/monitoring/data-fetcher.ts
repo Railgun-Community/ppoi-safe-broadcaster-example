@@ -4,7 +4,10 @@ import { gas_token_balance, shielded_token_balance } from './metrics';
 import { getActiveWallets } from '../wallets/active-wallets';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { networkForChain } from '@railgun-community/shared-models';
-import { getPrivateTokenBalanceCache, updateCachedShieldedBalances } from '../balances/shielded-balance-cache';
+import {
+  getPrivateTokenBalanceCache,
+  updateCachedShieldedBalances,
+} from '../balances/shielded-balance-cache';
 import { BigNumber } from 'ethers';
 import { TokenAmount } from '../../models/token-models';
 import { networkTokens, tokenForAddress } from '../tokens/network-tokens';
@@ -15,9 +18,11 @@ import { getRailgunWallet } from 'server/wallets/active-wallets';
 
 const bigZero = BigNumber.from('0');
 
-export const fetchShieldedBalances = async (chain: RelayerChain): TokenAmount[] => {
+export const fetchShieldedBalances = async (
+  chain: RelayerChain,
+): Promise<TokenAmount[]> => {
   const wallet = getRailgunWallet();
-  await updateCachedShieldedBalances(wallet,chain);	
+  await updateCachedShieldedBalances(wallet, chain);
   const privateTokenBalances = getPrivateTokenBalanceCache(chain);
   const tokensForChain = networkTokens[chain.type][chain.id];
   const shieldedAndZeroBalances: TokenAmount[] = tokensForChain.map((token) => {
@@ -70,13 +75,13 @@ export const fetchGasBalances = async (
   return normalizeToChainUnit(gasTokenBalance, chain);
 };
 
-export const collectMetrics = () => {
+export const collectMetrics = async () => {
   // get chains and wallets to monitor
   const chains = configuredNetworkChains();
   const activeWallets = getActiveWallets();
 
   // collect gas balances
-  chains.forEach((chain) => {
+  chains.forEach(async (chain) => {
     activeWallets.forEach(async (wallet) => {
       const gasBalance = await fetchGasBalances(chain, wallet.address);
       gas_token_balance
