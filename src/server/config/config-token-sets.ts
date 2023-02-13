@@ -3,6 +3,7 @@ import {
   TokenAddressEthereum,
   TokenAddressBSC,
   TokenAddressPolygonPOS,
+  TokenAddressArbitrum,
 } from './config-token-addresses';
 
 export const STABLES_ETH: AddressToTokenMap = {
@@ -106,9 +107,31 @@ export const STABLES_POLY: AddressToTokenMap = {
 };
 
 export const STABLES_ARBITRUM: AddressToTokenMap = {
-  // TODO: ADD TOKENS TO LIST
+  [TokenAddressArbitrum.USDT]: {
+    symbol: 'USDT',
+  },
+  [TokenAddressArbitrum.USDC]: {
+    symbol: 'USDC',
+  },
+  [TokenAddressArbitrum.DAI]: {
+    symbol: 'DAI',
+  },
+  [TokenAddressArbitrum.TUSD]: {
+    symbol: 'TUSD',
+  },
 };
 
 export const BLUECHIP_ARBITRUM: AddressToTokenMap = {
-  // TODO: ADD TOKENS TO LIST
+  [TokenAddressArbitrum.UNI]: {
+    symbol: 'UNI',
+  },
+  [TokenAddressArbitrum.FRAX]: {
+    symbol: 'FRAX',
+  },
+  [TokenAddressArbitrum.WBTC]: {
+    symbol: 'WBTC',
+  },
+  [TokenAddressArbitrum.WETH]: {
+    symbol: 'WETH',
+  },
 };
