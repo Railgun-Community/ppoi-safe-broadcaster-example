@@ -97,7 +97,7 @@ const networksConfig: NetworksConfig = {
     [NetworkChainID.Arbitrum]: {
       name: 'Arbitrum',
       gasToken: {
-        symbol: 'MATIC',
+        symbol: 'ETH',
         wrappedAddress: BaseTokenWrappedAddress.ArbitrumWETH,
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
