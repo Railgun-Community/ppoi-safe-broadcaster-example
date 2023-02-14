@@ -34,7 +34,7 @@ export const processTransaction = async (
 ): Promise<TransactionResponse> => {
   const transactionRequest = deserializeTransaction(serializedTransaction);
 
-  // Minimum gas for gas estimate wallet: 0.1.
+  // Minimum gas for gas estimate wallet: 0.15 (or 0.01 L2).
   const minimumGasNeeded = minimumGasBalanceForAvailability(chain);
 
   const walletForGasEstimate = await getBestMatchWalletForNetwork(

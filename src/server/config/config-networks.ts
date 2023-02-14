@@ -102,7 +102,7 @@ const networksConfig: NetworksConfig = {
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
-      fees: feeConfigL1,
+      fees: feeConfigL2,
       proxyContract: RailgunProxyContract.Arbitrum,
       relayAdaptContract: RelayAdaptContract.Arbitrum,
       coingeckoNetworkId: CoingeckoNetworkID.Arbitrum,

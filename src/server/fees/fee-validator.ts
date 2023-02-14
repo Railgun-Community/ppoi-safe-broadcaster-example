@@ -15,6 +15,7 @@ const comparePackagedFeeToCalculated = (
   const calculatedFeeWithBuffer = calculatedFee
     .mul(Math.round(10000 * (1 - slippageBuffer)))
     .div(10000);
+  // logger.log(`calculatedFeeWithBuffer: ${calculatedFeeWithBuffer?.toString()}`);
   return packagedFee.gte(calculatedFeeWithBuffer);
 };
 
