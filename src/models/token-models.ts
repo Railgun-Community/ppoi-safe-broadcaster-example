@@ -9,6 +9,7 @@ export type GasTokenConfig = {
   wrappedAddress: BaseTokenWrappedAddress | string;
   symbol: string;
   decimals: number;
+  minBalanceForAvailability: number;
 };
 
 export type TokenConfig = {

@@ -77,6 +77,7 @@ export const getMockNetwork = (): Network => {
       symbol: 'ETH',
       wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
       decimals: 18,
+      minBalanceForAvailability: 0.1,
     },
     fees: {
       slippageBuffer: 0.03,
@@ -97,6 +98,7 @@ export const getMockGoerliNetwork = (): Network => {
       symbol: 'ETH',
       wrappedAddress: '0x00',
       decimals: 18,
+      minBalanceForAvailability: 0.1,
     },
     fees: {
       slippageBuffer: 0.05,

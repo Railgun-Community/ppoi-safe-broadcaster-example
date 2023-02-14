@@ -8,9 +8,6 @@ import configNetworks from '../config/config-networks';
 import debug from 'debug';
 import { BigNumber } from '@ethersproject/bignumber';
 
-// 0.1 ETH minimum for availability.
-const MINIMUM_BALANCE_FOR_AVAILABILITY = 0.1;
-
 const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
 const dbg = debug('relayer:wallets:availability');
@@ -49,7 +46,7 @@ export const minimumGasBalanceForAvailability = (
 ): BigNumber => {
   const { gasToken } = configNetworks[chain.type][chain.id];
   return parseUnits(
-    String(MINIMUM_BALANCE_FOR_AVAILABILITY),
+    String(gasToken.minBalanceForAvailability),
     gasToken.decimals,
   );
 };

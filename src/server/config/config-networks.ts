@@ -19,6 +19,11 @@ import { NetworksConfig } from '../../models/config-models';
 import { ChainType } from '@railgun-community/engine';
 import { NO_GAS_TOKEN_ADDRESS } from '../../models/token-models';
 
+// 0.15 ETH minimum for L1 availability.
+const MINIMUM_BALANCE_FOR_AVAILABILITY_L1 = 0.15;
+// 0.01 ETH minimum for L2 availability.
+const MINIMUM_BALANCE_FOR_AVAILABILITY_L2 = 0.01;
+
 // 10 minute timeout on ticket prices retrieved from API.
 // Shorter is safer, but Coingecko free tier can lag by 15-30 minutes.
 const defaultTokenPriceTTL = 10 * 60 * 1000;
@@ -31,6 +36,7 @@ const networksConfig: NetworksConfig = {
         symbol: 'ETH',
         wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
         decimals: 18,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1,
       proxyContract: RailgunProxyContract.Ethereum,
@@ -46,6 +52,7 @@ const networksConfig: NetworksConfig = {
         symbol: 'ETH',
         wrappedAddress: BaseTokenWrappedAddress.EthereumGoerliWETH,
         decimals: 18,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1,
       proxyContract: RailgunProxyContract.EthereumGoerli,
@@ -61,6 +68,7 @@ const networksConfig: NetworksConfig = {
         symbol: 'BNB',
         wrappedAddress: BaseTokenWrappedAddress.BinanceWBNB,
         decimals: 18,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1,
       proxyContract: RailgunProxyContract.BNBChain,
@@ -76,6 +84,7 @@ const networksConfig: NetworksConfig = {
         symbol: 'MATIC',
         wrappedAddress: BaseTokenWrappedAddress.PolygonWMATIC,
         decimals: 18,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1,
       proxyContract: RailgunProxyContract.PolygonPOS,
@@ -91,6 +100,7 @@ const networksConfig: NetworksConfig = {
         symbol: 'MATIC',
         wrappedAddress: BaseTokenWrappedAddress.ArbitrumWETH,
         decimals: 18,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
       fees: feeConfigL1,
       proxyContract: RailgunProxyContract.Arbitrum,
@@ -106,6 +116,7 @@ const networksConfig: NetworksConfig = {
         symbol: 'MATIC',
         wrappedAddress: BaseTokenWrappedAddress.PolygonMumbaiWMATIC,
         decimals: 18,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1,
       proxyContract: RailgunProxyContract.PolygonMumbai,
@@ -121,6 +132,7 @@ const networksConfig: NetworksConfig = {
         symbol: 'ETH',
         wrappedAddress: BaseTokenWrappedAddress.ArbitrumGoerliWETH,
         decimals: 18,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
       fees: feeConfigL2,
       proxyContract: RailgunProxyContract.ArbitrumGoerli,
@@ -136,6 +148,7 @@ const networksConfig: NetworksConfig = {
         symbol: 'ETH',
         wrappedAddress: NO_GAS_TOKEN_ADDRESS,
         decimals: 18,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1,
       proxyContract: RailgunProxyContract.Hardhat,
