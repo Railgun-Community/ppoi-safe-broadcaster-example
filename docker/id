@@ -1,0 +1,3 @@
+#!/bin/sh
+SERVICE=$1
+docker ps --filter "name=relayer_$SERVICE" --format "{{.ID}}"
