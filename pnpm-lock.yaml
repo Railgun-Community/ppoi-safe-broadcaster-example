@@ -9,8 +9,8 @@ specifiers:
   '@ethersproject/transactions': ^5.7.0
   '@ethersproject/units': ^5.7.0
   '@noble/ed25519': ^1.7.1
-  '@railgun-community/engine': 3.10.3
-  '@railgun-community/shared-models': 3.9.4
+  '@railgun-community/engine': 3.10.11
+  '@railgun-community/shared-models': 3.9.7
   '@railgun-community/test-artifacts': ^1.0.2
   '@types/chai': ^4.3.4
   '@types/chai-as-promised': ^7.1.5
@@ -61,8 +61,8 @@ dependencies:
   '@ethersproject/transactions': 5.7.0
   '@ethersproject/units': 5.7.0
   '@noble/ed25519': 1.7.1
-  '@railgun-community/engine': 3.10.3_chai@4.3.7
-  '@railgun-community/shared-models': 3.9.4_nsp7oodujdmjmqrjctxjpxvj7a
+  '@railgun-community/engine': 3.10.11_chai@4.3.7
+  '@railgun-community/shared-models': 3.9.7_nsp7oodujdmjmqrjctxjpxvj7a
   '@railgun-community/test-artifacts': 1.0.2
   '@walletconnect/jsonrpc-types': 1.0.2
   '@walletconnect/jsonrpc-utils': 1.0.4
@@ -801,8 +801,8 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@railgun-community/engine/3.10.3_chai@4.3.7:
-    resolution: {integrity: sha512-NDhW9MbvmIXUh5Lz+y/s6+cjimd0ERPyCb/Wn9RSuVCtKrSsMAxme8nB2xL9N+BA+vp9hxqhuNnnjtLpEp6EhA==}
+  /@railgun-community/engine/3.10.11_chai@4.3.7:
+    resolution: {integrity: sha512-jeuP5PLBZjMKbP8wOkQztxOWSJlPfrsaHoO838t6GAtGB4cf4zHQnGsqnNpGMn6yS+2mOoBKwcU32pqKw2ABCA==}
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/abstract-provider': 5.7.0
@@ -828,8 +828,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@railgun-community/shared-models/3.9.4_nsp7oodujdmjmqrjctxjpxvj7a:
-    resolution: {integrity: sha512-NQl+MtXUOX9D/up8HLix2WgATj5FQ9zNsAaZ4nVnTf561DFNnasW7w6zeqx5qvNs03yT5dkrjpjxU7SlBfzaoA==}
+  /@railgun-community/shared-models/3.9.7_nsp7oodujdmjmqrjctxjpxvj7a:
+    resolution: {integrity: sha512-3blFUXImoSNajJnmFcfkII2tq9f6UBlh0I9AwMbwb0FH9kVhGUecE4yBrImiNjwn2Dg5dRdlvqWsVGylvsVRCQ==}
     peerDependencies:
       '@ethersproject/bignumber': ^5.7.0
       '@ethersproject/providers': ^5.7.1
@@ -1946,7 +1946,7 @@ packages:
     dev: true
 
   /cookie-signature/1.0.6:
-    resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
+    resolution: {integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw=}
     dev: false
 
   /cookie/0.5.0:
@@ -2245,7 +2245,7 @@ packages:
     dev: false
 
   /ee-first/1.1.1:
-    resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
+    resolution: {integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=}
     dev: false
 
   /ejs/3.1.8:
@@ -3019,7 +3019,7 @@ packages:
     dev: false
 
   /fresh/0.5.2:
-    resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
+    resolution: {integrity: sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=}
     engines: {node: '>= 0.6'}
     dev: false
 
@@ -4005,12 +4005,12 @@ packages:
     dev: false
 
   /media-typer/0.3.0:
-    resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
+    resolution: {integrity: sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=}
     engines: {node: '>= 0.6'}
     dev: false
 
   /merge-descriptors/1.0.1:
-    resolution: {integrity: sha512-cCi6g3/Zr1iqQi6ySbseM1Xvooa98N0w31jzUYrXPX2xqObmFGHJ0tQ5u74H3mVh7wLouTseZyYIq39g8cNp1w==}
+    resolution: {integrity: sha1-sAqqVW3YtEVoFQ7J0blT8/kMu2E=}
     dev: false
 
   /merge2/1.4.1:
@@ -5572,7 +5572,7 @@ packages:
     dev: false
 
   /utils-merge/1.0.1:
-    resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
+    resolution: {integrity: sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=}
     engines: {node: '>= 0.4.0'}
     dev: false
 

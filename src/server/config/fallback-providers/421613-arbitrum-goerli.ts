@@ -6,7 +6,8 @@ const config: FallbackProviderJsonConfig = {
     {
       provider: 'https://goerli-rollup.arbitrum.io/rpc',
       priority: 3,
-      weight: 1,
+      weight: 2,
+      stallTimeout: 2500,
     },
   ],
 };

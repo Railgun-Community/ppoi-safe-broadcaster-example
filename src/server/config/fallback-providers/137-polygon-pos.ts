@@ -7,7 +7,8 @@ const config: FallbackProviderJsonConfig = {
       provider:
         'https://poly-mainnet.gateway.pokt.network/v1/lb/627a4b6e18e53a003a6b6c26',
       priority: 1,
-      weight: 1,
+      weight: 2,
+      stallTimeout: 2500,
     },
     {
       provider: 'https://rpc.ankr.com/polygon',
@@ -22,21 +23,6 @@ const config: FallbackProviderJsonConfig = {
     {
       provider: 'https://rpc-mainnet.maticvigil.com',
       priority: 2,
-      weight: 1,
-    },
-    {
-      provider: 'https://rpc-mainnet.matic.quiknode.pro',
-      priority: 3,
-      weight: 1,
-    },
-    {
-      provider: 'https://matic-mainnet.chainstacklabs.com',
-      priority: 3,
-      weight: 1,
-    },
-    {
-      provider: 'https://matic-mainnet-archive-rpc.bwarelabs.com',
-      priority: 3,
       weight: 1,
     },
   ],
