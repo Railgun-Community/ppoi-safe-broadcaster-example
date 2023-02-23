@@ -9,9 +9,8 @@ specifiers:
   '@ethersproject/transactions': ^5.7.0
   '@ethersproject/units': ^5.7.0
   '@noble/ed25519': ^1.7.1
-  '@railgun-community/engine': 3.10.11
-  '@railgun-community/shared-models': 3.9.7
-  '@railgun-community/test-artifacts': ^1.0.2
+  '@railgun-community/engine': 4.0.3-test
+  '@railgun-community/shared-models': 4.0.4-test
   '@types/chai': ^4.3.4
   '@types/chai-as-promised': ^7.1.5
   '@types/debug': ^4.1.7
@@ -43,6 +42,7 @@ specifiers:
   npm: ^9.3.1
   nyc: ^15.1.0
   prompt-sync: ^4.2.0
+  railgun-community-circuit-artifacts: https://npm.railgun.org/railgun-community-circuit-artifacts-0.0.1.tgz
   sinon: ^15.0.1
   snarkjs: ^0.5.0
   ts-node: ^10.9.1
@@ -61,9 +61,8 @@ dependencies:
   '@ethersproject/transactions': 5.7.0
   '@ethersproject/units': 5.7.0
   '@noble/ed25519': 1.7.1
-  '@railgun-community/engine': 3.10.11_chai@4.3.7
-  '@railgun-community/shared-models': 3.9.7_nsp7oodujdmjmqrjctxjpxvj7a
-  '@railgun-community/test-artifacts': 1.0.2
+  '@railgun-community/engine': 4.0.3-test_chai@4.3.7
+  '@railgun-community/shared-models': 4.0.4-test_nsp7oodujdmjmqrjctxjpxvj7a
   '@walletconnect/jsonrpc-types': 1.0.2
   '@walletconnect/jsonrpc-utils': 1.0.4
   axios: 1.2.3_debug@4.3.4
@@ -74,6 +73,7 @@ dependencies:
   leveldown: 6.1.1
   npm: 9.3.1
   prompt-sync: 4.2.0
+  railgun-community-circuit-artifacts: '@npm.railgun.org/railgun-community-circuit-artifacts-0.0.1.tgz'
   snarkjs: 0.5.0
   tslib: 2.4.1
   web3-core: 1.8.1
@@ -801,8 +801,8 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@railgun-community/engine/3.10.11_chai@4.3.7:
-    resolution: {integrity: sha512-jeuP5PLBZjMKbP8wOkQztxOWSJlPfrsaHoO838t6GAtGB4cf4zHQnGsqnNpGMn6yS+2mOoBKwcU32pqKw2ABCA==}
+  /@railgun-community/engine/4.0.3-test_chai@4.3.7:
+    resolution: {integrity: sha512-q7x2NN6d7VbAsrL1DjYxKOJmSotVMPDcGw+YaPc8LrXQx4XgGdDaYCZfoALwuI6OQgvJFjM/JAmTpctY5dSARg==}
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/abstract-provider': 5.7.0
@@ -828,8 +828,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@railgun-community/shared-models/3.9.7_nsp7oodujdmjmqrjctxjpxvj7a:
-    resolution: {integrity: sha512-3blFUXImoSNajJnmFcfkII2tq9f6UBlh0I9AwMbwb0FH9kVhGUecE4yBrImiNjwn2Dg5dRdlvqWsVGylvsVRCQ==}
+  /@railgun-community/shared-models/4.0.4-test_nsp7oodujdmjmqrjctxjpxvj7a:
+    resolution: {integrity: sha512-gW5NZX24vL0NyAfoe5lGtFiznVSmom6U5v380uyuYrunfP8xCQ/nzLggwbQ2oLF+FGbMzCamZBJs7V13HXcUFw==}
     peerDependencies:
       '@ethersproject/bignumber': ^5.7.0
       '@ethersproject/providers': ^5.7.1
@@ -838,12 +838,6 @@ packages:
       '@ethersproject/contracts': 5.7.0
       '@ethersproject/providers': 5.7.2
       '@ethersproject/transactions': 5.7.0
-    dev: false
-
-  /@railgun-community/test-artifacts/1.0.2:
-    resolution: {integrity: sha512-YSgxiadxMQm0GpA4tlJbWLeCh4gFjq/iZoFhfehFogXys33ih3DrgZr/y8QU1VJd+gS0j3LFPGvxyXVEOEEZAg==}
-    dependencies:
-      brotli: 1.3.3
     dev: false
 
   /@scure/base/1.1.1:
@@ -6142,6 +6136,14 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  '@npm.railgun.org/railgun-community-circuit-artifacts-0.0.1.tgz':
+    resolution: {tarball: https://npm.railgun.org/railgun-community-circuit-artifacts-0.0.1.tgz}
+    name: '@railgun-community/circuit-artifacts'
+    version: 0.0.1
+    dependencies:
+      brotli: 1.3.3
+    dev: false
 
   github.com/hsg88/circomlibjs/fee5b3c479caa3db1e34cbfdedad763d74277844:
     resolution: {tarball: https://codeload.github.com/hsg88/circomlibjs/tar.gz/fee5b3c479caa3db1e34cbfdedad763d74277844}

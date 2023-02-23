@@ -1,7 +1,7 @@
 import { PublicInputs } from '@railgun-community/engine';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { artifactsGetter } from '../artifacts';
+import { artifactGetter } from '../artifacts';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -14,7 +14,7 @@ describe('artifacts', () => {
       nullifiers: [BigInt(0), BigInt(1)],
       commitmentsOut: [BigInt(0), BigInt(1)],
     };
-    const artifacts = await artifactsGetter(inputs);
+    const artifacts = await artifactGetter(inputs);
     expect(artifacts).to.be.an('object');
   });
 
@@ -25,7 +25,7 @@ describe('artifacts', () => {
       nullifiers: [BigInt(0), BigInt(1), BigInt(2)],
       commitmentsOut: [BigInt(0), BigInt(1)],
     };
-    expect(() => artifactsGetter(inputs)).to.throw(
+    expect(() => artifactGetter(inputs)).to.throw(
       'No artifacts for inputs: 3x2',
     );
   });

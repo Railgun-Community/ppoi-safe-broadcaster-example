@@ -1,7 +1,7 @@
 import leveldown from 'leveldown';
 import { FallbackProvider } from '@ethersproject/providers';
 import { logger } from '../../util/logger';
-import { artifactsGetter } from './artifacts';
+import { artifactGetter } from './artifacts';
 import { quickSyncIPNS } from '../api/railgun-events/quick-sync-ipns';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
@@ -37,9 +37,11 @@ export const initEngine = (optDebugger?: EngineDebugger) => {
   engine = new RailgunEngine(
     'relayer',
     levelDB,
-    artifactsGetter,
+    artifactGetter,
     quickSyncIPNS,
     configDefaults.debug.engine ? engineDebugger : undefined,
+    false,
+    {},
   );
   engine.prover.setSnarkJSGroth16(groth16 as Groth16);
 };
