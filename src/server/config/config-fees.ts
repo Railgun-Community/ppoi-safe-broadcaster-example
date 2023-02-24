@@ -1,7 +1,7 @@
 import { FeeConfig } from '../../models/fee-config';
 
 export const feeConfigL1: FeeConfig = {
-  slippageBuffer: 0.09,
+  slippageBuffer: 0.0,
   profit: 0.01,
 };
 
