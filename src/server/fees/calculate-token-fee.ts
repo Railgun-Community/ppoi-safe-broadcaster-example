@@ -86,7 +86,7 @@ export const getRoundedTokenToGasPriceRatio = (
   precision: number,
 ): BigNumber => {
   const priceRatio = gasTokenPrice / tokenPrice;
-  const slippage = priceRatio * fees.slippageBuffer;
+  const slippage = priceRatio * fees.gasEstimateVarianceBuffer;
   const profit = priceRatio * fees.profit;
   const totalFeeRatio = priceRatio + slippage + profit;
   const ratioMinimum = configDefaults.transactionFees.priceRatioMinimum;

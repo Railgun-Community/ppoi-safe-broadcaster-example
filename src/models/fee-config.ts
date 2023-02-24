@@ -1,4 +1,4 @@
 export type FeeConfig = {
-        slippageBuffer: number,
-        profit: number,
-}
+  gasEstimateVarianceBuffer: number;
+  profit: number;
+};

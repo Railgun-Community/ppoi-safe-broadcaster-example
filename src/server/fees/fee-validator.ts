@@ -11,9 +11,10 @@ const comparePackagedFeeToCalculated = (
   packagedFee: BigNumber,
   calculatedFee: BigNumber,
 ) => {
-  const { slippageBuffer } = configNetworks[chain.type][chain.id].fees;
+  const { gasEstimateVarianceBuffer } =
+    configNetworks[chain.type][chain.id].fees;
   const calculatedFeeWithBuffer = calculatedFee
-    .mul(Math.round(10000 * (1 - slippageBuffer)))
+    .mul(Math.round(10000 * (1 - gasEstimateVarianceBuffer)))
     .div(10000);
   // logger.log(`calculatedFeeWithBuffer: ${calculatedFeeWithBuffer?.toString()}`);
   return packagedFee.gte(calculatedFeeWithBuffer);

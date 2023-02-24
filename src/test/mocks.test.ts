@@ -80,7 +80,7 @@ export const getMockNetwork = (): Network => {
       minBalanceForAvailability: 0.1,
     },
     fees: {
-      slippageBuffer: 0.03,
+      gasEstimateVarianceBuffer: 0.03,
       profit: 0.07,
     },
     proxyContract: '0x00' as RailgunProxyContract,
@@ -101,7 +101,7 @@ export const getMockGoerliNetwork = (): Network => {
       minBalanceForAvailability: 0.1,
     },
     fees: {
-      slippageBuffer: 0.05,
+      gasEstimateVarianceBuffer: 0.05,
       profit: 0.05,
     },
     proxyContract: RailgunProxyContract.EthereumGoerli,
