@@ -1,5 +1,5 @@
 import { ArtifactGetter, PublicInputs } from '@railgun-community/engine';
-import artifacts from 'railgun-community-circuit-artifacts';
+import artifacts from '@railgun-community/circuit-artifacts';
 
 type Artifact = {
   zkey: ArrayLike<number>;
