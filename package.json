@@ -12,15 +12,14 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "lint": "eslint . --ext .ts && tsc --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "lint": "eslint src --ext .ts && tsc --noEmit && tsc -p tsconfig.test.json --noEmit",
     "compile": "npm run clean && npm run lint && tsc && tsc-alias",
     "start": "node --max-old-space-size=8192 dist/main.js",
     "debug": "npm run compile && env-cmd -e all,debug npm start",
     "compile-test": "npm run clean && tsc -p tsconfig.test.json && tsc-alias",
     "test": "npm run compile-test && env-cmd --no-override -e all,test mocha 'src/**/__tests__/*.test.ts'",
     "test-coverage": "npm run compile-test && env-cmd --no-override -e all,test nyc mocha 'src/**/__tests__/*.test.ts'",
-    "copy-my-config": "./scripts/copy-my-config.sh",
-    "prepare": "npm run compile"
+    "copy-my-config": "./scripts/copy-my-config.sh"
   },
   "keywords": [],
   "author": "",
@@ -36,7 +35,7 @@
     "@noble/ed25519": "^1.7.1",
     "@railgun-community/engine": "4.1.0",
     "@railgun-community/shared-models": "4.1.0",
-    "railgun-community-circuit-artifacts": "https://npm.railgun.org/railgun-community-circuit-artifacts-0.0.1.tgz",
+    "railgun-community-circuit-artifacts": "https://npm-railgun.b-cdn.net/railgun-community-circuit-artifacts-0.0.1.tgz",
     "@walletconnect/jsonrpc-types": "^1.0.2",
     "@walletconnect/jsonrpc-utils": "^1.0.4",
     "axios": "1.2.3",
