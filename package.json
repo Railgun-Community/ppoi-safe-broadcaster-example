@@ -33,7 +33,7 @@
     "@ethersproject/transactions": "^5.7.0",
     "@ethersproject/units": "^5.7.0",
     "@noble/ed25519": "^1.7.1",
-    "@railgun-community/engine": "4.0.3-test",
+    "@railgun-community/engine": "4.0.14-test",
     "@railgun-community/shared-models": "4.0.4-test",
     "railgun-community-circuit-artifacts": "https://npm.railgun.org/railgun-community-circuit-artifacts-0.0.1.tgz",
     "@walletconnect/jsonrpc-types": "^1.0.2",

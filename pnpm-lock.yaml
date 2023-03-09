@@ -9,7 +9,7 @@ specifiers:
   '@ethersproject/transactions': ^5.7.0
   '@ethersproject/units': ^5.7.0
   '@noble/ed25519': ^1.7.1
-  '@railgun-community/engine': 4.0.3-test
+  '@railgun-community/engine': 4.0.14-test
   '@railgun-community/shared-models': 4.0.4-test
   '@types/chai': ^4.3.4
   '@types/chai-as-promised': ^7.1.5
@@ -61,7 +61,7 @@ dependencies:
   '@ethersproject/transactions': 5.7.0
   '@ethersproject/units': 5.7.0
   '@noble/ed25519': 1.7.1
-  '@railgun-community/engine': 4.0.3-test_chai@4.3.7
+  '@railgun-community/engine': 4.0.14-test_chai@4.3.7
   '@railgun-community/shared-models': 4.0.4-test_nsp7oodujdmjmqrjctxjpxvj7a
   '@walletconnect/jsonrpc-types': 1.0.2
   '@walletconnect/jsonrpc-utils': 1.0.4
@@ -801,8 +801,8 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@railgun-community/engine/4.0.3-test_chai@4.3.7:
-    resolution: {integrity: sha512-q7x2NN6d7VbAsrL1DjYxKOJmSotVMPDcGw+YaPc8LrXQx4XgGdDaYCZfoALwuI6OQgvJFjM/JAmTpctY5dSARg==}
+  /@railgun-community/engine/4.0.14-test_chai@4.3.7:
+    resolution: {integrity: sha512-i3SJe3XKgQ3U/wCODSCnrUSfZMdfoTLvk86/LpSRJQJ0e+23v7VMkaYn9T7NaXScYDh4vyvMfazINvpruZI/wg==}
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/abstract-provider': 5.7.0

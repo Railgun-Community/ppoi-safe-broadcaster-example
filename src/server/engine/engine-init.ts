@@ -34,6 +34,17 @@ export const initEngine = (optDebugger?: EngineDebugger) => {
       logger.error(error);
     },
   };
+
+  const tempEngineV3NewShieldEventBlockNumbersEVM = {
+    1: 16790263,
+    5: 8625000, // TODO: Goerli
+    56: 26313947,
+    137: 40143539,
+    42161: 68196853,
+    80001: 32311023,
+    421613: 10585000, // TODO: Arbi-Goerli
+  };
+
   engine = new RailgunEngine(
     'relayer',
     levelDB,
@@ -41,7 +52,7 @@ export const initEngine = (optDebugger?: EngineDebugger) => {
     quickSyncIPNS,
     configDefaults.debug.engine ? engineDebugger : undefined,
     false,
-    {},
+    tempEngineV3NewShieldEventBlockNumbersEVM,
   );
   engine.prover.setSnarkJSGroth16(groth16 as Groth16);
 };

@@ -48,6 +48,7 @@ module.exports = {
     'require-await': 0,
     '@typescript-eslint/no-floating-promises': 2,
     '@typescript-eslint/no-non-null-assertion': 2,
+    'no-warning-comments': 1,
     camelcase: 0,
   },
   ignorePatterns: ['dist'],
