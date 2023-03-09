@@ -9,6 +9,7 @@ specifiers:
   '@ethersproject/transactions': ^5.7.0
   '@ethersproject/units': ^5.7.0
   '@noble/ed25519': ^1.7.1
+  '@railgun-community/circuit-artifacts': https://npm-railgun.b-cdn.net/railgun-community-circuit-artifacts-0.0.1.tgz
   '@railgun-community/engine': 4.1.0
   '@railgun-community/shared-models': 4.1.0
   '@types/chai': ^4.3.4
@@ -43,7 +44,6 @@ specifiers:
   npm: ^9.3.1
   nyc: ^15.1.0
   prompt-sync: ^4.2.0
-  railgun-community-circuit-artifacts: https://npm-railgun.b-cdn.net/railgun-community-circuit-artifacts-0.0.1.tgz
   sinon: ^15.0.1
   snarkjs: ^0.5.0
   ts-node: ^10.9.1
@@ -62,6 +62,7 @@ dependencies:
   '@ethersproject/transactions': 5.7.0
   '@ethersproject/units': 5.7.0
   '@noble/ed25519': 1.7.1
+  '@railgun-community/circuit-artifacts': '@npm-railgun.b-cdn.net/railgun-community-circuit-artifacts-0.0.1.tgz'
   '@railgun-community/engine': 4.1.0_chai@4.3.7
   '@railgun-community/shared-models': 4.1.0_nsp7oodujdmjmqrjctxjpxvj7a
   '@walletconnect/jsonrpc-types': 1.0.2
@@ -74,7 +75,6 @@ dependencies:
   leveldown: 6.1.1
   npm: 9.3.1
   prompt-sync: 4.2.0
-  railgun-community-circuit-artifacts: '@npm-railgun.b-cdn.net/railgun-community-circuit-artifacts-0.0.1.tgz'
   snarkjs: 0.5.0
   tslib: 2.4.1
   web3-core: 1.8.1
