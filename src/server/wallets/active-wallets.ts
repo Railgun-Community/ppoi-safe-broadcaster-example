@@ -5,7 +5,6 @@ import debug from 'debug';
 import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
 import { resetArray } from '../../util/utils';
-import { getRailgunEngine } from '../engine/engine-init';
 import { isWalletAvailableWithEnoughFunds } from './available-wallets';
 import {
   convertToReadableGasTokenBalanceMap,
@@ -13,18 +12,13 @@ import {
 } from '../balances/balance-cache';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configNetworks from '../config/config-networks';
-import { subscribeToShieldedBalanceEvents } from '../balances/shielded-balance-cache';
 import { RelayerChain } from '../../models/chain-models';
-import {
-  AddressData,
-  decodeAddress,
-  RailgunWallet,
-} from '@railgun-community/engine';
+import { createRailgunWallet } from '@railgun-community/quickstart';
 
 const activeWallets: ActiveWallet[] = [];
 
-let railgunWallet: RailgunWallet;
-let railgunWalletAnyAddress: string;
+let railgunWalletAddress: string;
+let railgunWalletID: string;
 
 const dbg = debug('relayer:wallets');
 
@@ -37,19 +31,32 @@ export const derivationPathForIndex = (index: number) => {
 };
 
 const initRailgunWallet = async (mnemonic: string) => {
-  const engine = getRailgunEngine();
   const encryptionKey = configDefaults.engine.dbEncryptionKey;
   if (!encryptionKey) {
-    throw Error(
+    throw new Error(
       'DB_ENCRYPTION_KEY not set (use docker secret, or env-cmdrc for insecure testing)',
     );
   }
-  railgunWallet = await engine.createWalletFromMnemonic(
+
+  // TODO: Add creationBlockNumbers for optimized balance scanning.
+  const creationBlockNumbers: Optional<MapType<number>> = undefined;
+
+  const railgunWalletResponse = await createRailgunWallet(
     encryptionKey,
     mnemonic,
+    creationBlockNumbers,
   );
-  subscribeToShieldedBalanceEvents(railgunWallet);
-  railgunWalletAnyAddress = railgunWallet.getAddress();
+  if (railgunWalletResponse.error) {
+    throw new Error(
+      `Error creating RAILGUN wallet: ${railgunWalletResponse.error}`,
+    );
+  }
+  if (!railgunWalletResponse.railgunWalletInfo) {
+    throw new Error(`Error getting RAILGUN wallet info`);
+  }
+
+  railgunWalletAddress = railgunWalletResponse.railgunWalletInfo.railgunAddress;
+  railgunWalletID = railgunWalletResponse.railgunWalletInfo.id;
 };
 
 export const initWallets = async () => {
@@ -82,7 +89,7 @@ const printDebugWalletData = () => {
     'Loaded public wallets:',
     activeWallets.map((w) => w.address),
   );
-  dbg('Loaded private wallet:', railgunWalletAnyAddress);
+  dbg('Loaded private wallet:', railgunWalletAddress);
 
   configuredNetworkChains().forEach(async (chain) => {
     const gasTokenBalanceMap = await getActiveWalletGasTokenBalanceMapForChain(
@@ -99,23 +106,18 @@ const printDebugWalletData = () => {
   });
 };
 
-export const getRailgunWallet = (): RailgunWallet => {
-  if (!railgunWallet) {
+export const getRailgunWalletID = (): string => {
+  if (!railgunWalletID) {
     throw new Error('No Railgun wallet initialized.');
   }
-  return railgunWallet;
+  return railgunWalletID;
 };
 
-export const getRailgunAnyAddress = () => {
-  return railgunWalletAnyAddress;
-};
-
-export const getRailgunAddressData = (): AddressData => {
-  return decodeAddress(getRailgunAnyAddress());
-};
-
-export const getRailgunPrivateViewingKey = () => {
-  return getRailgunWallet().getViewingKeyPair().privateKey;
+export const getRailgunWalletAddress = (): string => {
+  if (!railgunWalletAddress) {
+    throw new Error('No Railgun wallet initialized.');
+  }
+  return railgunWalletAddress;
 };
 
 export const createEthersWallet = (

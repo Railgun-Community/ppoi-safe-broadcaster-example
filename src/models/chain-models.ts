@@ -1,4 +1,4 @@
-import { ChainType } from '@railgun-community/engine';
+import { ChainType } from '@railgun-community/shared-models';
 import { NetworkChainID } from '../server/config/config-chains';
 
 export type RelayerChain = {

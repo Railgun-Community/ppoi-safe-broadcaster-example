@@ -20,16 +20,16 @@ export function removeUndefineds<T>(a: Optional<T>[]): T[] {
   return newArray;
 }
 
-export const resetMapObject = (map: MapType<any> | NumMapType<any>) => {
+export const resetMapObject = <T>(map: MapType<T> | NumMapType<T>) => {
   for (const key in map) {
     if ({}.hasOwnProperty.call(map, key)) {
       // eslint-disable-next-line no-param-reassign
-      delete (map as any)[key];
+      delete (map as MapType<T>)[key];
     }
   }
 };
 
-export const resetArray = (a: any[]) => {
+export const resetArray = (a: object[]) => {
   // eslint-disable-next-line no-param-reassign
   a.length = 0;
 };

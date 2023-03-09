@@ -5,13 +5,15 @@ import {
   encryptJSONDataWithSharedKey,
   tryDecryptJSONDataWithSharedKey,
   EncryptedData,
-} from '@railgun-community/engine';
+  getRailgunWalletPrivateViewingKey,
+  getRailgunWalletAddressData,
+} from '@railgun-community/quickstart';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
 import { processTransaction } from '../../transactions/process-transaction';
 import {
-  getRailgunAddressData,
-  getRailgunPrivateViewingKey,
+  getRailgunWalletAddress,
+  getRailgunWalletID,
 } from '../../wallets/active-wallets';
 import { contentTopics } from '../topics';
 import { WakuMethodResponse } from '../waku-response';
@@ -47,7 +49,8 @@ export const transactMethod = async (
   }
   handledClientPubKeys.push(clientPubKey);
 
-  const viewingPrivateKey = getRailgunPrivateViewingKey();
+  const railgunWalletID = getRailgunWalletID();
+  const viewingPrivateKey = getRailgunWalletPrivateViewingKey(railgunWalletID);
   const sharedKey = await ed.getSharedSecret(viewingPrivateKey, clientPubKey);
 
   const decrypted = await tryDecryptData(encryptedData, sharedKey);
@@ -100,7 +103,10 @@ export const transactMethod = async (
       // Do nothing. No error response.
       return;
     }
-    const { viewingPublicKey } = getRailgunAddressData();
+
+    const railgunWalletAddress = getRailgunWalletAddress();
+    const { viewingPublicKey } =
+      getRailgunWalletAddressData(railgunWalletAddress);
     if (relayerViewingKey !== hexlify(viewingPublicKey)) {
       return undefined;
     }
@@ -160,7 +166,7 @@ export const transactMethod = async (
       devLog,
     );
     return resultResponse(id, chain, sharedKey, txResponse);
-  } catch (err: any) {
+  } catch (err) {
     dbg(err);
     return errorResponse(id, chain, sharedKey, err, devLog);
   }

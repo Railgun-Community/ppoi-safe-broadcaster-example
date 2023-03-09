@@ -49,7 +49,7 @@ export const generateSwapTransactions = async (
             swapQuote.quote,
           );
           return populatedSwap;
-        } catch (err: any) {
+        } catch (err) {
           dbg(
             `Could not populate transaction for token ${tokenAmount.tokenAddress} being swapped for top up: ${err.message}`,
           );

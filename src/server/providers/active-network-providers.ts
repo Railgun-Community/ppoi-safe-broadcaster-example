@@ -1,26 +1,33 @@
 import { FallbackProvider } from '@ethersproject/providers';
 import configNetworks from '../config/config-networks';
-import { createFallbackProviderFromJsonConfig } from './fallback-providers';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
-import { initEngineNetwork } from '../engine/engine-init';
-import { logger } from '../../util/logger';
+import { loadEngineProvider } from '../engine/engine-init';
 import { RelayerChain } from '../../models/chain-models';
+import {
+  createFallbackProviderFromJsonConfig,
+  FallbackProviderJsonConfig,
+  getAvailableProviderJSONs,
+} from '@railgun-community/shared-models';
+import debug from 'debug';
+
+const dbg = debug('relayer:networks');
 
 const activeNetworkProviders: NumMapType<NumMapType<FallbackProvider>> = {};
 
 // eslint-disable-next-line require-await
 export const initNetworkProviders = async (chains?: RelayerChain[]) => {
   const initChains = chains ?? configuredNetworkChains();
-  initChains.forEach(async (chain) => {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      await initNetworkProvider(chain);
-    } catch (err: any) {
-      logger.warn(
-        `Could not init network ${chain.type}:${chain.id}. ${err.message}`,
-      );
-    }
-  });
+  await Promise.all(
+    initChains.map(async (chain) => {
+      try {
+        await initNetworkProvider(chain);
+      } catch (err) {
+        throw new Error(
+          `Could not initialize network provider for chain: ${chain.type}:${chain.id} - ${err.message}`,
+        );
+      }
+    }),
+  );
 };
 
 /**
@@ -38,15 +45,25 @@ const initNetworkProvider = async (chain: RelayerChain) => {
       `Fallback Provider chain ID ${fallbackProviderConfig.chainId} does not match ID ${chain.id} for network: ${name}`,
     );
   }
+
+  const finalConfig: FallbackProviderJsonConfig = {
+    chainId: fallbackProviderConfig.chainId,
+    providers: [],
+  };
+  const possibleProviderJSONs = [...fallbackProviderConfig.providers];
+  const availableProviders = await getAvailableProviderJSONs(
+    possibleProviderJSONs,
+    dbg,
+  );
+  finalConfig.providers = availableProviders;
+
+  await loadEngineProvider(chain, fallbackProviderConfig);
   const fallbackProvider = createFallbackProviderFromJsonConfig(
     fallbackProviderConfig,
   );
-  if (!activeNetworkProviders[chain.type]) {
-    activeNetworkProviders[chain.type] = {};
-  }
+  activeNetworkProviders[chain.type] ??= {};
   activeNetworkProviders[chain.type][chain.id] = fallbackProvider;
-  await initEngineNetwork(chain, fallbackProvider);
-  logger.log(`Loaded network ${chain.type}:${chain.id}`);
+  dbg(`Loaded network ${chain.type}:${chain.id}`);
 };
 
 export const getProviderForNetwork = (

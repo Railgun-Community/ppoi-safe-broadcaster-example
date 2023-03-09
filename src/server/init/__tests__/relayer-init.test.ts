@@ -20,7 +20,9 @@ describe('relayer-init', () => {
   });
 
   it('Should run init scripts', async () => {
-    const stubInitEngine = sinon.stub(engineInitModule, 'initEngine').returns();
+    const stubInitEngine = sinon
+      .stub(engineInitModule, 'startEngine')
+      .returns();
     const stubInitWallets = sinon
       .stub(activeWalletsModule, 'initWallets')
       .resolves();

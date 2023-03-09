@@ -1,6 +1,6 @@
 import { TransactionRequest } from '@ethersproject/providers';
-import { ChainType } from '@railgun-community/engine';
 import {
+  ChainType,
   calculateGasPrice,
   EVMGasType,
   TransactionGasDetails,

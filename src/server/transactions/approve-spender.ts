@@ -1,7 +1,7 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { Contract, PopulatedTransaction } from 'ethers';
 import { TokenAmount } from '../../models/token-models';
-import { abiForChainToken } from '../abi/abi';
+import { ABI_ERC20 } from '../abi/abi';
 import { zeroXExchangeProxyContractAddress } from '../api/0x/0x-quote';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { ActiveWallet } from '../../models/wallet-models';
@@ -25,18 +25,17 @@ export const generateApprovalTransactions = async (
     await Promise.all(
       tokenAmounts.map(async (tokenAmount) => {
         try {
-          const abi = abiForChainToken(chain);
           const provider = getProviderForNetwork(chain);
           const contract = new Contract(
             tokenAmount.tokenAddress,
-            abi,
+            ABI_ERC20,
             provider,
           );
           const approvalAmount = tokenAmount.amount;
           const value = approvalAmount.toHexString();
           const spender = zeroXExchangeProxyContractAddress(chain);
           return await contract.populateTransaction.approve(spender, value);
-        } catch (err: any) {
+        } catch (err) {
           dbg(`Could not populate transaction for some token: ${err.message}`);
           return undefined;
         }

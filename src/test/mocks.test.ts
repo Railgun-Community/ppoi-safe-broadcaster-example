@@ -11,12 +11,6 @@ import { Network } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 import { Token, TokenConfig } from '../models/token-models';
 import { RelayerChain } from '../models/chain-models';
-import { randomBytes } from 'ethers/lib/utils';
-import {
-  RailgunEngine,
-  ViewingKeyPair,
-  getPublicViewingKey,
-} from '@railgun-community/engine';
 
 export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
   // @ts-ignore
@@ -28,23 +22,19 @@ export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
 
 export const MOCK_TOKEN_6_DECIMALS = '0x03738239';
 
-export const getMockFallbackProviderConfig = (): FallbackProviderJsonConfig => {
-  return {
-    chainId: 1,
-    providers: [
-      {
-        provider: 'https://eth.railgun.ch',
-        priority: 1,
-        weight: 1,
-      },
-      {
-        provider: 'https://cloudflare-eth.com',
-        priority: 2,
-        weight: 1,
-      },
-    ],
+export const getMockEthereumFallbackProviderConfig =
+  (): FallbackProviderJsonConfig => {
+    return {
+      chainId: 1,
+      providers: [
+        {
+          provider: 'https://cloudflare-eth.com',
+          priority: 2,
+          weight: 1,
+        },
+      ],
+    };
   };
-};
 
 const getMockGoerliFallbackProviderConfig = (): FallbackProviderJsonConfig => {
   return {
@@ -86,7 +76,7 @@ export const getMockNetwork = (): Network => {
     proxyContract: '0x00' as RailgunProxyContract,
     relayAdaptContract: '0x00' as RelayAdaptContract,
     coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
-    fallbackProviderConfig: getMockFallbackProviderConfig(),
+    fallbackProviderConfig: getMockEthereumFallbackProviderConfig(),
     priceTTLInMS: 5 * 60 * 1000,
   };
 };
@@ -137,18 +127,4 @@ export const getMockToken = (): Token => {
 export const getMockWalletAddress = (): string => {
   // Vitalik public address
   return '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B';
-};
-
-export const getMockWalletViewingPublicKey = (): Uint8Array => {
-  return RailgunEngine.decodeAddress(getMockWalletAddress()).viewingPublicKey;
-};
-
-export const mockViewingKeys = async () => {
-  const privateViewingKey = randomBytes(32);
-  const publicViewingKey = await getPublicViewingKey(privateViewingKey);
-  const mockViewingKeys: ViewingKeyPair = {
-    privateKey: privateViewingKey,
-    pubkey: publicViewingKey,
-  };
-  return mockViewingKeys;
 };

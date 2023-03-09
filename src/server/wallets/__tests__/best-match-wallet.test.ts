@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber, Wallet as EthersWallet } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
-import { initEngine } from '../../engine/engine-init';
+import { startEngine } from '../../engine/engine-init';
 import {
   createEthersWallet,
   derivationPathForIndex,
@@ -40,7 +40,7 @@ const addressForIndex = (index: number): string => {
 
 describe('best-match-wallet', () => {
   before(async () => {
-    initEngine();
+    startEngine();
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
       .resolves(BigNumber.from(10).pow(18));

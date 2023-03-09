@@ -1,24 +1,22 @@
 import {
-  EngineEvent,
-  WalletScannedEventData,
-  trim,
-  RailgunWallet,
-} from '@railgun-community/engine';
+  BalancesUpdatedCallback,
+  refreshRailgunBalances,
+} from '@railgun-community/quickstart';
 import { resetMapObject } from '../../util/utils';
 import { TokenAmount } from '../../models/token-models';
 import { BigNumber } from 'ethers';
-import { throwErr } from '../../util/promise-utils';
 import { RelayerChain } from '../../models/chain-models';
-import debug from 'debug';
+import { RailgunBalancesEvent } from '@railgun-community/shared-models';
+import { getRailgunWalletID } from '../wallets/active-wallets';
 
-const dbg = debug('relayer:shielded-cache');
+// const dbg = debug('relayer:balances:shielded');
 
 export type ShieldedCachedBalance = {
   tokenAmount: TokenAmount;
   updatedAt: number;
 };
 
-// {chainType: {chainID: {token: balance}[]}}
+// Type: {chainType: {chainID: {token: balance}[]}}
 const shieldedTokenBalanceCache: NumMapType<
   NumMapType<ShieldedCachedBalance[]>
 > = {};
@@ -27,39 +25,60 @@ export const resetShieldedTokenBalanceCache = () => {
   resetMapObject(shieldedTokenBalanceCache);
 };
 
-export const subscribeToShieldedBalanceEvents = (wallet: RailgunWallet) => {
-  wallet.on(
-    EngineEvent.WalletScanComplete,
-    ({ chain }: WalletScannedEventData) =>
-      updateCachedShieldedBalances(wallet, chain),
-  );
-};
+let balancePromiseResolve: Optional<() => void>;
 
-export const parseRailBalanceAddress = (tokenAddress: string): string => {
-  return `0x${trim(tokenAddress, 20)}`;
-};
-
-export const updateCachedShieldedBalances = async (
-  wallet: RailgunWallet,
+export const updateShieldedBalances = async (
   chain: RelayerChain,
-): Promise<void> => {
+  fullRescan: boolean,
+) => {
+  balancePromiseResolve = undefined;
+
+  const railgunWalletID = getRailgunWalletID();
+  const response = await refreshRailgunBalances(
+    chain,
+    railgunWalletID,
+    fullRescan,
+  );
+  if (response.error) {
+    throw new Error(`Could not update RAILGUN balances: ${response.error}`);
+  }
+  return new Promise<void>((resolve) => {
+    balancePromiseResolve = resolve;
+  });
+};
+
+// Called by RAILGUN Engine when balances updated.
+export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
+  chain,
+  erc20Amounts,
+  railgunWalletID: balanceRailgunWalletID,
+}: RailgunBalancesEvent) => {
+  const railgunWalletID = getRailgunWalletID();
+  if (railgunWalletID !== balanceRailgunWalletID) {
+    return;
+  }
+
   shieldedTokenBalanceCache[chain.type] ??= {};
   shieldedTokenBalanceCache[chain.type][chain.id] ??= [];
-  dbg(`Wallet balance scanned. Getting balances for chain ${chain.id}.`);
-  const balances = await wallet.balances(chain).catch(throwErr);
-  const tokenAddresses = Object.keys(balances);
-  tokenAddresses.forEach((railBalanceAddress) => {
-    const parsedAddress =
-      parseRailBalanceAddress(railBalanceAddress).toLowerCase();
+
+  erc20Amounts.forEach((erc20Amount) => {
     const tokenAmount: TokenAmount = {
-      tokenAddress: parsedAddress,
-      amount: BigNumber.from(balances[railBalanceAddress].balance.toString()),
+      tokenAddress: erc20Amount.tokenAddress,
+      amount: BigNumber.from(erc20Amount.amountString),
     };
     shieldedTokenBalanceCache[chain.type][chain.id].push({
       tokenAmount,
       updatedAt: Date.now(),
     });
   });
+
+  if (balancePromiseResolve) {
+    balancePromiseResolve();
+  }
+  // dbg(
+  //   `Shielded balances updated for ${chain.type}:${chain.id}`,
+  //   shieldedTokenBalanceCache[chain.type][chain.id],
+  // );
 };
 
 export const getPrivateTokenBalanceCache = (

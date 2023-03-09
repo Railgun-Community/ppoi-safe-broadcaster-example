@@ -1,11 +1,10 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { EVMGasType } from '@railgun-community/shared-models';
+import { EVMGasType , ChainType } from '@railgun-community/shared-models';
 import { GasHistoryPercentile } from '../../../models/gas-models';
 import { getGasDetailsForSpeed } from '../gas-by-speed';
 import { NetworkChainID } from '../../config/config-chains';
 import { RelayerChain } from '../../../models/chain-models';
-import { ChainType } from '@railgun-community/engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

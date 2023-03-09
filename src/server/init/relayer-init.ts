@@ -1,4 +1,4 @@
-import { getRailgunEngine, initEngine } from '../engine/engine-init';
+import { startEngine, stopEngine } from '../engine/engine-init';
 import { initWallets } from '../wallets/active-wallets';
 import { initNetworkProviders } from '../providers/active-network-providers';
 import {
@@ -14,15 +14,18 @@ import {
   initTopUpPoller,
   stopTopUpPolling,
 } from '../wallets/wallet-top-up-poller';
+import { setOnBalanceUpdateCallback } from '@railgun-community/quickstart';
+import { onBalanceUpdateCallback } from '../balances/shielded-balance-cache';
 
 export const initRelayerModules = async (forTest = false) => {
   if (!forTest) {
     myConfigOverrides && myConfigOverrides();
   }
   initSettingsDB();
-  initEngine();
+  startEngine();
   await initNetworkProviders();
   await Promise.all([initWallets(), initTokens()]);
+  setOnBalanceUpdateCallback(onBalanceUpdateCallback);
   initPricePoller();
   initTopUpPoller();
   logger.log('Relayer ready.');
@@ -35,6 +38,6 @@ export const uninitRelayerModules = () => {
   logger.log('stopping wallet top up polling');
   closeSettingsDB();
   logger.log('closed settings db');
-  getRailgunEngine().unload();
+  stopEngine();
   logger.log('unloaded engine');
 };

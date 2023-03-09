@@ -4,18 +4,18 @@ import { getMockProvider } from '../../../test/mocks.test';
 import {
   createEthersWallet,
   getActiveWallets,
-  getRailgunAnyAddress,
+  getRailgunWalletAddress,
 } from '../active-wallets';
 import { setupSingleTestWallet } from '../../../test/setup.test';
-import { initEngine } from '../../engine/engine-init';
-import { RailgunEngine } from '@railgun-community/engine';
+import { startEngine } from '../../engine/engine-init';
+import { getRailgunWalletAddressData } from '@railgun-community/quickstart';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('active-wallets', () => {
   before(async () => {
-    initEngine();
+    startEngine();
     await setupSingleTestWallet();
   });
 
@@ -35,18 +35,18 @@ describe('active-wallets', () => {
   });
 
   it('Should have Railgun wallet with valid address', () => {
-    const railgunAddress = getRailgunAnyAddress();
+    const railgunAddress = getRailgunWalletAddress();
     expect(railgunAddress).to.equal(
       '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53lama02nutwtcqc979wnce0qwly4y7w4rls5cq040g7z8eagshxrw5ajy990',
     );
   });
 
   it('Should check pubkey value matches across networks', () => {
-    const viewingPublicKeyAll = RailgunEngine.decodeAddress(
-      getRailgunAnyAddress(),
+    const viewingPublicKeyAll = getRailgunWalletAddressData(
+      getRailgunWalletAddress(),
     ).viewingPublicKey;
-    const viewingPublicKeyRopsten = RailgunEngine.decodeAddress(
-      getRailgunAnyAddress(),
+    const viewingPublicKeyRopsten = getRailgunWalletAddressData(
+      getRailgunWalletAddress(),
     ).viewingPublicKey;
     expect(viewingPublicKeyAll).to.deep.equal(
       new Uint8Array([

@@ -26,7 +26,7 @@ const pollTopUp = async () => {
         }
       }),
     );
-  } catch (err: any) {
+  } catch (err) {
     logger.warn('top up error');
     logger.error(err);
   } finally {

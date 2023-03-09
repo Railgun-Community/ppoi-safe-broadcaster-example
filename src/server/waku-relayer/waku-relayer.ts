@@ -3,17 +3,19 @@ import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
 import { BigNumber } from 'ethers';
 import {
   fromUTF8String,
-  hexlify,
-  hexStringToBytes,
-  RailgunWallet,
-} from '@railgun-community/engine';
+  signWithWalletViewingKey,
+} from '@railgun-community/quickstart';
 import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
 import { delay } from '../../util/promise-utils';
 import { contentTopics } from './topics';
-import { numAvailableWallets } from '../wallets/active-wallets';
+import {
+  getRailgunWalletAddress,
+  getRailgunWalletID,
+  numAvailableWallets,
+} from '../wallets/active-wallets';
 import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
 import configNetworks from '../config/config-networks';
@@ -48,7 +50,9 @@ export class WakuRelayer {
 
   subscribedContentTopics: string[];
 
-  walletRailgunAddress: string;
+  railgunWalletAddress: string;
+
+  railgunWalletID: string;
 
   identifier: Optional<string> = configDefaults.instanceIdentifier.length
     ? configDefaults.instanceIdentifier
@@ -56,19 +60,13 @@ export class WakuRelayer {
 
   options: WakuRelayerOptions;
 
-  wallet: RailgunWallet;
-
   methods: MapType<JsonRPCMessageHandler> = {
     [WakuMethodNames.Transact]: transactMethod,
   };
 
   stopping = false;
 
-  constructor(
-    client: WakuApiClient,
-    wallet: RailgunWallet,
-    options: WakuRelayerOptions,
-  ) {
+  constructor(client: WakuApiClient, options: WakuRelayerOptions) {
     const chainIDs = configuredNetworkChains();
     this.client = client;
     this.options = options;
@@ -76,17 +74,16 @@ export class WakuRelayer {
     this.subscribedContentTopics = [
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
-    this.wallet = wallet;
-    this.walletRailgunAddress = wallet.getAddress();
+    this.railgunWalletAddress = getRailgunWalletAddress();
+    this.railgunWalletID = getRailgunWalletID();
     this.dbg(this.subscribedContentTopics);
   }
 
   static async init(
     client: WakuApiClient,
-    wallet: RailgunWallet,
     options: WakuRelayerOptions,
   ): Promise<WakuRelayer> {
-    const relayer = new WakuRelayer(client, wallet, options);
+    const relayer = new WakuRelayer(client, options);
     await relayer.subscribe();
     return relayer;
   }
@@ -163,15 +160,16 @@ export class WakuRelayer {
       // client can't rely on message timestamp to calculate expiration
       feeExpiration: Date.now() + this.options.feeExpiration,
       feesID: feeCacheID,
-      railgunAddress: this.walletRailgunAddress,
+      railgunAddress: this.railgunWalletAddress,
       identifier: this.identifier,
       availableWallets,
       version: getRelayerVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
     };
     const message = fromUTF8String(JSON.stringify(data));
-    const signature = hexlify(
-      await this.wallet.signWithViewingKey(hexStringToBytes(message)),
+    const signature = await signWithWalletViewingKey(
+      this.railgunWalletID,
+      message,
     );
     this.dbg(
       `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${

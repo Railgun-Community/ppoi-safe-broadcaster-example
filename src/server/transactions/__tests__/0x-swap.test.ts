@@ -17,7 +17,7 @@ import {
   testChainEthereum,
   testChainGoerli,
 } from '../../../test/setup.test';
-import { initEngine } from '../../engine/engine-init';
+import { startEngine } from '../../engine/engine-init';
 import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
 import { delay } from '../../../util/promise-utils';
 import * as ExecuteTransactionModule from '../execute-transaction';
@@ -60,7 +60,7 @@ const MOCK_CHAIN = testChainEthereum();
 
 describe('0x-swap', () => {
   before(async () => {
-    initEngine();
+    startEngine();
     initSettingsDB();
     await clearSettingsDB();
     await setupSingleTestWallet();

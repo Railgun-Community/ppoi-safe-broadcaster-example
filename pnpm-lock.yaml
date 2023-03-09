@@ -9,9 +9,8 @@ specifiers:
   '@ethersproject/transactions': ^5.7.0
   '@ethersproject/units': ^5.7.0
   '@noble/ed25519': ^1.7.1
-  '@railgun-community/circuit-artifacts': https://npm-railgun.b-cdn.net/railgun-community-circuit-artifacts-0.0.1.tgz
-  '@railgun-community/engine': 4.1.0
-  '@railgun-community/shared-models': 4.1.0
+  '@railgun-community/quickstart': 4.1.3
+  '@railgun-community/shared-models': 4.1.3
   '@types/chai': ^4.3.4
   '@types/chai-as-promised': ^7.1.5
   '@types/debug': ^4.1.7
@@ -62,9 +61,8 @@ dependencies:
   '@ethersproject/transactions': 5.7.0
   '@ethersproject/units': 5.7.0
   '@noble/ed25519': 1.7.1
-  '@railgun-community/circuit-artifacts': '@npm-railgun.b-cdn.net/railgun-community-circuit-artifacts-0.0.1.tgz'
-  '@railgun-community/engine': 4.1.0_chai@4.3.7
-  '@railgun-community/shared-models': 4.1.0_nsp7oodujdmjmqrjctxjpxvj7a
+  '@railgun-community/quickstart': 4.1.3_ju3ajxejw32lyvr2mnfrt6fkbm
+  '@railgun-community/shared-models': 4.1.3_nsp7oodujdmjmqrjctxjpxvj7a
   '@walletconnect/jsonrpc-types': 1.0.2
   '@walletconnect/jsonrpc-utils': 1.0.4
   axios: 1.2.3_debug@4.3.4
@@ -830,8 +828,47 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@railgun-community/shared-models/4.1.0_nsp7oodujdmjmqrjctxjpxvj7a:
-    resolution: {integrity: sha512-C7SIpUmkQrCDWx4s83fUhmS7WD9Bn34OXyqpWakHIl93arqgRBX6V+MntXPgwb+OO7SowJEi6lhCewJoqRZPlg==}
+  /@railgun-community/quickstart/4.1.3_ju3ajxejw32lyvr2mnfrt6fkbm:
+    resolution: {integrity: sha512-yCp3/Gp0VBoZDpHLEGGKwH3XyeiWOPLYPUInPkanxUZbFRfROCaJ3CeqCKoFaR/yEHutff3OIjUXjbnn+lH2QQ==}
+    peerDependencies:
+      '@ethersproject/address': ^5.7.0
+      '@ethersproject/bignumber': ^5.7.0
+      '@ethersproject/contracts': ^5.5.0
+      '@ethersproject/hdnode': ^5.7.0
+      '@ethersproject/providers': ^5.7.2
+      '@ethersproject/wallet': ^5.7.0
+    dependencies:
+      '@ethersproject/bignumber': 5.7.0
+      '@ethersproject/contracts': 5.7.0
+      '@ethersproject/providers': 5.7.2
+      '@noble/ed25519': 1.7.1
+      '@railgun-community/engine': 4.1.0_chai@4.3.7
+      '@railgun-community/shared-models': 4.1.1_nsp7oodujdmjmqrjctxjpxvj7a
+      axios: 0.27.2_debug@4.3.4
+      brotli: 1.3.3
+    transitivePeerDependencies:
+      - bufferutil
+      - chai
+      - debug
+      - encoding
+      - supports-color
+      - utf-8-validate
+    dev: false
+
+  /@railgun-community/shared-models/4.1.1_nsp7oodujdmjmqrjctxjpxvj7a:
+    resolution: {integrity: sha512-ZC5nVdsye0sfjdm9em4NQFkhoBVuiqeXbnvB89FLF+ma6AcWL68E1HOUx8QZ8zZ60SLvGgD5CpECQDjwpNl+kQ==}
+    peerDependencies:
+      '@ethersproject/bignumber': ^5.7.0
+      '@ethersproject/providers': ^5.7.1
+    dependencies:
+      '@ethersproject/bignumber': 5.7.0
+      '@ethersproject/contracts': 5.7.0
+      '@ethersproject/providers': 5.7.2
+      '@ethersproject/transactions': 5.7.0
+    dev: false
+
+  /@railgun-community/shared-models/4.1.3_nsp7oodujdmjmqrjctxjpxvj7a:
+    resolution: {integrity: sha512-J3qSKrz/FX1h12/cDmxUPWpBnzZfCecaNCyqMs+Abk8w/rEBeQ67Za7jhuhOU+QyWDNDOCZmZI1i5k5ryao0Jw==}
     peerDependencies:
       '@ethersproject/bignumber': ^5.7.0
       '@ethersproject/providers': ^5.7.1
@@ -1395,6 +1432,15 @@ packages:
     resolution: {integrity: sha512-NmWvPnx0F1SfrQbYwOi7OeaNGokp9XhzNioJ/CSBs8Qa4vxug81mhJEAVZwxXuBmYB5KDRfMq/F3RR0BIU7sWg==}
     dev: false
 
+  /axios/0.27.2_debug@4.3.4:
+    resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
+    dependencies:
+      follow-redirects: 1.15.2_debug@4.3.4
+      form-data: 4.0.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
   /axios/1.2.3_debug@4.3.4:
     resolution: {integrity: sha512-pdDkMYJeuXLZ6Xj/Q5J3Phpe+jbGdsSzlQaFVkMQzRUL05+6+tetX8TV3p4HrU4kzuO9bt+io/yGQxuyxA/xcw==}
     dependencies:
@@ -1942,7 +1988,7 @@ packages:
     dev: true
 
   /cookie-signature/1.0.6:
-    resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
+    resolution: {integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw=}
     dev: false
 
   /cookie/0.5.0:
@@ -2241,7 +2287,7 @@ packages:
     dev: false
 
   /ee-first/1.1.1:
-    resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
+    resolution: {integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=}
     dev: false
 
   /ejs/3.1.8:
@@ -3020,7 +3066,7 @@ packages:
     dev: false
 
   /fresh/0.5.2:
-    resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
+    resolution: {integrity: sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=}
     engines: {node: '>= 0.6'}
     dev: false
 
@@ -4006,12 +4052,12 @@ packages:
     dev: false
 
   /media-typer/0.3.0:
-    resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
+    resolution: {integrity: sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=}
     engines: {node: '>= 0.6'}
     dev: false
 
   /merge-descriptors/1.0.1:
-    resolution: {integrity: sha512-cCi6g3/Zr1iqQi6ySbseM1Xvooa98N0w31jzUYrXPX2xqObmFGHJ0tQ5u74H3mVh7wLouTseZyYIq39g8cNp1w==}
+    resolution: {integrity: sha1-sAqqVW3YtEVoFQ7J0blT8/kMu2E=}
     dev: false
 
   /merge2/1.4.1:
@@ -5573,7 +5619,7 @@ packages:
     dev: false
 
   /utils-merge/1.0.1:
-    resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
+    resolution: {integrity: sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=}
     engines: {node: '>= 0.4.0'}
     dev: false
 
@@ -6143,14 +6189,6 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
-
-  '@npm-railgun.b-cdn.net/railgun-community-circuit-artifacts-0.0.1.tgz':
-    resolution: {tarball: https://npm-railgun.b-cdn.net/railgun-community-circuit-artifacts-0.0.1.tgz}
-    name: '@railgun-community/circuit-artifacts'
-    version: 0.0.1
-    dependencies:
-      brotli: 1.3.3
-    dev: false
 
   github.com/hsg88/circomlibjs/fee5b3c479caa3db1e34cbfdedad763d74277844:
     resolution: {tarball: https://codeload.github.com/hsg88/circomlibjs/tar.gz/fee5b3c479caa3db1e34cbfdedad763d74277844}

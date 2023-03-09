@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import configDefaults from '../server/config/config-defaults';
 import { DebugLevel } from '../models/debug-models';
 import DebugWrapper from './debug-wrapper';

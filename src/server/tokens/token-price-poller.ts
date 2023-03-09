@@ -36,7 +36,7 @@ const pollPrices = async (source: TokenPriceSource) => {
     configTokenPriceRefresher.tokenPriceRefreshers[source];
   try {
     await pullAndCacheCurrentPricesForAllNetworks(tokenPriceRefresher);
-  } catch (err: any) {
+  } catch (err) {
     logger.warn('pollPrices error');
     logger.error(err);
   } finally {

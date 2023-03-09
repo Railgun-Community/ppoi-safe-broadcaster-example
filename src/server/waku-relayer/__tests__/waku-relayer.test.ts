@@ -8,14 +8,14 @@ import { BigNumber } from 'ethers';
 import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import {
-  verifyED25519,
+  verifyRelayerSignature,
   hexlify,
-  hexStringToBytes,
-  randomHex,
   toUTF8String,
   tryDecryptJSONDataWithSharedKey,
-  RailgunEngine,
-} from '@railgun-community/engine';
+  getRailgunWalletPrivateViewingKey,
+  getRandomBytes,
+  getRailgunWalletAddressData,
+} from '@railgun-community/quickstart';
 import { WakuMethodNames, WakuRelayer, WAKU_TOPIC } from '../waku-relayer';
 import {
   WakuApiClient,
@@ -31,7 +31,7 @@ import {
   setupTestNetwork,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { initEngine } from '../../engine/engine-init';
+import { startEngine } from '../../engine/engine-init';
 import configDefaults from '../../config/config-defaults';
 import {
   cacheTokenPriceForNetwork,
@@ -49,11 +49,6 @@ import {
   getMockSerializedTransaction,
 } from '../../../test/mocks.test';
 import { initTokens } from '../../tokens/network-tokens';
-import {
-  getRailgunAddressData,
-  getRailgunPrivateViewingKey,
-  getRailgunWallet,
-} from '../../wallets/active-wallets';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import {
@@ -68,6 +63,10 @@ import {
   RelayerRawParamsTransact,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../../util/relayer-version';
+import {
+  getRailgunWalletAddress,
+  getRailgunWalletID,
+} from '../../wallets/active-wallets';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -95,7 +94,7 @@ const handleHTTPPost = async (url: string, data?: unknown) => {
 describe('waku-relayer', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
-    initEngine();
+    startEngine();
     await setupSingleTestWallet();
     network = setupTestNetwork();
     configNetworks[chain.type][chain.id] = getMockNetwork();
@@ -111,8 +110,7 @@ describe('waku-relayer', () => {
 
     client = new WakuApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
-    const wallet = getRailgunWallet();
-    wakuRelayer = await WakuRelayer.init(client, wallet, {
+    wakuRelayer = await WakuRelayer.init(client, {
       topic: WAKU_TOPIC,
       feeExpiration: configDefaults.transactionFees.feeExpirationInMS,
     });
@@ -138,20 +136,6 @@ describe('waku-relayer', () => {
     resetGasTokenBalanceCache();
     restoreGasBalanceStub();
   });
-
-  /*
-  it('Should re-subscribe when unsubscribed', async () => {
-    const handleHTTPPost = () => {
-      return {
-        error: {
-          code: -32000,
-          message: 'get_waku_v2_relay_v1_messsages raised an exception',
-          data: 'not subscribed to topic: /waku/2/default-waku/proto',
-        },
-      };
-    };
-  });
-  */
 
   it('Should test fee broadcast', async () => {
     const tokenPrice = 1.067;
@@ -207,21 +191,25 @@ describe('waku-relayer', () => {
     expect(data.railgunAddress).to.equal(
       '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53lama02nutwtcqc979wnce0qwly4y7w4rls5cq040g7z8eagshxrw5ajy990',
     );
-    const decodedRailgunAddress = RailgunEngine.decodeAddress(
+    const decodedRailgunAddress = getRailgunWalletAddressData(
       data.railgunAddress,
     );
-    const isValid = await verifyED25519(
-      hexStringToBytes(message.data),
-      hexStringToBytes(signature),
+    const isValid = await verifyRelayerSignature(
+      signature,
+      message.data,
       decodedRailgunAddress.viewingPublicKey,
     );
     expect(isValid).to.be.true;
   }).timeout(5000);
 
   it('Should encrypt and decrypt data using shared keys', async () => {
-    const relayerPrivateKey = getRailgunPrivateViewingKey();
+    const railgunWalletID = getRailgunWalletID();
+    const relayerPrivateKey =
+      getRailgunWalletPrivateViewingKey(railgunWalletID);
     const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
-    const { viewingPublicKey } = getRailgunAddressData();
+    const railgunWalletAddress = getRailgunWalletAddress();
+    const { viewingPublicKey } =
+      getRailgunWalletAddressData(railgunWalletAddress);
 
     const data: RelayerRawParamsTransact = {
       chainID: chain.id,
@@ -235,7 +223,7 @@ describe('waku-relayer', () => {
       minVersion: getRelayerVersion(),
       maxVersion: getRelayerVersion(),
     };
-    const randomPrivKey = randomHex(32);
+    const randomPrivKey = getRandomBytes(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
     const encryptedData = encryptResponseData(data, sharedKey);
@@ -257,9 +245,13 @@ describe('waku-relayer', () => {
 
     const contentTopic = contentTopics.transact(chain);
 
-    const relayerPrivateKey = getRailgunPrivateViewingKey();
+    const railgunWalletID = getRailgunWalletID();
+    const relayerPrivateKey =
+      getRailgunWalletPrivateViewingKey(railgunWalletID);
     const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
-    const { viewingPublicKey } = getRailgunAddressData();
+    const railgunWalletAddress = getRailgunWalletAddress();
+    const { viewingPublicKey } =
+      getRailgunWalletAddressData(railgunWalletAddress);
 
     const data: RelayerRawParamsTransact = {
       chainID: chain.id,
@@ -273,7 +265,7 @@ describe('waku-relayer', () => {
       minVersion: getRelayerVersion(),
       maxVersion: getRelayerVersion(),
     };
-    const randomPrivKey = randomHex(32);
+    const randomPrivKey = getRandomBytes(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
     const clientPubKey = hexlify(randomPubKeyUint8Array);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);

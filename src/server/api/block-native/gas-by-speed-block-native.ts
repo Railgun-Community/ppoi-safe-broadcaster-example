@@ -1,9 +1,8 @@
-import { EVMGasType } from '@railgun-community/shared-models';
+import { EVMGasType , ChainType } from '@railgun-community/shared-models';
 import axios from 'axios';
 import { parseUnits } from '@ethersproject/units';
 import debug from 'debug';
 import configDefaults from '../../config/config-defaults';
-import { ChainType } from '@railgun-community/engine';
 import { RelayerChain } from '../../../models/chain-models';
 import { NetworkChainID } from '../../config/config-chains';
 import {

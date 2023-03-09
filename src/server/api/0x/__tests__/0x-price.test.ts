@@ -32,6 +32,7 @@ import {
   testChainEthereum,
   testChainGoerli,
 } from '../../../../test/setup.test';
+import { startEngine } from '../../../engine/engine-init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -66,6 +67,8 @@ const validatePriceRefresherOutput = (chain: RelayerChain) => {
 
 describe('0x-price', () => {
   before(async () => {
+    startEngine();
+
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
     configNetworks[chainRopsten.type][chainRopsten.id] = ropstenNetwork;
     await initNetworkProviders();

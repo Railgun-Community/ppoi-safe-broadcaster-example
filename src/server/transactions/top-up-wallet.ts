@@ -6,10 +6,9 @@ import configNetworks from '../config/config-networks';
 import { networkTokens } from '../tokens/network-tokens';
 import {
   createEthersWallet,
-  getRailgunWallet,
+  getRailgunWalletID,
 } from '../wallets/active-wallets';
 import { setWalletAvailability } from '../wallets/available-wallets';
-import { getRailgunEngine } from '../engine/engine-init';
 import { unshieldTokens } from './unshield-tokens';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getCurrentNonce, waitForTx, waitForTxs } from './execute-transaction';
@@ -19,7 +18,7 @@ import { swapZeroX } from './0x-swap';
 import {
   getPrivateTokenBalanceCache,
   ShieldedCachedBalance,
-  updateCachedShieldedBalances,
+  updateShieldedBalances,
 } from '../balances/shielded-balance-cache';
 import { removeUndefineds } from '../../util/utils';
 import { RelayerChain } from '../../models/chain-models';
@@ -48,26 +47,27 @@ const getPublicTokenAmountsAfterUnwrap = async (
 const getShieldedTokenAmountsForChain = async (
   chain: RelayerChain,
 ): Promise<ShieldedCachedBalance[]> => {
-  const wallet = getRailgunWallet();
-  await updateCachedShieldedBalances(wallet, chain);
+  const fullRescan = false;
+  await updateShieldedBalances(chain, fullRescan);
   const shieldedBalancesForChain = getPrivateTokenBalanceCache(chain);
   return shieldedBalancesForChain;
 };
 
-export const filterTopUpTokens = (
-  topUpTokens: TokenAmount[],
-): TokenAmount[] => {
-  // const desiredTopUpTokens = [];
-  // const desiredTopUpTokens: Optiona<TokenAmount>[] = await Promise.all (
-  //   topUpTokens.map( async (tokenAmount) => {
-  //       if (!configDefaults.topUps.shouldNotSwap.includes(tokenAmount.tokenAddress)){
-  //         return
-  //       }
-  //     }
-  //   )
-  // )
-  return [topUpTokens[0]];
-};
+// Currently unused.
+// export const filterTopUpTokens = (
+//   topUpTokens: TokenAmount[],
+// ): TokenAmount[] => {
+//   // const desiredTopUpTokens = [];
+//   // const desiredTopUpTokens: Optiona<TokenAmount>[] = await Promise.all (
+//   //   topUpTokens.map( async (tokenAmount) => {
+//   //       if (!configDefaults.topUps.shouldNotSwap.includes(tokenAmount.tokenAddress)){
+//   //         return
+//   //       }
+//   //     }
+//   //   )
+//   // )
+//   return [topUpTokens[0]];
+// };
 
 export const getTopUpTokenAmountsForChain = async (
   chain: RelayerChain,
@@ -121,9 +121,7 @@ export const topUpWallet = async (
     `Begin top up for wallet with address ${topUpWallet.address} and index ${topUpWallet.index} on chain ${chain.type}:${chain.id}`,
   );
 
-  // get relevant data for transactions
-  const railWallet = getRailgunWallet();
-  const { prover } = getRailgunEngine();
+  const railgunWalletID = getRailgunWalletID();
 
   setWalletAvailability(topUpWallet, chain, false);
   const provider = getProviderForNetwork(chain);
@@ -132,11 +130,9 @@ export const topUpWallet = async (
 
   // unshield tokens intended to swap
   const batchResponse = await unshieldTokens(
-    prover,
-    railWallet,
+    railgunWalletID,
     configDefaults.engine.dbEncryptionKey,
     topUpWallet.address,
-    false, // allowOveride
     topUpTokens,
     chain,
   );

@@ -5,7 +5,7 @@ export const delay = (delayInMS: number): Promise<void> => {
   });
 };
 
-export const throwErr = (err: any) => {
+export const throwErr = (err: Error) => {
   throw err;
 };
 

@@ -33,7 +33,7 @@ export const validateMinGasPrice = async (
       // Valid gas price.
       return;
     }
-  } catch (err: any) {
+  } catch (err) {
     logger.log(`error getting current gas price: ${err.message}`);
   }
 

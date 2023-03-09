@@ -17,7 +17,7 @@ import {
 import { getMockWalletAddress } from '../../../test/mocks.test';
 import { getActiveWallets, initWallets } from '../../wallets/active-wallets';
 import { delay } from '../../../util/promise-utils';
-import { initEngine } from '../../engine/engine-init';
+import { startEngine } from '../../engine/engine-init';
 import { testChainEthereum } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
@@ -34,8 +34,8 @@ const shouldUpdateEthWalletBalance = (address: string) => {
 describe('balance-cache', () => {
   // name of the test suite
   before(async () => {
-    // before running any test - initEngine (the sdk), init the wallets, init network providers, and some helperfunrctions
-    initEngine();
+    // before running any test - startEngine (the sdk), init the wallets, init network providers, and some helperfunrctions
+    startEngine();
     await initWallets();
     await initNetworkProviders();
     resetGasTokenBalanceCache();

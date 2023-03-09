@@ -42,7 +42,7 @@ export type ZeroXFormattedQuoteData = {
 };
 
 export const zeroXExchangeProxyContractAddress = (chain: RelayerChain) => {
-  const addresses = getContractAddressesForChainOrThrow(chain.id as number);
+  const addresses = getContractAddressesForChainOrThrow(Number(chain.id));
   return addresses.exchangeProxy;
 };
 
@@ -197,16 +197,14 @@ const formatApiError = (err: AxiosError<any>): string => {
   logger.error(err);
 
   try {
-    if (
-      err.response?.data?.validationErrors[0].reason ===
-      'INSUFFICIENT_ASSET_LIQUIDITY'
-    ) {
+    const data = err.response?.data;
+    const firstValidationErrorReason = data?.validationErrors[0].reason;
+
+    if (firstValidationErrorReason === 'INSUFFICIENT_ASSET_LIQUIDITY') {
       return 'Insufficient liquidity. One of the selected tokens is not supported by the 0x Exchange.';
     }
 
-    return `${err.response?.data.reason}: ${err.response?.data.validationErrors
-      .map((e: any) => e.reason)
-      .join(', ')}.`;
+    return `0x API: ${err.response?.data.reason}. ${firstValidationErrorReason}.`;
   } catch {
     return '0x API request failed.';
   }

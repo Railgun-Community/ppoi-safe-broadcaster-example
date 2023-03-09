@@ -1,4 +1,4 @@
-import { ChainType } from '@railgun-community/engine';
+import { ChainType } from '@railgun-community/shared-models';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { setupTestNetwork } from '../../../test/setup.test';

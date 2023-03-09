@@ -44,13 +44,13 @@ export class WakuApiClient {
     try {
       const response = await this.http.post('/', req);
       return response.data;
-    } catch (e: any) {
+    } catch (err) {
       if (retry < MAX_RETRIES) {
-        this.dbg('Error posting to relay-api. Retrying.', req, e.message);
+        this.dbg('Error posting to relay-api. Retrying.', req, err.message);
         return this.request(method, params, retry + 1);
       }
-      this.dbg('Error posting to relay-api', req, e.message);
-      throw Error(e.message);
+      this.dbg('Error posting to relay-api', req, err.message);
+      throw Error(err.message);
     }
   }
 

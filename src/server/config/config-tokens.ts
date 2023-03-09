@@ -16,7 +16,7 @@ import {
   STABLES_ARBITRUM,
 } from './config-token-sets';
 import { NetworkChainID } from './config-chains';
-import { ChainType } from '@railgun-community/engine';
+import { ChainType } from '@railgun-community/shared-models';
 
 /**
  *

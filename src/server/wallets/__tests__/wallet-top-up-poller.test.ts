@@ -21,7 +21,7 @@ import {
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
-import { initEngine } from '../../engine/engine-init';
+import { startEngine } from '../../engine/engine-init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -35,7 +35,7 @@ describe('wallet-top-up-poller', () => {
     configDefaults.topUps.shouldTopUp = true;
     resetGasTokenBalanceCache();
     resetAvailableWallets(MOCK_CHAIN);
-    initEngine();
+    startEngine();
     await setupSingleTestWallet();
   });
 

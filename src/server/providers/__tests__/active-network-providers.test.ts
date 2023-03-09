@@ -1,12 +1,11 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import configNetworks from '../../config/config-networks';
 import {
   getProviderForNetwork,
   initNetworkProviders,
 } from '../active-network-providers';
-import { getMockFallbackProviderConfig } from '../../../test/mocks.test';
 import { testChainEthereum } from '../../../test/setup.test';
+import { startEngine } from '../../engine/engine-init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -15,8 +14,7 @@ const MOCK_CHAIN = testChainEthereum();
 
 describe('active-network-providers', () => {
   before(async () => {
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fallbackProviderConfig =
-      getMockFallbackProviderConfig();
+    startEngine();
     await initNetworkProviders();
   });
 

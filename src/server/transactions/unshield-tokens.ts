@@ -1,118 +1,31 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import {
-  Prover,
-  RailgunWallet,
-  TransactionStruct,
-  TransactionBatch,
-  RailgunSmartWalletContract,
-  getTokenDataERC20,
-} from '@railgun-community/engine';
+  populateProvedUnshield,
+  generateUnshieldProof,
+  gasEstimateForUnprovenUnshield,
+} from '@railgun-community/quickstart';
 import {
-  Chain,
+  deserializeTransaction,
   getEVMGasTypeForTransaction,
   networkForChain,
+  RailgunERC20AmountRecipient,
+  serializeTransactionGasDetails,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import debug from 'debug';
-import { PopulatedTransaction } from 'ethers';
+import { BigNumber } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { TokenAmount } from '../../models/token-models';
+import { getStandardGasDetails } from '../fees/gas-by-speed';
 import { getEstimateGasDetailsPublic } from '../fees/gas-estimate';
-import { getRailgunEngine } from '../engine/engine-init';
 import { executeTransaction } from './execute-transaction';
 
-const dbg = debug('relayer:unshield-tokens');
-
-export const generateUnshieldTransactions = async (
-  prover: Prover,
-  railgunWallet: RailgunWallet,
-  encryptionKey: string,
+export const generateUnshieldTransaction = async (
+  railgunWalletID: string,
+  dbEncryptionKey: string,
   toWalletAddress: string,
-  allowOverride: boolean,
-  tokenAmounts: TokenAmount[],
+  erc20Amounts: TokenAmount[],
   chain: RelayerChain,
-): Promise<TransactionStruct[]> => {
-  const txBatchPromises: Promise<TransactionStruct[]>[] = [];
-
-  for (const tokenAmount of tokenAmounts) {
-    const transactionBatch = new TransactionBatch(chain);
-
-    transactionBatch.addUnshieldData({
-      toAddress: toWalletAddress,
-      value: tokenAmount.amount.toBigInt(),
-      tokenData: getTokenDataERC20(tokenAmount.tokenAddress),
-      allowOverride,
-    });
-
-    txBatchPromises.push(
-      transactionBatch.generateTransactions(
-        prover,
-        railgunWallet,
-        encryptionKey,
-        () => {}, // progressCallback
-      ),
-    );
-  }
-  const txBatches: TransactionStruct[][] = [];
-
-  // do not require success of *all* batch unshields; return succesful and report failures
-  const results = await Promise.allSettled(txBatchPromises);
-  results.forEach((result, index) => {
-    if (result.status === 'fulfilled') {
-      txBatches.push(result.value);
-    } else if (result.status === 'rejected') {
-      dbg(
-        `Error generating batch unshield tx of ${tokenAmounts[index].tokenAddress}: ${result.reason}`,
-      );
-    }
-  });
-
-  return txBatches.flat();
-};
-
-export const generatePopulatedUnshieldTransact = async (
-  txs: TransactionStruct[],
-  chain: Chain,
-): Promise<PopulatedTransaction> => {
-  const railContract = getRailgunSmartWalletContractForNetwork(chain);
-  const populatedTransaction = await railContract.transact(txs);
-  return populatedTransaction;
-};
-
-export const getRailgunSmartWalletContractForNetwork = (
-  chain: RelayerChain,
-): RailgunSmartWalletContract => {
-  const proxyContract =
-    getRailgunEngine().railgunSmartWalletContracts[chain.type][chain.id];
-  if (!proxyContract) {
-    throw new Error(
-      `RAILGUN Smart Wallet contract not yet loaded for network with chain ${chain.type}:${chain.id}`,
-    );
-  }
-  return proxyContract;
-};
-
-export const unshieldTokens = async (
-  prover: Prover,
-  railgunWallet: RailgunWallet,
-  encryptionKey: string,
-  toWalletAddress: string,
-  allowOverride: boolean,
-  tokenAmounts: TokenAmount[],
-  chain: RelayerChain,
-): Promise<TransactionResponse> => {
-  const serializedTransactions = await generateUnshieldTransactions(
-    prover,
-    railgunWallet,
-    encryptionKey,
-    toWalletAddress,
-    allowOverride,
-    tokenAmounts,
-    chain,
-  );
-  const populatedTransaction = await generatePopulatedUnshieldTransact(
-    serializedTransactions,
-    chain,
-  );
+) => {
   const network = networkForChain(chain);
   if (!network) {
     throw new Error(`Unsupported network for chain ${chain.type}:${chain.id}`);
@@ -122,6 +35,116 @@ export const unshieldTokens = async (
     network.name,
     sendWithPublicWallet,
   );
+
+  const erc20AmountRecipients: RailgunERC20AmountRecipient[] = erc20Amounts.map(
+    (erc20Amount) => ({
+      tokenAddress: erc20Amount.tokenAddress,
+      amountString: erc20Amount.amount.toHexString(),
+      recipientAddress: toWalletAddress,
+    }),
+  );
+
+  const standardGasDetails = await getStandardGasDetails(evmGasType, chain);
+  const originalGasDetails: TransactionGasDetails = {
+    ...standardGasDetails,
+    gasEstimate: BigNumber.from(0),
+  };
+  const originalGasDetailsSerialized =
+    serializeTransactionGasDetails(originalGasDetails);
+
+  const gasEstimateResponse = await gasEstimateForUnprovenUnshield(
+    network.name,
+    railgunWalletID,
+    dbEncryptionKey,
+    erc20AmountRecipients,
+    [], // nftAmountRecipients
+    originalGasDetailsSerialized,
+    undefined, // feeTokenDetails
+    sendWithPublicWallet,
+  );
+  if (gasEstimateResponse.error) {
+    throw new Error(
+      `Unshield gas estimate error: ${gasEstimateResponse.error}`,
+    );
+  }
+  if (!gasEstimateResponse.gasEstimateString) {
+    throw new Error(`Unshield gas estimate: No gas estimate returned`);
+  }
+
+  const proofResponse = await generateUnshieldProof(
+    network.name,
+    railgunWalletID,
+    dbEncryptionKey,
+    erc20AmountRecipients,
+    [], // nftAmountRecipients
+    undefined, // relayerFeeERC20AmountRecipient
+    sendWithPublicWallet,
+    undefined, // overallBatchMinGasPrice
+    () => {}, // progressCallback
+  );
+  if (proofResponse.error) {
+    throw new Error(`Unshield proof generation error: ${proofResponse.error}`);
+  }
+
+  const finalGasDetails: TransactionGasDetails = {
+    ...originalGasDetails,
+    gasEstimate: BigNumber.from(gasEstimateResponse.gasEstimateString),
+  };
+  const finalGasDetailsSerialized =
+    serializeTransactionGasDetails(finalGasDetails);
+
+  const populateResponse = await populateProvedUnshield(
+    network.name,
+    railgunWalletID,
+    erc20AmountRecipients,
+    [], // nftAmountRecipients
+    undefined, // relayerFeeERC20AmountRecipient
+    true, // sendWithPublicWallet
+    undefined, // overallBatchMinGasPrice
+    finalGasDetailsSerialized,
+  );
+  if (populateResponse.error) {
+    throw new Error(
+      `Unshield populate transaction error: ${populateResponse.error}`,
+    );
+  }
+  if (!populateResponse.serializedTransaction) {
+    throw new Error('No serializedTransaction for unshield');
+  }
+
+  const populatedTransaction = deserializeTransaction(
+    populateResponse.serializedTransaction,
+    undefined, // nonce
+    network.chain.id,
+  );
+  return populatedTransaction;
+};
+
+export const unshieldTokens = async (
+  railgunWalletID: string,
+  dbEncryptionKey: string,
+  toWalletAddress: string,
+  erc20Amounts: TokenAmount[],
+  chain: RelayerChain,
+): Promise<TransactionResponse> => {
+  const network = networkForChain(chain);
+  if (!network) {
+    throw new Error(`Unsupported network for chain ${chain.type}:${chain.id}`);
+  }
+  const sendWithPublicWallet = true;
+  const evmGasType = getEVMGasTypeForTransaction(
+    network.name,
+    sendWithPublicWallet,
+  );
+
+  const populatedTransaction = await generateUnshieldTransaction(
+    railgunWalletID,
+    dbEncryptionKey,
+    toWalletAddress,
+    erc20Amounts,
+    chain,
+  );
+
   const gasDetails = await getEstimateGasDetailsPublic(
     chain,
     evmGasType,

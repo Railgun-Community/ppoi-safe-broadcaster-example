@@ -8,7 +8,6 @@ import {
   WakuRelayerOptions,
   WAKU_TOPIC,
 } from 'server/waku-relayer/waku-relayer';
-import { getRailgunWallet } from 'server/wallets/active-wallets';
 import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
 import { WakuApiClient } from 'server/networking/waku-api-client';
@@ -26,12 +25,11 @@ const main = async (): Promise<void> => {
   dbg(`Connecting to ${config.waku.rpcURL}`);
 
   const client = new WakuApiClient({ url: config.waku.rpcURL });
-  const wallet = getRailgunWallet();
   const options: WakuRelayerOptions = {
     topic: WAKU_TOPIC,
     feeExpiration: config.transactionFees.feeExpirationInMS,
   };
-  relayer = await WakuRelayer.init(client, wallet, options);
+  relayer = await WakuRelayer.init(client, options);
 
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   relayer.poll(config.waku.pollFrequencyInMS);

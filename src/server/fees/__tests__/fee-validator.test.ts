@@ -42,7 +42,9 @@ const validatePackagedFee = (
   );
 };
 
-describe('fee-validator', () => {
+describe('fee-validator', function test() {
+  this.timeout(10000);
+
   before(async () => {
     const network = getMockNetwork();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = network;

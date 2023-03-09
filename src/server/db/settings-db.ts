@@ -1,4 +1,4 @@
-import { Database, BytesData } from '@railgun-community/engine';
+import { Database } from '@railgun-community/quickstart';
 import leveldown from 'leveldown';
 import { logger } from '../../util/logger';
 import configDefaults from '../config/config-defaults';
@@ -26,7 +26,7 @@ export const clearSettingsDB = async () => {
   }
 };
 
-const getPathsForKey = (key: string): BytesData[] => {
+const getPathsForKey = (key: string): string[] => {
   return [SETTINGS_DB_NAMESPACE, key];
 };
 
@@ -60,7 +60,7 @@ export const storeSettingsString = (
 
 export const storeSettingsBytes = (
   key: string,
-  value: BytesData,
+  value: string,
 ): Promise<void> => {
   if (!db) {
     return handleNoDBError();

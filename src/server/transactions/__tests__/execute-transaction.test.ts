@@ -26,7 +26,7 @@ import {
   setupSingleTestWallet,
   testChainGoerli,
 } from '../../../test/setup.test';
-import { initEngine } from '../../engine/engine-init';
+import { startEngine } from '../../engine/engine-init';
 import {
   clearSettingsDB,
   getSettingsNumber,
@@ -64,7 +64,7 @@ const MOCK_CHAIN = testChainGoerli();
 
 describe('execute-transaction', () => {
   before(async () => {
-    initEngine();
+    startEngine();
     initSettingsDB();
     await clearSettingsDB();
     await setupSingleTestWallet();

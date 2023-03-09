@@ -1,78 +1,93 @@
-import leveldown from 'leveldown';
-import { FallbackProvider } from '@ethersproject/providers';
-import { logger } from '../../util/logger';
-import { artifactGetter } from './artifacts';
-import { quickSyncIPNS } from '../api/railgun-events/quick-sync-ipns';
+import LevelDOWN from 'leveldown';
 import configDefaults from '../config/config-defaults';
-import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
-import { groth16 } from 'snarkjs';
 import {
-  RailgunEngine,
-  EngineDebugger,
-  Groth16,
-} from '@railgun-community/engine';
+  startRailgunEngine,
+  stopRailgunEngine,
+  ArtifactStore,
+  loadProvider,
+} from '@railgun-community/quickstart';
+import fs from 'fs';
+import {
+  FallbackProviderJsonConfig,
+  networkForChain,
+} from '@railgun-community/shared-models';
+import { DebugLevel } from '../../models/debug-models';
 
-let engine: RailgunEngine;
+let engineStarted = false;
 
-export const getRailgunEngine = () => {
-  if (!engine) {
-    throw new Error('RAILGUN RailgunEngine not yet init.');
-  }
-  return engine;
+const fileExists = (path: string): Promise<boolean> => {
+  return new Promise((resolve) => {
+    fs.promises
+      .access(path)
+      .then(() => resolve(true))
+      .catch(() => resolve(false));
+  });
 };
 
-export const initEngine = (optDebugger?: EngineDebugger) => {
-  if (engine) {
+const testArtifactStore = new ArtifactStore(
+  fs.promises.readFile,
+  async (dir, path, data) => {
+    await fs.promises.mkdir(dir, { recursive: true });
+    await fs.promises.writeFile(path, data);
+  },
+  fileExists,
+);
+
+export const startEngine = () => {
+  if (engineStarted) {
     return;
   }
-  const levelDB = leveldown(configDefaults.engine.dbDir);
-  const engineDebugger: EngineDebugger = optDebugger ?? {
-    log: (msg: string) => logger.log(msg),
-    error: (error: Error) => {
-      logger.warn('engineDebugger error');
-      logger.error(error);
-    },
-  };
+  const levelDB = new LevelDOWN(configDefaults.engine.dbDir);
 
-  engine = new RailgunEngine(
-    'relayer',
+  const walletSource = 'relayer';
+  const shouldDebug = configDefaults.debug.logLevel === DebugLevel.VerboseLogs;
+  const response = startRailgunEngine(
+    walletSource,
     levelDB,
-    artifactGetter,
-    quickSyncIPNS,
-    configDefaults.debug.engine ? engineDebugger : undefined,
-    false,
+    shouldDebug,
+    testArtifactStore,
+    false, // useNativeArtifacts
+    false, // skipMerkletreeScans
   );
-  engine.prover.setSnarkJSGroth16(groth16 as Groth16);
+  if (response.error) {
+    throw new Error(response.error);
+  }
+  engineStarted = true;
+};
+
+export const stopEngine = () => {
+  if (!engineStarted) {
+    return;
+  }
+  stopRailgunEngine();
 };
 
 /**
  * Note: This call is async, but you may call it synchronously
  * so it will run the slow scan in the background.
  */
-export const initEngineNetwork = async (
+export const loadEngineProvider = async (
   chain: RelayerChain,
-  provider: FallbackProvider,
+  providerJsonConfig: FallbackProviderJsonConfig,
 ) => {
-  if (!engine) {
+  if (!engineStarted) {
     // No RailgunEngine instance (might be in unit test).
-    return;
+    throw new Error('No engine instance.');
+  }
+  const network = networkForChain(chain);
+  if (!network) {
+    throw new Error('Network not found.');
   }
 
-  const network = configNetworks[chain.type][chain.id];
-  const deploymentBlock = network.deploymentBlock ?? 0;
+  const shouldDebug = configDefaults.debug.logLevel === DebugLevel.VerboseLogs;
 
-  try {
-    await engine.loadNetwork(
-      chain,
-      network.proxyContract,
-      network.relayAdaptContract,
-      provider,
-      deploymentBlock,
-    );
-  } catch (err: any) {
-    logger.warn(
-      `Could not load network ${chain.id} in RailgunEngine: ${err.message}.`,
-    );
+  const response = await loadProvider(
+    providerJsonConfig,
+    network.name,
+    shouldDebug,
+  );
+  if (response.error) {
+    throw new Error(response.error);
   }
 };

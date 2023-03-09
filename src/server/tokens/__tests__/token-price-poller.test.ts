@@ -14,7 +14,7 @@ import { initPricePoller, stopTokenPricePolling } from '../token-price-poller';
 import { delay } from '../../../util/promise-utils';
 import { initTokens } from '../network-tokens';
 import { RelayerChain } from '../../../models/chain-models';
-import { ChainType } from '@railgun-community/engine';
+import { ChainType } from '@railgun-community/shared-models';
 import { NetworkChainID } from '../../config/config-chains';
 import { testChainEthereum, testChainGoerli } from '../../../test/setup.test';
 

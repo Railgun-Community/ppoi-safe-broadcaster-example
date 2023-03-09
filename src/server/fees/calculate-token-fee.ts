@@ -22,7 +22,7 @@ export const getAllUnitTokenFeesForChain = (
         chain,
         tokenAddress,
       );
-    } catch (err: any) {
+    } catch (err) {
       // No op.
     }
   });

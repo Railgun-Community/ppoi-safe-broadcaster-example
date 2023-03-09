@@ -12,7 +12,7 @@ export const getGasTokenBalance = async (
     const provider = getProviderForNetwork(chain);
     const balance = await provider.getBalance(walletAddress).catch(throwErr);
     return balance;
-  } catch (err: any) {
+  } catch (err) {
     logger.error(new Error(`Could not get gas token balance: ${err.message}`));
     return undefined;
   }

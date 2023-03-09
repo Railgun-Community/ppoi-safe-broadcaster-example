@@ -10,9 +10,9 @@ import { getActiveWallets } from '../../wallets/active-wallets';
 import { getMockGoerliNetwork, getMockToken } from '../../../test/mocks.test';
 import {
   setupSingleTestWallet,
-  testChainEthereum,
+  testChainGoerli,
 } from '../../../test/setup.test';
-import { initEngine } from '../../engine/engine-init';
+import { startEngine } from '../../engine/engine-init';
 import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
 import { delay } from '../../../util/promise-utils';
 import * as ExecuteTransactionModule from '../execute-transaction';
@@ -49,11 +49,11 @@ const MOCK_TOKEN_AMOUNT_2 = {
 };
 const TO_APPROVE = [MOCK_TOKEN_AMOUNT_1, MOCK_TOKEN_AMOUNT_2];
 
-const MOCK_CHAIN = testChainEthereum();
+const MOCK_CHAIN = testChainGoerli();
 
 describe('approve-spender', () => {
   before(async () => {
-    initEngine();
+    startEngine();
     initSettingsDB();
     await clearSettingsDB();
     await setupSingleTestWallet();

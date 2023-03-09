@@ -13,10 +13,9 @@ import {
   RailgunProxyContract,
   RelayAdaptContract,
   RailgunProxyDeploymentBlock,
-} from '@railgun-community/shared-models';
+ ChainType } from '@railgun-community/shared-models';
 import { NetworkChainID } from './config-chains';
 import { NetworksConfig } from '../../models/config-models';
-import { ChainType } from '@railgun-community/engine';
 import { NO_GAS_TOKEN_ADDRESS } from '../../models/token-models';
 
 // 0.15 ETH minimum for L1 availability.

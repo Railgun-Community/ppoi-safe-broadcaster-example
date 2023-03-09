@@ -5,7 +5,7 @@ import {
   setupSingleTestWallet,
   testChainEthereum,
 } from '../../../test/setup.test';
-import { initEngine } from '../../engine/engine-init';
+import { startEngine } from '../../engine/engine-init';
 import {
   isWalletAvailableWithEnoughFunds,
   setWalletAvailability,
@@ -23,7 +23,7 @@ const { expect } = chai;
 
 describe('available-wallets', () => {
   before(async () => {
-    initEngine();
+    startEngine();
     await setupSingleTestWallet();
     await initNetworkProviders();
     resetGasTokenBalanceCache();

@@ -49,7 +49,7 @@ export const providerDebugListener = (debugEvent: ProviderDebugEvent) => {
     let body: RPCError | undefined;
     try {
       body = JSON.parse(info.body);
-    } catch (e: any) {
+    } catch (err) {
       /* noop */
     }
     if (body && body?.error?.message === 'already known') {

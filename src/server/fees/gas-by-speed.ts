@@ -21,8 +21,7 @@
 //
 
 import { BigNumber } from '@ethersproject/bignumber';
-import { ChainType } from '@railgun-community/engine';
-import { EVMGasType } from '@railgun-community/shared-models';
+import { ChainType, EVMGasType } from '@railgun-community/shared-models';
 import Web3, { Eth, FeeHistoryResult } from 'web3-eth';
 import { RelayerChain } from '../../models/chain-models';
 import {

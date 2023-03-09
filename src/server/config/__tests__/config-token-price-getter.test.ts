@@ -2,6 +2,8 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getMockGoerliNetwork } from '../../../test/mocks.test';
 import { testChainGoerli } from '../../../test/setup.test';
+import { startEngine } from '../../engine/engine-init';
+import { initNetworkProviders } from '../../providers/active-network-providers';
 import { initTokens } from '../../tokens/network-tokens';
 import {
   getTokenPriceCache,
@@ -20,7 +22,12 @@ const MOCK_CHAIN = testChainGoerli();
 
 describe('config-token-price-refresher', () => {
   before(async () => {
+    startEngine();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = testNetwork;
+    await initNetworkProviders();
+    // @ts-ignore
+    configTokens[MOCK_CHAIN.type] ??= {};
+    configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id] ??= {};
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK',
     };

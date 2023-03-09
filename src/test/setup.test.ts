@@ -12,12 +12,12 @@ import configTokens from '../server/config/config-tokens';
 import { resetMapObject } from '../util/utils';
 import * as NetworkTokensModule from '../server/tokens/network-tokens';
 import { RelayerChain } from '../models/chain-models';
-import { ChainType } from '@railgun-community/engine';
+import { ChainType } from '@railgun-community/shared-models';
 
 export const LEPTON_TEST_DB = 'engine.test.db';
 const SETTINGS_TEST_DB = 'settings.test.db';
 
-let savedConfigDefaults: any;
+let savedConfigDefaults: typeof configDefaults;
 
 let stubERC20Decimals: SinonStub;
 

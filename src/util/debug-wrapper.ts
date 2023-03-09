@@ -9,6 +9,7 @@ export default class DebugWrapper {
     this.dbg = debug(namespace);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   call(obj: any) {
     this.dbg(obj);
   }

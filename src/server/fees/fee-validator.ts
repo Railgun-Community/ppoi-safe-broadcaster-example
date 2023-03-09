@@ -57,7 +57,7 @@ export const validateFee = (
     if (comparePackagedFeeToCalculated(chain, packagedFee, calculatedFee)) {
       return;
     }
-  } catch (err: any) {
+  } catch (err) {
     logger.log(`error getting current token fee: ${err.message}`);
   }
 
