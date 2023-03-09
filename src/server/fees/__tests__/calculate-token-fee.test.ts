@@ -151,7 +151,7 @@ describe('calculate-token-fee', () => {
       evmGasType,
       MOCK_TRANSACTION,
     );
-    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails);
+    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails, chain);
     const maximumGasFeeForToken = getTokenFee(
       chain,
       maximumGas,
@@ -185,7 +185,7 @@ describe('calculate-token-fee', () => {
       evmGasType,
       MOCK_TRANSACTION,
     );
-    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails);
+    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails, chain);
     const maximumGasFeeForToken = getTokenFee(
       chain,
       maximumGas,
@@ -233,7 +233,7 @@ describe('calculate-token-fee', () => {
       evmGasType,
       MOCK_TRANSACTION,
     );
-    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails);
+    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails, chain);
     expect(() => getTokenFee(chain, maximumGas, MOCK_TOKEN_ADDRESS)).to.throw();
   });
 }).timeout(10000);

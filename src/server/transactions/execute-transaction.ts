@@ -80,14 +80,14 @@ export const executeTransaction = async (
 ): Promise<TransactionResponse> => {
   dbg('Execute transaction');
 
-  const maximumGas = calculateMaximumGasRelayer(gasDetails);
+  const maximumGas = calculateMaximumGasRelayer(gasDetails, chain);
   const activeWallet =
     wallet ?? (await getBestMatchWalletForNetwork(chain, maximumGas));
 
   const provider = getProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(activeWallet, provider);
   const nonce = overrideNonce ?? (await getCurrentWalletNonce(ethersWallet));
-  const gasLimit = calculateGasLimitRelayer(gasDetails.gasEstimate);
+  const gasLimit = calculateGasLimitRelayer(gasDetails.gasEstimate, chain);
   dbg('Nonce', nonce);
 
   const finalTransaction: TransactionRequest = {

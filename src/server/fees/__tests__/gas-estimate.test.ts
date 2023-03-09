@@ -49,7 +49,10 @@ describe('gas-estimate', () => {
       evmGasType,
       getMockPopulatedTransaction(),
     );
-    const maximumGas = calculateMaximumGasRelayer(estimateGasDetails);
+    const maximumGas = calculateMaximumGasRelayer(
+      estimateGasDetails,
+      MOCK_CHAIN,
+    );
 
     // (Gas estimate + 20%) * gas price (maxFeePerGas).
     expect(maximumGas.toNumber()).to.equal(120000);
@@ -71,7 +74,10 @@ describe('gas-estimate', () => {
       evmGasType,
       getMockPopulatedTransaction(),
     );
-    const maximumGas = calculateMaximumGasRelayer(estimateGasDetails);
+    const maximumGas = calculateMaximumGasRelayer(
+      estimateGasDetails,
+      MOCK_CHAIN,
+    );
 
     // 20% added by gasLimit.
     expect(maximumGas.toNumber()).to.equal(120000);

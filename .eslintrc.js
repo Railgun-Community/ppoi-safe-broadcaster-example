@@ -19,7 +19,7 @@ module.exports = {
   parserOptions: {
     project: ['./tsconfig.json', './tsconfig.test.json'],
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'no-only-tests'],
   rules: {
     'no-return-await': 0,
     'no-unused-vars': 0,
@@ -49,6 +49,7 @@ module.exports = {
     '@typescript-eslint/no-floating-promises': 2,
     '@typescript-eslint/no-non-null-assertion': 2,
     'no-warning-comments': 1,
+    'no-only-tests/no-only-tests': 1,
     camelcase: 0,
   },
   ignorePatterns: ['dist'],

@@ -1,4 +1,5 @@
 import { TransactionRequest } from '@ethersproject/providers';
+import { ChainType } from '@railgun-community/engine';
 import {
   calculateGasPrice,
   EVMGasType,
@@ -9,6 +10,7 @@ import { RelayerChain } from '../../models/chain-models';
 import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
 import { logger } from '../../util/logger';
 import { throwErr } from '../../util/promise-utils';
+import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getStandardGasDetails } from './gas-by-speed';
 
@@ -68,15 +70,35 @@ export const getEstimateGasDetailsRelayed = async (
   }
 };
 
-export const calculateGasLimitRelayer = (gasEstimate: BigNumber): BigNumber => {
-  // Add 20% to gasEstimate.
-  return gasEstimate.mul(12000).div(10000);
+export const calculateGasLimitRelayer = (
+  gasEstimate: BigNumber,
+  chain: RelayerChain,
+): BigNumber => {
+  switch (chain.type) {
+    case ChainType.EVM: {
+      switch (chain.id) {
+        case NetworkChainID.Arbitrum:
+        case NetworkChainID.ArbitrumGoerli:
+          // Add 30% to gasEstimate for L2s.
+          return gasEstimate.mul(13000).div(10000);
+        case NetworkChainID.EthereumGoerli:
+        case NetworkChainID.BNBChain:
+        case NetworkChainID.PolygonPOS:
+        case NetworkChainID.Hardhat:
+        case NetworkChainID.PolygonMumbai:
+        case NetworkChainID.Ethereum:
+          // Add 20% to gasEstimate.
+          return gasEstimate.mul(12000).div(10000);
+      }
+    }
+  }
 };
 
 export const calculateMaximumGasRelayer = (
   transactionGasDetails: TransactionGasDetails,
+  chain: RelayerChain,
 ): BigNumber => {
   const gasPrice = calculateGasPrice(transactionGasDetails);
   const { gasEstimate } = transactionGasDetails;
-  return calculateGasLimitRelayer(gasEstimate).mul(gasPrice);
+  return calculateGasLimitRelayer(gasEstimate, chain).mul(gasPrice);
 };

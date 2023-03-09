@@ -61,7 +61,9 @@ describe('calculate-transaction-gas-legacy', () => {
     mockTokenConfig(MOCK_CHAIN, MOCK_TOKEN_6_DECIMALS);
     await initTokens();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fees.slippageBuffer = 0.05;
+    configNetworks[MOCK_CHAIN.type][
+      MOCK_CHAIN.id
+    ].fees.gasEstimateVarianceBuffer = 0.05;
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fees.profit = 0.05;
     await initNetworkProviders();
     cacheTokenPriceForNetwork(
@@ -158,7 +160,10 @@ describe('calculate-transaction-gas-legacy', () => {
       evmGasType,
       populatedTransaction,
     );
-    const maximumGas = calculateMaximumGasRelayer(estimateGasDetails);
+    const maximumGas = calculateMaximumGasRelayer(
+      estimateGasDetails,
+      MOCK_CHAIN,
+    );
     const tokenFee = getTokenFee(MOCK_CHAIN, maximumGas, MOCK_TOKEN_ADDRESS);
     const gasDetails = createTransactionGasDetailsLegacy(
       MOCK_CHAIN,
@@ -194,7 +199,10 @@ describe('calculate-transaction-gas-legacy', () => {
       MOCK_MAX_FEE_PER_GAS.toHexString(), // minGasPrice
       populatedTransaction,
     );
-    const maximumGas = calculateMaximumGasRelayer(estimateGasDetails);
+    const maximumGas = calculateMaximumGasRelayer(
+      estimateGasDetails,
+      MOCK_CHAIN,
+    );
     const tokenFee = getTokenFee(MOCK_CHAIN, maximumGas, MOCK_TOKEN_ADDRESS);
     const gasDetails = createTransactionGasDetailsLegacy(
       MOCK_CHAIN,

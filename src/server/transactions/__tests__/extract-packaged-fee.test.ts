@@ -139,6 +139,7 @@ describe('extract-packaged-fee', () => {
       provider,
       0, // deploymentBlock
     );
+
     proxyContract = new RailgunSmartWalletContract(
       ropstenProxyContractAddress,
       provider as Provider,

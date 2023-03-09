@@ -80,7 +80,7 @@ export const processTransaction = async (
 
   dbg('transactionGasDetails:', transactionGasDetails);
 
-  const maximumGas = calculateMaximumGasRelayer(transactionGasDetails);
+  const maximumGas = calculateMaximumGasRelayer(transactionGasDetails, chain);
   dbg('Maximum gas:', maximumGas);
 
   const { tokenAddress, packagedFeeAmount } =

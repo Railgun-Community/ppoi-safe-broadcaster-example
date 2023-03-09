@@ -25,7 +25,7 @@ export const createTransactionGasDetailsLegacy = (
   tokenFee: BigNumber,
 ): TransactionGasDetails => {
   const { evmGasType, gasEstimate } = gasEstimateDetails;
-  const gasLimit = calculateGasLimitRelayer(gasEstimate);
+  const gasLimit = calculateGasLimitRelayer(gasEstimate, chain);
   const { token, gasToken } = getTransactionTokens(chain, tokenAddress);
   const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
     chain,

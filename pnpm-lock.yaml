@@ -9,8 +9,8 @@ specifiers:
   '@ethersproject/transactions': ^5.7.0
   '@ethersproject/units': ^5.7.0
   '@noble/ed25519': ^1.7.1
-  '@railgun-community/engine': 4.0.14-test
-  '@railgun-community/shared-models': 4.0.4-test
+  '@railgun-community/engine': 4.0.15-test
+  '@railgun-community/shared-models': 4.1.0
   '@types/chai': ^4.3.4
   '@types/chai-as-promised': ^7.1.5
   '@types/debug': ^4.1.7
@@ -34,6 +34,7 @@ specifiers:
   eslint-config-airbnb-base: ^15.0.0
   eslint-config-prettier: ^8.6.0
   eslint-plugin-import: ^2.27.5
+  eslint-plugin-no-only-tests: ^3.1.0
   ethers: ^5.7.2
   got: ^12.5.3
   i: ^0.3.7
@@ -61,8 +62,8 @@ dependencies:
   '@ethersproject/transactions': 5.7.0
   '@ethersproject/units': 5.7.0
   '@noble/ed25519': 1.7.1
-  '@railgun-community/engine': 4.0.14-test_chai@4.3.7
-  '@railgun-community/shared-models': 4.0.4-test_nsp7oodujdmjmqrjctxjpxvj7a
+  '@railgun-community/engine': 4.0.15-test_chai@4.3.7
+  '@railgun-community/shared-models': 4.1.0_nsp7oodujdmjmqrjctxjpxvj7a
   '@walletconnect/jsonrpc-types': 1.0.2
   '@walletconnect/jsonrpc-utils': 1.0.4
   axios: 1.2.3_debug@4.3.4
@@ -98,6 +99,7 @@ devDependencies:
   eslint-config-airbnb-base: 15.0.0_ps7hf4l2dvbuxvtusmrfhmzsba
   eslint-config-prettier: 8.6.0_eslint@8.32.0
   eslint-plugin-import: 2.27.5_2l6piu6guil2f63lj3qmhzbnn4
+  eslint-plugin-no-only-tests: 3.1.0
   got: 12.5.3
   mocha: 10.2.0
   nyc: 15.1.0
@@ -801,8 +803,8 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@railgun-community/engine/4.0.14-test_chai@4.3.7:
-    resolution: {integrity: sha512-i3SJe3XKgQ3U/wCODSCnrUSfZMdfoTLvk86/LpSRJQJ0e+23v7VMkaYn9T7NaXScYDh4vyvMfazINvpruZI/wg==}
+  /@railgun-community/engine/4.0.15-test_chai@4.3.7:
+    resolution: {integrity: sha512-SkqaXDL1DzBlC1IBkurJ3FGKT/Yux11aH5B9euNaYKenwB/T/ERG53hBL+3tUdLRpii1YMdyd+uvgGgIKh1uOA==}
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/abstract-provider': 5.7.0
@@ -828,8 +830,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@railgun-community/shared-models/4.0.4-test_nsp7oodujdmjmqrjctxjpxvj7a:
-    resolution: {integrity: sha512-gW5NZX24vL0NyAfoe5lGtFiznVSmom6U5v380uyuYrunfP8xCQ/nzLggwbQ2oLF+FGbMzCamZBJs7V13HXcUFw==}
+  /@railgun-community/shared-models/4.1.0_nsp7oodujdmjmqrjctxjpxvj7a:
+    resolution: {integrity: sha512-C7SIpUmkQrCDWx4s83fUhmS7WD9Bn34OXyqpWakHIl93arqgRBX6V+MntXPgwb+OO7SowJEi6lhCewJoqRZPlg==}
     peerDependencies:
       '@ethersproject/bignumber': ^5.7.0
       '@ethersproject/providers': ^5.7.1
@@ -2509,6 +2511,11 @@ packages:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
       - supports-color
+    dev: true
+
+  /eslint-plugin-no-only-tests/3.1.0:
+    resolution: {integrity: sha512-Lf4YW/bL6Un1R6A76pRZyE1dl1vr31G/ev8UzIc/geCgFWyrKil8hVjYqWVKGB/UIGmb6Slzs9T0wNezdSVegw==}
+    engines: {node: '>=5.0.0'}
     dev: true
 
   /eslint-scope/5.1.1:
