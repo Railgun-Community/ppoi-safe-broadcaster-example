@@ -42,13 +42,14 @@ const zeroXPriceLookupByAddress = async (
     // However, if the price of DAI drops, the broadcasted fees can only increase,
     // so for this use case, it is not harmful.
 
-    if (symbol === 'DAI') {
+    const refSymbol = chain.id === 42161 ? 'USDT' : 'DAI';
+    if (symbol === refSymbol) {
       return { price: 1 };
     }
     const sellAmount = (10 ** decimals).toString(10);
     const params: ZeroXPriceParams = {
       sellToken: tokenAddress,
-      buyToken: 'DAI',
+      buyToken: refSymbol,
       sellAmount, // 1 token
     };
     const { price } = await getZeroXData<ZeroXPriceData>(
