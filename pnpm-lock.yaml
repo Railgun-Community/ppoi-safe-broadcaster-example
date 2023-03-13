@@ -9,7 +9,7 @@ specifiers:
   '@ethersproject/transactions': ^5.7.0
   '@ethersproject/units': ^5.7.0
   '@noble/ed25519': ^1.7.1
-  '@railgun-community/quickstart': 4.1.5
+  '@railgun-community/quickstart': 4.1.6
   '@railgun-community/shared-models': 4.1.3
   '@types/chai': ^4.3.4
   '@types/chai-as-promised': ^7.1.5
@@ -61,7 +61,7 @@ dependencies:
   '@ethersproject/transactions': 5.7.0
   '@ethersproject/units': 5.7.0
   '@noble/ed25519': 1.7.1
-  '@railgun-community/quickstart': 4.1.5_ju3ajxejw32lyvr2mnfrt6fkbm
+  '@railgun-community/quickstart': 4.1.6_ju3ajxejw32lyvr2mnfrt6fkbm
   '@railgun-community/shared-models': 4.1.3_nsp7oodujdmjmqrjctxjpxvj7a
   '@walletconnect/jsonrpc-types': 1.0.2
   '@walletconnect/jsonrpc-utils': 1.0.4
@@ -828,8 +828,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@railgun-community/quickstart/4.1.5_ju3ajxejw32lyvr2mnfrt6fkbm:
-    resolution: {integrity: sha512-yia9JCeM5YrSWlQ1Dpoho1kGARnL3CF7tS3P8dcLphk2qPC9GwLsni9Esszgplltlfo1VMvXxQZ2ZiiZ+p1ePQ==}
+  /@railgun-community/quickstart/4.1.6_ju3ajxejw32lyvr2mnfrt6fkbm:
+    resolution: {integrity: sha512-hEY0SQMeddiDBVLw2LxXhFuDfqmJIHYJio5k5KlJNXsEYAFvyXrNtmKP5v9kQphY/1rCthGc8WGD46LfTYa/UQ==}
     peerDependencies:
       '@ethersproject/address': ^5.7.0
       '@ethersproject/bignumber': ^5.7.0
