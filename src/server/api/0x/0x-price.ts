@@ -2,7 +2,7 @@ import { RelayerChain } from '../../../models/chain-models';
 import { delay } from '../../../util/promise-utils';
 import { tokenForAddress } from '../../tokens/network-tokens';
 import { TokenPrice, TokenPriceUpdater } from '../../tokens/token-price-cache';
-import { ZeroXApiEndpoint, getZeroXData } from './0x-fetch';
+import { ZeroXApiEndpoint, getZeroXData, getStablecoinReferenceSymbol } from './0x-fetch';
 
 // 1.5 second delay; 40 per minute maximum.
 // https://docs.0x.org/0x-api-swap/advanced-topics/rate-limiting
@@ -42,13 +42,14 @@ const zeroXPriceLookupByAddress = async (
     // However, if the price of DAI drops, the broadcasted fees can only increase,
     // so for this use case, it is not harmful.
 
-    if (symbol === 'DAI') {
+    const stablecoinSymbol = getStablecoinReferenceSymbol(chain);
+    if (symbol === stablecoinSymbol) {
       return { price: 1 };
     }
     const sellAmount = (10 ** decimals).toString(10);
     const params: ZeroXPriceParams = {
       sellToken: tokenAddress,
-      buyToken: 'DAI',
+      buyToken: stablecoinSymbol,
       sellAmount, // 1 token
     };
     const { price } = await getZeroXData<ZeroXPriceData>(

@@ -9,6 +9,32 @@ export enum ZeroXApiEndpoint {
   GetSwapQuote = 'swap/v1/quote',
 }
 
+export const getStablecoinReferenceSymbol = (
+  chain: RelayerChain,
+): string =>{
+
+  const error = new Error(`Chain ${chain.type}:${chain.id} has no reference symbol, Unable to get price quotes.`);
+
+  switch (chain.type) {
+    case ChainType.EVM: {
+      switch (chain.id) {
+        case NetworkChainID.Ethereum:
+        case NetworkChainID.EthereumGoerli:
+        case NetworkChainID.BNBChain:
+        case NetworkChainID.PolygonPOS:
+        case NetworkChainID.PolygonMumbai:
+          return 'DAI';
+        case NetworkChainID.Arbitrum:
+        case NetworkChainID.ArbitrumGoerli:
+          return 'USDT';
+        case NetworkChainID.Hardhat:
+          throw error;
+      }
+    }
+  }
+  throw error;
+}
+
 const zeroXApiUrl = (chain: RelayerChain): string => {
   switch (chain.type) {
     case ChainType.EVM: {
@@ -27,7 +53,7 @@ const zeroXApiUrl = (chain: RelayerChain): string => {
           return 'https://mumbai.api.0x.org/';
         case NetworkChainID.ArbitrumGoerli:
         case NetworkChainID.Hardhat:
-          throw new Error(`No 0x API URL for chain ${chain}`);
+          throw new Error(`No 0x API URL for chain ${chain.type}:${chain.id}`);
       }
     }
   }
