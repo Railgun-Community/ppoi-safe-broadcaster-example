@@ -13,7 +13,7 @@ export const getStablecoinReferenceSymbol = (
   chain: RelayerChain,
 ): string =>{
 
-  const error = new Error(`Chain ${chain} has no reference symbol, Unable to get price quotes.`);
+  const error = new Error(`Chain ${chain.type}:${chain.id} has no reference symbol, Unable to get price quotes.`);
 
   switch (chain.type) {
     case ChainType.EVM: {
