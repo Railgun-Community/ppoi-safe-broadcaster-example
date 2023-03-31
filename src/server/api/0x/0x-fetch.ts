@@ -12,6 +12,9 @@ export enum ZeroXApiEndpoint {
 export const getStablecoinReferenceSymbol = (
   chain: RelayerChain,
 ): string =>{
+
+  const error = new Error(`Chain ${chain} has no reference symbol, Unable to get price quotes.`);
+
   switch (chain.type) {
     case ChainType.EVM: {
       switch (chain.id) {
@@ -25,12 +28,11 @@ export const getStablecoinReferenceSymbol = (
         case NetworkChainID.ArbitrumGoerli:
           return 'USDT';
         case NetworkChainID.Hardhat:
-          throw new Error(`Chain ${chain} has no reference symbol, Unable to get price quotes.`)
+          throw error;
       }
     }
   }
-  // fallback to DAI?
-  return 'DAI';
+  throw error;
 }
 
 const zeroXApiUrl = (chain: RelayerChain): string => {
