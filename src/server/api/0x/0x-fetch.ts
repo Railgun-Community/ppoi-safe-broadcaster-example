@@ -53,7 +53,7 @@ const zeroXApiUrl = (chain: RelayerChain): string => {
           return 'https://mumbai.api.0x.org/';
         case NetworkChainID.ArbitrumGoerli:
         case NetworkChainID.Hardhat:
-          throw new Error(`No 0x API URL for chain ${chain}`);
+          throw new Error(`No 0x API URL for chain ${chain.type}:${chain.id}`);
       }
     }
   }
