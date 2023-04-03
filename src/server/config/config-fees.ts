@@ -1,9 +1,12 @@
 import { FeeConfig } from '../../models/fee-config';
 
-export const feeConfigL1: FeeConfig = {
+export const feeConfigL1 = (
+  gasEstimateLimitToActualRatio: number,
+): FeeConfig => ({
   gasEstimateVarianceBuffer: 0.0,
-  profit: 0.01,
-};
+  gasEstimateLimitToActualRatio,
+  profit: 0.15,
+});
 
 /**
  * Default fee config for L2 networks.
@@ -11,7 +14,10 @@ export const feeConfigL1: FeeConfig = {
  * This gas estimation difference is only relevant on L2s.
  * If gas doesn't spike to this degree, this buffer becomes profit.
  */
-export const feeConfigL2: FeeConfig = {
+export const feeConfigL2 = (
+  gasEstimateLimitToActualRatio: number,
+): FeeConfig => ({
   gasEstimateVarianceBuffer: 0.3,
-  profit: 0.01,
-};
+  gasEstimateLimitToActualRatio,
+  profit: 0.15,
+});

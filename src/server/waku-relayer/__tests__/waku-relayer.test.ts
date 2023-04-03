@@ -185,7 +185,7 @@ describe('waku-relayer', () => {
       'No fee for token in broadcast data',
     );
     expect(BigNumber.from(data.fees[MOCK_TOKEN_ADDRESS]).toString()).to.equal(
-      '1272742268040000000000',
+      '1018193814430000000000',
     );
     expect(data.feeExpiration).to.be.a('number');
     expect(data.railgunAddress).to.equal(

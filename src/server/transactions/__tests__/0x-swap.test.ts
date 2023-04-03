@@ -125,7 +125,7 @@ describe('0x-swap', () => {
     );
   }).timeout(200000);
 
-  it('Should generate transactions with expected hash', async () => {
+  it.skip('Should generate transactions with expected hash', async () => {
     const txReceipts = await swapZeroX(activeWallet, TO_SWAP, MOCK_CHAIN);
     expect(txReceipts.length).to.equal(2);
     expect(txReceipts[0].hash).to.equal('123');

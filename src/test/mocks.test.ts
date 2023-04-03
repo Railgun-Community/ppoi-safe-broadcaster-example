@@ -71,6 +71,7 @@ export const getMockNetwork = (): Network => {
     },
     fees: {
       gasEstimateVarianceBuffer: 0.03,
+      gasEstimateLimitToActualRatio: 1.25,
       profit: 0.07,
     },
     proxyContract: '0x00' as RailgunProxyContract,
@@ -92,6 +93,7 @@ export const getMockGoerliNetwork = (): Network => {
     },
     fees: {
       gasEstimateVarianceBuffer: 0.05,
+      gasEstimateLimitToActualRatio: 1.25,
       profit: 0.05,
     },
     proxyContract: RailgunProxyContract.EthereumGoerli,

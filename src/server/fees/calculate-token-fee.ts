@@ -1,7 +1,6 @@
 import { BigNumber } from 'ethers';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
-import { NetworkFeeSettings } from '../../models/network-models';
 import { GAS_TOKEN_DECIMALS, Token } from '../../models/token-models';
 import {
   allTokenAddressesForNetwork,
@@ -10,6 +9,7 @@ import {
 import { getTransactionTokenPrices } from '../tokens/token-price-cache';
 import { cacheUnitFeesForTokens } from './transaction-fee-cache';
 import { RelayerChain } from '../../models/chain-models';
+import { FeeConfig } from '../../models/fee-config';
 
 export const getAllUnitTokenFeesForChain = (
   chain: RelayerChain,
@@ -82,13 +82,18 @@ const getTokenRatiosFromCachedPrices = (
 export const getRoundedTokenToGasPriceRatio = (
   tokenPrice: number,
   gasTokenPrice: number,
-  fees: NetworkFeeSettings,
+  fees: FeeConfig,
   precision: number,
 ): BigNumber => {
   const priceRatio = gasTokenPrice / tokenPrice;
-  const slippage = priceRatio * fees.gasEstimateVarianceBuffer;
-  const profit = priceRatio * fees.profit;
-  const totalFeeRatio = priceRatio + slippage + profit;
+
+  // Adjust price ratio to account for difference between gas limit and actual gas cost.
+  const adjustedPriceRatio = priceRatio / fees.gasEstimateLimitToActualRatio;
+
+  const gasEstimateVariance =
+    adjustedPriceRatio * fees.gasEstimateVarianceBuffer;
+  const profit = adjustedPriceRatio * fees.profit;
+  const totalFeeRatio = adjustedPriceRatio + gasEstimateVariance + profit;
   const ratioMinimum = configDefaults.transactionFees.priceRatioMinimum;
 
   const ratio = totalFeeRatio * precision;

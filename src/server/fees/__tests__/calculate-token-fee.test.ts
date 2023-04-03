@@ -113,7 +113,7 @@ describe('calculate-token-fee', () => {
       MOCK_TOKEN_ADDRESS,
     );
 
-    expect(maximumGasFeeForToken.toString()).to.equal('1272742268040000000000');
+    expect(maximumGasFeeForToken.toString()).to.equal('1018193814430000000000');
   });
 
   it('Should calculate token fee per unit gas with different decimal amounts', () => {
@@ -126,7 +126,7 @@ describe('calculate-token-fee', () => {
       MOCK_TOKEN_6_DECIMALS,
     );
 
-    expect(maximumGasFeeForToken.toString()).to.equal('1272742268');
+    expect(maximumGasFeeForToken.toString()).to.equal('1018193814');
   });
 
   it('Should calculate token fee for transaction with precision', async () => {
@@ -159,7 +159,7 @@ describe('calculate-token-fee', () => {
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal(
-      '137456164948320000000000',
+      '109964931958440000000000',
     );
   });
 
@@ -193,7 +193,7 @@ describe('calculate-token-fee', () => {
     );
 
     expect(maximumGasFeeForToken.toString()).to.equal(
-      '137456164948', // +20%
+      '109964931958', // (+20% gas limit) (-25% limit to actual ratio)
     );
   });
 
@@ -207,7 +207,7 @@ describe('calculate-token-fee', () => {
     expect(fees).to.be.an('object');
     expect(feeCacheID).to.be.a('string');
     expect(fees[MOCK_TOKEN_ADDRESS].toString()).to.equal(
-      '1272742268040000000000',
+      '1018193814430000000000',
     );
   });
 
