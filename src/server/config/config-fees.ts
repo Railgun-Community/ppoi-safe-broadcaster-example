@@ -1,11 +1,12 @@
 import { FeeConfig } from '../../models/fee-config';
+import configDefaults from './config-defaults';
 
 export const feeConfigL1 = (
   gasEstimateLimitToActualRatio: number,
 ): FeeConfig => ({
   gasEstimateVarianceBuffer: 0.0,
   gasEstimateLimitToActualRatio,
-  profit: 0.15,
+  profit: configDefaults.transactionFees.profitMargin,
 });
 
 /**
@@ -19,5 +20,5 @@ export const feeConfigL2 = (
 ): FeeConfig => ({
   gasEstimateVarianceBuffer: 0.3,
   gasEstimateLimitToActualRatio,
-  profit: 0.15,
+  profit: configDefaults.transactionFees.profitMargin,
 });
