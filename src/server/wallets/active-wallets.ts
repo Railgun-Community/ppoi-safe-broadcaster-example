@@ -62,7 +62,7 @@ const initRailgunWallet = async (mnemonic: string) => {
 export const initWallets = async () => {
   resetWallets();
   const { mnemonic, hdWallets } = configDefaults.wallet;
-  hdWallets.forEach(({ index, priority }) => {
+  hdWallets.forEach(({ index, priority, chains }) => {
     if (!isValidMnemonic(mnemonic)) {
       throw Error(
         'Invalid or missing MNEMONIC (use docker secret or insecure env-cmdrc for testing)',
@@ -78,6 +78,7 @@ export const initWallets = async () => {
       pkey: wallet.privateKey,
       priority,
       index,
+      chains,
     });
   });
   await initRailgunWallet(mnemonic);
@@ -132,6 +133,14 @@ export const getActiveWallets = (): ActiveWallet[] => {
     throw new Error('No wallets initialized.');
   }
   return activeWallets;
+};
+
+export const getActiveWalletsForChain = (
+  chain: RelayerChain,
+): ActiveWallet[] => {
+  return getActiveWallets().filter((wallet) =>
+    wallet.chains.includes(chain.id),
+  );
 };
 
 export const numAvailableWallets = async (

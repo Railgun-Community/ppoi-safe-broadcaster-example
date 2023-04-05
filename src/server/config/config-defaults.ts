@@ -109,6 +109,13 @@ export default {
     mnemonic: secrets.mnemonic,
 
     /**
+     * Cycles wallets based on balance, and usage. 'Randomly'
+     * - Sorts by highest balance & disregards the last used wallet.
+     * - Selects random wallet from the remaining set.
+     */
+    randomizeWalletSelection: false,
+
+    /**
      * Indeces to configure HD wallets from the same mnemonic.
      * Each separate Relayer instance must have its own HD wallets.
      * If you run multiple Relayers with the same mnemonic, set `transactionFees.requireMatchingFeeCacheID = true`
@@ -117,6 +124,19 @@ export default {
       {
         index: 0,
         priority: 1,
+        /**
+         * Select chains to run per wallet index.
+         */
+        chains: [
+          NetworkChainID.Ethereum,
+          NetworkChainID.BNBChain,
+          NetworkChainID.PolygonPOS,
+          NetworkChainID.Arbitrum,
+          NetworkChainID.EthereumGoerli,
+          NetworkChainID.PolygonMumbai,
+          NetworkChainID.ArbitrumGoerli,
+          NetworkChainID.Hardhat,
+        ],
       },
     ],
   },

@@ -12,6 +12,20 @@ const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
 const dbg = debug('relayer:wallets:availability');
 
+const lastWalletUsed: NumMapType<NumMapType<string>> = {};
+
+export const getLastUsedWalletForChain = (chain: RelayerChain) => {
+  return lastWalletUsed?.[chain.type]?.[chain.id] ?? '';
+};
+
+export const setLastWalletUsed = (
+  walletAddress: string,
+  chain: RelayerChain,
+) => {
+  lastWalletUsed[chain.type] ??= {};
+  lastWalletUsed[chain.type][chain.id] = walletAddress;
+};
+
 export const setWalletAvailability = (
   wallet: ActiveWallet,
   chain: RelayerChain,
@@ -21,6 +35,9 @@ export const setWalletAvailability = (
   unavailableWalletMap[chain.type][chain.id] ??= {};
   unavailableWalletMap[chain.type][chain.id][wallet.address] = !available;
   dbg(`Set wallet ${wallet.address}:`, available ? 'AVAILABLE' : 'BUSY');
+  if (!available) {
+    setLastWalletUsed(wallet.address, chain);
+  }
 };
 
 export const isWalletAvailableWithEnoughFunds = async (
