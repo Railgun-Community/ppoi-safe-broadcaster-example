@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import configDefaults from '../config/config-defaults';
-import configNetworks from '../config/config-networks';
 import { GAS_TOKEN_DECIMALS, Token } from '../../models/token-models';
+
 import {
   allTokenAddressesForNetwork,
   getTransactionTokens,
@@ -60,7 +60,6 @@ const getTokenRatiosFromCachedPrices = (
   tokenAddress: string,
   precision: number,
 ) => {
-  const networkConfig = configNetworks[chain.type][chain.id];
   const { token, gasToken } = getTransactionTokens(chain, tokenAddress);
   const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
     chain,
@@ -71,7 +70,7 @@ const getTokenRatiosFromCachedPrices = (
   const roundedPriceRatio = getRoundedTokenToGasPriceRatio(
     tokenPrice,
     gasTokenPrice,
-    networkConfig.fees,
+    token.fee,
     precision,
   );
   const decimalRatio = getTransactionTokenToGasDecimalRatio(token);

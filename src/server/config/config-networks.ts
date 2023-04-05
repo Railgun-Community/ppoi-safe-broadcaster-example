@@ -6,7 +6,6 @@ import fallbackProvidersArbitrum from './fallback-providers/42161-arbitrum';
 import fallbackProvidersPolygonMumbai from './fallback-providers/80001-polygon-mumbai';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
 import fallbackProvidersArbitrumGoerli from './fallback-providers/421613-arbitrum-goerli';
-import { feeConfigL1, feeConfigL2 } from './config-fees';
 import { CoingeckoNetworkID } from '../../models/api-constants';
 import {
   BaseTokenWrappedAddress,
@@ -21,6 +20,7 @@ import { NO_GAS_TOKEN_ADDRESS } from '../../models/token-models';
 
 // 0.15 ETH minimum for L1 availability.
 const MINIMUM_BALANCE_FOR_AVAILABILITY_L1 = 0.15;
+
 // 0.01 ETH minimum for L2 availability.
 const MINIMUM_BALANCE_FOR_AVAILABILITY_L2 = 0.01;
 
@@ -38,7 +38,6 @@ const networksConfig: NetworksConfig = {
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
-      fees: feeConfigL1(1.25),
       proxyContract: RailgunProxyContract.Ethereum,
       relayAdaptContract: RelayAdaptContract.Ethereum,
       deploymentBlock: RailgunProxyDeploymentBlock.Ethereum,
@@ -54,7 +53,6 @@ const networksConfig: NetworksConfig = {
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
-      fees: feeConfigL1(1.25),
       proxyContract: RailgunProxyContract.EthereumGoerli,
       relayAdaptContract: RelayAdaptContract.EthereumGoerli,
       deploymentBlock: RailgunProxyDeploymentBlock.EthereumGoerli,
@@ -70,7 +68,6 @@ const networksConfig: NetworksConfig = {
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
-      fees: feeConfigL1(1.2),
       proxyContract: RailgunProxyContract.BNBChain,
       relayAdaptContract: RelayAdaptContract.BNBChain,
       deploymentBlock: RailgunProxyDeploymentBlock.BNBChain,
@@ -86,7 +83,6 @@ const networksConfig: NetworksConfig = {
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
-      fees: feeConfigL1(1.15),
       proxyContract: RailgunProxyContract.PolygonPOS,
       relayAdaptContract: RelayAdaptContract.PolygonPOS,
       coingeckoNetworkId: CoingeckoNetworkID.PolygonPOS,
@@ -102,7 +98,6 @@ const networksConfig: NetworksConfig = {
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
-      fees: feeConfigL2(1.5),
       proxyContract: RailgunProxyContract.Arbitrum,
       relayAdaptContract: RelayAdaptContract.Arbitrum,
       coingeckoNetworkId: CoingeckoNetworkID.Arbitrum,
@@ -118,7 +113,6 @@ const networksConfig: NetworksConfig = {
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
-      fees: feeConfigL1(1.15),
       proxyContract: RailgunProxyContract.PolygonMumbai,
       relayAdaptContract: RelayAdaptContract.PolygonMumbai,
       deploymentBlock: RailgunProxyDeploymentBlock.PolygonMumbai,
@@ -134,7 +128,6 @@ const networksConfig: NetworksConfig = {
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
-      fees: feeConfigL2(1.5),
       proxyContract: RailgunProxyContract.ArbitrumGoerli,
       relayAdaptContract: RelayAdaptContract.ArbitrumGoerli,
       deploymentBlock: RailgunProxyDeploymentBlock.ArbitrumGoerli,
@@ -150,7 +143,6 @@ const networksConfig: NetworksConfig = {
         decimals: 18,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
-      fees: feeConfigL1(1.25),
       proxyContract: RailgunProxyContract.Hardhat,
       relayAdaptContract: RelayAdaptContract.Hardhat,
       deploymentBlock: RailgunProxyDeploymentBlock.Hardhat,

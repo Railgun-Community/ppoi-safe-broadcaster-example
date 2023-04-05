@@ -6,7 +6,6 @@ import {
 import { CoingeckoNetworkID } from './api-constants';
 import { FallbackProviderJsonConfig } from './provider-models';
 import { GasTokenConfig } from './token-models';
-import { FeeConfig } from './fee-config';
 
 export type Network = {
   name: string;
@@ -17,7 +16,6 @@ export type Network = {
   gasToken: GasTokenConfig;
   coingeckoNetworkId?: CoingeckoNetworkID;
   priceTTLInMS: number;
-  fees: FeeConfig;
   isTestNetwork?: boolean;
   skipQuickScan?: boolean;
 };

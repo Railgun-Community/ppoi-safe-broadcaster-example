@@ -1,5 +1,6 @@
 import { BaseTokenWrappedAddress } from '@railgun-community/shared-models';
 import { BigNumber } from 'ethers';
+import { FeeConfig } from './fee-config';
 
 export const GAS_TOKEN_DECIMALS = 18;
 
@@ -14,6 +15,7 @@ export type GasTokenConfig = {
 
 export type TokenConfig = {
   symbol: string;
+  fee: FeeConfig;
 };
 
 export type Token = TokenConfig & {

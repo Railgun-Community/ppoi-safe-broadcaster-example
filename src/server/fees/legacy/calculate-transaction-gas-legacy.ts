@@ -5,7 +5,6 @@ import {
 import { BigNumber } from 'ethers';
 import { RelayerChain } from '../../../models/chain-models';
 import configDefaults from '../../config/config-defaults';
-import configNetworks from '../../config/config-networks';
 import { getTransactionTokens } from '../../tokens/network-tokens';
 import { getTransactionTokenPrices } from '../../tokens/token-price-cache';
 import {
@@ -33,12 +32,12 @@ export const createTransactionGasDetailsLegacy = (
     gasToken,
   );
 
-  const networkConfig = configNetworks[chain.type][chain.id];
+  // const networkConfig = configNetworks[chain.type][chain.id];
   const { precision } = configDefaults.transactionFees;
   const roundedRatio = getRoundedTokenToGasPriceRatio(
     tokenPrice,
     gasTokenPrice,
-    networkConfig.fees,
+    token.fee, // networkConfig.fees,
     precision,
   );
   const decimalRatio = getTransactionTokenToGasDecimalRatio(token);

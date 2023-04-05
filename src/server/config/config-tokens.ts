@@ -17,6 +17,7 @@ import {
 } from './config-token-sets';
 import { NetworkChainID } from './config-chains';
 import { ChainType } from '@railgun-community/shared-models';
+import { feeConfigL1, feeConfigL2 } from './config-fees';
 
 /**
  *
@@ -39,9 +40,11 @@ const tokensConfig: NetworkTokensConfig = {
     [NetworkChainID.EthereumGoerli]: {
       [TokenAddressGoerli.WETH]: {
         symbol: 'WETH',
+        fee: feeConfigL1(1.17),
       },
       [TokenAddressGoerli.DAI]: {
         symbol: 'DAI',
+        fee: feeConfigL1(1.17),
       },
     },
     [NetworkChainID.BNBChain]: {
@@ -59,22 +62,27 @@ const tokensConfig: NetworkTokensConfig = {
     [NetworkChainID.PolygonMumbai]: {
       [TokenAddressPolygonMumbai.WMATIC]: {
         symbol: 'WMATIC',
+        fee: feeConfigL1(1.17),
       },
       [TokenAddressPolygonMumbai.DERC20]: {
         symbol: 'DERC20',
+        fee: feeConfigL1(1.17),
       },
     },
     [NetworkChainID.ArbitrumGoerli]: {
       [TokenAddressArbitrumGoerli.WETH]: {
         symbol: 'WETH',
+        fee: feeConfigL2(1.17),
       },
       [TokenAddressArbitrumGoerli.USDC]: {
         symbol: 'USDC',
+        fee: feeConfigL2(1.17),
       },
     },
     [NetworkChainID.Hardhat]: {
       '0x5FbDB2315678afecb367f032d93F642f64180aa3': {
         symbol: 'TESTERC20',
+        fee: feeConfigL1(1.17),
       },
     },
   },

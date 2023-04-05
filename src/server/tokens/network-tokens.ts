@@ -45,13 +45,14 @@ const erc20TokenDetailsForAddress = async (
   provider: FallbackProvider,
   chain: RelayerChain,
 ): Promise<Optional<Token>> => {
-  const { symbol } = configTokens[chain.type][chain.id][tokenAddress];
+  const { symbol, fee } = configTokens[chain.type][chain.id][tokenAddress];
   try {
     const decimals = await getERC20Decimals(tokenAddress, provider);
     return {
       symbol,
       address: tokenAddress,
       decimals,
+      fee,
     };
   } catch (err) {
     logger.warn(

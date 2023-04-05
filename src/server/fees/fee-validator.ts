@@ -2,17 +2,17 @@ import { BigNumber } from 'ethers';
 import { logger } from '../../util/logger';
 import { getTokenFee } from './calculate-token-fee';
 import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
-import configNetworks from '../config/config-networks';
 import { ErrorMessage } from '../../util/errors';
 import { RelayerChain } from '../../models/chain-models';
+import { tokenForAddress } from '../tokens/network-tokens';
+import { TokenConfig } from 'models/token-models';
 
 const comparePackagedFeeToCalculated = (
-  chain: RelayerChain,
+  token: TokenConfig,
   packagedFee: BigNumber,
   calculatedFee: BigNumber,
 ) => {
-  const { gasEstimateVarianceBuffer } =
-    configNetworks[chain.type][chain.id].fees;
+  const { gasEstimateVarianceBuffer } = token.fee;
   const calculatedFeeWithBuffer = calculatedFee
     .mul(Math.round(10000 * (1 - gasEstimateVarianceBuffer)))
     .div(10000);
@@ -38,10 +38,12 @@ export const validateFee = (
     feeCacheID,
     tokenAddress,
   );
+  const token = tokenForAddress(chain, tokenAddress);
+
   if (cachedUnitTokenFee) {
     if (
       comparePackagedFeeToCalculated(
-        chain,
+        token,
         packagedFee,
         cachedUnitTokenFee.mul(maximumGas),
       )
@@ -54,7 +56,7 @@ export const validateFee = (
   let calculatedFee;
   try {
     calculatedFee = getTokenFee(chain, maximumGas, tokenAddress);
-    if (comparePackagedFeeToCalculated(chain, packagedFee, calculatedFee)) {
+    if (comparePackagedFeeToCalculated(token, packagedFee, calculatedFee)) {
       return;
     }
   } catch (err) {
