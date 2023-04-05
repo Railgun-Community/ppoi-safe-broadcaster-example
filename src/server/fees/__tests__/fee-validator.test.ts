@@ -19,6 +19,7 @@ import configTokens from '../../config/config-tokens';
 import { initTokens } from '../../tokens/network-tokens';
 import { ErrorMessage } from '../../../util/errors';
 import { testChainEthereum } from '../../../test/setup.test';
+import { feeConfigL1 } from '../../config/config-fees';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -53,6 +54,7 @@ describe('fee-validator', function test() {
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id] = {};
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'TOKEN',
+      fee: feeConfigL1(1.1),
     };
     await initTokens();
   });

@@ -12,6 +12,7 @@ import {
 import configNetworks from '../config-networks';
 import configTokenPriceRefresher from '../config-token-price-refresher';
 import configTokens from '../config-tokens';
+import { feeConfigL1 } from '../config-fees';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -30,6 +31,7 @@ describe('config-token-price-refresher', () => {
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id] ??= {};
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK',
+      fee: feeConfigL1(1.1),
     };
     await initTokens();
   });

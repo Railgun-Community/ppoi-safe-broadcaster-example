@@ -67,6 +67,7 @@ import {
   getRailgunWalletAddress,
   getRailgunWalletID,
 } from '../../wallets/active-wallets';
+import { feeConfigL1 } from '../../config/config-fees';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -102,6 +103,7 @@ describe('waku-relayer', () => {
     configTokens[chain.type][chain.id] = {};
     configTokens[chain.type][chain.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',
+      fee: feeConfigL1(1.1),
     };
     await initTokens();
     processTransactionStub = sinon

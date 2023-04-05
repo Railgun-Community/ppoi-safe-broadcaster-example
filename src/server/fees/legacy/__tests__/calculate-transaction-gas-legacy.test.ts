@@ -61,10 +61,10 @@ describe('calculate-transaction-gas-legacy', () => {
     mockTokenConfig(MOCK_CHAIN, MOCK_TOKEN_6_DECIMALS);
     await initTokens();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
-    configNetworks[MOCK_CHAIN.type][
-      MOCK_CHAIN.id
-    ].fees.gasEstimateVarianceBuffer = 0.05;
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fees.profit = 0.05;
+    // configNetworks[MOCK_CHAIN.type][
+    //   MOCK_CHAIN.id
+    // ].fees.gasEstimateVarianceBuffer = 0.05;
+    // configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fees.profit = 0.05;
     await initNetworkProviders();
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,

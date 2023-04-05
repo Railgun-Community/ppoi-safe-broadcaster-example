@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { testChainEthereum } from '../../../test/setup.test';
 import configTokens from '../../config/config-tokens';
 import { allTokenAddressesForNetwork, initTokens } from '../network-tokens';
+import { feeConfigL1 } from '../../config/config-fees';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -16,6 +17,7 @@ describe('network-tokens', () => {
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id] = {
       '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {
         symbol: 'WETH',
+        fee: feeConfigL1(1.1),
       },
     };
     await initTokens();

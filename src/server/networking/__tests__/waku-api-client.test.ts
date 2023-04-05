@@ -12,6 +12,7 @@ import { resetTokenPriceCache } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
 import configTokens from '../../config/config-tokens';
 import { initTokens } from '../../tokens/network-tokens';
+import { feeConfigL1 } from '../../config/config-fees';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -30,6 +31,7 @@ describe('waku-api-client', () => {
     await setupSingleTestWallet();
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',
+      fee: feeConfigL1(1.1),
     };
     await initTokens();
 

@@ -11,12 +11,14 @@ import { Network } from '../models/network-models';
 import { FallbackProviderJsonConfig } from '../models/provider-models';
 import { Token, TokenConfig } from '../models/token-models';
 import { RelayerChain } from '../models/chain-models';
+import { feeConfigL1 } from 'server/config/config-fees';
 
 export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
   // @ts-ignore
   configTokens[chain.type] ??= {};
   configTokens[chain.type][chain.id][tokenAddress] = {
     symbol: tokenAddress.toUpperCase(),
+    fee: feeConfigL1(1),
   };
 };
 
@@ -69,11 +71,7 @@ export const getMockNetwork = (): Network => {
       decimals: 18,
       minBalanceForAvailability: 0.1,
     },
-    fees: {
-      gasEstimateVarianceBuffer: 0.03,
-      gasEstimateLimitToActualRatio: 1.25,
-      profit: 0.07,
-    },
+
     proxyContract: '0x00' as RailgunProxyContract,
     relayAdaptContract: '0x00' as RelayAdaptContract,
     coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
@@ -91,11 +89,7 @@ export const getMockGoerliNetwork = (): Network => {
       decimals: 18,
       minBalanceForAvailability: 0.1,
     },
-    fees: {
-      gasEstimateVarianceBuffer: 0.05,
-      gasEstimateLimitToActualRatio: 1.25,
-      profit: 0.05,
-    },
+
     proxyContract: RailgunProxyContract.EthereumGoerli,
     relayAdaptContract: RelayAdaptContract.EthereumGoerli,
     fallbackProviderConfig: getMockGoerliFallbackProviderConfig(),
@@ -115,6 +109,7 @@ export const getMockSerializedTransaction = (): string => {
 export const getMockTokenConfig = (): TokenConfig => {
   return {
     symbol: 'SHIB',
+    fee: feeConfigL1(1.18),
   };
 };
 
@@ -123,6 +118,7 @@ export const getMockToken = (): Token => {
     address: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
     symbol: 'SHIB',
     decimals: 18,
+    fee: feeConfigL1(1.18),
   };
 };
 

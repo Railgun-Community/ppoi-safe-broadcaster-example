@@ -31,6 +31,7 @@ import {
   getEVMGasTypeForTransaction,
   NetworkName,
 } from '@railgun-community/shared-models';
+import { feeConfigL1 } from '../../config/config-fees';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -90,9 +91,11 @@ describe('calculate-token-fee', () => {
     configTokens[chain.type][chain.id] = {
       [MOCK_TOKEN_ADDRESS]: {
         symbol: 'MOCK1',
+        fee: feeConfigL1(1.1),
       },
       [MOCK_TOKEN_6_DECIMALS]: {
         symbol: 'MOCK2',
+        fee: feeConfigL1(1.1),
       },
     };
     await initTokens();
