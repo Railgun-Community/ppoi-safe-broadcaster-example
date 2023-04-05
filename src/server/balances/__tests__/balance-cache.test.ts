@@ -39,7 +39,7 @@ describe('balance-cache', () => {
     await initWallets();
     await initNetworkProviders();
     resetGasTokenBalanceCache();
-    createGasBalanceStub(BigNumber.from(5000)); //
+    createGasBalanceStub(BigNumber.from(5000));
   });
 
   afterEach(() => {
