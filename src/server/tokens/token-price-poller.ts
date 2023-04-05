@@ -13,22 +13,17 @@ let shouldPoll = true;
 const pullAndCacheCurrentPricesForAllNetworks = async (
   tokenPriceRefresher: TokenPriceRefresher,
 ): Promise<void> => {
-  const networkPriceRefreshers: Promise<void>[] = [];
-
   const chains = configuredNetworkChains();
-  chains.forEach((chain) => {
+  for (const chain of chains) {
     const tokenAddresses = allTokenAddressesForNetwork(chain);
     const gasTokenAddress =
       configNetworks[chain.type][chain.id].gasToken.wrappedAddress;
     if (gasTokenAddress) {
       tokenAddresses.push(gasTokenAddress);
     }
-    networkPriceRefreshers.push(
-      tokenPriceRefresher.refresher(chain, tokenAddresses),
-    );
-  });
-
-  await Promise.all(networkPriceRefreshers);
+    // eslint-disable-next-line no-await-in-loop
+    await tokenPriceRefresher.refresher(chain, tokenAddresses);
+  }
 };
 
 const pollPrices = async (source: TokenPriceSource) => {

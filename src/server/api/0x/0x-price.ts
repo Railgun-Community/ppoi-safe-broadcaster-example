@@ -1,12 +1,20 @@
 import { RelayerChain } from '../../../models/chain-models';
-import { delay } from '../../../util/promise-utils';
+import { delay, promiseTimeout } from '../../../util/promise-utils';
 import { tokenForAddress } from '../../tokens/network-tokens';
 import { TokenPrice, TokenPriceUpdater } from '../../tokens/token-price-cache';
-import { ZeroXApiEndpoint, getZeroXData, getStablecoinReferenceSymbol } from './0x-fetch';
+import {
+  ZeroXApiEndpoint,
+  getZeroXData,
+  getStablecoinReferenceSymbol,
+} from './0x-fetch';
+
+import debug from 'debug';
+
+const dbg = debug('relayer:0xPrice');
 
 // 1.5 second delay; 40 per minute maximum.
 // https://docs.0x.org/0x-api-swap/advanced-topics/rate-limiting
-let ZERO_X_PRICE_LOOKUP_DELAY = 1500;
+let ZERO_X_PRICE_LOOKUP_DELAY = 350;
 
 const refreshLocks: NumMapType<NumMapType<boolean>> = {};
 
@@ -76,10 +84,18 @@ export const zeroXUpdatePricesByAddresses = async (
     return;
   }
   refreshLocks[chain.type][chain.id] = true;
+  dbg(`Starting chain ${chain.id}`);
 
   for (const tokenAddress of tokenAddresses) {
     // eslint-disable-next-line no-await-in-loop
-    const zeroXPriceData = await zeroXPriceLookupByAddress(chain, tokenAddress);
+    const zeroXPriceData = await promiseTimeout(
+      zeroXPriceLookupByAddress(chain, tokenAddress),
+      10000, // 10 second price fetch timeout
+    ).catch((err) => {
+      if (err?.message?.includes('Timed out')) {
+        dbg(`Token ${tokenAddress} timed out on chain ${chain.id}`);
+      }
+    });
     if (zeroXPriceData) {
       const tokenPrice: TokenPrice = {
         price: zeroXPriceData.price,
@@ -91,6 +107,7 @@ export const zeroXUpdatePricesByAddresses = async (
     // eslint-disable-next-line no-await-in-loop
     await delay(ZERO_X_PRICE_LOOKUP_DELAY);
   }
+  dbg(`Ended chain ${chain.id}`);
 
   refreshLocks[chain.type][chain.id] = false;
 };
