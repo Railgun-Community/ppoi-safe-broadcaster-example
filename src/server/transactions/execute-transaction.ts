@@ -139,9 +139,11 @@ export const executeTransaction = async (
 
     dbg('Submitted transaction:', txResponse.hash);
 
-    await waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce);
-
-    setWalletAvailability(activeWallet, chain, true);
+    // Perform this action synchronously - return txResponse immediately.
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce).then(() => {
+      setWalletAvailability(activeWallet, chain, true);
+    });
 
     return txResponse;
   } catch (err) {
