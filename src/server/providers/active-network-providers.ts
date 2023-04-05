@@ -57,10 +57,9 @@ const initNetworkProvider = async (chain: RelayerChain) => {
   );
   finalConfig.providers = availableProviders;
 
-  await loadEngineProvider(chain, fallbackProviderConfig);
-  const fallbackProvider = createFallbackProviderFromJsonConfig(
-    fallbackProviderConfig,
-  );
+  await loadEngineProvider(chain, finalConfig);
+
+  const fallbackProvider = createFallbackProviderFromJsonConfig(finalConfig);
   activeNetworkProviders[chain.type] ??= {};
   activeNetworkProviders[chain.type][chain.id] = fallbackProvider;
   dbg(`Loaded network ${chain.type}:${chain.id}`);
