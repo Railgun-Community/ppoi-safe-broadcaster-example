@@ -9,7 +9,7 @@ import { BigNumber } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
 import { logger } from '../../util/logger';
-import { throwErr } from '../../util/promise-utils';
+import { throwErr, delay } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getStandardGasDetails } from './gas-by-speed';
@@ -48,20 +48,37 @@ export const getEstimateGasDetailsRelayed = async (
     // minGasPrice not allowed on EVMGasType 2
     throw new Error('EVMGasType 2 not allowed for Relayer transactions.');
   }
-  try {
-    const gasPrice = BigNumber.from(minGasPrice);
-    const transactionRequestWithOptionalMinGas: TransactionRequest = {
-      ...transactionRequest,
-      gasPrice,
-    };
+  const gasPrice = BigNumber.from(minGasPrice);
+  const transactionRequestWithOptionalMinGas: TransactionRequest = {
+    ...transactionRequest,
+    gasPrice,
+  };
 
-    const provider = getProviderForNetwork(chain);
+  const provider = getProviderForNetwork(chain);
+
+  try {
     const gasEstimate = await provider
       .estimateGas(transactionRequestWithOptionalMinGas)
       .catch(throwErr);
 
     return { evmGasType, gasEstimate, gasPrice };
   } catch (err) {
+    if (err.message.indexOf('failed to meet quorum') !== -1) {
+      logger.warn('Experienced a quorum error. Trying again in a few seconds.');
+      await delay(2000);
+      try {
+        // retry gas estimate again, maybe it had bad connection.
+        const gasEstimate = await provider
+          .estimateGas(transactionRequestWithOptionalMinGas)
+          .catch(throwErr);
+
+        return { evmGasType, gasEstimate, gasPrice };
+      } catch (error) {
+        if (err.message.indexOf('failed to meet quorum') !== -1) {
+          throw new Error(ErrorMessage.FAILED_QUORUM);
+        }
+      }
+    }
     logger.error(err);
     if (devLog) {
       throw sanitizeRelayerError(err);
