@@ -30,6 +30,22 @@ export const getAllUnitTokenFeesForChain = (
   return { fees: tokenFeesForChain, feeCacheID };
 };
 
+export const parseGasTokenFee = (fee: BigNumber, token: Token) => {
+  return fee.div(BigNumber.from(10).pow(BigNumber.from(token.decimals)));
+};
+
+export const convertCachedTokenFee = (
+  cachedUnitTokenFee: BigNumber,
+  maximumGas: BigNumber,
+  token: Token,
+) => {
+  const decimalRatio = getTransactionTokenToGasDecimalRatio(token);
+  const maximumGasConversion = cachedUnitTokenFee
+    .mul(maximumGas)
+    .div(decimalRatio);
+  return parseGasTokenFee(maximumGasConversion, token);
+};
+
 export const calculateTokenFeePerUnitGasToken = (
   chain: RelayerChain,
   tokenAddress: string,
@@ -90,10 +106,8 @@ export const getRoundedTokenToGasPriceRatio = (
   // Adjust price ratio to account for difference between gas limit and actual gas cost.
   const adjustedPriceRatio = priceRatio / fees.gasEstimateLimitToActualRatio;
 
-  const gasEstimateVariance =
-    adjustedPriceRatio * fees.gasEstimateVarianceBuffer;
   const profit = adjustedPriceRatio * fees.profit;
-  const totalFeeRatio = adjustedPriceRatio + gasEstimateVariance + profit;
+  const totalFeeRatio = adjustedPriceRatio + profit;
   const ratioMinimum = configDefaults.transactionFees.priceRatioMinimum;
 
   const ratio = totalFeeRatio * precision;

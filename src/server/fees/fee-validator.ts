@@ -1,10 +1,11 @@
 import { BigNumber } from 'ethers';
 import { logger } from '../../util/logger';
-import { getTokenFee } from './calculate-token-fee';
+import { convertCachedTokenFee, getTokenFee } from './calculate-token-fee';
 import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
 import configNetworks from '../config/config-networks';
 import { ErrorMessage } from '../../util/errors';
 import { RelayerChain } from '../../models/chain-models';
+import { tokenForAddress } from '../tokens/network-tokens';
 
 const comparePackagedFeeToCalculated = (
   chain: RelayerChain,
@@ -17,7 +18,9 @@ const comparePackagedFeeToCalculated = (
     .mul(Math.round(10000 * (1 - gasEstimateVarianceBuffer)))
     .div(10000);
   // logger.log(`calculatedFeeWithBuffer: ${calculatedFeeWithBuffer?.toString()}`);
-  return packagedFee.gte(calculatedFeeWithBuffer);
+  return (
+    packagedFee.gte(calculatedFee) || packagedFee.gte(calculatedFeeWithBuffer)
+  );
 };
 
 export const validateFee = (
@@ -38,29 +41,30 @@ export const validateFee = (
     feeCacheID,
     tokenAddress,
   );
+  logger.warn(
+    `validateFee:cachedUnitTokenFee: ${cachedUnitTokenFee?.toString()}`,
+  );
+  logger.warn(`maximumGas: ${maximumGas?.toString()}`);
+
+  const token = tokenForAddress(chain, tokenAddress);
   if (cachedUnitTokenFee) {
-    if (
-      comparePackagedFeeToCalculated(
-        chain,
-        packagedFee,
-        cachedUnitTokenFee.mul(maximumGas),
-      )
-    ) {
+    const unitTokenFee = convertCachedTokenFee(
+      cachedUnitTokenFee,
+      maximumGas,
+      token,
+    );
+
+    if (comparePackagedFeeToCalculated(chain, packagedFee, unitTokenFee)) {
       return;
     }
   }
 
+  logger.warn('First calculation failed, Cached Fee invalid.');
   // Re-calculate the fee based on current pricing if cache is expired.
-  let calculatedFee;
-  try {
-    calculatedFee = getTokenFee(chain, maximumGas, tokenAddress);
-    if (comparePackagedFeeToCalculated(chain, packagedFee, calculatedFee)) {
-      return;
-    }
-  } catch (err) {
-    logger.log(`error getting current token fee: ${err.message}`);
+  const calculatedFee = getTokenFee(chain, maximumGas, tokenAddress);
+  if (comparePackagedFeeToCalculated(chain, packagedFee, calculatedFee)) {
+    return;
   }
-
   logger.log(`maximumGas: ${maximumGas?.toString()}`);
   logger.log(`cachedUnitTokenFee: ${cachedUnitTokenFee?.toString()}`);
   logger.log(`calculatedFee: ${calculatedFee?.toString()}`);
