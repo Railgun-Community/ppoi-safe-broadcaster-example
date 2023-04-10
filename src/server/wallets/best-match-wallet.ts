@@ -33,17 +33,26 @@ export const getBestMatchWalletForNetwork = async (
     .filter((wallet) => {
       const balanceMet =
         gasTokenBalanceMap[wallet.address].gte(minimumGasNeeded);
-      if (!randomizeSelection) return balanceMet;
-      return balanceMet && availableWallets.length > 1
-        ? wallet.address !== lastUsedWallet
-        : true;
+      if (!randomizeSelection) {
+        return balanceMet;
+      }
+      if (balanceMet && availableWallets.length > 1) {
+        // Filter out last used wallet.
+        return wallet.address !== lastUsedWallet;
+      }
+
+      return true;
     })
     .sort((a, b) => {
-      if (!randomizeSelection) return a.priority - b.priority;
-      if (gasTokenBalanceMap[a.address].lt(gasTokenBalanceMap[b.address]))
+      if (!randomizeSelection) {
+        return a.priority - b.priority;
+      }
+      if (gasTokenBalanceMap[a.address].lt(gasTokenBalanceMap[b.address])) {
         return 1;
-      if (gasTokenBalanceMap[a.address].gt(gasTokenBalanceMap[b.address]))
+      }
+      if (gasTokenBalanceMap[a.address].gt(gasTokenBalanceMap[b.address])) {
         return -1;
+      }
       return 0;
     });
 
