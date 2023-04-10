@@ -37,12 +37,15 @@ export const getEstimateGasDetailsPublic = async (
   }
 };
 
+const MAX_RELAYER_GAS_RETRIES = 4;
+
 export const getEstimateGasDetailsRelayed = async (
   chain: RelayerChain,
   evmGasType: EVMGasType,
   minGasPrice: string,
   transactionRequest: TransactionRequest,
   devLog?: boolean,
+  retryCount = 0,
 ): Promise<TransactionGasDetails> => {
   if (evmGasType === EVMGasType.Type2) {
     // minGasPrice not allowed on EVMGasType 2
@@ -65,19 +68,18 @@ export const getEstimateGasDetailsRelayed = async (
   } catch (err) {
     if (err.message.indexOf('failed to meet quorum') !== -1) {
       logger.warn('Experienced a quorum error. Trying again in a few seconds.');
-      await delay(2000);
-      try {
-        // retry gas estimate again, maybe it had bad connection.
-        const gasEstimate = await provider
-          .estimateGas(transactionRequestWithOptionalMinGas)
-          .catch(throwErr);
-
-        return { evmGasType, gasEstimate, gasPrice };
-      } catch (error) {
-        if (err.message.indexOf('failed to meet quorum') !== -1) {
-          throw new Error(ErrorMessage.FAILED_QUORUM);
-        }
+      await delay(500);
+      if (retryCount > MAX_RELAYER_GAS_RETRIES) {
+        throw new Error(ErrorMessage.FAILED_QUORUM);
       }
+      return getEstimateGasDetailsRelayed(
+        chain,
+        evmGasType,
+        minGasPrice,
+        transactionRequest,
+        devLog,
+        retryCount + 1,
+      );
     }
     logger.error(err);
     if (devLog) {

@@ -10,7 +10,7 @@ export enum ErrorMessage {
   MISSING_REQUIRED_FIELD = `Missing required field.`,
   NO_RELAYER_FEE = 'No Relayer Fee included in transaction.',
   UNKNOWN_ERROR = 'Unknown Relayer error.',
-  PACKAGED_FEE = 'Gas Price is too low to guarantee inclusion into the next block, it has changed too much from the estimates.',
+  REJECTED_PACKAGED_FEE = 'Network Gas Price has changed dramatically and the Relayer Fee was rejected.',
 }
 
 const sanitizeEthersError = (errMessage: string) => {
