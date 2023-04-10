@@ -84,7 +84,7 @@ export const zeroXUpdatePricesByAddresses = async (
     return;
   }
   refreshLocks[chain.type][chain.id] = true;
-  dbg(`Starting chain ${chain.id}`);
+  dbg(`Starting chain ${chain.type}:${chain.id}`);
 
   for (const tokenAddress of tokenAddresses) {
     // eslint-disable-next-line no-await-in-loop
@@ -93,7 +93,9 @@ export const zeroXUpdatePricesByAddresses = async (
       10000, // 10 second price fetch timeout
     ).catch((err) => {
       if (err?.message?.includes('Timed out')) {
-        dbg(`Token ${tokenAddress} timed out on chain ${chain.id}`);
+        dbg(
+          `Token ${tokenAddress} timed out on chain ${chain.type}:${chain.id}`,
+        );
       }
     });
     if (zeroXPriceData) {
@@ -107,7 +109,7 @@ export const zeroXUpdatePricesByAddresses = async (
     // eslint-disable-next-line no-await-in-loop
     await delay(ZERO_X_PRICE_LOOKUP_DELAY);
   }
-  dbg(`Ended chain ${chain.id}`);
+  dbg(`Ended chain ${chain.type}:${chain.id}`);
 
   refreshLocks[chain.type][chain.id] = false;
 };
