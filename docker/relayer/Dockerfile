@@ -3,7 +3,7 @@ FROM node:lts-bullseye-slim as base
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt install -y --no-install-recommends jq build-essential netcat python3 && rm -rf /var/lib/apt/lists/*
-RUN corepack prepare pnpm@latest --activate
+RUN corepack prepare pnpm@8.2.0 --activate
 
 ###
 FROM base as buildenv
