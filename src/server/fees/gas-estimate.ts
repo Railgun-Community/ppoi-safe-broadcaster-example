@@ -13,6 +13,7 @@ import { throwErr, delay } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getStandardGasDetails } from './gas-by-speed';
+import configDefaults from 'server/config/config-defaults';
 
 export const getEstimateGasDetailsPublic = async (
   chain: RelayerChain,
@@ -36,8 +37,6 @@ export const getEstimateGasDetailsPublic = async (
     throw new Error(ErrorMessage.GAS_ESTIMATE_ERROR);
   }
 };
-
-const MAX_RELAYER_GAS_RETRIES = 4;
 
 export const getEstimateGasDetailsRelayed = async (
   chain: RelayerChain,
@@ -68,8 +67,12 @@ export const getEstimateGasDetailsRelayed = async (
   } catch (err) {
     if (err.message.indexOf('failed to meet quorum') !== -1) {
       logger.warn('Experienced a quorum error. Trying again in a few seconds.');
-      await delay(500);
-      if (retryCount > MAX_RELAYER_GAS_RETRIES) {
+
+      const { failedGasEstimateDelay, failedRetryAttempts } =
+        configDefaults.gasEstimateSettings;
+
+      await delay(failedGasEstimateDelay);
+      if (retryCount > failedRetryAttempts) {
         throw new Error(ErrorMessage.FAILED_QUORUM);
       }
       return getEstimateGasDetailsRelayed(
