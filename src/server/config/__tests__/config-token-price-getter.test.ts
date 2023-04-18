@@ -24,7 +24,7 @@ describe('config-token-price-refresher', () => {
   before(async () => {
     startEngine();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = testNetwork;
-    await initNetworkProviders();
+    await initNetworkProviders([MOCK_CHAIN]);
     // @ts-ignore
     configTokens[MOCK_CHAIN.type] ??= {};
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id] ??= {};

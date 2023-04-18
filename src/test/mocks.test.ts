@@ -15,6 +15,7 @@ import { RelayerChain } from '../models/chain-models';
 export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
   // @ts-ignore
   configTokens[chain.type] ??= {};
+  configTokens[chain.type][chain.id] ??= {};
   configTokens[chain.type][chain.id][tokenAddress] = {
     symbol: tokenAddress.toUpperCase(),
   };

@@ -20,6 +20,7 @@ import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { testChainEthereum } from '../../../test/setup.test';
+import { RelayerChain } from '../../../models/chain-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -45,7 +46,7 @@ describe('best-match-wallet', () => {
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
       .resolves(BigNumber.from(10).pow(18));
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
-    await initNetworkProviders();
+    await initNetworkProviders([MOCK_CHAIN]);
   });
 
   afterEach(() => {

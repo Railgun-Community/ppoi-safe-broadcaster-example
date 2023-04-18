@@ -49,7 +49,7 @@ describe('fee-validator', function test() {
     const network = getMockNetwork();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = network;
     gasTokenAddress = network.gasToken.wrappedAddress;
-    await initNetworkProviders();
+    await initNetworkProviders([MOCK_CHAIN]);
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id] = {};
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'TOKEN',

@@ -29,7 +29,7 @@ const MOCK_CHAIN = testChainEthereum();
 describe('gas-estimate', () => {
   before(async () => {
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
-    await initNetworkProviders();
+    await initNetworkProviders([MOCK_CHAIN]);
   });
 
   afterEach(() => {

@@ -15,8 +15,8 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('relayer-init', () => {
-  after(() => {
-    closeSettingsDB();
+  after(async () => {
+    await closeSettingsDB();
   });
 
   it('Should run init scripts', async () => {

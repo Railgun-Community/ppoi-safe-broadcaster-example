@@ -56,11 +56,11 @@ export const startEngine = () => {
   engineStarted = true;
 };
 
-export const stopEngine = () => {
+export const stopEngine = async () => {
   if (!engineStarted) {
     return;
   }
-  stopRailgunEngine();
+  await stopRailgunEngine();
 };
 
 /**

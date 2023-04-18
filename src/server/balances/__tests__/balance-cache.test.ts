@@ -32,9 +32,7 @@ const shouldUpdateEthWalletBalance = (address: string) => {
 };
 
 describe('balance-cache', () => {
-  // name of the test suite
   before(async () => {
-    // before running any test - startEngine (the sdk), init the wallets, init network providers, and some helperfunrctions
     startEngine();
     await initWallets();
     await initNetworkProviders();
@@ -43,17 +41,14 @@ describe('balance-cache', () => {
   });
 
   afterEach(() => {
-    //
     resetGasTokenBalanceCache();
   });
 
   after(() => {
-    // resets tests after
     restoreGasBalanceStub();
   });
 
   it('Should update gas token balance cache for all chains', async () => {
-    // tests always start with it -
     const activeWallets = getActiveWallets();
     const firstWalletAddress = activeWallets[0].address;
     await updateAllActiveWalletsGasTokenBalances(activeWallets);

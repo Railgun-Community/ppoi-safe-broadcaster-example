@@ -1,4 +1,4 @@
-import { EVMGasType , ChainType } from '@railgun-community/shared-models';
+import { EVMGasType, ChainType } from '@railgun-community/shared-models';
 import axios from 'axios';
 import { parseUnits } from '@ethersproject/units';
 import debug from 'debug';

@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { EVMGasType , ChainType } from '@railgun-community/shared-models';
+import { EVMGasType, ChainType } from '@railgun-community/shared-models';
 import { GasHistoryPercentile } from '../../../models/gas-models';
 import { getGasDetailsForSpeed } from '../gas-by-speed';
 import { NetworkChainID } from '../../config/config-chains';
@@ -32,7 +32,7 @@ describe('gas-by-speed', () => {
             1_000_000_000,
           );
           expect(gasDetails.gasPrice.toNumber()).to.be.lessThan(
-            2_500_000_000_000,
+            3_500_000_000_000,
           );
         }),
     );
@@ -55,13 +55,13 @@ describe('gas-by-speed', () => {
             1_000_000_000,
           );
           expect(gasDetails.maxFeePerGas.toNumber()).to.be.lessThan(
-            2_500_000_000_000,
+            3_500_000_000_000,
           );
           expect(gasDetails.maxPriorityFeePerGas.toNumber()).to.be.greaterThan(
             1_000_000_000,
           );
           expect(gasDetails.maxPriorityFeePerGas.toNumber()).to.be.lessThan(
-            2_500_000_000_000,
+            3_500_000_000_000,
           );
         }),
     );

@@ -75,7 +75,7 @@ describe('coingecko-price', () => {
 
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
     configNetworks[chainRopsten.type][chainRopsten.id] = ropstenNetwork;
-    await initNetworkProviders();
+    await initNetworkProviders([chainEthereum, chainRopsten]);
 
     resetTokenPriceCache();
 

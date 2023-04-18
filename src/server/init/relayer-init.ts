@@ -31,13 +31,13 @@ export const initRelayerModules = async (forTest = false) => {
   logger.log('Relayer ready.');
 };
 
-export const uninitRelayerModules = () => {
+export const uninitRelayerModules = async () => {
   stopTokenPricePolling();
   logger.log('stopping token price polling');
   stopTopUpPolling();
   logger.log('stopping wallet top up polling');
-  closeSettingsDB();
+  await closeSettingsDB();
   logger.log('closed settings db');
-  stopEngine();
+  await stopEngine();
   logger.log('unloaded engine');
 };

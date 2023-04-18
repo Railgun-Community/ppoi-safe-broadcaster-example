@@ -47,6 +47,7 @@ import { contentTopics } from '../topics';
 import {
   getMockNetwork,
   getMockSerializedTransaction,
+  mockTokenConfig,
 } from '../../../test/mocks.test';
 import { initTokens } from '../../tokens/network-tokens';
 import configNetworks from '../../config/config-networks';
@@ -98,11 +99,8 @@ describe('waku-relayer', () => {
     await setupSingleTestWallet();
     network = setupTestNetwork();
     configNetworks[chain.type][chain.id] = getMockNetwork();
-    await initNetworkProviders();
-    configTokens[chain.type][chain.id] = {};
-    configTokens[chain.type][chain.id][MOCK_TOKEN_ADDRESS] = {
-      symbol: 'MOCK1',
-    };
+    await initNetworkProviders([chain]);
+    mockTokenConfig(chain, MOCK_TOKEN_ADDRESS);
     await initTokens();
     processTransactionStub = sinon
       .stub(processTransactionModule, 'processTransaction')

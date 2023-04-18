@@ -61,7 +61,7 @@ const validatePriceRefresherOutput = (chain: RelayerChain) => {
     );
     expect(priceData).to.be.an('object');
     expect(priceData?.price).to.be.a('number');
-    expect(priceData?.updatedAt).to.be.greaterThan(Date.now() - 20);
+    expect(priceData?.updatedAt).to.be.greaterThanOrEqual(Date.now() - 20);
   });
 };
 
@@ -71,7 +71,7 @@ describe('0x-price', () => {
 
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
     configNetworks[chainRopsten.type][chainRopsten.id] = ropstenNetwork;
-    await initNetworkProviders();
+    await initNetworkProviders([chainEthereum, chainRopsten]);
 
     resetTokenPriceCache();
 

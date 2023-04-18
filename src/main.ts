@@ -42,7 +42,7 @@ const main = async (): Promise<void> => {
 
 process.on('SIGINT', async () => {
   dbg('shutting down');
-  uninitRelayerModules();
+  await uninitRelayerModules();
   await relayer.stop();
   await delay(2000);
   process.exit(0);

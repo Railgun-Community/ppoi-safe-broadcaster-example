@@ -15,8 +15,8 @@ export const initSettingsDB = () => {
   db = new Database(level);
 };
 
-export const closeSettingsDB = () => {
-  db?.close();
+export const closeSettingsDB = async () => {
+  await db?.close();
   db = undefined;
 };
 

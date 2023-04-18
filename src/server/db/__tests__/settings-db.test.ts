@@ -16,8 +16,8 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('settings-db', () => {
-  after(() => {
-    closeSettingsDB();
+  after(async () => {
+    await closeSettingsDB();
   });
 
   it('Should test settings db', async () => {
@@ -35,7 +35,7 @@ describe('settings-db', () => {
   });
 
   it('Should test settings db errors', async () => {
-    closeSettingsDB();
+    await closeSettingsDB();
     await storeSettingsString('str', 'val');
     await storeSettingsBytes('byt', 'val');
     await storeSettingsNumber('str', 12500);

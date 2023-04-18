@@ -68,7 +68,7 @@ describe('0x-swap', () => {
     configNetworks[MOCK_LOW_LIQUIDITY_CHAIN.type][MOCK_LOW_LIQUIDITY_CHAIN.id] =
       getMockGoerliNetwork();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
-    await initNetworkProviders();
+    await initNetworkProviders([MOCK_CHAIN]);
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getTransactionCount')
       .resolves(3);
