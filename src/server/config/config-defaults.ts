@@ -173,9 +173,14 @@ export default {
     blockNativeApiKey: '',
 
     /**
-     * Configurable API Keys for Pricing APIs.
+     * API Key for Coingecko Price API.
      * Pro tiers are more stable and reliable.
      */
     coingeckoProApiKey: 'CG-zmXR1JBHNGdG98yZz7QUHUTr',
+
+    /**
+     * API Key for 0x Exchange APIs.
+     */
+    zeroXApiKey: '',
   },
 };

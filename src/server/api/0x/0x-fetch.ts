@@ -3,17 +3,17 @@ import axios from 'axios';
 import { RelayerChain } from '../../../models/chain-models';
 import { logger } from '../../../util/logger';
 import { NetworkChainID } from '../../config/config-chains';
+import configDefaults from '../../config/config-defaults';
 
 export enum ZeroXApiEndpoint {
   PriceLookup = 'swap/v1/price',
   GetSwapQuote = 'swap/v1/quote',
 }
 
-export const getStablecoinReferenceSymbol = (
-  chain: RelayerChain,
-): string =>{
-
-  const error = new Error(`Chain ${chain.type}:${chain.id} has no reference symbol, Unable to get price quotes.`);
+export const getStablecoinReferenceSymbol = (chain: RelayerChain): string => {
+  const error = new Error(
+    `Chain ${chain.type}:${chain.id} has no reference symbol, Unable to get price quotes.`,
+  );
 
   switch (chain.type) {
     case ChainType.EVM: {
@@ -33,7 +33,7 @@ export const getStablecoinReferenceSymbol = (
     }
   }
   throw error;
-}
+};
 
 const zeroXApiUrl = (chain: RelayerChain): string => {
   switch (chain.type) {
@@ -91,12 +91,14 @@ export const getZeroXData = async <T>(
   params?: MapType<any>,
 ): Promise<T> => {
   const url = createUrl(endpoint, chain, params);
+  const apiKey = configDefaults.api.zeroXApiKey;
   try {
     const rsp = await axios.get(url, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        '0x-api-key': apiKey,
       },
     });
     return rsp.data;
