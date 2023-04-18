@@ -12,18 +12,18 @@ const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
 const dbg = debug('relayer:wallets:availability');
 
-const lastWalletUsed: NumMapType<NumMapType<string>> = {};
+const lastUsedWalletAddressMap: NumMapType<NumMapType<string>> = {};
 
-export const getLastUsedWalletForChain = (chain: RelayerChain) => {
-  return lastWalletUsed?.[chain.type]?.[chain.id] ?? '';
+export const getLastUsedWalletAddressForChain = (chain: RelayerChain) => {
+  return lastUsedWalletAddressMap?.[chain.type]?.[chain.id] ?? '';
 };
 
 export const setLastWalletUsed = (
   walletAddress: string,
   chain: RelayerChain,
 ) => {
-  lastWalletUsed[chain.type] ??= {};
-  lastWalletUsed[chain.type][chain.id] = walletAddress;
+  lastUsedWalletAddressMap[chain.type] ??= {};
+  lastUsedWalletAddressMap[chain.type][chain.id] = walletAddress;
 };
 
 export const setWalletAvailability = (

@@ -3,12 +3,13 @@ import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-c
 import { getActiveWalletsForChain } from './active-wallets';
 import {
   getAvailableWallets,
-  getLastUsedWalletForChain,
+  getLastUsedWalletAddressForChain,
 } from './available-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { RelayerChain } from '../../models/chain-models';
 import configDefaults from '../config/config-defaults';
+import { randomElement } from 'util/utils';
 
 export const getBestMatchWalletForNetwork = async (
   chain: RelayerChain,
@@ -28,7 +29,7 @@ export const getBestMatchWalletForNetwork = async (
   // Simple sort:
   // - Priority.
   const randomizeSelection = configDefaults.wallet.randomizeWalletSelection;
-  const lastUsedWallet = getLastUsedWalletForChain(chain);
+  const lastUsedWalletAddress = getLastUsedWalletAddressForChain(chain);
   const sortedAvailableWallets = availableWallets
     .filter((wallet) => {
       const balanceMet =
@@ -44,7 +45,7 @@ export const getBestMatchWalletForNetwork = async (
         //    - check balance requirement
         if (availableWallets.length > 1) {
           // Filter out last used wallet.
-          return wallet.address !== lastUsedWallet && balanceMet;
+          return wallet.address !== lastUsedWalletAddress && balanceMet;
         }
       }
 
@@ -74,10 +75,13 @@ export const getBestMatchWalletForNetwork = async (
     );
     throw new Error(`All wallets busy or out of funds.`);
   }
-  const walletIndex = randomizeSelection
-    ? Math.floor(Math.random() * sortedAvailableWallets.length)
-    : 0;
 
-  const bestWallet = sortedAvailableWallets[walletIndex];
-  return bestWallet;
+  if (randomizeSelection) {
+    const randomSelectedWallet = randomElement(sortedAvailableWallets);
+    if (randomSelectedWallet) {
+      return randomSelectedWallet;
+    }
+  }
+
+  return sortedAvailableWallets[0];
 };
