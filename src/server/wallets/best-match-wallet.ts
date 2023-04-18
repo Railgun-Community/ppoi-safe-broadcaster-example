@@ -33,15 +33,22 @@ export const getBestMatchWalletForNetwork = async (
     .filter((wallet) => {
       const balanceMet =
         gasTokenBalanceMap[wallet.address].gte(minimumGasNeeded);
-      if (!randomizeSelection) {
-        return balanceMet;
-      }
-      if (balanceMet && availableWallets.length > 1) {
-        // Filter out last used wallet.
-        return wallet.address !== lastUsedWallet;
+      if (randomizeSelection) {
+        // if we're using random select,
+        // balance for tx must be still met.
+
+        // so if we only have 1 wallet left, we base the check soley on balance.
+        //    - falls through to bottom.
+        // if we have more than 1 available wallet
+        //    - filter out last wallet used
+        //    - check balance requirement
+        if (availableWallets.length > 1) {
+          // Filter out last used wallet.
+          return wallet.address !== lastUsedWallet && balanceMet;
+        }
       }
 
-      return true;
+      return balanceMet;
     })
     .sort((a, b) => {
       if (!randomizeSelection) {
