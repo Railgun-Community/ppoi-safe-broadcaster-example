@@ -176,7 +176,7 @@ export default {
      * API Key for Coingecko Price API.
      * Pro tiers are more stable and reliable.
      */
-    coingeckoProApiKey: 'CG-zmXR1JBHNGdG98yZz7QUHUTr',
+    coingeckoProApiKey: '',
 
     /**
      * API Key for 0x Exchange APIs.
