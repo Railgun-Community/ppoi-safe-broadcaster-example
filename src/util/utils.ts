@@ -34,6 +34,13 @@ export const resetArray = (a: object[]) => {
   a.length = 0;
 };
 
+export const randomElement = <T>(list: T[]): Optional<T> => {
+  if (list.length === 0) {
+    return undefined;
+  }
+  return list[Math.floor(Math.random() * list.length)];
+};
+
 export const maxBigNumber = (b1: BigNumber, b2: BigNumber) => {
   return b1.gt(b2) ? b1 : b2;
 };
