@@ -18,7 +18,7 @@ export type ShieldedCachedBalance = {
 
 // Type: {chainType: {chainID: {token: balance}[]}}
 const shieldedTokenBalanceCache: NumMapType<
-  NumMapType<ShieldedCachedBalance[]>
+  NumMapType<MapType<ShieldedCachedBalance>>
 > = {};
 
 export const resetShieldedTokenBalanceCache = () => {
@@ -59,17 +59,17 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
   }
 
   shieldedTokenBalanceCache[chain.type] ??= {};
-  shieldedTokenBalanceCache[chain.type][chain.id] ??= [];
+  shieldedTokenBalanceCache[chain.type][chain.id] ??= {};
 
-  erc20Amounts.forEach((erc20Amount) => {
+  erc20Amounts.forEach(({ tokenAddress, amountString }) => {
     const tokenAmount: TokenAmount = {
-      tokenAddress: erc20Amount.tokenAddress,
-      amount: BigNumber.from(erc20Amount.amountString),
+      tokenAddress,
+      amount: BigNumber.from(amountString),
     };
-    shieldedTokenBalanceCache[chain.type][chain.id].push({
+    shieldedTokenBalanceCache[chain.type][chain.id][tokenAddress] = {
       tokenAmount,
       updatedAt: Date.now(),
-    });
+    };
   });
 
   if (balancePromiseResolve) {
@@ -85,6 +85,6 @@ export const getPrivateTokenBalanceCache = (
   chain: RelayerChain,
 ): ShieldedCachedBalance[] => {
   shieldedTokenBalanceCache[chain.type] ??= {};
-  shieldedTokenBalanceCache[chain.type][chain.id] ??= [];
-  return shieldedTokenBalanceCache[chain.type][chain.id];
+  shieldedTokenBalanceCache[chain.type][chain.id] ??= {};
+  return Object.values(shieldedTokenBalanceCache[chain.type][chain.id]);
 };

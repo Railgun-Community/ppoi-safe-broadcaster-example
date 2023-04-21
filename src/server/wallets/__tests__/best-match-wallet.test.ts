@@ -20,7 +20,6 @@ import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { testChainEthereum } from '../../../test/setup.test';
-import { RelayerChain } from '../../../models/chain-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -60,6 +59,7 @@ describe('best-match-wallet', () => {
   it('Should select best match wallet ordered by priority', async () => {
     configDefaults.wallet = {
       mnemonic: MOCK_MNEMONIC,
+      randomizeWalletSelection: false,
       hdWallets: [
         {
           index: 0,
@@ -87,6 +87,7 @@ describe('best-match-wallet', () => {
   it('Should skip unavailable wallets when selecting best match', async () => {
     configDefaults.wallet = {
       mnemonic: MOCK_MNEMONIC,
+      randomizeWalletSelection: false,
       hdWallets: [
         {
           index: 0,
@@ -122,6 +123,7 @@ describe('best-match-wallet', () => {
   it('Should error if all wallets unavailable', async () => {
     configDefaults.wallet = {
       mnemonic: MOCK_MNEMONIC,
+      randomizeWalletSelection: false,
       hdWallets: [
         {
           index: 0,
@@ -142,6 +144,7 @@ describe('best-match-wallet', () => {
   it('Should error if all wallets out of funds', async () => {
     configDefaults.wallet = {
       mnemonic: MOCK_MNEMONIC,
+      randomizeWalletSelection: false,
       hdWallets: [
         {
           index: 0,

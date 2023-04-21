@@ -5,5 +5,5 @@ export type ActiveWallet = {
   pkey: string;
   index: number;
   priority: number;
-  chains: NetworkChainID[];
+  chains: Optional<NetworkChainID[]>;
 };

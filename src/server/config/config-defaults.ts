@@ -4,6 +4,16 @@ import { GAS_TOKEN_DECIMALS } from '../../models/token-models';
 import { NetworkChainID } from './config-chains';
 import secrets from './config-secrets';
 
+const firstHDWalletDefault: {
+  index: number;
+  priority: number;
+  chains?: NetworkChainID[];
+} = {
+  index: 0,
+  priority: 1,
+  chains: undefined,
+};
+
 export default {
   /*
    * String to identify this relayer instance.
@@ -20,6 +30,7 @@ export default {
       NetworkChainID.Ethereum,
       NetworkChainID.EthereumGoerli,
       NetworkChainID.BNBChain,
+      NetworkChainID.Arbitrum,
       NetworkChainID.PolygonPOS,
       NetworkChainID.PolygonMumbai,
       NetworkChainID.ArbitrumGoerli,
@@ -119,26 +130,9 @@ export default {
      * Indeces to configure HD wallets from the same mnemonic.
      * Each separate Relayer instance must have its own HD wallets.
      * If you run multiple Relayers with the same mnemonic, set `transactionFees.requireMatchingFeeCacheID = true`
+     * Add optional chains to run per wallet index. Defaults to all active chains.
      */
-    hdWallets: [
-      {
-        index: 0,
-        priority: 1,
-        /**
-         * Select chains to run per wallet index.
-         */
-        chains: [
-          NetworkChainID.Ethereum,
-          NetworkChainID.BNBChain,
-          NetworkChainID.PolygonPOS,
-          NetworkChainID.Arbitrum,
-          NetworkChainID.EthereumGoerli,
-          NetworkChainID.PolygonMumbai,
-          NetworkChainID.ArbitrumGoerli,
-          NetworkChainID.Hardhat,
-        ],
-      },
-    ],
+    hdWallets: [firstHDWalletDefault],
   },
 
   topUps: {

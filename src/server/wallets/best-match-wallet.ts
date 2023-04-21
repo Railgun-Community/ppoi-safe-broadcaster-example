@@ -9,7 +9,7 @@ import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { RelayerChain } from '../../models/chain-models';
 import configDefaults from '../config/config-defaults';
-import { randomElement } from 'util/utils';
+import { randomElement } from '../../util/utils';
 
 export const getBestMatchWalletForNetwork = async (
   chain: RelayerChain,

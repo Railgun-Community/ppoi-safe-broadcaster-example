@@ -138,8 +138,8 @@ export const getActiveWallets = (): ActiveWallet[] => {
 export const getActiveWalletsForChain = (
   chain: RelayerChain,
 ): ActiveWallet[] => {
-  return getActiveWallets().filter((wallet) =>
-    wallet.chains.includes(chain.id),
+  return getActiveWallets().filter(
+    (wallet) => !wallet.chains || wallet.chains.includes(chain.id),
   );
 };
 
