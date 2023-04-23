@@ -18,6 +18,7 @@ import {
 import { NetworkChainID } from './config-chains';
 import { NetworksConfig } from '../../models/config-models';
 import { NO_GAS_TOKEN_ADDRESS } from '../../models/token-models';
+import { PaymasterContractAddress } from '../../models/network-models';
 
 // 0.15 ETH minimum for L1 availability.
 const MINIMUM_BALANCE_FOR_AVAILABILITY_L1 = 0.15;
@@ -41,6 +42,7 @@ const networksConfig: NetworksConfig = {
       fees: feeConfigL1(1.25),
       proxyContract: RailgunProxyContract.Ethereum,
       relayAdaptContract: RelayAdaptContract.Ethereum,
+      paymasterContract: PaymasterContractAddress.Ethereum,
       deploymentBlock: RailgunProxyDeploymentBlock.Ethereum,
       coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
       fallbackProviderConfig: fallbackProvidersEthereum,
@@ -57,6 +59,7 @@ const networksConfig: NetworksConfig = {
       fees: feeConfigL1(1.25),
       proxyContract: RailgunProxyContract.EthereumGoerli,
       relayAdaptContract: RelayAdaptContract.EthereumGoerli,
+      paymasterContract: PaymasterContractAddress.EthereumGoerli,
       deploymentBlock: RailgunProxyDeploymentBlock.EthereumGoerli,
       fallbackProviderConfig: fallbackProvidersEthereumGoerli,
       priceTTLInMS: defaultTokenPriceTTL,
@@ -73,6 +76,7 @@ const networksConfig: NetworksConfig = {
       fees: feeConfigL1(1.2),
       proxyContract: RailgunProxyContract.BNBChain,
       relayAdaptContract: RelayAdaptContract.BNBChain,
+      paymasterContract: PaymasterContractAddress.BNBChain,
       deploymentBlock: RailgunProxyDeploymentBlock.BNBChain,
       coingeckoNetworkId: CoingeckoNetworkID.BNBChain,
       fallbackProviderConfig: fallbackProvidersBNBChain,
@@ -89,6 +93,7 @@ const networksConfig: NetworksConfig = {
       fees: feeConfigL1(1.15),
       proxyContract: RailgunProxyContract.PolygonPOS,
       relayAdaptContract: RelayAdaptContract.PolygonPOS,
+      paymasterContract: PaymasterContractAddress.PolygonPOS,
       coingeckoNetworkId: CoingeckoNetworkID.PolygonPOS,
       deploymentBlock: RailgunProxyDeploymentBlock.PolygonPOS,
       fallbackProviderConfig: fallbackProvidersPolygon,
@@ -105,6 +110,7 @@ const networksConfig: NetworksConfig = {
       fees: feeConfigL2(1.5),
       proxyContract: RailgunProxyContract.Arbitrum,
       relayAdaptContract: RelayAdaptContract.Arbitrum,
+      paymasterContract: PaymasterContractAddress.Arbitrum,
       coingeckoNetworkId: CoingeckoNetworkID.Arbitrum,
       deploymentBlock: RailgunProxyDeploymentBlock.Arbitrum,
       fallbackProviderConfig: fallbackProvidersArbitrum,
@@ -121,6 +127,7 @@ const networksConfig: NetworksConfig = {
       fees: feeConfigL1(1.15),
       proxyContract: RailgunProxyContract.PolygonMumbai,
       relayAdaptContract: RelayAdaptContract.PolygonMumbai,
+      paymasterContract: PaymasterContractAddress.PolygonMumbai,
       deploymentBlock: RailgunProxyDeploymentBlock.PolygonMumbai,
       fallbackProviderConfig: fallbackProvidersPolygonMumbai,
       priceTTLInMS: defaultTokenPriceTTL,
@@ -137,6 +144,7 @@ const networksConfig: NetworksConfig = {
       fees: feeConfigL2(1.5),
       proxyContract: RailgunProxyContract.ArbitrumGoerli,
       relayAdaptContract: RelayAdaptContract.ArbitrumGoerli,
+      paymasterContract: PaymasterContractAddress.ArbitrumGoerli,
       deploymentBlock: RailgunProxyDeploymentBlock.ArbitrumGoerli,
       fallbackProviderConfig: fallbackProvidersArbitrumGoerli,
       priceTTLInMS: defaultTokenPriceTTL,
@@ -153,6 +161,7 @@ const networksConfig: NetworksConfig = {
       fees: feeConfigL1(1.25),
       proxyContract: RailgunProxyContract.Hardhat,
       relayAdaptContract: RelayAdaptContract.Hardhat,
+      paymasterContract: PaymasterContractAddress.Hardhat,
       deploymentBlock: RailgunProxyDeploymentBlock.Hardhat,
       fallbackProviderConfig: fallbackProvidersHardhat,
       priceTTLInMS: defaultTokenPriceTTL,

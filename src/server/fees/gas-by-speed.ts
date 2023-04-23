@@ -22,7 +22,7 @@
 
 import { BigNumber } from '@ethersproject/bignumber';
 import { ChainType, EVMGasType } from '@railgun-community/shared-models';
-import Web3, { Eth, FeeHistoryResult } from 'web3-eth';
+import { Eth, FeeHistoryResult } from 'web3-eth';
 import { RelayerChain } from '../../models/chain-models';
 import {
   GasHistoryPercentile,
@@ -37,9 +37,6 @@ import {
 import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { web3ProviderFromChainID } from '../providers/web3-providers';
-
-// Hack to get the types to apply correctly.
-const Web3Eth = Web3 as unknown as typeof Web3.Eth;
 
 //
 // THIS CODE WAS MODIFIED FROM METAMASK (MAY 10 2022):
@@ -291,7 +288,7 @@ const estimateGasMaxFeesBySpeedUsingHeuristic = async (
   evmGasType: EVMGasType.Type2,
   chain: RelayerChain,
 ): Promise<GasDetailsBySpeed> => {
-  const web3Eth = new Web3Eth();
+  const web3Eth = new Eth();
   const provider = web3ProviderFromChainID(chain);
   web3Eth.setProvider(provider);
 

@@ -1,6 +1,6 @@
 import debug from 'debug';
 import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   fromUTF8String,
   signWithWalletViewingKey,
@@ -26,6 +26,7 @@ import {
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../util/relayer-version';
 import configDefaults from '../config/config-defaults';
+import { preAuthorizeMethod } from './methods/pre-authorize-method';
 
 export const WAKU_TOPIC = '/waku/2/default-waku/proto';
 
@@ -36,6 +37,7 @@ type JsonRPCMessageHandler = (
 
 export enum WakuMethodNames {
   Transact = 'transact',
+  PreAuthorize = 'preAuthorize',
 }
 
 export type WakuRelayerOptions = {
@@ -62,6 +64,7 @@ export class WakuRelayer {
 
   methods: MapType<JsonRPCMessageHandler> = {
     [WakuMethodNames.Transact]: transactMethod,
+    [WakuMethodNames.PreAuthorize]: preAuthorizeMethod,
   };
 
   stopping = false;
@@ -153,6 +156,7 @@ export class WakuRelayer {
     });
 
     // Availability must be accurate or Relayer risks automatic blocking by clients.
+    // TODO: Update availableWallets to 'available' and check paymaster balance.
     const availableWallets = await numAvailableWallets(chain);
 
     const data: RelayerFeeMessageData = {

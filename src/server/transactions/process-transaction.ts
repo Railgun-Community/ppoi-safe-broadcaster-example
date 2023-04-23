@@ -17,7 +17,7 @@ import {
 } from '../fees/gas-estimate';
 import { validateMinGasPrice } from '../fees/gas-price-validator';
 import { minimumGasBalanceForAvailability } from '../wallets/available-wallets';
-import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
+import { getBestMatchAvailableWalletForNetwork } from '../wallets/best-match-wallet';
 import { executeTransaction } from './execute-transaction';
 import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
 import { deserializeTransaction } from './transaction-deserializer';
@@ -37,7 +37,7 @@ export const processTransaction = async (
   // Minimum gas for gas estimate wallet: 0.15 (or 0.01 L2).
   const minimumGasNeeded = minimumGasBalanceForAvailability(chain);
 
-  const walletForGasEstimate = await getBestMatchWalletForNetwork(
+  const walletForGasEstimate = await getBestMatchAvailableWalletForNetwork(
     chain,
     minimumGasNeeded,
   );

@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import {
   getActiveWallets,
@@ -18,11 +17,13 @@ import { ActiveWallet } from '../../../models/wallet-models';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import configNetworks from '../../config/config-networks';
 import { restoreGasBalanceStub } from '../../../test/stubs/ethers-provider-stubs.test';
-import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { resetGasTokenBalanceCache } from '../../balances/gas-balance-cache';
 import { generateUnshieldTransaction } from '../unshield-tokens';
 import configDefaults from '../../config/config-defaults';
 import { getRailgunSmartWalletContractForNetwork } from '@railgun-community/quickstart';
 import { networkForChain } from '@railgun-community/shared-models';
+import { BigNumber } from '@ethersproject/bignumber';
+import { Wallet } from '@ethersproject/wallet';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -31,7 +32,7 @@ let activeWallet: ActiveWallet;
 let railgunWalletID: string;
 
 let walletGetTransactionCountStub: SinonStub;
-let getBestMatchWalletForNetwork: SinonStub;
+let getBestMatchAvailableWalletForNetwork: SinonStub;
 let railProveStub: SinonStub;
 
 const MOCK_TOKEN_ADDRESS = getMockToken().address;
@@ -70,10 +71,10 @@ describe('unshield-tokens', () => {
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockGoerliNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
     walletGetTransactionCountStub = sinon
-      .stub(EthersWallet.prototype, 'getTransactionCount')
+      .stub(Wallet.prototype, 'getTransactionCount')
       .resolves(3);
-    getBestMatchWalletForNetwork = sinon
-      .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')
+    getBestMatchAvailableWalletForNetwork = sinon
+      .stub(BestWalletMatchModule, 'getBestMatchAvailableWalletForNetwork')
       .resolves(activeWallet);
   });
 
@@ -84,7 +85,7 @@ describe('unshield-tokens', () => {
 
   after(() => {
     walletGetTransactionCountStub.restore();
-    getBestMatchWalletForNetwork.restore();
+    getBestMatchAvailableWalletForNetwork.restore();
     railProveStub?.restore();
   });
 

@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { logger } from '../../util/logger';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { throwErr } from '../../util/promise-utils';

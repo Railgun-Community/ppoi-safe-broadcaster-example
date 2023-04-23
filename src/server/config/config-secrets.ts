@@ -1,7 +1,7 @@
 import { Secrets } from 'models/config-models';
-import { getSecret } from 'docker-secret';
+import { getSecrets } from 'docker-secret';
 import _prompt from 'prompt-sync';
-import { sha256 } from 'ethers/lib/utils';
+import { sha256 } from '@ethersproject/sha2';
 import { fromUTF8String, hexlify } from '@railgun-community/quickstart';
 
 const prompt = _prompt({ sigint: true });
@@ -23,6 +23,8 @@ const getMnemonic = (): string => {
   return input;
 };
 
+const dockerSecrets = getSecrets();
+
 /**
  * Try to load secrets
  * Check .env first (testing), then Docker secrets and finally, prompt for input
@@ -30,9 +32,9 @@ const getMnemonic = (): string => {
 const secrets: Secrets = {
   dbEncryptionKey:
     process.env.DB_ENCRYPTION_KEY ??
-    getSecret('DB_ENCRYPTION_KEY') ??
+    dockerSecrets.DB_ENCRYPTION_KEY ??
     getEncryptionKey(),
-  mnemonic: process.env.MNEMONIC ?? getSecret('MNEMONIC') ?? getMnemonic(),
+  mnemonic: process.env.MNEMONIC ?? dockerSecrets.MNEMONIC ?? getMnemonic(),
 };
 
 export default secrets;

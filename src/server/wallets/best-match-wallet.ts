@@ -1,5 +1,5 @@
-import { BigNumber } from 'ethers';
-import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
+import { BigNumber } from '@ethersproject/bignumber';
+import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/gas-balance-cache';
 import { getActiveWalletsForChain } from './active-wallets';
 import {
   getAvailableWallets,
@@ -11,7 +11,7 @@ import { RelayerChain } from '../../models/chain-models';
 import configDefaults from '../config/config-defaults';
 import { randomElement } from '../../util/utils';
 
-export const getBestMatchWalletForNetwork = async (
+export const getBestMatchAvailableWalletForNetwork = async (
   chain: RelayerChain,
   minimumGasNeeded: BigNumber,
 ): Promise<ActiveWallet> => {
@@ -23,33 +23,23 @@ export const getBestMatchWalletForNetwork = async (
 
   const availableWallets = await getAvailableWallets(activeWallets, chain);
 
-  // Simple filters:
-  // - Availability.
-  // - Amount of (gas token) available.
-  // Simple sort:
-  // - Priority.
   const randomizeSelection = configDefaults.wallet.randomizeWalletSelection;
   const lastUsedWalletAddress = getLastUsedWalletAddressForChain(chain);
   const sortedAvailableWallets = availableWallets
     .filter((wallet) => {
       const balanceMet =
         gasTokenBalanceMap[wallet.address].gte(minimumGasNeeded);
-      if (randomizeSelection) {
-        // if we're using random select,
-        // balance for tx must be still met.
 
-        // so if we only have 1 wallet left, we base the check soley on balance.
-        //    - falls through to bottom.
-        // if we have more than 1 available wallet
-        //    - filter out last wallet used
-        //    - check balance requirement
-        if (availableWallets.length > 1) {
-          // Filter out last used wallet.
-          return wallet.address !== lastUsedWalletAddress && balanceMet;
-        }
+      if (!balanceMet) {
+        return false;
       }
 
-      return balanceMet;
+      if (randomizeSelection && availableWallets.length > 1) {
+        // Avoid using same wallet twice in a row.
+        return wallet.address !== lastUsedWalletAddress;
+      }
+
+      return true;
     })
     .sort((a, b) => {
       if (!randomizeSelection) {

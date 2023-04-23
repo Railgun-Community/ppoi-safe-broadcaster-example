@@ -1,5 +1,4 @@
 import { FallbackProvider } from '@ethersproject/providers';
-import { Contract } from 'ethers';
 import configNetworks from '../config/config-networks';
 import configTokens from '../config/config-tokens';
 import { GasTokenConfig, Token } from '../../models/token-models';
@@ -9,6 +8,7 @@ import { removeUndefineds } from '../../util/utils';
 import { logger } from '../../util/logger';
 import { ABI_ERC20 } from '../abi/abi';
 import { RelayerChain } from '../../models/chain-models';
+import { Contract } from '@ethersproject/contracts';
 
 export const networkTokens: NumMapType<NumMapType<Token[]>> = {};
 
@@ -73,6 +73,11 @@ export const tokenForAddress = (
 ): Token => {
   const lowercaseAddress = address.toLowerCase();
   const tokens = networkTokens[chain.type][chain.id];
+  if (!tokens) {
+    throw new Error(
+      `Tokens not initialized for chain ${chain.type}:${chain.id}`,
+    );
+  }
   for (const token of tokens) {
     if (token.address.toLowerCase() === lowercaseAddress) {
       return token;

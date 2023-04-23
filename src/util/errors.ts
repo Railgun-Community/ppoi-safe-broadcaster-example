@@ -8,6 +8,7 @@ export enum ErrorMessage {
   UNSUPPORTED_NETWORK = `Relayer does not support this network.`,
   MISSING_REQUIRED_FIELD = `Missing required field.`,
   NO_RELAYER_FEE = 'No Relayer Fee included in transaction.',
+  NOT_ENOUGH_PAYMASTER_GAS = 'Not enough gas in Paymaster wallet.',
   UNKNOWN_ERROR = 'Unknown Relayer error.',
 }
 

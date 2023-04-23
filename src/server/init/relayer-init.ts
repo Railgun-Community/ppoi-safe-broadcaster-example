@@ -16,6 +16,7 @@ import {
 } from '../wallets/wallet-top-up-poller';
 import { setOnBalanceUpdateCallback } from '@railgun-community/quickstart';
 import { onBalanceUpdateCallback } from '../balances/shielded-balance-cache';
+import { initContracts } from '../contracts/init-contracts';
 
 export const initRelayerModules = async (forTest = false) => {
   if (!forTest) {
@@ -24,6 +25,7 @@ export const initRelayerModules = async (forTest = false) => {
   initSettingsDB();
   startEngine();
   await initNetworkProviders();
+  initContracts();
   await Promise.all([initWallets(), initTokens()]);
   setOnBalanceUpdateCallback(onBalanceUpdateCallback);
   initPricePoller();

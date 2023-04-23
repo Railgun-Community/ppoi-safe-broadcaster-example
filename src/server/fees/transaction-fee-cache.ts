@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
 import { RelayerChain } from '../../models/chain-models';

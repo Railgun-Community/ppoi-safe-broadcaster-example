@@ -20,7 +20,7 @@ import {
   createGasBalanceStub,
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
-import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { resetGasTokenBalanceCache } from '../../balances/gas-balance-cache';
 import { startEngine } from '../../engine/engine-init';
 
 chai.use(chaiAsPromised);

@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   setupSingleTestWallet,
   testChainEthereum,
@@ -16,7 +16,7 @@ import {
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { initNetworkProviders } from '../../providers/active-network-providers';
-import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { resetGasTokenBalanceCache } from '../../balances/gas-balance-cache';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

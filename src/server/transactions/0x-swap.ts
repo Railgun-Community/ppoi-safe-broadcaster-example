@@ -1,5 +1,5 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { BigNumber, PopulatedTransaction } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { TokenAmount } from '../../models/token-models';
 import {
   zeroXExchangeProxyContractAddress,
@@ -18,6 +18,7 @@ import {
   getEVMGasTypeForTransaction,
   networkForChain,
 } from '@railgun-community/shared-models';
+import { PopulatedTransaction } from '@ethersproject/contracts';
 
 const dbg = debug('relayer:swaps');
 

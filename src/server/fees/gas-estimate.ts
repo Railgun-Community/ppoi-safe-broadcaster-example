@@ -5,7 +5,7 @@ import {
   EVMGasType,
   TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { RelayerChain } from '../../models/chain-models';
 import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
 import { logger } from '../../util/logger';

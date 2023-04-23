@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import {
   FallbackProvider,
@@ -43,22 +42,24 @@ import {
   createGasBalanceStub,
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
-import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { resetGasTokenBalanceCache } from '../../balances/gas-balance-cache';
 import {
   TransactionGasDetails,
   EVMGasType,
 } from '@railgun-community/shared-models';
+import { BigNumber } from '@ethersproject/bignumber';
+import { Wallet } from '@ethersproject/wallet';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 let activeWallet: ActiveWallet;
-let ethersWallet: EthersWallet;
+let ethersWallet: Wallet;
 
 let walletGetTransactionCountStub: SinonStub;
 let sendTransactionStub: SinonStub;
 let waitTxStub: SinonStub;
-let getBestMatchWalletForNetwork: SinonStub;
+let getBestMatchAvailableWalletForNetwork: SinonStub;
 
 const MOCK_CHAIN = testChainGoerli();
 
@@ -74,7 +75,7 @@ describe('execute-transaction', () => {
     await initNetworkProviders([testChainGoerli()]);
     ethersWallet = createEthersWallet(activeWallet, getMockProvider());
     walletGetTransactionCountStub = sinon
-      .stub(EthersWallet.prototype, 'getTransactionCount')
+      .stub(Wallet.prototype, 'getTransactionCount')
       .resolves(3);
     sendTransactionStub = sinon
       .stub(FallbackProvider.prototype, 'sendTransaction')
@@ -84,8 +85,8 @@ describe('execute-transaction', () => {
       .callsFake(async () => {
         await delay(10);
       });
-    getBestMatchWalletForNetwork = sinon
-      .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')
+    getBestMatchAvailableWalletForNetwork = sinon
+      .stub(BestWalletMatchModule, 'getBestMatchAvailableWalletForNetwork')
       .resolves(activeWallet);
   });
 
@@ -98,7 +99,7 @@ describe('execute-transaction', () => {
     walletGetTransactionCountStub.restore();
     sendTransactionStub.restore();
     waitTxStub.restore();
-    getBestMatchWalletForNetwork.restore();
+    getBestMatchAvailableWalletForNetwork.restore();
   });
 
   it.skip('Should get and store nonce values', async () => {

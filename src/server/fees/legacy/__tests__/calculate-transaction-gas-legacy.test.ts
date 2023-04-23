@@ -1,10 +1,9 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
 import { assert } from 'console';
 import configNetworks from '../../../config/config-networks';
 import {
-  getMockNetwork,
+  getMockEthereumNetwork,
   getMockPopulatedTransaction,
   mockTokenConfig,
   MOCK_TOKEN_6_DECIMALS,
@@ -35,6 +34,7 @@ import {
   NetworkName,
   TransactionGasDetails,
 } from '@railgun-community/shared-models';
+import { BigNumber } from '@ethersproject/bignumber';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -60,7 +60,7 @@ describe('calculate-transaction-gas-legacy', () => {
     mockTokenConfig(MOCK_CHAIN, MOCK_TOKEN_ADDRESS);
     mockTokenConfig(MOCK_CHAIN, MOCK_TOKEN_6_DECIMALS);
     await initTokens();
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockEthereumNetwork();
     configNetworks[MOCK_CHAIN.type][
       MOCK_CHAIN.id
     ].fees.gasEstimateVarianceBuffer = 0.05;

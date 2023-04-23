@@ -1,9 +1,9 @@
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { formatUnits } from '@ethersproject/units';
 import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
-import { getGasTokenBalance } from './gas-token-balance';
+import { getGasTokenBalance } from './gas-balance';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { RelayerChain } from '../../models/chain-models';
@@ -56,7 +56,7 @@ export const shouldUpdateCachedGasTokenBalance = (
 ) => {
   gasTokenBalanceCache[chain.type] ??= {};
   gasTokenBalanceCache[chain.type][chain.id] ??= {};
-  if (!gasTokenBalanceCache[chain.type][chain.id][walletAddress]) {
+  if (gasTokenBalanceCache[chain.type][chain.id][walletAddress] == null) {
     return true;
   }
   const cachedBalance =
@@ -76,8 +76,8 @@ export const getCachedGasTokenBalance = async (
   }
   gasTokenBalanceCache[chain.type] ??= {};
   gasTokenBalanceCache[chain.type][chain.id] ??= {};
-  if (!gasTokenBalanceCache[chain.type][chain.id][walletAddress]) {
-    throw new Error('No balance found');
+  if (gasTokenBalanceCache[chain.type][chain.id][walletAddress] == null) {
+    throw new Error('No gas balance found');
   }
   return gasTokenBalanceCache[chain.type][chain.id][walletAddress].balance;
 };

@@ -131,14 +131,26 @@ export default {
      * Each separate Relayer instance must have its own HD wallets.
      * If you run multiple Relayers with the same mnemonic, set `transactionFees.requireMatchingFeeCacheID = true`
      * Add optional chains to run per wallet index. Defaults to all active chains.
+     * Note that the first index will be used as the paymaster wallet, for pre-authorizationn requests.
      */
     hdWallets: [firstHDWalletDefault],
+  },
+
+  paymaster: {
+    /*
+     * How long to cache Paymaster gas balances.
+     */
+    gasBalanceCacheTTLInMS: 5 * 60 * 1000,
+
+    preAuthorizationExpirationInMS: 3 * 60 * 1000,
+
+    minBalanceForAvailability: '0.3',
   },
 
   topUps: {
     /**
      * Enables regular top-ups for each wallet when their gas tokens run low
-     *  (ie. below networkConfig.gasToken.minimumBalanceForAvailability).
+     *  (ie. below networkConfig.gasToken.minBalanceForAvailability).
      * Automatically unshields ERC-20 tokens from private balance and swaps for gas token.
      */
     shouldTopUp: false,

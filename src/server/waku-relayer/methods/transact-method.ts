@@ -1,40 +1,31 @@
-import * as ed from '@noble/ed25519';
+import { getSharedSecret as getSharedSecretED25519 } from '@noble/ed25519';
 import { TransactionResponse } from '@ethersproject/providers';
-import {
-  hexlify,
-  encryptJSONDataWithSharedKey,
-  tryDecryptJSONDataWithSharedKey,
-  EncryptedData,
-  getRailgunWalletPrivateViewingKey,
-  getRailgunWalletAddressData,
-} from '@railgun-community/quickstart';
-import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
+import { getRailgunWalletPrivateViewingKey } from '@railgun-community/quickstart';
 import debug from 'debug';
 import { processTransaction } from '../../transactions/process-transaction';
-import {
-  getRailgunWalletAddress,
-  getRailgunWalletID,
-} from '../../wallets/active-wallets';
-import { contentTopics } from '../topics';
+import { getRailgunWalletID } from '../../wallets/active-wallets';
 import { WakuMethodResponse } from '../waku-response';
 import { ErrorMessage } from '../../../util/errors';
-import configDefaults from '../../config/config-defaults';
-import { recognizesFeeCacheID } from '../../fees/transaction-fee-cache';
 import { RelayerChain } from '../../../models/chain-models';
 import configNetworks from '../../config/config-networks';
 import {
-  RelayerMethodParamsTransact,
+  RelayerEncryptedMethodParams,
   RelayerRawParamsTransact,
-  versionCompare,
 } from '@railgun-community/shared-models';
-import { getRelayerVersion } from '../../../util/relayer-version';
+import { tryDecryptData } from '../../../util/encryption';
+import {
+  encryptedRPCResponse,
+  relayerErrorResponse,
+} from '../relayer-response';
+import { validateRequest } from './validate-request';
+import { contentTopics } from '../topics';
 
 const handledClientPubKeys: string[] = [];
 
 const dbg = debug('relayer:transact');
 
 export const transactMethod = async (
-  params: RelayerMethodParamsTransact,
+  params: RelayerEncryptedMethodParams,
   id: number,
 ): Promise<Optional<WakuMethodResponse>> => {
   dbg('got transact');
@@ -51,9 +42,12 @@ export const transactMethod = async (
 
   const railgunWalletID = getRailgunWalletID();
   const viewingPrivateKey = getRailgunWalletPrivateViewingKey(railgunWalletID);
-  const sharedKey = await ed.getSharedSecret(viewingPrivateKey, clientPubKey);
+  const sharedKey = await getSharedSecretED25519(
+    viewingPrivateKey,
+    clientPubKey,
+  );
 
-  const decrypted = await tryDecryptData(encryptedData, sharedKey);
+  const decrypted = tryDecryptData(encryptedData, sharedKey);
   if (decrypted == null) {
     // Incorrect key. Skipping transact message.
     dbg('Cannot decrypt - Not intended receiver');
@@ -78,56 +72,25 @@ export const transactMethod = async (
     id: chainID,
   };
 
+  dbg('Decrypted - attempting to transact');
+
+  const responseContentTopic = contentTopics.transactResponse(chain);
+
   try {
-    dbg('Decrypted - attempting to transact');
-
-    if (!minVersion || !maxVersion) {
-      dbg(`Cannot process tx - Requires params minVersion, maxVersion`);
-      // Do nothing. No error response.
-      return;
-    }
-    const relayerVersion = getRelayerVersion();
-    if (
-      versionCompare(relayerVersion, minVersion) < 0 ||
-      versionCompare(relayerVersion, maxVersion) > 0
-    ) {
-      dbg(
-        `Cannot process tx - Relayer version ${relayerVersion} outside range ${minVersion}-${maxVersion}`,
-      );
+    const isValid = validateRequest(
+      dbg,
+      chain,
+      minVersion,
+      maxVersion,
+      relayerViewingKey,
+      feeCacheID,
+    );
+    if (!isValid) {
       // Do nothing. No error response.
       return;
     }
 
-    if (!relayerViewingKey) {
-      dbg(`Cannot process tx - Requires params relayerViewingKey`);
-      // Do nothing. No error response.
-      return;
-    }
-
-    const railgunWalletAddress = getRailgunWalletAddress();
-    const { viewingPublicKey } =
-      getRailgunWalletAddressData(railgunWalletAddress);
-    if (relayerViewingKey !== hexlify(viewingPublicKey)) {
-      return undefined;
-    }
-
-    if (!feeCacheID) {
-      dbg(`Cannot process tx - Requires params feeCacheID`);
-      // Do nothing. No error response.
-      return;
-    }
-    if (
-      configDefaults.transactionFees.requireMatchingFeeCacheID &&
-      !recognizesFeeCacheID(chain, feeCacheID)
-    ) {
-      dbg(
-        'Fee cache ID unrecognized. Transaction sent to another Relayer with same Rail Address.',
-      );
-      // Do nothing. No error response.
-      return undefined;
-    }
-
-    // Relayer validated. Begin error responses.
+    // Relayer request validated. Begin error responses.
 
     if (
       chainType == null ||
@@ -138,9 +101,9 @@ export const transactMethod = async (
       relayerViewingKey == null ||
       useRelayAdapt == null
     ) {
-      return errorResponse(
+      return relayerErrorResponse(
         id,
-        chain,
+        responseContentTopic,
         sharedKey,
         new Error(ErrorMessage.MISSING_REQUIRED_FIELD),
         devLog,
@@ -148,9 +111,9 @@ export const transactMethod = async (
     }
 
     if (!configNetworks[chain.type] || !configNetworks[chain.type][chain.id]) {
-      return errorResponse(
+      return relayerErrorResponse(
         id,
-        chain,
+        responseContentTopic,
         sharedKey,
         new Error(ErrorMessage.UNSUPPORTED_NETWORK),
         devLog,
@@ -165,84 +128,31 @@ export const transactMethod = async (
       useRelayAdapt ?? false,
       devLog,
     );
-    return resultResponse(id, chain, sharedKey, txResponse);
+    return relayerResultResponse(
+      id,
+      responseContentTopic,
+      sharedKey,
+      txResponse,
+    );
   } catch (err) {
     dbg(err);
-    return errorResponse(id, chain, sharedKey, err, devLog);
+    return relayerErrorResponse(
+      id,
+      responseContentTopic,
+      sharedKey,
+      err,
+      devLog,
+    );
   }
 };
 
-const resultResponse = (
+const relayerResultResponse = (
   id: number,
-  chain: RelayerChain,
+  responseContentTopic: string,
   sharedKey: Uint8Array,
   txResponse: TransactionResponse,
 ): WakuMethodResponse => {
   const response = { txHash: txResponse.hash };
-  return encryptedRPCResponse(response, id, chain, sharedKey);
-};
-
-const replaceErrorMessageNonDev = (
-  errMsg: string,
-  devLog?: boolean,
-): string => {
-  if (devLog) {
-    return errMsg;
-  }
-  const knownError = errMsg as ErrorMessage;
-  switch (knownError) {
-    case ErrorMessage.BAD_TOKEN_FEE:
-    case ErrorMessage.NO_RELAYER_FEE:
-    case ErrorMessage.GAS_ESTIMATE_ERROR:
-    case ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR:
-    case ErrorMessage.UNSUPPORTED_NETWORK:
-    case ErrorMessage.GAS_PRICE_TOO_LOW:
-    case ErrorMessage.MISSING_REQUIRED_FIELD:
-    case ErrorMessage.UNKNOWN_ERROR:
-      return errMsg;
-  }
-  return ErrorMessage.UNKNOWN_ERROR;
-};
-
-const errorResponse = (
-  id: number,
-  chain: RelayerChain,
-  sharedKey: Uint8Array,
-  err: Error,
-  devLog?: boolean,
-): WakuMethodResponse => {
-  const response = {
-    error: replaceErrorMessageNonDev(err.message, devLog),
-  };
-  return encryptedRPCResponse(response, id, chain, sharedKey);
-};
-
-const encryptedRPCResponse = (
-  response: object,
-  id: number,
-  chain: RelayerChain,
-  sharedKey: Uint8Array,
-) => {
   dbg('Response:', response);
-  const encryptedResponse = encryptResponseData(response, sharedKey);
-  const rpcResult = formatJsonRpcResult(id, encryptedResponse);
-  return {
-    rpcResult,
-    contentTopic: contentTopics.transactResponse(chain),
-  };
-};
-
-export const tryDecryptData = async (
-  encryptedData: EncryptedData,
-  sharedKey: Uint8Array,
-  // eslint-disable-next-line require-await
-): Promise<object | null> => {
-  return tryDecryptJSONDataWithSharedKey(encryptedData, sharedKey);
-};
-
-export const encryptResponseData = (
-  data: object,
-  sharedKey: Uint8Array,
-): EncryptedData => {
-  return encryptJSONDataWithSharedKey(data, sharedKey);
+  return encryptedRPCResponse(response, responseContentTopic, id, sharedKey);
 };

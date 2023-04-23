@@ -4,7 +4,7 @@ import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { getERC20TokenBalance } from '../erc20-token-balance';
 import {
-  getMockNetwork,
+  getMockEthereumNetwork,
   getMockToken,
   getMockWalletAddress,
 } from '../../../test/mocks.test';
@@ -19,7 +19,7 @@ const MOCK_CHAIN = testChainEthereum();
 
 describe('erc20-token-balance', () => {
   before(async () => {
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockEthereumNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
   });
 

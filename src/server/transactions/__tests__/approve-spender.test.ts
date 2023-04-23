@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import {
   FallbackProvider,
@@ -25,8 +24,10 @@ import {
   restoreGasBalanceStub,
   restoreGasEstimateStubs,
 } from '../../../test/stubs/ethers-provider-stubs.test';
-import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { resetGasTokenBalanceCache } from '../../balances/gas-balance-cache';
 import { generateApprovalTransactions, approveZeroX } from '../approve-spender';
+import { BigNumber } from '@ethersproject/bignumber';
+import { Wallet } from '@ethersproject/wallet';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -35,7 +36,7 @@ let activeWallet: ActiveWallet;
 let walletGetTransactionCountStub: SinonStub;
 let sendTransactionStub: SinonStub;
 let waitTxStub: SinonStub;
-let getBestMatchWalletForNetwork: SinonStub;
+let getBestMatchAvailableWalletForNetwork: SinonStub;
 
 const MOCK_TOKEN_ADDRESS = getMockToken().address;
 
@@ -61,7 +62,7 @@ describe('approve-spender', () => {
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockGoerliNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
     walletGetTransactionCountStub = sinon
-      .stub(EthersWallet.prototype, 'getTransactionCount')
+      .stub(Wallet.prototype, 'getTransactionCount')
       .resolves(3);
     sendTransactionStub = sinon
       .stub(FallbackProvider.prototype, 'sendTransaction')
@@ -71,8 +72,8 @@ describe('approve-spender', () => {
       .callsFake(async () => {
         await delay(10);
       });
-    getBestMatchWalletForNetwork = sinon
-      .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')
+    getBestMatchAvailableWalletForNetwork = sinon
+      .stub(BestWalletMatchModule, 'getBestMatchAvailableWalletForNetwork')
       .resolves(activeWallet);
     const gasEstimate = BigNumber.from(1000);
     const maxFeePerGas = BigNumber.from(90);
@@ -89,7 +90,7 @@ describe('approve-spender', () => {
     walletGetTransactionCountStub.restore();
     sendTransactionStub.restore();
     waitTxStub.restore();
-    getBestMatchWalletForNetwork.restore();
+    getBestMatchAvailableWalletForNetwork.restore();
     restoreGasEstimateStubs();
   });
 

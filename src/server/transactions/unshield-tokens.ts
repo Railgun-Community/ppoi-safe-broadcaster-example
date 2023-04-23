@@ -12,7 +12,7 @@ import {
   serializeTransactionGasDetails,
   TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { RelayerChain } from '../../models/chain-models';
 import { TokenAmount } from '../../models/token-models';
 import { getStandardGasDetails } from '../fees/gas-by-speed';

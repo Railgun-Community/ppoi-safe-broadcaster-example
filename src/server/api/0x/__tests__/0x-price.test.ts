@@ -14,7 +14,7 @@ import {
 } from '../../../tokens/token-price-cache';
 import configNetworks from '../../../config/config-networks';
 import {
-  getMockNetwork,
+  getMockEthereumNetwork,
   getMockGoerliNetwork,
   getMockTokenConfig,
 } from '../../../../test/mocks.test';
@@ -69,7 +69,8 @@ describe('0x-price', () => {
   before(async () => {
     startEngine();
 
-    configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
+    configNetworks[chainEthereum.type][chainEthereum.id] =
+      getMockEthereumNetwork();
     configNetworks[chainRopsten.type][chainRopsten.id] = ropstenNetwork;
     await initNetworkProviders([chainEthereum, chainRopsten]);
 

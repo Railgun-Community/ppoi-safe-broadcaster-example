@@ -3,7 +3,7 @@ import { RelayerChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';
-import { getCachedGasTokenBalance } from '../balances/balance-cache';
+import { getCachedGasTokenBalance } from '../balances/gas-balance-cache';
 import configNetworks from '../config/config-networks';
 import debug from 'debug';
 import { BigNumber } from '@ethersproject/bignumber';

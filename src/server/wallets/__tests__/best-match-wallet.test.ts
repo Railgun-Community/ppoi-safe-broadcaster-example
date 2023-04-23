@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import { startEngine } from '../../engine/engine-init';
 import {
@@ -9,17 +8,22 @@ import {
   getActiveWallets,
   initWallets,
 } from '../active-wallets';
-import { getBestMatchWalletForNetwork } from '../best-match-wallet';
+import { getBestMatchAvailableWalletForNetwork } from '../best-match-wallet';
 import {
   resetAvailableWallets,
   setWalletAvailability,
 } from '../available-wallets';
-import { getMockNetwork, getMockProvider } from '../../../test/mocks.test';
-import * as BalanceCacheModule from '../../balances/balance-cache';
+import {
+  getMockEthereumNetwork,
+  getMockProvider,
+} from '../../../test/mocks.test';
+import * as BalanceCacheModule from '../../balances/gas-balance-cache';
 import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { testChainEthereum } from '../../../test/setup.test';
+import { Wallet } from '@ethersproject/wallet';
+import { BigNumber } from '@ethersproject/bignumber';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -31,7 +35,7 @@ const MOCK_MNEMONIC =
 let getCachedGasTokenBalanceStub: SinonStub;
 
 const addressForIndex = (index: number): string => {
-  const ethersWallet = EthersWallet.fromMnemonic(
+  const ethersWallet = Wallet.fromMnemonic(
     MOCK_MNEMONIC,
     derivationPathForIndex(index),
   );
@@ -44,7 +48,7 @@ describe('best-match-wallet', () => {
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
       .resolves(BigNumber.from(10).pow(18));
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockEthereumNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
   });
 
@@ -77,7 +81,7 @@ describe('best-match-wallet', () => {
     };
     await initWallets();
 
-    const bestWallet = await getBestMatchWalletForNetwork(
+    const bestWallet = await getBestMatchAvailableWalletForNetwork(
       MOCK_CHAIN,
       BigNumber.from(100),
     );
@@ -113,7 +117,7 @@ describe('best-match-wallet', () => {
     expect(firstWallet.address).to.equal(addressForIndex(0));
     setWalletAvailability(firstActiveWallet, MOCK_CHAIN, false);
 
-    const bestWallet = await getBestMatchWalletForNetwork(
+    const bestWallet = await getBestMatchAvailableWalletForNetwork(
       MOCK_CHAIN,
       BigNumber.from(100),
     );
@@ -137,7 +141,7 @@ describe('best-match-wallet', () => {
     setWalletAvailability(firstWallet, MOCK_CHAIN, false);
 
     await expect(
-      getBestMatchWalletForNetwork(MOCK_CHAIN, BigNumber.from(100)),
+      getBestMatchAvailableWalletForNetwork(MOCK_CHAIN, BigNumber.from(100)),
     ).to.be.rejectedWith('All wallets busy or out of funds.');
   }).timeout(10000);
 
@@ -155,7 +159,10 @@ describe('best-match-wallet', () => {
     await initWallets();
 
     await expect(
-      getBestMatchWalletForNetwork(MOCK_CHAIN, BigNumber.from(10).pow(19)),
+      getBestMatchAvailableWalletForNetwork(
+        MOCK_CHAIN,
+        BigNumber.from(10).pow(19),
+      ),
     ).to.be.rejectedWith('All wallets busy or out of funds.');
   }).timeout(10000);
 }).timeout(20000);

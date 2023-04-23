@@ -2,7 +2,6 @@ import {
   TransactionGasDetails,
   EVMGasType,
 } from '@railgun-community/shared-models';
-import { BigNumber } from 'ethers';
 import { RelayerChain } from '../../../models/chain-models';
 import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
@@ -13,6 +12,7 @@ import {
   getTransactionTokenToGasDecimalRatio,
 } from '../calculate-token-fee';
 import { calculateGasLimitRelayer } from '../gas-estimate';
+import { BigNumber } from '@ethersproject/bignumber';
 
 /**
  * This is a legacy operation, now that we have minGasPrice in every Relayed transaction.

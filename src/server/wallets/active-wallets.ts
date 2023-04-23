@@ -1,6 +1,4 @@
 import { BaseProvider } from '@ethersproject/providers';
-import { Wallet as EthersWallet } from 'ethers';
-import { isValidMnemonic } from 'ethers/lib/utils';
 import debug from 'debug';
 import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
@@ -9,11 +7,15 @@ import { isWalletAvailableWithEnoughFunds } from './available-wallets';
 import {
   convertToReadableGasTokenBalanceMap,
   getActiveWalletGasTokenBalanceMapForChain,
-} from '../balances/balance-cache';
+} from '../balances/gas-balance-cache';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
 import { createRailgunWallet } from '@railgun-community/quickstart';
+import { getActiveWalletPaymasterGasBalanceMapForChain } from '../balances/paymaster-gas-balance-cache';
+import { PaymasterWallet } from './paymaster-wallet';
+import { Wallet } from '@ethersproject/wallet';
+import { isValidMnemonic } from '@ethersproject/hdnode';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -62,16 +64,14 @@ const initRailgunWallet = async (mnemonic: string) => {
 export const initWallets = async () => {
   resetWallets();
   const { mnemonic, hdWallets } = configDefaults.wallet;
+  let isFirstWallet = true;
   hdWallets.forEach(({ index, priority, chains }) => {
     if (!isValidMnemonic(mnemonic)) {
       throw Error(
         'Invalid or missing MNEMONIC (use docker secret or insecure env-cmdrc for testing)',
       );
     }
-    const wallet = EthersWallet.fromMnemonic(
-      mnemonic,
-      derivationPathForIndex(index),
-    );
+    const wallet = Wallet.fromMnemonic(mnemonic, derivationPathForIndex(index));
     // TODO: determine whether wallet is currently busy, set available(false) if so.
     activeWallets.push({
       address: wallet.address,
@@ -80,6 +80,11 @@ export const initWallets = async () => {
       index,
       chains,
     });
+
+    if (isFirstWallet) {
+      PaymasterWallet.setPaymasterWallet(wallet);
+      isFirstWallet = false;
+    }
   });
   await initRailgunWallet(mnemonic);
   printDebugWalletData();
@@ -90,8 +95,9 @@ const printDebugWalletData = () => {
     'Loaded public wallets:',
     activeWallets.map((w) => w.address),
   );
-  dbg('Loaded private wallet:', railgunWalletAddress);
+  dbg('Loaded RAILGUN wallet:', railgunWalletAddress);
 
+  // Log Wallet balances
   configuredNetworkChains().forEach(async (chain) => {
     const gasTokenBalanceMap = await getActiveWalletGasTokenBalanceMapForChain(
       chain,
@@ -101,8 +107,22 @@ const printDebugWalletData = () => {
     const gasTokenBalanceMapReadable =
       convertToReadableGasTokenBalanceMap(gasTokenBalanceMap);
     dbg(
-      `Chain ${chain.type}:${chain.id}, ${gasToken} balances:`,
+      `Chain ${chain.type}:${chain.id}, ${gasToken} WALLET balances:`,
       gasTokenBalanceMapReadable,
+    );
+  });
+
+  // Log Paymaster balances
+  configuredNetworkChains().forEach(async (chain) => {
+    const paymasterGasBalanceMap =
+      await getActiveWalletPaymasterGasBalanceMapForChain(chain, activeWallets);
+    const gasToken = configNetworks[chain.type][chain.id].gasToken.symbol;
+    const paymasterGasBalanceMapReadable = convertToReadableGasTokenBalanceMap(
+      paymasterGasBalanceMap,
+    );
+    dbg(
+      `Chain ${chain.type}:${chain.id}, ${gasToken} PAYMASTER balances:`,
+      paymasterGasBalanceMapReadable,
     );
   });
 };
@@ -124,8 +144,8 @@ export const getRailgunWalletAddress = (): string => {
 export const createEthersWallet = (
   activeWallet: ActiveWallet,
   provider: BaseProvider,
-): EthersWallet => {
-  return new EthersWallet(activeWallet.pkey, provider);
+): Wallet => {
+  return new Wallet(activeWallet.pkey, provider);
 };
 
 export const getActiveWallets = (): ActiveWallet[] => {

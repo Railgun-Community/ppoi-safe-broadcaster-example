@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, utils } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import configTokens from '../../config/config-tokens';
 import { Network } from '../../../models/network-models';
@@ -31,6 +30,8 @@ import {
   getEVMGasTypeForTransaction,
   NetworkName,
 } from '@railgun-community/shared-models';
+import { parseEther } from '@ethersproject/units';
+import { BigNumber } from '@ethersproject/bignumber';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -132,7 +133,7 @@ describe('calculate-token-fee', () => {
   it('Should calculate token fee for transaction with precision', async () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
-    const gasEstimate = utils.parseEther('0.001');
+    const gasEstimate = parseEther('0.001');
     const maxFeePerGas = BigNumber.from('90000');
     const maxPriorityFeePerGas = BigNumber.from('10000');
     setupMocks(
@@ -166,7 +167,7 @@ describe('calculate-token-fee', () => {
   it('Should calculate token fee for transaction with different decimal amounts', async () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
-    const gasEstimate = utils.parseEther('0.001');
+    const gasEstimate = parseEther('0.001');
     const maxFeePerGas = BigNumber.from('90000');
     const maxPriorityFeePerGas = BigNumber.from('10000');
     setupMocks(
@@ -214,7 +215,7 @@ describe('calculate-token-fee', () => {
   it('Should error when precision not high enough', async () => {
     const tokenPrice = 0.00000106;
     const gasTokenPrice = 1234.56;
-    const gasEstimate = utils.parseEther('0.001');
+    const gasEstimate = parseEther('0.001');
     const maxFeePerGas = BigNumber.from('90000');
     const maxPriorityFeePerGas = BigNumber.from('10000');
     setupMocks(

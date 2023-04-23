@@ -1,5 +1,4 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { Contract, PopulatedTransaction } from 'ethers';
 import { TokenAmount } from '../../models/token-models';
 import { ABI_ERC20 } from '../abi/abi';
 import { zeroXExchangeProxyContractAddress } from '../api/0x/0x-quote';
@@ -14,6 +13,7 @@ import {
   getEVMGasTypeForTransaction,
   networkForChain,
 } from '@railgun-community/shared-models';
+import { Contract, PopulatedTransaction } from '@ethersproject/contracts';
 
 const dbg = debug('relayer:approvals');
 

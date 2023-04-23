@@ -7,13 +7,13 @@ import {
   TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import debug from 'debug';
-import { Wallet as EthersWallet } from 'ethers';
+import { Wallet } from '@ethersproject/wallet';
 import { RelayerChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
 import { minBigNumber } from '../../util/utils';
-import { updateCachedGasTokenBalance } from '../balances/balance-cache';
+import { updateCachedGasTokenBalance } from '../balances/gas-balance-cache';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import {
   calculateGasLimitRelayer,
@@ -22,18 +22,18 @@ import {
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
 import { setWalletAvailability } from '../wallets/available-wallets';
-import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
+import { getBestMatchAvailableWalletForNetwork } from '../wallets/best-match-wallet';
 
 const dbg = debug('relayer:transact:execute');
 
 const LAST_NONCE_KEY = 'last_nonce_key';
 
-export const getLastNonceKey = (chain: RelayerChain, wallet: EthersWallet) => {
+export const getLastNonceKey = (chain: RelayerChain, wallet: Wallet) => {
   return `${LAST_NONCE_KEY}|${wallet.address}|${chain.type}|${chain.id}`;
 };
 
 export const getCurrentWalletNonce = async (
-  wallet: EthersWallet,
+  wallet: Wallet,
 ): Promise<number> => {
   try {
     const blockTag = 'pending';
@@ -50,7 +50,7 @@ export const getCurrentWalletNonce = async (
  */
 export const getCurrentNonce = async (
   chain: RelayerChain,
-  wallet: EthersWallet,
+  wallet: Wallet,
 ): Promise<number> => {
   const blockTag = 'pending';
   const [txCount, lastTransactionNonce] = await Promise.all([
@@ -66,7 +66,7 @@ export const getCurrentNonce = async (
 export const storeCurrentNonce = async (
   chain: RelayerChain,
   nonce: number,
-  wallet: EthersWallet,
+  wallet: Wallet,
 ) => {
   await storeSettingsNumber(getLastNonceKey(chain, wallet), nonce);
 };
@@ -82,7 +82,7 @@ export const executeTransaction = async (
 
   const maximumGas = calculateMaximumGasRelayer(gasDetails, chain);
   const activeWallet =
-    wallet ?? (await getBestMatchWalletForNetwork(chain, maximumGas));
+    wallet ?? (await getBestMatchAvailableWalletForNetwork(chain, maximumGas));
 
   const provider = getProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(activeWallet, provider);
@@ -172,7 +172,7 @@ export const executeTransaction = async (
 
 export const waitForTx = async (
   activeWallet: ActiveWallet,
-  ethersWallet: EthersWallet,
+  ethersWallet: Wallet,
   chain: RelayerChain,
   txResponse: TransactionResponse,
   nonce: number,
@@ -190,7 +190,7 @@ export const waitForTx = async (
 
 export const waitForTxs = async (
   activeWallet: ActiveWallet,
-  ethersWallet: EthersWallet,
+  ethersWallet: Wallet,
   chain: RelayerChain,
   txResponses: TransactionResponse[],
 ) => {

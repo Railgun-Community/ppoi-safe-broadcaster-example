@@ -1,5 +1,5 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { BaseTokenWrappedAddress } from '@railgun-community/shared-models';
-import { BigNumber } from 'ethers';
 
 export const GAS_TOKEN_DECIMALS = 18;
 

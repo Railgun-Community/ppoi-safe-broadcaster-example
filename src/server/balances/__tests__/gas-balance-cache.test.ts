@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import {
   getCachedGasTokenBalance,
@@ -8,7 +8,7 @@ import {
   shouldUpdateCachedGasTokenBalance,
   updateAllActiveWalletsGasTokenBalances,
   updateCachedGasTokenBalance,
-} from '../balance-cache';
+} from '../gas-balance-cache';
 import configDefaults from '../../config/config-defaults';
 import {
   createGasBalanceStub,
@@ -31,7 +31,7 @@ const shouldUpdateEthWalletBalance = (address: string) => {
   return shouldUpdateCachedGasTokenBalance(MOCK_CHAIN, address);
 };
 
-describe('balance-cache', () => {
+describe('gas-balance-cache', () => {
   before(async () => {
     startEngine();
     await initWallets();

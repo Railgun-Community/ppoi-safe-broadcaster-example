@@ -4,7 +4,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
 import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import {
@@ -15,6 +15,7 @@ import {
   getRailgunWalletPrivateViewingKey,
   getRandomBytes,
   getRailgunWalletAddressData,
+  convertTransactionStructToCommitmentSummary,
 } from '@railgun-community/quickstart';
 import { WakuMethodNames, WakuRelayer, WAKU_TOPIC } from '../waku-relayer';
 import {
@@ -23,13 +24,10 @@ import {
   WakuRequestMethods,
 } from '../../networking/waku-api-client';
 import {
-  encryptResponseData,
-  tryDecryptData,
-} from '../methods/transact-method';
-import {
   setupSingleTestWallet,
   setupTestNetwork,
   testChainEthereum,
+  testChainHardhat,
 } from '../../../test/setup.test';
 import { startEngine } from '../../engine/engine-init';
 import configDefaults from '../../config/config-defaults';
@@ -40,12 +38,15 @@ import {
 } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
 import { Network } from '../../../models/network-models';
-import configTokens from '../../config/config-tokens';
 import * as processTransactionModule from '../../transactions/process-transaction';
 import { WakuMessage } from '../waku-message';
 import { contentTopics } from '../topics';
 import {
-  getMockNetwork,
+  MOCK_BOUND_PARAMS,
+  MOCK_COMMITMENT_HASH,
+  MOCK_RELAYER_FEE_TOKEN_ADDRESS,
+  getMockEthereumNetwork,
+  getMockHardhatNetwork,
   getMockSerializedTransaction,
   mockTokenConfig,
 } from '../../../test/mocks.test';
@@ -56,18 +57,24 @@ import {
   createGasBalanceStub,
   restoreGasBalanceStub,
 } from '../../../test/stubs/ethers-provider-stubs.test';
-import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { resetGasTokenBalanceCache } from '../../balances/gas-balance-cache';
 import {
   RelayerFeeMessage,
   RelayerFeeMessageData,
-  RelayerMethodParamsTransact,
+  RelayerEncryptedMethodParams,
+  RelayerRawParamsPreAuthorize,
   RelayerRawParamsTransact,
+  RelayerSignedPreAuthorization,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../../util/relayer-version';
 import {
   getRailgunWalletAddress,
   getRailgunWalletID,
 } from '../../wallets/active-wallets';
+import { encryptResponseData, tryDecryptData } from '../../../util/encryption';
+import { NetworkChainID } from '../../config/config-chains';
+import * as PaymasterGasBalanceCacheModule from '../../balances/paymaster-gas-balance-cache';
+import { initContracts } from '../../contracts/init-contracts';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -77,13 +84,22 @@ let client: WakuApiClient;
 
 let clientHTTPStub: SinonStub;
 let processTransactionStub: SinonStub;
+let dateStub: SinonStub;
+let paymasterGasBalanceStub: SinonStub;
 
 // @ts-ignore
 let requestData: Optional<JsonRpcRequest>;
 
+const MOCK_DATE_NOW = 200000000;
+
 const MOCK_TOKEN_ADDRESS = '0x12345';
-let network: Network;
-const chain = testChainEthereum();
+let networkEthereum: Network;
+let networkHardhat: Network;
+
+const chainEthereum = testChainEthereum();
+
+// TODO: Replace with ethereum when paymaster contract deployed.
+const chainHardhat = testChainHardhat();
 
 // eslint-disable-next-line require-await
 const handleHTTPPost = async (url: string, data?: unknown) => {
@@ -94,14 +110,21 @@ const handleHTTPPost = async (url: string, data?: unknown) => {
 
 describe('waku-relayer', () => {
   before(async () => {
+    configDefaults.networks.EVM.push(NetworkChainID.Hardhat);
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
     startEngine();
     await setupSingleTestWallet();
-    network = setupTestNetwork();
-    configNetworks[chain.type][chain.id] = getMockNetwork();
-    await initNetworkProviders([chain]);
-    mockTokenConfig(chain, MOCK_TOKEN_ADDRESS);
+    networkEthereum = setupTestNetwork();
+    configNetworks[chainEthereum.type][chainEthereum.id] =
+      getMockEthereumNetwork();
+    configNetworks[chainHardhat.type][chainHardhat.id] =
+      getMockHardhatNetwork();
+    networkHardhat = configNetworks[chainHardhat.type][chainHardhat.id];
+    await initNetworkProviders([chainEthereum, chainHardhat]);
+    mockTokenConfig(chainEthereum, MOCK_TOKEN_ADDRESS);
+    mockTokenConfig(chainHardhat, MOCK_RELAYER_FEE_TOKEN_ADDRESS);
     await initTokens();
+    initContracts([chainHardhat]);
     processTransactionStub = sinon
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
@@ -114,6 +137,10 @@ describe('waku-relayer', () => {
     });
     clientHTTPStub.resetHistory();
     createGasBalanceStub(BigNumber.from(10).pow(18));
+    dateStub = sinon.stub(Date, 'now').returns(MOCK_DATE_NOW);
+    paymasterGasBalanceStub = sinon
+      .stub(PaymasterGasBalanceCacheModule, 'getCachedPaymasterGasBalance')
+      .resolves(BigNumber.from(10).pow(18));
   });
 
   beforeEach(() => {
@@ -123,6 +150,8 @@ describe('waku-relayer', () => {
   afterEach(() => {
     clientHTTPStub.resetBehavior();
     clientHTTPStub.resetHistory();
+    dateStub.resetBehavior();
+    paymasterGasBalanceStub.resetBehavior();
   });
 
   after(() => {
@@ -140,7 +169,7 @@ describe('waku-relayer', () => {
     const gasTokenPrice = 1234.56;
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      chain,
+      chainEthereum,
       MOCK_TOKEN_ADDRESS,
       {
         price: tokenPrice,
@@ -149,8 +178,8 @@ describe('waku-relayer', () => {
     );
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
-      chain,
-      network.gasToken.wrappedAddress,
+      chainEthereum,
+      networkEthereum.gasToken.wrappedAddress,
       {
         price: gasTokenPrice,
         updatedAt: Date.now(),
@@ -158,9 +187,9 @@ describe('waku-relayer', () => {
     );
 
     const contentTopic = '/railgun/v2/0/1/fees/json';
-    expect(contentTopic).to.equal(contentTopics.fees(chain));
+    expect(contentTopic).to.equal(contentTopics.fees(chainEthereum));
 
-    await wakuRelayer?.broadcastFeesForChain(chain);
+    await wakuRelayer?.broadcastFeesForChain(chainEthereum);
     expect(requestData?.id).to.be.a('number');
     expect(requestData?.method).to.equal(WakuRequestMethods.PublishMessage);
     expect(requestData?.params).to.be.an('array');
@@ -209,9 +238,9 @@ describe('waku-relayer', () => {
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
 
-    const data: RelayerRawParamsTransact = {
-      chainID: chain.id,
-      chainType: chain.type,
+    const preAuthorizeData: RelayerRawParamsTransact = {
+      chainID: chainEthereum.id,
+      chainType: chainEthereum.type,
       feesID: '468abc',
       minGasPrice: '0x1000',
       serializedTransaction: getMockSerializedTransaction(),
@@ -224,7 +253,7 @@ describe('waku-relayer', () => {
     const randomPrivKey = getRandomBytes(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
-    const encryptedData = encryptResponseData(data, sharedKey);
+    const encryptedData = encryptResponseData(preAuthorizeData, sharedKey);
 
     const sharedKeyAlternate = await ed.getSharedSecret(
       relayerPrivateKey,
@@ -232,7 +261,9 @@ describe('waku-relayer', () => {
     );
     expect(sharedKeyAlternate).to.deep.equal(sharedKey);
 
-    expect(await tryDecryptData(encryptedData, sharedKey)).to.deep.equal(data);
+    expect(tryDecryptData(encryptedData, sharedKey)).to.deep.equal(
+      preAuthorizeData,
+    );
   });
 
   it('Should test transact method - transfer', async () => {
@@ -241,7 +272,7 @@ describe('waku-relayer', () => {
     };
     clientHTTPStub.callsFake(handleHTTPPost);
 
-    const contentTopic = contentTopics.transact(chain);
+    const contentTopic = contentTopics.transact(chainEthereum);
 
     const railgunWalletID = getRailgunWalletID();
     const relayerPrivateKey =
@@ -252,8 +283,8 @@ describe('waku-relayer', () => {
       getRailgunWalletAddressData(railgunWalletAddress);
 
     const data: RelayerRawParamsTransact = {
-      chainID: chain.id,
-      chainType: chain.type,
+      chainID: chainEthereum.id,
+      chainType: chainEthereum.type,
       feesID: '468abc',
       minGasPrice: '0x1000',
       serializedTransaction: getMockSerializedTransaction(),
@@ -268,7 +299,7 @@ describe('waku-relayer', () => {
     const clientPubKey = hexlify(randomPubKeyUint8Array);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
     const encryptedData = encryptResponseData(data, sharedKey);
-    const params: RelayerMethodParamsTransact = {
+    const params: RelayerEncryptedMethodParams = {
       encryptedData,
       pubkey: clientPubKey,
     };
@@ -295,24 +326,22 @@ describe('waku-relayer', () => {
     expect(rpcArgs.params).to.be.an('array');
     expect(rpcArgs.params[0]).to.equal(WAKU_TOPIC);
 
-    const encryptedResponse = encryptResponseData(
-      {
-        txHash: '123',
-      },
-      sharedKey,
-    );
+    const responseData = {
+      txHash: '123',
+    };
+    const encryptedResponse = encryptResponseData(responseData, sharedKey);
     const expectedJsonRpcResult = formatJsonRpcResult(
       payload.id,
       encryptedResponse,
     );
     const expectedWakuMessage = WakuMessage.fromUtf8String(
       JSON.stringify(expectedJsonRpcResult),
-      contentTopics.transactResponse(chain),
+      contentTopics.transactResponse(chainEthereum),
       // { timestamp: relayMessage.timestamp },
     );
     expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
     expect(rpcArgs.params[1].contentTopic).to.equal(
-      contentTopics.transactResponse(chain),
+      contentTopics.transactResponse(chainEthereum),
     );
 
     const decoded = JSON.parse(
@@ -321,14 +350,148 @@ describe('waku-relayer', () => {
     const decodedExpected = JSON.parse(
       WakuRelayer.decode(expectedWakuMessage.payload as Uint8Array),
     );
-    const resultData = await tryDecryptJSONDataWithSharedKey(
+    const resultData = tryDecryptJSONDataWithSharedKey(
       decoded.result,
       sharedKey,
     );
-    const expectedResultData = await tryDecryptJSONDataWithSharedKey(
+    const expectedResultData = tryDecryptJSONDataWithSharedKey(
       decodedExpected.result,
       sharedKey,
     );
     expect(resultData).to.deep.equal(expectedResultData);
   }).timeout(5000);
+
+  it.only('[HH] Should test preAuthorize method', async function run() {
+    if (!process.env.RUN_HARDHAT_TESTS) {
+      this.skip();
+      return;
+    }
+
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      chainHardhat,
+      MOCK_RELAYER_FEE_TOKEN_ADDRESS,
+      {
+        price: 1,
+        updatedAt: Date.now(),
+      },
+    );
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.CoinGecko,
+      chainHardhat,
+      networkHardhat.gasToken.wrappedAddress,
+      {
+        price: 1,
+        updatedAt: Date.now(),
+      },
+    );
+
+    const handleHTTPPost = () => {
+      return { result: {} };
+    };
+    clientHTTPStub.callsFake(handleHTTPPost);
+
+    const contentTopic = contentTopics.preAuthorize(chainHardhat);
+
+    const railgunWalletID = getRailgunWalletID();
+    const relayerPrivateKey =
+      getRailgunWalletPrivateViewingKey(railgunWalletID);
+    const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
+    const railgunWalletAddress = getRailgunWalletAddress();
+    const { viewingPublicKey } =
+      getRailgunWalletAddressData(railgunWalletAddress);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mockTxStruct: any = {
+      boundParams: MOCK_BOUND_PARAMS,
+      commitments: [MOCK_COMMITMENT_HASH],
+    };
+    const relayerFeeIndex = 0;
+    const { commitmentCiphertext, commitmentHash } =
+      convertTransactionStructToCommitmentSummary(
+        mockTxStruct,
+        relayerFeeIndex,
+      );
+
+    const data: RelayerRawParamsPreAuthorize = {
+      chainID: chainHardhat.id,
+      chainType: chainHardhat.type,
+      feesID: '468abc',
+      gasLimit: '0x1000',
+      relayerViewingKey: hexlify(viewingPublicKey),
+      commitmentCiphertext,
+      commitmentHash,
+      devLog: true,
+      minVersion: getRelayerVersion(),
+      maxVersion: getRelayerVersion(),
+    };
+    const randomPrivKey = getRandomBytes(32);
+    const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
+    const clientPubKey = hexlify(randomPubKeyUint8Array);
+    const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
+    const encryptedData = encryptResponseData(data, sharedKey);
+    const params: RelayerEncryptedMethodParams = {
+      encryptedData,
+      pubkey: clientPubKey,
+    };
+
+    const payload = {
+      method: WakuMethodNames.PreAuthorize,
+      params,
+      id: 123456,
+    };
+    const relayMessage: WakuRelayMessage = {
+      contentTopic,
+      payload: Buffer.from(JSON.stringify(payload)),
+      timestamp: Date.now(),
+    };
+    await wakuRelayer?.handleMessage(relayMessage);
+
+    // After pre-authorize-response sent.
+    expect(clientHTTPStub.calledOnce).to.be.true;
+    const postCall = clientHTTPStub.getCall(0);
+    expect(postCall.args[0]).to.equal('/');
+    const rpcArgs = postCall.args[1];
+    expect(rpcArgs.id).to.be.a('number');
+    expect(rpcArgs.method).to.equal(WakuRequestMethods.PublishMessage);
+    expect(rpcArgs.params).to.be.an('array');
+    expect(rpcArgs.params[0]).to.equal(WAKU_TOPIC);
+
+    const responseData: RelayerSignedPreAuthorization = {
+      gasLimit: data.gasLimit,
+      commitmentHash: data.commitmentHash,
+      expiration: MOCK_DATE_NOW + 3 * 60 * 1000, // 3 min
+      signature:
+        '0x30ac3c0519fdc436a8387f7c63152c76f50424e4598d9815304bb9faf5bfbbbc38e419eac98ebc44254aabc2bebded5b977fcc9ca5968b076e25fec964bb45df1b',
+    };
+    const encryptedResponse = encryptResponseData(responseData, sharedKey);
+    const expectedJsonRpcResult = formatJsonRpcResult(
+      payload.id,
+      encryptedResponse,
+    );
+    const expectedWakuMessage = WakuMessage.fromUtf8String(
+      JSON.stringify(expectedJsonRpcResult),
+      contentTopics.preAuthorizeResponse(chainHardhat),
+    );
+    expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
+    expect(rpcArgs.params[1].contentTopic).to.equal(
+      contentTopics.preAuthorizeResponse(chainHardhat),
+    );
+
+    const decoded = JSON.parse(
+      WakuRelayer.decode(Buffer.from(rpcArgs.params[1].payload, 'hex')),
+    );
+    const decodedExpected = JSON.parse(
+      WakuRelayer.decode(expectedWakuMessage.payload as Uint8Array),
+    );
+    const resultData = tryDecryptJSONDataWithSharedKey(
+      decoded.result,
+      sharedKey,
+    );
+    const expectedResultData = tryDecryptJSONDataWithSharedKey(
+      decodedExpected.result,
+      sharedKey,
+    );
+    expect(resultData).to.deep.equal(expectedResultData);
+  }).timeout(2000);
 }).timeout(10000);

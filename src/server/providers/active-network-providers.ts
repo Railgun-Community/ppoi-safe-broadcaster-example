@@ -51,10 +51,15 @@ const initNetworkProvider = async (chain: RelayerChain) => {
     providers: [],
   };
   const possibleProviderJSONs = [...fallbackProviderConfig.providers];
+
   const availableProviders = await getAvailableProviderJSONs(
     possibleProviderJSONs,
     dbg,
   );
+  if (!availableProviders.length) {
+    throw new Error(`None of the configured providers are available.`);
+  }
+
   finalConfig.providers = availableProviders;
 
   await loadEngineProvider(chain, finalConfig);
@@ -62,6 +67,7 @@ const initNetworkProvider = async (chain: RelayerChain) => {
   const fallbackProvider = createFallbackProviderFromJsonConfig(finalConfig);
   activeNetworkProviders[chain.type] ??= {};
   activeNetworkProviders[chain.type][chain.id] = fallbackProvider;
+
   dbg(`Loaded network ${chain.type}:${chain.id}`);
 };
 

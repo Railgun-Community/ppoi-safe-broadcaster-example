@@ -1,13 +1,13 @@
 /// <reference types="../../../global" />
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { validateFee } from '../fee-validator';
 import {
   cacheUnitFeesForTokens,
   resetTransactionFeeCache,
 } from '../transaction-fee-cache';
-import { getMockNetwork } from '../../../test/mocks.test';
+import { getMockEthereumNetwork } from '../../../test/mocks.test';
 import {
   cacheTokenPriceForNetwork,
   resetTokenPriceCache,
@@ -46,7 +46,7 @@ describe('fee-validator', function test() {
   this.timeout(10000);
 
   before(async () => {
-    const network = getMockNetwork();
+    const network = getMockEthereumNetwork();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = network;
     gasTokenAddress = network.gasToken.wrappedAddress;
     await initNetworkProviders([MOCK_CHAIN]);

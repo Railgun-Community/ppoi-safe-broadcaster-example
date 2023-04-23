@@ -7,7 +7,7 @@ import configNetworks from '../server/config/config-networks';
 import { DebugLevel } from '../models/debug-models';
 import { Network } from '../models/network-models';
 import { initWallets } from '../server/wallets/active-wallets';
-import { getMockNetwork, MOCK_TOKEN_6_DECIMALS } from './mocks.test';
+import { getMockEthereumNetwork, MOCK_TOKEN_6_DECIMALS } from './mocks.test';
 import configTokens from '../server/config/config-tokens';
 import { resetMapObject } from '../util/utils';
 import * as NetworkTokensModule from '../server/tokens/network-tokens';
@@ -77,6 +77,7 @@ export const testChainGoerli = (): RelayerChain => {
     id: NetworkChainID.EthereumGoerli,
   };
 };
+
 export const testChainHardhat = (): RelayerChain => {
   return {
     type: ChainType.EVM,
@@ -99,7 +100,7 @@ export const testChainPolygon = (): RelayerChain => {
 };
 
 export const setupTestNetwork = (): Network => {
-  const testNetwork = getMockNetwork();
+  const testNetwork = getMockEthereumNetwork();
   const chain = testChainEthereum();
   configNetworks[chain.type][chain.id] = testNetwork;
   return testNetwork;

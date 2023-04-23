@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { GAS_TOKEN_DECIMALS, Token } from '../../models/token-models';

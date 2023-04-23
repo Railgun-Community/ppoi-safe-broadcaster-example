@@ -1,9 +1,10 @@
-import { BigNumber, Contract } from 'ethers';
 import { Token } from '../../models/token-models';
 import { logger } from '../../util/logger';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { RelayerChain } from '../../models/chain-models';
 import { ABI_ERC20 } from '../abi/abi';
+import { Contract } from '@ethersproject/contracts';
+import { BigNumber } from '@ethersproject/bignumber';
 
 export const getERC20TokenBalance = async (
   chain: RelayerChain,

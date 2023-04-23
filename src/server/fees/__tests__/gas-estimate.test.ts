@@ -1,12 +1,12 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   getEstimateGasDetailsPublic,
   calculateMaximumGasRelayer,
 } from '../gas-estimate';
 import {
-  getMockNetwork,
+  getMockEthereumNetwork,
   getMockPopulatedTransaction,
 } from '../../../test/mocks.test';
 import {
@@ -28,7 +28,7 @@ const MOCK_CHAIN = testChainEthereum();
 
 describe('gas-estimate', () => {
   before(async () => {
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockEthereumNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
   });
 

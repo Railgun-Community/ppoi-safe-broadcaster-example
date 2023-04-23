@@ -39,7 +39,7 @@ module.exports = {
     'import/extensions': ['error', 'ignorePackages', { ts: 'never' }],
     'default-case': 0,
     '@typescript-eslint/ban-ts-comment': 0,
-    '@typescript-eslint/no-explicit-any': 0,
+    '@typescript-eslint/no-explicit-any': 1,
     'import/order': 0,
     '@typescript-eslint/no-empty-function': 0,
     '@typescript-eslint/switch-exhaustiveness-check': 2,

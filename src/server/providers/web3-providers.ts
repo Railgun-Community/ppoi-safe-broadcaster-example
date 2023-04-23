@@ -1,11 +1,7 @@
-import Web3 from 'web3-eth';
-// eslint-disable-next-line import/no-extraneous-dependencies
+import { Eth } from 'web3-eth';
 import { HttpProvider } from 'web3-core';
 import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
-
-// Hack to get the types to apply correctly.
-const Web3Eth = Web3 as unknown as typeof Web3.Eth;
 
 export const web3ProviderFromChainID = (chain: RelayerChain): HttpProvider => {
   const network = configNetworks[chain.type][chain.id];
@@ -23,6 +19,6 @@ export const web3ProviderFromChainID = (chain: RelayerChain): HttpProvider => {
 
   const host = fallbackProviderConfig.providers[0].provider;
 
-  const web3Provider = new Web3Eth.providers.HttpProvider(host, {});
+  const web3Provider = new Eth.providers.HttpProvider(host, {});
   return web3Provider;
 };

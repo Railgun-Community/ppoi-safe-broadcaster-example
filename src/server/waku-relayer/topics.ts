@@ -8,4 +8,8 @@ export const contentTopics = {
     `/railgun/v2/${chain.type}/${chain.id}/transact/json`,
   transactResponse: (chain: RelayerChain) =>
     `/railgun/v2/${chain.type}/${chain.id}/transact-response/json`,
+  preAuthorize: (chain: RelayerChain) =>
+    `/railgun/v2/${chain.type}/${chain.id}/pre-authorize/json`,
+  preAuthorizeResponse: (chain: RelayerChain) =>
+    `/railgun/v2/${chain.type}/${chain.id}/pre-authorize-response/json`,
 };

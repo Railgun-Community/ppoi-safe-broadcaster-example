@@ -4,10 +4,11 @@ import {
 } from '@railgun-community/quickstart';
 import { resetMapObject } from '../../util/utils';
 import { TokenAmount } from '../../models/token-models';
-import { BigNumber } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { RelayerChain } from '../../models/chain-models';
 import { RailgunBalancesEvent } from '@railgun-community/shared-models';
 import { getRailgunWalletID } from '../wallets/active-wallets';
+import { PaymasterWallet } from '../wallets/paymaster-wallet';
 
 // const dbg = debug('relayer:balances:shielded');
 
@@ -71,14 +72,18 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
       updatedAt: Date.now(),
     };
   });
-
-  if (balancePromiseResolve) {
-    balancePromiseResolve();
-  }
   // dbg(
   //   `Shielded balances updated for ${chain.type}:${chain.id}`,
   //   shieldedTokenBalanceCache[chain.type][chain.id],
   // );
+
+  if (balancePromiseResolve) {
+    balancePromiseResolve();
+  }
+
+  // Kick off a Paymaster balance refresh when RAILGUN balances are updated.
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  PaymasterWallet.updateGasBalance(chain);
 };
 
 export const getPrivateTokenBalanceCache = (
