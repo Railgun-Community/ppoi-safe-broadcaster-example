@@ -24,16 +24,181 @@ import type {
   PromiseOrValue,
 } from '../../common';
 
+export type PreAuthorizationStruct = {
+  gasLimit: PromiseOrValue<BigNumberish>;
+  commitmentHash: PromiseOrValue<BytesLike>;
+  expiration: PromiseOrValue<BigNumberish>;
+  signature: PromiseOrValue<BytesLike>;
+};
+
+export type PreAuthorizationStructOutput = [
+  BigNumber,
+  string,
+  BigNumber,
+  string,
+] & {
+  gasLimit: BigNumber;
+  commitmentHash: string;
+  expiration: BigNumber;
+  signature: string;
+};
+
+export type G1PointStruct = {
+  x: PromiseOrValue<BigNumberish>;
+  y: PromiseOrValue<BigNumberish>;
+};
+
+export type G1PointStructOutput = [BigNumber, BigNumber] & {
+  x: BigNumber;
+  y: BigNumber;
+};
+
+export type G2PointStruct = {
+  x: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>];
+  y: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>];
+};
+
+export type G2PointStructOutput = [
+  [BigNumber, BigNumber],
+  [BigNumber, BigNumber],
+] & { x: [BigNumber, BigNumber]; y: [BigNumber, BigNumber] };
+
+export type SnarkProofStruct = {
+  a: G1PointStruct;
+  b: G2PointStruct;
+  c: G1PointStruct;
+};
+
+export type SnarkProofStructOutput = [
+  G1PointStructOutput,
+  G2PointStructOutput,
+  G1PointStructOutput,
+] & { a: G1PointStructOutput; b: G2PointStructOutput; c: G1PointStructOutput };
+
+export type CommitmentCiphertextStruct = {
+  ciphertext: [
+    PromiseOrValue<BytesLike>,
+    PromiseOrValue<BytesLike>,
+    PromiseOrValue<BytesLike>,
+    PromiseOrValue<BytesLike>,
+  ];
+  blindedSenderViewingKey: PromiseOrValue<BytesLike>;
+  blindedReceiverViewingKey: PromiseOrValue<BytesLike>;
+  annotationData: PromiseOrValue<BytesLike>;
+  memo: PromiseOrValue<BytesLike>;
+};
+
+export type CommitmentCiphertextStructOutput = [
+  [string, string, string, string],
+  string,
+  string,
+  string,
+  string,
+] & {
+  ciphertext: [string, string, string, string];
+  blindedSenderViewingKey: string;
+  blindedReceiverViewingKey: string;
+  annotationData: string;
+  memo: string;
+};
+
+export type BoundParamsStruct = {
+  treeNumber: PromiseOrValue<BigNumberish>;
+  minGasPrice: PromiseOrValue<BigNumberish>;
+  unshield: PromiseOrValue<BigNumberish>;
+  chainID: PromiseOrValue<BigNumberish>;
+  adaptContract: PromiseOrValue<string>;
+  adaptParams: PromiseOrValue<BytesLike>;
+  commitmentCiphertext: CommitmentCiphertextStruct[];
+};
+
+export type BoundParamsStructOutput = [
+  number,
+  BigNumber,
+  number,
+  BigNumber,
+  string,
+  string,
+  CommitmentCiphertextStructOutput[],
+] & {
+  treeNumber: number;
+  minGasPrice: BigNumber;
+  unshield: number;
+  chainID: BigNumber;
+  adaptContract: string;
+  adaptParams: string;
+  commitmentCiphertext: CommitmentCiphertextStructOutput[];
+};
+
+export type TokenDataStruct = {
+  tokenType: PromiseOrValue<BigNumberish>;
+  tokenAddress: PromiseOrValue<string>;
+  tokenSubID: PromiseOrValue<BigNumberish>;
+};
+
+export type TokenDataStructOutput = [number, string, BigNumber] & {
+  tokenType: number;
+  tokenAddress: string;
+  tokenSubID: BigNumber;
+};
+
+export type CommitmentPreimageStruct = {
+  npk: PromiseOrValue<BytesLike>;
+  token: TokenDataStruct;
+  value: PromiseOrValue<BigNumberish>;
+};
+
+export type CommitmentPreimageStructOutput = [
+  string,
+  TokenDataStructOutput,
+  BigNumber,
+] & { npk: string; token: TokenDataStructOutput; value: BigNumber };
+
+export type TransactionStruct = {
+  proof: SnarkProofStruct;
+  merkleRoot: PromiseOrValue<BytesLike>;
+  nullifiers: PromiseOrValue<BytesLike>[];
+  commitments: PromiseOrValue<BytesLike>[];
+  boundParams: BoundParamsStruct;
+  unshieldPreimage: CommitmentPreimageStruct;
+};
+
+export type TransactionStructOutput = [
+  SnarkProofStructOutput,
+  string,
+  string[],
+  string[],
+  BoundParamsStructOutput,
+  CommitmentPreimageStructOutput,
+] & {
+  proof: SnarkProofStructOutput;
+  merkleRoot: string;
+  nullifiers: string[];
+  commitments: string[];
+  boundParams: BoundParamsStructOutput;
+  unshieldPreimage: CommitmentPreimageStructOutput;
+};
+
 export interface PaymasterInterface extends utils.Interface {
   functions: {
     'balance(address)': FunctionFragment;
     'balances(address)': FunctionFragment;
+    'callWithPreAuthorization(address,(uint256,bytes32,uint256,bytes),(((uint256,uint256),(uint256[2],uint256[2]),(uint256,uint256)),bytes32,bytes32[],bytes32[],(uint16,uint72,uint8,uint64,address,bytes32,(bytes32[4],bytes32,bytes32,bytes,bytes)[]),(bytes32,(uint8,address,uint256),uint120))[])': FunctionFragment;
     'deposit(address)': FunctionFragment;
+    'railgun()': FunctionFragment;
+    'verifyPreAuthorization(address,(uint256,bytes32,uint256,bytes))': FunctionFragment;
     'withdraw(uint256)': FunctionFragment;
   };
 
   getFunction(
-    nameOrSignatureOrTopic: 'balance' | 'balances' | 'deposit' | 'withdraw',
+    nameOrSignatureOrTopic:
+      | 'balance'
+      | 'balances'
+      | 'callWithPreAuthorization'
+      | 'deposit'
+      | 'railgun'
+      | 'verifyPreAuthorization'
+      | 'withdraw',
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -45,8 +210,21 @@ export interface PaymasterInterface extends utils.Interface {
     values: [PromiseOrValue<string>],
   ): string;
   encodeFunctionData(
+    functionFragment: 'callWithPreAuthorization',
+    values: [
+      PromiseOrValue<string>,
+      PreAuthorizationStruct,
+      TransactionStruct[],
+    ],
+  ): string;
+  encodeFunctionData(
     functionFragment: 'deposit',
     values: [PromiseOrValue<string>],
+  ): string;
+  encodeFunctionData(functionFragment: 'railgun', values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: 'verifyPreAuthorization',
+    values: [PromiseOrValue<string>, PreAuthorizationStruct],
   ): string;
   encodeFunctionData(
     functionFragment: 'withdraw',
@@ -55,7 +233,16 @@ export interface PaymasterInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: 'balance', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: 'balances', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'callWithPreAuthorization',
+    data: BytesLike,
+  ): Result;
   decodeFunctionResult(functionFragment: 'deposit', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'railgun', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'verifyPreAuthorization',
+    data: BytesLike,
+  ): Result;
   decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
 
   events: {};
@@ -89,7 +276,7 @@ export interface Paymaster extends BaseContract {
 
   functions: {
     balance(
-      _address: PromiseOrValue<string>,
+      _paymaster: PromiseOrValue<string>,
       overrides?: CallOverrides,
     ): Promise<[BigNumber]>;
 
@@ -98,10 +285,25 @@ export interface Paymaster extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<[BigNumber]>;
 
+    callWithPreAuthorization(
+      _paymaster: PromiseOrValue<string>,
+      _preAuthorization: PreAuthorizationStruct,
+      _transactions: TransactionStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> },
+    ): Promise<ContractTransaction>;
+
     deposit(
       _paymaster: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
     ): Promise<ContractTransaction>;
+
+    railgun(overrides?: CallOverrides): Promise<[string]>;
+
+    verifyPreAuthorization(
+      _paymaster: PromiseOrValue<string>,
+      _preAuthorization: PreAuthorizationStruct,
+      overrides?: CallOverrides,
+    ): Promise<[void]>;
 
     withdraw(
       _amount: PromiseOrValue<BigNumberish>,
@@ -110,7 +312,7 @@ export interface Paymaster extends BaseContract {
   };
 
   balance(
-    _address: PromiseOrValue<string>,
+    _paymaster: PromiseOrValue<string>,
     overrides?: CallOverrides,
   ): Promise<BigNumber>;
 
@@ -119,10 +321,25 @@ export interface Paymaster extends BaseContract {
     overrides?: CallOverrides,
   ): Promise<BigNumber>;
 
+  callWithPreAuthorization(
+    _paymaster: PromiseOrValue<string>,
+    _preAuthorization: PreAuthorizationStruct,
+    _transactions: TransactionStruct[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> },
+  ): Promise<ContractTransaction>;
+
   deposit(
     _paymaster: PromiseOrValue<string>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
   ): Promise<ContractTransaction>;
+
+  railgun(overrides?: CallOverrides): Promise<string>;
+
+  verifyPreAuthorization(
+    _paymaster: PromiseOrValue<string>,
+    _preAuthorization: PreAuthorizationStruct,
+    overrides?: CallOverrides,
+  ): Promise<void>;
 
   withdraw(
     _amount: PromiseOrValue<BigNumberish>,
@@ -131,7 +348,7 @@ export interface Paymaster extends BaseContract {
 
   callStatic: {
     balance(
-      _address: PromiseOrValue<string>,
+      _paymaster: PromiseOrValue<string>,
       overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
@@ -140,8 +357,23 @@ export interface Paymaster extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
+    callWithPreAuthorization(
+      _paymaster: PromiseOrValue<string>,
+      _preAuthorization: PreAuthorizationStruct,
+      _transactions: TransactionStruct[],
+      overrides?: CallOverrides,
+    ): Promise<void>;
+
     deposit(
       _paymaster: PromiseOrValue<string>,
+      overrides?: CallOverrides,
+    ): Promise<void>;
+
+    railgun(overrides?: CallOverrides): Promise<string>;
+
+    verifyPreAuthorization(
+      _paymaster: PromiseOrValue<string>,
+      _preAuthorization: PreAuthorizationStruct,
       overrides?: CallOverrides,
     ): Promise<void>;
 
@@ -155,7 +387,7 @@ export interface Paymaster extends BaseContract {
 
   estimateGas: {
     balance(
-      _address: PromiseOrValue<string>,
+      _paymaster: PromiseOrValue<string>,
       overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
@@ -164,9 +396,24 @@ export interface Paymaster extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
+    callWithPreAuthorization(
+      _paymaster: PromiseOrValue<string>,
+      _preAuthorization: PreAuthorizationStruct,
+      _transactions: TransactionStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> },
+    ): Promise<BigNumber>;
+
     deposit(
       _paymaster: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
+    ): Promise<BigNumber>;
+
+    railgun(overrides?: CallOverrides): Promise<BigNumber>;
+
+    verifyPreAuthorization(
+      _paymaster: PromiseOrValue<string>,
+      _preAuthorization: PreAuthorizationStruct,
+      overrides?: CallOverrides,
     ): Promise<BigNumber>;
 
     withdraw(
@@ -177,7 +424,7 @@ export interface Paymaster extends BaseContract {
 
   populateTransaction: {
     balance(
-      _address: PromiseOrValue<string>,
+      _paymaster: PromiseOrValue<string>,
       overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
@@ -186,9 +433,24 @@ export interface Paymaster extends BaseContract {
       overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
+    callWithPreAuthorization(
+      _paymaster: PromiseOrValue<string>,
+      _preAuthorization: PreAuthorizationStruct,
+      _transactions: TransactionStruct[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> },
+    ): Promise<PopulatedTransaction>;
+
     deposit(
       _paymaster: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> },
+    ): Promise<PopulatedTransaction>;
+
+    railgun(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    verifyPreAuthorization(
+      _paymaster: PromiseOrValue<string>,
+      _preAuthorization: PreAuthorizationStruct,
+      overrides?: CallOverrides,
     ): Promise<PopulatedTransaction>;
 
     withdraw(

@@ -161,6 +161,8 @@ describe.only('pre-authorization', () => {
       signedPreAuthorization,
     );
 
+    const paymasterAddress = PaymasterWallet.getPaymasterWallet(chain).address;
+
     // Verify signature
     const signerAddress = verifyTypedData(
       domain,
@@ -168,14 +170,12 @@ describe.only('pre-authorization', () => {
       data,
       signature,
     );
-    expect(signerAddress).to.equal(
-      PaymasterWallet.getPaymasterWallet(chain).address,
-    );
+    expect(signerAddress).to.equal(paymasterAddress);
 
     const paymasterContract = ContractStore.getPaymasterContract(chain);
 
-    // TODO: Modify this request when its parameters and output are known.
     const contractResponse = await paymasterContract.verifyPreAuthorization(
+      paymasterAddress,
       signedPreAuthorization,
     );
     expect(contractResponse).to.equal(true);

@@ -2,19 +2,23 @@ import { Contract, PopulatedTransaction } from '@ethersproject/contracts';
 import { Provider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { RelayerSignedPreAuthorization } from '@railgun-community/shared-models';
-import { Paymaster } from './typechain/contracts/paymaster/Paymaster';
+import {
+  Paymaster,
+  PreAuthorizationStruct,
+} from './typechain/contracts/paymaster/Paymaster';
 // TODO: Add Paymaster ABI from final contract.
 import ABIPaymaster from './abi/Paymaster.json';
+import { logger } from '../../util/logger';
 
 export class PaymasterContract {
   private readonly contract: Paymaster;
 
   readonly address: string;
 
-  constructor(relayAdaptContractAddress: string, provider: Provider) {
-    this.address = relayAdaptContractAddress;
+  constructor(paymasterContractAddress: string, provider: Provider) {
+    this.address = paymasterContractAddress;
     this.contract = new Contract(
-      relayAdaptContractAddress,
+      paymasterContractAddress,
       ABIPaymaster,
       provider,
     ) as Paymaster;
@@ -24,15 +28,15 @@ export class PaymasterContract {
     return ABIPaymaster;
   }
 
-  async balance(walletAddress: string): Promise<BigNumber> {
-    return this.contract.balance(walletAddress);
+  async balance(paymasterAddress: string): Promise<BigNumber> {
+    return this.contract.balance(paymasterAddress);
   }
 
   async createDeposit(
-    paymasterWalletAddress: string,
+    paymasterAddress: string,
     amount: BigNumber,
   ): Promise<PopulatedTransaction> {
-    return this.contract.populateTransaction.deposit(paymasterWalletAddress, {
+    return this.contract.populateTransaction.deposit(paymasterAddress, {
       value: amount,
     });
   }
@@ -42,22 +46,31 @@ export class PaymasterContract {
   }
 
   async verifyPreAuthorization(
+    paymasterAddress: string,
     signedPreAuthorization: RelayerSignedPreAuthorization,
-  ): Promise<void> {
-    // TODO: Update this interface.
-    // @ts-ignore
-    return this.contract.verifyPreAuthorization(signedPreAuthorization);
+  ): Promise<boolean> {
+    try {
+      await this.contract.verifyPreAuthorization(
+        paymasterAddress,
+        signedPreAuthorization,
+      );
+      return true;
+    } catch (err) {
+      logger.error(err);
+      return false;
+    }
   }
 
-  async callWithPreAuthorization(
+  async createPaymasterTransactionsWithPreAuthorization(
+    paymasterAddress: string,
     signedPreAuthorization: RelayerSignedPreAuthorization,
-    callData: string,
-  ): Promise<void> {
-    // TODO: Update this interface.
-    // @ts-ignore
-    return this.contract.callWithPreAuthorization(
+    transactions: any,
+  ): Promise<PopulatedTransaction> {
+    // TODO: Update this interface
+    return this.contract.populateTransaction.callWithPreAuthorization(
+      paymasterAddress,
       signedPreAuthorization,
-      callData,
+      [],
     );
   }
 }

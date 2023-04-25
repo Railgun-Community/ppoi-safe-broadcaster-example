@@ -2,8 +2,19 @@
   {
     "inputs": [
       {
+        "internalType": "contract RailgunSmartWallet",
+        "name": "_railgun",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
-        "name": "_address",
+        "name": "_paymaster",
         "type": "address"
       }
     ],
@@ -43,11 +54,292 @@
         "internalType": "address",
         "name": "_paymaster",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "gasLimit",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "commitmentHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expiration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "signature",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct PreAuthorization",
+        "name": "_preAuthorization",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "uint256",
+                    "name": "x",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "y",
+                    "type": "uint256"
+                  }
+                ],
+                "internalType": "struct G1Point",
+                "name": "a",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint256[2]",
+                    "name": "x",
+                    "type": "uint256[2]"
+                  },
+                  {
+                    "internalType": "uint256[2]",
+                    "name": "y",
+                    "type": "uint256[2]"
+                  }
+                ],
+                "internalType": "struct G2Point",
+                "name": "b",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint256",
+                    "name": "x",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "y",
+                    "type": "uint256"
+                  }
+                ],
+                "internalType": "struct G1Point",
+                "name": "c",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct SnarkProof",
+            "name": "proof",
+            "type": "tuple"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "merkleRoot",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32[]",
+            "name": "nullifiers",
+            "type": "bytes32[]"
+          },
+          {
+            "internalType": "bytes32[]",
+            "name": "commitments",
+            "type": "bytes32[]"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint16",
+                "name": "treeNumber",
+                "type": "uint16"
+              },
+              {
+                "internalType": "uint72",
+                "name": "minGasPrice",
+                "type": "uint72"
+              },
+              {
+                "internalType": "enum UnshieldType",
+                "name": "unshield",
+                "type": "uint8"
+              },
+              {
+                "internalType": "uint64",
+                "name": "chainID",
+                "type": "uint64"
+              },
+              {
+                "internalType": "address",
+                "name": "adaptContract",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "adaptParams",
+                "type": "bytes32"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "bytes32[4]",
+                    "name": "ciphertext",
+                    "type": "bytes32[4]"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "blindedSenderViewingKey",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "blindedReceiverViewingKey",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "annotationData",
+                    "type": "bytes"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "memo",
+                    "type": "bytes"
+                  }
+                ],
+                "internalType": "struct CommitmentCiphertext[]",
+                "name": "commitmentCiphertext",
+                "type": "tuple[]"
+              }
+            ],
+            "internalType": "struct BoundParams",
+            "name": "boundParams",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "npk",
+                "type": "bytes32"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "enum TokenType",
+                    "name": "tokenType",
+                    "type": "uint8"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "tokenAddress",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "tokenSubID",
+                    "type": "uint256"
+                  }
+                ],
+                "internalType": "struct TokenData",
+                "name": "token",
+                "type": "tuple"
+              },
+              {
+                "internalType": "uint120",
+                "name": "value",
+                "type": "uint120"
+              }
+            ],
+            "internalType": "struct CommitmentPreimage",
+            "name": "unshieldPreimage",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Transaction[]",
+        "name": "_transactions",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "callWithPreAuthorization",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_paymaster",
+        "type": "address"
       }
     ],
     "name": "deposit",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "railgun",
+    "outputs": [
+      {
+        "internalType": "contract RailgunSmartWallet",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_paymaster",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "gasLimit",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "commitmentHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expiration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "signature",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct PreAuthorization",
+        "name": "_preAuthorization",
+        "type": "tuple"
+      }
+    ],
+    "name": "verifyPreAuthorization",
+    "outputs": [],
+    "stateMutability": "view",
     "type": "function"
   },
   {
