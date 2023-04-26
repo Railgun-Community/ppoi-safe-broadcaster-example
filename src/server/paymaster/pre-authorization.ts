@@ -19,6 +19,7 @@ import { parseUnits } from '@ethersproject/units';
 import configNetworks from '../config/config-networks';
 import { PaymasterWallet } from '../wallets/paymaster-wallet';
 import { ErrorMessage } from '../../util/errors';
+import { convertMsecToSec } from '../../util/date';
 
 export const preAuthorizeRequest = async (
   chain: RelayerChain,
@@ -76,7 +77,7 @@ export const preAuthorizeRequest = async (
   }
 
   const expirationMS = configDefaults.paymaster.preAuthorizationExpirationInMS;
-  const expiration = Date.now() + expirationMS;
+  const expiration = convertMsecToSec(Date.now() + expirationMS);
 
   const preAuthorization: RelayerPreAuthorization = {
     gasLimit,

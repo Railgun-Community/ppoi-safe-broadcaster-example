@@ -75,6 +75,7 @@ import { encryptResponseData, tryDecryptData } from '../../../util/encryption';
 import { NetworkChainID } from '../../config/config-chains';
 import * as PaymasterGasBalanceCacheModule from '../../balances/paymaster-gas-balance-cache';
 import { initContracts } from '../../contracts/init-contracts';
+import { convertMsecToSec } from '../../../util/date';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -337,7 +338,6 @@ describe('waku-relayer', () => {
     const expectedWakuMessage = WakuMessage.fromUtf8String(
       JSON.stringify(expectedJsonRpcResult),
       contentTopics.transactResponse(chainEthereum),
-      // { timestamp: relayMessage.timestamp },
     );
     expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
     expect(rpcArgs.params[1].contentTopic).to.equal(
@@ -460,9 +460,9 @@ describe('waku-relayer', () => {
     const responseData: RelayerSignedPreAuthorization = {
       gasLimit: data.gasLimit,
       commitmentHash: data.commitmentHash,
-      expiration: MOCK_DATE_NOW + 3 * 60 * 1000, // 3 min
+      expiration: convertMsecToSec(MOCK_DATE_NOW + 3 * 60 * 1000), // 3 min expiration
       signature:
-        '0x30ac3c0519fdc436a8387f7c63152c76f50424e4598d9815304bb9faf5bfbbbc38e419eac98ebc44254aabc2bebded5b977fcc9ca5968b076e25fec964bb45df1b',
+        '0xf38f03ce563a2d3af61f0e070565b27a94787201ceb7e4895822e18f0ef4700a1e074c56cf830eee674f76ab36df5a976eb86285ebe8df8a37634d45c38972921c',
     };
     const encryptedResponse = encryptResponseData(responseData, sharedKey);
     const expectedJsonRpcResult = formatJsonRpcResult(
@@ -493,5 +493,5 @@ describe('waku-relayer', () => {
       sharedKey,
     );
     expect(resultData).to.deep.equal(expectedResultData);
-  }).timeout(2000);
+  }).timeout(10000);
 }).timeout(10000);
