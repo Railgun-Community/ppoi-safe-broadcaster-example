@@ -181,7 +181,6 @@ export type TransactionStructOutput = [
 
 export interface PaymasterInterface extends utils.Interface {
   functions: {
-    'balance(address)': FunctionFragment;
     'balances(address)': FunctionFragment;
     'callWithPreAuthorization(address,(uint256,bytes32,uint256,bytes),(((uint256,uint256),(uint256[2],uint256[2]),(uint256,uint256)),bytes32,bytes32[],bytes32[],(uint16,uint72,uint8,uint64,address,bytes32,(bytes32[4],bytes32,bytes32,bytes,bytes)[]),(bytes32,(uint8,address,uint256),uint120))[])': FunctionFragment;
     'deposit(address)': FunctionFragment;
@@ -192,7 +191,6 @@ export interface PaymasterInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
-      | 'balance'
       | 'balances'
       | 'callWithPreAuthorization'
       | 'deposit'
@@ -201,10 +199,6 @@ export interface PaymasterInterface extends utils.Interface {
       | 'withdraw',
   ): FunctionFragment;
 
-  encodeFunctionData(
-    functionFragment: 'balance',
-    values: [PromiseOrValue<string>],
-  ): string;
   encodeFunctionData(
     functionFragment: 'balances',
     values: [PromiseOrValue<string>],
@@ -231,7 +225,6 @@ export interface PaymasterInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>],
   ): string;
 
-  decodeFunctionResult(functionFragment: 'balance', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: 'balances', data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: 'callWithPreAuthorization',
@@ -275,11 +268,6 @@ export interface Paymaster extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    balance(
-      _paymaster: PromiseOrValue<string>,
-      overrides?: CallOverrides,
-    ): Promise<[BigNumber]>;
-
     balances(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides,
@@ -310,11 +298,6 @@ export interface Paymaster extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> },
     ): Promise<ContractTransaction>;
   };
-
-  balance(
-    _paymaster: PromiseOrValue<string>,
-    overrides?: CallOverrides,
-  ): Promise<BigNumber>;
 
   balances(
     arg0: PromiseOrValue<string>,
@@ -347,11 +330,6 @@ export interface Paymaster extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    balance(
-      _paymaster: PromiseOrValue<string>,
-      overrides?: CallOverrides,
-    ): Promise<BigNumber>;
-
     balances(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides,
@@ -386,11 +364,6 @@ export interface Paymaster extends BaseContract {
   filters: {};
 
   estimateGas: {
-    balance(
-      _paymaster: PromiseOrValue<string>,
-      overrides?: CallOverrides,
-    ): Promise<BigNumber>;
-
     balances(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides,
@@ -423,11 +396,6 @@ export interface Paymaster extends BaseContract {
   };
 
   populateTransaction: {
-    balance(
-      _paymaster: PromiseOrValue<string>,
-      overrides?: CallOverrides,
-    ): Promise<PopulatedTransaction>;
-
     balances(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides,

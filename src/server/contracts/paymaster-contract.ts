@@ -2,11 +2,8 @@ import { Contract, PopulatedTransaction } from '@ethersproject/contracts';
 import { Provider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { RelayerSignedPreAuthorization } from '@railgun-community/shared-models';
-import {
-  Paymaster,
-  PreAuthorizationStruct,
-} from './typechain/contracts/paymaster/Paymaster';
-// TODO: Add Paymaster ABI from final contract.
+import { Paymaster } from './typechain/contracts/paymaster/Paymaster';
+// TODO: Update Paymaster ABI from final contract (contract: abi-exports/Paymaster.json).
 import ABIPaymaster from './abi/Paymaster.json';
 import { logger } from '../../util/logger';
 
@@ -29,7 +26,7 @@ export class PaymasterContract {
   }
 
   async balance(paymasterAddress: string): Promise<BigNumber> {
-    return this.contract.balance(paymasterAddress);
+    return this.contract.balances(paymasterAddress);
   }
 
   async createDeposit(
@@ -66,7 +63,7 @@ export class PaymasterContract {
     signedPreAuthorization: RelayerSignedPreAuthorization,
     transactions: any,
   ): Promise<PopulatedTransaction> {
-    // TODO: Update this interface
+    // TODO: Update this interface for 4337 call with UserOperation.
     return this.contract.populateTransaction.callWithPreAuthorization(
       paymasterAddress,
       signedPreAuthorization,
