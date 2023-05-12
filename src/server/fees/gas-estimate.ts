@@ -9,10 +9,11 @@ import { BigNumber } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
 import { logger } from '../../util/logger';
-import { throwErr } from '../../util/promise-utils';
+import { throwErr, delay } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getStandardGasDetails } from './gas-by-speed';
+import configDefaults from 'server/config/config-defaults';
 
 export const getEstimateGasDetailsPublic = async (
   chain: RelayerChain,
@@ -43,25 +44,46 @@ export const getEstimateGasDetailsRelayed = async (
   minGasPrice: string,
   transactionRequest: TransactionRequest,
   devLog?: boolean,
+  retryCount = 0,
 ): Promise<TransactionGasDetails> => {
   if (evmGasType === EVMGasType.Type2) {
     // minGasPrice not allowed on EVMGasType 2
     throw new Error('EVMGasType 2 not allowed for Relayer transactions.');
   }
-  try {
-    const gasPrice = BigNumber.from(minGasPrice);
-    const transactionRequestWithOptionalMinGas: TransactionRequest = {
-      ...transactionRequest,
-      gasPrice,
-    };
+  const gasPrice = BigNumber.from(minGasPrice);
+  const transactionRequestWithOptionalMinGas: TransactionRequest = {
+    ...transactionRequest,
+    gasPrice,
+  };
 
-    const provider = getProviderForNetwork(chain);
+  const provider = getProviderForNetwork(chain);
+
+  try {
     const gasEstimate = await provider
       .estimateGas(transactionRequestWithOptionalMinGas)
       .catch(throwErr);
 
     return { evmGasType, gasEstimate, gasPrice };
   } catch (err) {
+    if (err.message.indexOf('failed to meet quorum') !== -1) {
+      logger.warn('Experienced a quorum error. Trying again in a few seconds.');
+
+      const { failedGasEstimateDelay, failedRetryAttempts } =
+        configDefaults.gasEstimateSettings;
+
+      await delay(failedGasEstimateDelay);
+      if (retryCount > failedRetryAttempts) {
+        throw new Error(ErrorMessage.FAILED_QUORUM);
+      }
+      return getEstimateGasDetailsRelayed(
+        chain,
+        evmGasType,
+        minGasPrice,
+        transactionRequest,
+        devLog,
+        retryCount + 1,
+      );
+    }
     logger.error(err);
     if (devLog) {
       throw sanitizeRelayerError(err);

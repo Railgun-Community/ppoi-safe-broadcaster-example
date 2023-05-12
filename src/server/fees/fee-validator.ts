@@ -17,7 +17,11 @@ const comparePackagedFeeToCalculated = (
     .mul(Math.round(10000 * (1 - gasEstimateVarianceBuffer)))
     .div(10000);
   // logger.log(`calculatedFeeWithBuffer: ${calculatedFeeWithBuffer?.toString()}`);
-  return packagedFee.gte(calculatedFeeWithBuffer);
+  const feeIsValid = packagedFee.gte(calculatedFeeWithBuffer);
+  if (!feeIsValid) {
+    throw new Error(ErrorMessage.REJECTED_PACKAGED_FEE);
+  }
+  return feeIsValid;
 };
 
 export const validateFee = (

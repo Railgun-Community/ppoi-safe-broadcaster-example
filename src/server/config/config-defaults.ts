@@ -83,6 +83,14 @@ export default {
     requireMatchingFeeCacheID: false,
   },
 
+  gasEstimateSettings: {
+    /**
+     * Time to wait after a failed quorum gas estimate.
+     */
+    failedGasEstimateDelay: 300,
+    failedRetryAttempts: 3,
+  },
+
   tokenPrices: {
     /**
      * Number of times to retry price lookup.
