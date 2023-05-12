@@ -77,7 +77,7 @@ export default {
      * Time to wait after a failed quorum gas estimate.
      */
     failedGasEstimateDelay: 300,
-    failedRetryAttempts: 2,
+    failedRetryAttempts: 3,
   },
 
   tokenPrices: {
