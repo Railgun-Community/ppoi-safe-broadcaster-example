@@ -76,7 +76,7 @@ export default {
     /**
      * Time to wait after a failed quorum gas estimate.
      */
-    failedGasEstimateDelay: 500,
+    failedGasEstimateDelay: 300,
     failedRetryAttempts: 2,
   },
 
