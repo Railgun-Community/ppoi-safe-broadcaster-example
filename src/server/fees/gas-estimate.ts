@@ -13,7 +13,7 @@ import { throwErr, delay } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getStandardGasDetails } from './gas-by-speed';
-import configDefaults from 'server/config/config-defaults';
+import configDefaults from '../config/config-defaults';
 
 export const getEstimateGasDetailsPublic = async (
   chain: RelayerChain,
