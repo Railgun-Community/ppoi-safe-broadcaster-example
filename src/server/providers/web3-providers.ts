@@ -5,6 +5,7 @@ import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
 
 // Hack to get the types to apply correctly.
+// @ts-ignore
 const Web3Eth = Web3 as unknown as typeof Web3.Eth;
 
 export const web3ProviderFromChainID = (chain: RelayerChain): HttpProvider => {

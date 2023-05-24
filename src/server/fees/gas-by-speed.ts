@@ -39,6 +39,7 @@ import { getProviderForNetwork } from '../providers/active-network-providers';
 import { web3ProviderFromChainID } from '../providers/web3-providers';
 
 // Hack to get the types to apply correctly.
+// @ts-ignore
 const Web3Eth = Web3 as unknown as typeof Web3.Eth;
 
 //
