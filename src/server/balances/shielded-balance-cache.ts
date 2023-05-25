@@ -34,14 +34,7 @@ export const updateShieldedBalances = async (
   balancePromiseResolve = undefined;
 
   const railgunWalletID = getRailgunWalletID();
-  const response = await refreshRailgunBalances(
-    chain,
-    railgunWalletID,
-    fullRescan,
-  );
-  if (response.error) {
-    throw new Error(`Could not update RAILGUN balances: ${response.error}`);
-  }
+  await refreshRailgunBalances(chain, railgunWalletID, fullRescan);
   return new Promise<void>((resolve) => {
     balancePromiseResolve = resolve;
   });

@@ -40,7 +40,6 @@ import {
 } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
 import { Network } from '../../../models/network-models';
-import configTokens from '../../config/config-tokens';
 import * as processTransactionModule from '../../transactions/process-transaction';
 import { WakuMessage } from '../waku-message';
 import { contentTopics } from '../topics';
@@ -58,9 +57,9 @@ import {
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 import {
+  RelayerEncryptedMethodParams,
   RelayerFeeMessage,
   RelayerFeeMessageData,
-  RelayerMethodParamsTransact,
   RelayerRawParamsTransact,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../../util/relayer-version';
@@ -267,7 +266,7 @@ describe('waku-relayer', () => {
     const clientPubKey = hexlify(randomPubKeyUint8Array);
     const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
     const encryptedData = encryptResponseData(data, sharedKey);
-    const params: RelayerMethodParamsTransact = {
+    const params: RelayerEncryptedMethodParams = {
       encryptedData,
       pubkey: clientPubKey,
     };

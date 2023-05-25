@@ -42,7 +42,7 @@ export const startEngine = () => {
 
   const walletSource = 'relayer';
   const shouldDebug = configDefaults.debug.logLevel === DebugLevel.VerboseLogs;
-  const response = startRailgunEngine(
+  startRailgunEngine(
     walletSource,
     levelDB,
     shouldDebug,
@@ -50,9 +50,6 @@ export const startEngine = () => {
     false, // useNativeArtifacts
     false, // skipMerkletreeScans
   );
-  if (response.error) {
-    throw new Error(response.error);
-  }
   engineStarted = true;
 };
 
@@ -82,12 +79,5 @@ export const loadEngineProvider = async (
 
   const shouldDebug = configDefaults.debug.logLevel === DebugLevel.VerboseLogs;
 
-  const response = await loadProvider(
-    providerJsonConfig,
-    network.name,
-    shouldDebug,
-  );
-  if (response.error) {
-    throw new Error(response.error);
-  }
+  await loadProvider(providerJsonConfig, network.name, shouldDebug);
 };

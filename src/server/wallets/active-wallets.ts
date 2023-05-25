@@ -41,22 +41,13 @@ const initRailgunWallet = async (mnemonic: string) => {
   // TODO: Add creationBlockNumbers for optimized balance scanning.
   const creationBlockNumbers: Optional<MapType<number>> = undefined;
 
-  const railgunWalletResponse = await createRailgunWallet(
+  const railgunWalletInfo = await createRailgunWallet(
     encryptionKey,
     mnemonic,
     creationBlockNumbers,
   );
-  if (railgunWalletResponse.error) {
-    throw new Error(
-      `Error creating RAILGUN wallet: ${railgunWalletResponse.error}`,
-    );
-  }
-  if (!railgunWalletResponse.railgunWalletInfo) {
-    throw new Error(`Error getting RAILGUN wallet info`);
-  }
-
-  railgunWalletAddress = railgunWalletResponse.railgunWalletInfo.railgunAddress;
-  railgunWalletID = railgunWalletResponse.railgunWalletInfo.id;
+  railgunWalletAddress = railgunWalletInfo.railgunAddress;
+  railgunWalletID = railgunWalletInfo.id;
 };
 
 export const initWallets = async () => {

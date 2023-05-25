@@ -52,7 +52,7 @@ export const generateUnshieldTransaction = async (
   const originalGasDetailsSerialized =
     serializeTransactionGasDetails(originalGasDetails);
 
-  const gasEstimateResponse = await gasEstimateForUnprovenUnshield(
+  const { gasEstimateString } = await gasEstimateForUnprovenUnshield(
     network.name,
     railgunWalletID,
     dbEncryptionKey,
@@ -62,16 +62,8 @@ export const generateUnshieldTransaction = async (
     undefined, // feeTokenDetails
     sendWithPublicWallet,
   );
-  if (gasEstimateResponse.error) {
-    throw new Error(
-      `Unshield gas estimate error: ${gasEstimateResponse.error}`,
-    );
-  }
-  if (!gasEstimateResponse.gasEstimateString) {
-    throw new Error(`Unshield gas estimate: No gas estimate returned`);
-  }
 
-  const proofResponse = await generateUnshieldProof(
+  await generateUnshieldProof(
     network.name,
     railgunWalletID,
     dbEncryptionKey,
@@ -82,18 +74,15 @@ export const generateUnshieldTransaction = async (
     undefined, // overallBatchMinGasPrice
     () => {}, // progressCallback
   );
-  if (proofResponse.error) {
-    throw new Error(`Unshield proof generation error: ${proofResponse.error}`);
-  }
 
   const finalGasDetails: TransactionGasDetails = {
     ...originalGasDetails,
-    gasEstimate: BigNumber.from(gasEstimateResponse.gasEstimateString),
+    gasEstimate: BigNumber.from(gasEstimateString),
   };
   const finalGasDetailsSerialized =
     serializeTransactionGasDetails(finalGasDetails);
 
-  const populateResponse = await populateProvedUnshield(
+  const { serializedTransaction } = await populateProvedUnshield(
     network.name,
     railgunWalletID,
     erc20AmountRecipients,
@@ -103,17 +92,8 @@ export const generateUnshieldTransaction = async (
     undefined, // overallBatchMinGasPrice
     finalGasDetailsSerialized,
   );
-  if (populateResponse.error) {
-    throw new Error(
-      `Unshield populate transaction error: ${populateResponse.error}`,
-    );
-  }
-  if (!populateResponse.serializedTransaction) {
-    throw new Error('No serializedTransaction for unshield');
-  }
-
   const populatedTransaction = deserializeTransaction(
-    populateResponse.serializedTransaction,
+    serializedTransaction,
     undefined, // nonce
     network.chain.id,
   );

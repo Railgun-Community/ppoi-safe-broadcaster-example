@@ -23,7 +23,7 @@ import { recognizesFeeCacheID } from '../../fees/transaction-fee-cache';
 import { RelayerChain } from '../../../models/chain-models';
 import configNetworks from '../../config/config-networks';
 import {
-  RelayerMethodParamsTransact,
+  RelayerEncryptedMethodParams,
   RelayerRawParamsTransact,
   versionCompare,
 } from '@railgun-community/shared-models';
@@ -34,7 +34,7 @@ const handledClientPubKeys: string[] = [];
 const dbg = debug('relayer:transact');
 
 export const transactMethod = async (
-  params: RelayerMethodParamsTransact,
+  params: RelayerEncryptedMethodParams,
   id: number,
 ): Promise<Optional<WakuMethodResponse>> => {
   dbg('got transact');
@@ -199,6 +199,8 @@ const replaceErrorMessageNonDev = (
     case ErrorMessage.GAS_PRICE_TOO_LOW:
     case ErrorMessage.MISSING_REQUIRED_FIELD:
     case ErrorMessage.UNKNOWN_ERROR:
+    case ErrorMessage.FAILED_QUORUM:
+    case ErrorMessage.REJECTED_PACKAGED_FEE:
       return errMsg;
   }
   return ErrorMessage.UNKNOWN_ERROR;
