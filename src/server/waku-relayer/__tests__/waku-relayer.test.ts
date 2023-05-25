@@ -78,7 +78,6 @@ let client: WakuApiClient;
 let clientHTTPStub: SinonStub;
 let processTransactionStub: SinonStub;
 
-// @ts-ignore
 let requestData: Optional<JsonRpcRequest>;
 
 const MOCK_TOKEN_ADDRESS = '0x12345';

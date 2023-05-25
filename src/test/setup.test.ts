@@ -66,7 +66,7 @@ export const setupSingleTestWallet = async () => {
 export const resetConfigDefaults = () => {
   const keys = Object.keys(savedConfigDefaults);
   for (const key of keys) {
-    // @ts-ignore
+    // @ts-expect-error
     configDefaults[key] = savedConfigDefaults[key];
   }
 };

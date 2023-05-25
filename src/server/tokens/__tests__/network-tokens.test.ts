@@ -11,7 +11,7 @@ const MOCK_CHAIN = testChainEthereum();
 
 describe('network-tokens', () => {
   before(async () => {
-    // @ts-ignore
+    // @ts-expect-error
     configTokens[MOCK_CHAIN.type] ??= {};
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id] = {
       '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': {

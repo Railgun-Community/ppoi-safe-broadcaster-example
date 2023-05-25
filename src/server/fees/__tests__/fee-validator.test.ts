@@ -19,6 +19,7 @@ import configTokens from '../../config/config-tokens';
 import { initTokens } from '../../tokens/network-tokens';
 import { ErrorMessage } from '../../../util/errors';
 import { testChainEthereum } from '../../../test/setup.test';
+import { startEngine } from '../../engine/engine-init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -46,10 +47,13 @@ describe('fee-validator', function test() {
   this.timeout(10000);
 
   before(async () => {
+    startEngine();
     const network = getMockNetwork();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = network;
     gasTokenAddress = network.gasToken.wrappedAddress;
     await initNetworkProviders([MOCK_CHAIN]);
+    // @ts-expect-error
+    configTokens[MOCK_CHAIN.type] ??= {};
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id] = {};
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'TOKEN',
@@ -77,7 +81,7 @@ describe('fee-validator', function test() {
     });
     expect(() =>
       validatePackagedFee(feeCacheID, BigNumber.from(50), BigNumber.from(10)),
-    ).to.throw(ErrorMessage.BAD_TOKEN_FEE);
+    ).to.throw(ErrorMessage.REJECTED_PACKAGED_FEE);
   });
 
   it('Should invalidate without a cached or calculated fee', () => {

@@ -84,9 +84,9 @@ describe('coingecko-price', () => {
       [TOKEN_ADDRESS_2]: getMockTokenConfig(),
     };
 
-    // @ts-ignore
+    // @ts-expect-error
     configTokens[chainEthereum.type] ??= {};
-    // @ts-ignore
+    // @ts-expect-error
     configTokens[chainRopsten.type] ??= {};
     configTokens[chainEthereum.type][chainEthereum.id] = tokenConfigs;
     configTokens[chainRopsten.type][chainRopsten.id] = tokenConfigs;

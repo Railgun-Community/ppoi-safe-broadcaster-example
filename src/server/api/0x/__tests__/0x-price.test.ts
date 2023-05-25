@@ -82,9 +82,9 @@ describe('0x-price', () => {
 
     overrideZeroXPriceLookupDelay_TEST_ONLY(5);
 
-    // @ts-ignore
+    // @ts-expect-error
     configTokens[chainEthereum.type] ??= {};
-    // @ts-ignore
+    // @ts-expect-error
     configTokens[chainRopsten.type] ??= {};
     configTokens[chainEthereum.type][chainEthereum.id] = tokenConfigs;
     configTokens[chainRopsten.type][chainRopsten.id] = tokenConfigs;

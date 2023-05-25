@@ -206,6 +206,6 @@ const formatApiError = (err: AxiosError<any>): string => {
 
     return `0x API: ${err.response?.data.reason}. ${firstValidationErrorReason}.`;
   } catch {
-    return '0x API request failed.';
+    return err.message ?? '0x API request failed.';
   }
 };

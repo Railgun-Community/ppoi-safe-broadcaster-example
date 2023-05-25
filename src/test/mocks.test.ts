@@ -13,7 +13,7 @@ import { Token, TokenConfig } from '../models/token-models';
 import { RelayerChain } from '../models/chain-models';
 
 export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
-  // @ts-ignore
+  // @ts-expect-error
   configTokens[chain.type] ??= {};
   configTokens[chain.type][chain.id] ??= {};
   configTokens[chain.type][chain.id][tokenAddress] = {

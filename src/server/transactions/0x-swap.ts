@@ -24,6 +24,7 @@ const dbg = debug('relayer:swaps');
 export const generateSwapTransactions = async (
   tokenAmounts: TokenAmount[],
   chain: RelayerChain,
+  shouldThrow = false,
 ): Promise<PopulatedTransaction[]> => {
   const populatedTransactions: Optional<PopulatedTransaction>[] =
     await Promise.all(
@@ -39,9 +40,11 @@ export const generateSwapTransactions = async (
             throw new Error(swapQuote.error);
           }
           if (!swapQuote.quote) {
-            dbg(
-              `Failed to get zeroX Swap Quote for ${tokenAmount.tokenAddress}`,
-            );
+            const errMessage = `Failed to get zeroX Swap Quote for ${tokenAmount.tokenAddress}`;
+            if (shouldThrow) {
+              throw new Error(errMessage);
+            }
+            dbg(errMessage);
             return undefined;
           }
           const populatedSwap = quoteToPopulatedTransaction(
@@ -50,9 +53,11 @@ export const generateSwapTransactions = async (
           );
           return populatedSwap;
         } catch (err) {
-          dbg(
-            `Could not populate transaction for token ${tokenAmount.tokenAddress} being swapped for top up: ${err.message}`,
-          );
+          const errMessage = `Could not populate swap transaction (during top-up) for token ${tokenAmount.tokenAddress}: ${err.message}`;
+          if (shouldThrow) {
+            throw new Error(errMessage);
+          }
+          dbg(errMessage);
           return undefined;
         }
       }),

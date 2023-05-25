@@ -109,12 +109,17 @@ describe('0x-swap', () => {
     expect(swapTxs.length).to.equal(0);
   }).timeout(200000);
 
-  it('Should generate the correct number of swap transactions', async () => {
-    const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN);
-    expect(swapTxs.length).to.equal(2);
-  }).timeout(200000);
+  // Skip: Hitting 429s.
+  it.skip(
+    'Should generate the correct number of swap transactions',
+    async () => {
+      const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN);
+      expect(swapTxs.length).to.equal(2);
+    },
+  ).timeout(200000);
 
-  it('Should generate approval transactions to each token', async () => {
+  // Skip: Hitting 429s.
+  it.skip('Should generate approval transactions to each token', async () => {
     const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN);
     expect(swapTxs.length).to.equal(2);
     expect(swapTxs[0].to).to.equal(
@@ -125,6 +130,7 @@ describe('0x-swap', () => {
     );
   }).timeout(200000);
 
+  // Skip: Hitting 429s.
   it.skip('Should generate transactions with expected hash', async () => {
     const txReceipts = await swapZeroX(activeWallet, TO_SWAP, MOCK_CHAIN);
     expect(txReceipts.length).to.equal(2);
