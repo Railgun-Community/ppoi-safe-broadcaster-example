@@ -38,3 +38,5 @@ docker/config.toml
 docker/docker-stack.yml
 docker/appdata
 docker/custom.yml
+
+*.bak

@@ -7,6 +7,7 @@ export type WakuRelayMessage = {
   contentTopic: string;
   payload: Uint8Array;
   timestamp: number;
+  version?: number;
 };
 
 export type WakuApiClientOptions = {
@@ -95,13 +96,23 @@ export class WakuApiClient {
       return false;
     }
     const { timestamp } = message;
-    const payload = Buffer.from(message.payload).toString('hex');
+    const payload = Buffer.from(message.payload).toString('base64');
     const { contentTopic } = message;
     const data = await this.request(WakuRequestMethods.PublishMessage, [
       topic,
       { payload, timestamp, contentTopic },
     ]);
     return data.result;
+  }
+
+  static fromJSON(obj: any): WakuRelayMessage {
+    const msg: WakuRelayMessage = {
+      contentTopic: obj.contentTopic,
+      payload: Buffer.from(obj?.payload || [], 'base64'),
+      version: obj.version || 0,
+      timestamp: obj.timestamp ?? undefined,
+    };
+    return msg;
   }
 
   /**
@@ -116,15 +127,17 @@ export class WakuApiClient {
   ): Promise<WakuRelayMessage[]> {
     const data = await this.request(WakuRequestMethods.GetMessages, [topic]);
 
-    const messages: WakuRelayMessage[] = data.result;
-    // if contentTopics given, return only matching messages
     if (data.error) {
       throw data.error;
     }
+    const messages: WakuRelayMessage[] = data.result.map(WakuApiClient.fromJSON);
+
     if (!messages) {
       this.dbg('No messages, got data:', data);
       return [];
     }
+
+    // if contentTopics given, return only matching messages
     if (contentTopics.length) {
       return messages.filter((message: WakuRelayMessage) =>
         contentTopics.includes(message.contentTopic),

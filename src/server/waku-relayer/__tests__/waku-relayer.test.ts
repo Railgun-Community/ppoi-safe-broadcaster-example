@@ -16,7 +16,7 @@ import {
   getRandomBytes,
   getRailgunWalletAddressData,
 } from '@railgun-community/quickstart';
-import { WakuMethodNames, WakuRelayer, WAKU_TOPIC } from '../waku-relayer';
+import { WakuMethodNames, WakuRelayer } from '../waku-relayer';
 import {
   WakuApiClient,
   WakuRelayMessage,
@@ -107,7 +107,7 @@ describe('waku-relayer', () => {
     client = new WakuApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
     wakuRelayer = await WakuRelayer.init(client, {
-      topic: WAKU_TOPIC,
+      topic: configDefaults.waku.pubSubTopic,
       feeExpiration: configDefaults.transactionFees.feeExpirationInMS,
     });
     clientHTTPStub.resetHistory();
@@ -162,14 +162,14 @@ describe('waku-relayer', () => {
     expect(requestData?.id).to.be.a('number');
     expect(requestData?.method).to.equal(WakuRequestMethods.PublishMessage);
     expect(requestData?.params).to.be.an('array');
-    expect(requestData?.params[0]).to.equal(WAKU_TOPIC);
+    expect(requestData?.params[0]).to.equal(configDefaults.waku.pubSubTopic);
     expect(requestData?.params[1]).to.be.an('object');
     const requestParams = requestData?.params[1];
     expect(requestParams?.contentTopic).to.equal(contentTopic);
     expect(requestParams?.timestamp).to.be.a('number');
     expect(requestParams?.payload).to.be.a('string');
 
-    const utf8 = Buffer.from(requestParams.payload, 'hex').toString('utf8');
+    const utf8 = Buffer.from(requestParams.payload, 'base64').toString('utf8');
     const message = JSON.parse(utf8) as RelayerFeeMessage;
     const data = JSON.parse(
       toUTF8String(message.data),
@@ -291,7 +291,7 @@ describe('waku-relayer', () => {
     expect(rpcArgs.id).to.be.a('number');
     expect(rpcArgs.method).to.equal(WakuRequestMethods.PublishMessage);
     expect(rpcArgs.params).to.be.an('array');
-    expect(rpcArgs.params[0]).to.equal(WAKU_TOPIC);
+    expect(rpcArgs.params[0]).to.equal(configDefaults.waku.pubSubTopic);
 
     const encryptedResponse = encryptResponseData(
       {
@@ -314,7 +314,7 @@ describe('waku-relayer', () => {
     );
 
     const decoded = JSON.parse(
-      WakuRelayer.decode(Buffer.from(rpcArgs.params[1].payload, 'hex')),
+      WakuRelayer.decode(Buffer.from(rpcArgs.params[1].payload, 'base64')),
     );
     const decodedExpected = JSON.parse(
       WakuRelayer.decode(expectedWakuMessage.payload as Uint8Array),

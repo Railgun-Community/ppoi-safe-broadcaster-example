@@ -27,8 +27,6 @@ import {
 import { getRelayerVersion } from '../../util/relayer-version';
 import configDefaults from '../config/config-defaults';
 
-export const WAKU_TOPIC = '/waku/2/default-waku/proto';
-
 type JsonRPCMessageHandler = (
   params: any,
   id: number,
@@ -112,7 +110,7 @@ export class WakuRelayer {
       JSON.stringify(payload),
       contentTopic,
     );
-    return this.client.publish(msg, WAKU_TOPIC).catch((e) => {
+    return this.client.publish(msg, this.options.topic).catch((e) => {
       this.dbg('Error publishing message', e.message);
     });
   }
@@ -211,7 +209,7 @@ export class WakuRelayer {
   async poll(frequency: number): Promise<void> {
     if (this.stopping) return;
     const messages = await this.client
-      .getMessages(WAKU_TOPIC, this.subscribedContentTopics)
+      .getMessages(this.options.topic, this.subscribedContentTopics)
       .catch(async (e) => {
         this.dbg(e.message);
         this.dbg('type', typeof e.code);

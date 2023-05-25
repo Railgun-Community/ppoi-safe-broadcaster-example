@@ -6,7 +6,6 @@ import {
 import {
   WakuRelayer,
   WakuRelayerOptions,
-  WAKU_TOPIC,
 } from 'server/waku-relayer/waku-relayer';
 import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
@@ -26,7 +25,7 @@ const main = async (): Promise<void> => {
 
   const client = new WakuApiClient({ url: config.waku.rpcURL });
   const options: WakuRelayerOptions = {
-    topic: WAKU_TOPIC,
+    topic: config.waku.pubSubTopic,
     feeExpiration: config.transactionFees.feeExpirationInMS,
   };
   relayer = await WakuRelayer.init(client, options);

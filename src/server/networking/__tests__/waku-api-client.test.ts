@@ -77,7 +77,7 @@ describe('waku-api-client', () => {
       },
       {
         contentTopic: 'def',
-        payload: Buffer.from(''),
+        payload: Buffer.from('', 'base64'),
         timestamp: 456,
       },
     ];

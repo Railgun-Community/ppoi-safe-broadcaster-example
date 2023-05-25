@@ -185,6 +185,11 @@ export default {
      * Frequency to broadcast fees.
      */
     broadcastFeesDelayInMS: 15 * 1000,
+
+    /**
+     * libp2p pubSubTopic to subscribe to
+     */
+     pubSubTopic: '/waku/2/railgun-relayer',
   },
 
   api: {

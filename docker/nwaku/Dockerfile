@@ -1,4 +1,4 @@
-FROM statusteam/nim-waku:v0.14.0
+FROM statusteam/nim-waku:v0.17.0
 
-RUN apk add curl jq
+RUN apk add curl jq websocat
 COPY ./config.toml /app
