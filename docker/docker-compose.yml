@@ -7,19 +7,17 @@ volumes:
     name: 'nwaku2'
   relayer:
     name: 'relayer'
-    external: true
 
 services:
-  nwaku:
+  nwaku1:
     image: nwaku:latest
     container_name: 'nwaku1'
     hostname: 'nwaku1'
     ports:
       - '60000:60000'
+      - '9000:9000'
       - '8000:8000'
       - '8546:8546'
-    #expose:
-    #  - '8546'
     restart: always
     volumes:
       - nwaku1:/data
@@ -32,7 +30,7 @@ services:
       wakunode2 --config-file=/app/config.toml
       --nat="extip:${EXTIP}"
       --dns4-domain-name=${SUBDOMAIN}.${BASEDOMAIN}
-      --nodekey=${NODEKEY}
+      --nodekey=${NODEKEY_1}
       --websocket-support=true
       --websocket-secure-support=true
       --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
@@ -57,12 +55,13 @@ services:
       wakunode2
         --config-file=/app/config.toml
         --nat="extip:${EXTIP}"
-        --ports-shift=1
+        --nodekey=${NODEKEY_2}
         --dns4-domain-name=${SUBDOMAIN}.${BASEDOMAIN}
         --websocket-support=true
         --websocket-secure-support=true
         --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
         --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
+        --ports-shift=1
 
   relayer:
     image: 'relayer:latest'
@@ -74,7 +73,7 @@ services:
       LOG_LEVEL: 'debug'
       DEBUG: 'relayer*,waku:jsonrpc-api'
     depends_on:
-      - nwaku
+      - nwaku1
     restart: always
     tty: true
     volumes:

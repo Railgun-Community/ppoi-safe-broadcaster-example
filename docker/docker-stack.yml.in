@@ -37,7 +37,7 @@ services:
         --nat="extip:${EXTIP}"
         --listen-address="${LISTENIP}"
         --dns4-domain-name="${SUBDOMAIN}.${BASEDOMAIN}"
-        --nodekey="${NODEKEY}"
+        --nodekey="${NODEKEY_1}"
         --websocket-support=true
         --websocket-secure-support=true
         --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
