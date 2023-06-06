@@ -87,7 +87,7 @@ describe('fee-validator', function test() {
   it('Should invalidate without a cached or calculated fee', () => {
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(15), BigNumber.from(10)),
-    ).to.throw(ErrorMessage.BAD_TOKEN_FEE);
+    ).to.throw(ErrorMessage.REJECTED_PACKAGED_FEE);
   });
 
   it('Should validate if packaged fee > calculated fee', () => {
@@ -131,6 +131,6 @@ describe('fee-validator', function test() {
   it('Should invalidate if packaged fee < calculated fee', () => {
     expect(() =>
       validatePackagedFee('mockfeeid', BigNumber.from(5), BigNumber.from(10)),
-    ).to.throw(ErrorMessage.BAD_TOKEN_FEE);
+    ).to.throw(ErrorMessage.REJECTED_PACKAGED_FEE);
   });
 }).timeout(10000);
