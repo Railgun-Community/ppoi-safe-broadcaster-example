@@ -12,9 +12,9 @@ import debug from 'debug';
 
 const dbg = debug('relayer:0xPrice');
 
-// 1.5 second delay; 40 per minute maximum.
-// https://docs.0x.org/0x-api-swap/advanced-topics/rate-limiting
-let ZERO_X_PRICE_LOOKUP_DELAY = 350;
+// The current limit for the Free Tier of our APIs is approximately 2 Requests Per Second (RPS) and 200K API calls per month globally.
+// https://0x.org/docs/0x-swap-api/advanced-topics/rate-limiting
+let ZERO_X_PRICE_LOOKUP_DELAY = 600;
 
 const refreshLocks: NumMapType<NumMapType<boolean>> = {};
 
