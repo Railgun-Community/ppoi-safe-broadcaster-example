@@ -1,14 +1,13 @@
 import { BaseTokenWrappedAddress } from '@railgun-community/shared-models';
-import { BigNumber } from 'ethers';
 
-export const GAS_TOKEN_DECIMALS = 18;
+export const GAS_TOKEN_DECIMALS = 18n;
 
 export const NO_GAS_TOKEN_ADDRESS = 'NO_GAS_TOKEN_ADDRESS';
 
 export type GasTokenConfig = {
   wrappedAddress: BaseTokenWrappedAddress | string;
   symbol: string;
-  decimals: number;
+  decimals: bigint;
   minBalanceForAvailability: number;
 };
 
@@ -18,10 +17,10 @@ export type TokenConfig = {
 
 export type Token = TokenConfig & {
   address: string;
-  decimals: number;
+  decimals: bigint;
 };
 
-export type TokenAmount = {
+export type ERC20Amount = {
   tokenAddress: string;
-  amount: BigNumber;
+  amount: bigint;
 };

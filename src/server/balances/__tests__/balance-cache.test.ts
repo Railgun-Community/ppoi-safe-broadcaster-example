@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
+
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import {
   getCachedGasTokenBalance,
@@ -35,9 +35,9 @@ describe('balance-cache', () => {
   before(async () => {
     startEngine();
     await initWallets();
-    await initNetworkProviders();
+    await initNetworkProviders([MOCK_CHAIN]);
     resetGasTokenBalanceCache();
-    createGasBalanceStub(BigNumber.from(5000));
+    createGasBalanceStub(BigInt(5000));
   });
 
   afterEach(() => {

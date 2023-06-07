@@ -1,6 +1,5 @@
 import { EVMGasType, ChainType } from '@railgun-community/shared-models';
 import axios from 'axios';
-import { parseUnits } from '@ethersproject/units';
 import debug from 'debug';
 import configDefaults from '../../config/config-defaults';
 import { RelayerChain } from '../../../models/chain-models';
@@ -9,6 +8,7 @@ import {
   GasDetailsBySpeed,
   GasHistoryPercentile,
 } from '../../../models/gas-models';
+import { parseUnits } from 'ethers';
 
 const dbg = debug('relayer:api:block-native');
 
@@ -82,17 +82,18 @@ const gasPriceForConfidenceLevel = (
     blockNativeResponse,
     confidenceLevelMin,
   ).price;
-  const gasPriceMinUnits = parseUnits(gasPriceMin.toString(), 9)
-    .mul(averageWeighting * 10000)
-    .div(10000);
+  const gasPriceMinUnits =
+    (parseUnits(gasPriceMin.toString(), 9) * BigInt(averageWeighting * 10000)) /
+    10000n;
   const gasPriceMax = estimatedPriceForConfidenceLevel(
     blockNativeResponse,
     confidenceLevelMax,
   ).price;
-  const gasPriceMaxUnits = parseUnits(gasPriceMax.toString(), 9)
-    .mul(10000 - averageWeighting * 10000)
-    .div(10000);
-  return gasPriceMinUnits.add(gasPriceMaxUnits);
+  const gasPriceMaxUnits =
+    (parseUnits(gasPriceMax.toString(), 9) *
+      BigInt(10000 - averageWeighting * 10000)) /
+    10000n;
+  return gasPriceMinUnits + gasPriceMaxUnits;
 };
 
 const maxFeesForConfidenceLevel = (

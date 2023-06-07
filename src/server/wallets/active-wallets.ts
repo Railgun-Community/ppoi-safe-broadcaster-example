@@ -1,6 +1,9 @@
-import { BaseProvider } from '@ethersproject/providers';
-import { Wallet as EthersWallet } from 'ethers';
-import { isValidMnemonic } from 'ethers/lib/utils';
+import {
+  Wallet as EthersWallet,
+  HDNodeWallet,
+  Mnemonic,
+  Provider,
+} from 'ethers';
 import debug from 'debug';
 import configDefaults from '../config/config-defaults';
 import { ActiveWallet } from '../../models/wallet-models';
@@ -13,7 +16,7 @@ import {
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
-import { createRailgunWallet } from '@railgun-community/quickstart';
+import { createRailgunWallet } from '@railgun-community/wallet';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -54,13 +57,8 @@ export const initWallets = async () => {
   resetWallets();
   const { mnemonic, hdWallets } = configDefaults.wallet;
   hdWallets.forEach(({ index, priority, chains }) => {
-    if (!isValidMnemonic(mnemonic)) {
-      throw Error(
-        'Invalid or missing MNEMONIC (use docker secret or insecure env-cmdrc for testing)',
-      );
-    }
-    const wallet = EthersWallet.fromMnemonic(
-      mnemonic,
+    const wallet = HDNodeWallet.fromMnemonic(
+      Mnemonic.fromPhrase(mnemonic),
       derivationPathForIndex(index),
     );
     // TODO: determine whether wallet is currently busy, set available(false) if so.
@@ -114,7 +112,7 @@ export const getRailgunWalletAddress = (): string => {
 
 export const createEthersWallet = (
   activeWallet: ActiveWallet,
-  provider: BaseProvider,
+  provider: Provider,
 ): EthersWallet => {
   return new EthersWallet(activeWallet.pkey, provider);
 };

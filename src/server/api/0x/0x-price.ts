@@ -54,7 +54,7 @@ const zeroXPriceLookupByAddress = async (
     if (symbol === stablecoinSymbol) {
       return { price: 1 };
     }
-    const sellAmount = (10 ** decimals).toString(10);
+    const sellAmount = (10n ** decimals).toString(10);
     const params: ZeroXPriceParams = {
       sellToken: tokenAddress,
       buyToken: stablecoinSymbol,

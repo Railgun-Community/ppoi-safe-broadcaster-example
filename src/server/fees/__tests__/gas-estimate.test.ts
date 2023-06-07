@@ -1,13 +1,13 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
+
 import {
   getEstimateGasDetailsPublic,
   calculateMaximumGasRelayer,
 } from '../gas-estimate';
 import {
   getMockNetwork,
-  getMockPopulatedTransaction,
+  getMockContractTransaction,
 } from '../../../test/mocks.test';
 import {
   createGasEstimateStubs,
@@ -37,9 +37,9 @@ describe('gas-estimate', () => {
   });
 
   it('Should calculate maximum gas based on gas estimate', async () => {
-    const gasEstimate = BigNumber.from(1000);
-    const maxFeePerGas = BigNumber.from(100);
-    const maxPriorityFeePerGas = BigNumber.from(10);
+    const gasEstimate = 1000n;
+    const maxFeePerGas = 100n;
+    const maxPriorityFeePerGas = 10n;
     createGasEstimateStubs(gasEstimate, maxFeePerGas, maxPriorityFeePerGas);
 
     const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
@@ -47,7 +47,7 @@ describe('gas-estimate', () => {
     const estimateGasDetails = await getEstimateGasDetailsPublic(
       MOCK_CHAIN,
       evmGasType,
-      getMockPopulatedTransaction(),
+      getMockContractTransaction(),
     );
     const maximumGas = calculateMaximumGasRelayer(
       estimateGasDetails,
@@ -55,12 +55,12 @@ describe('gas-estimate', () => {
     );
 
     // (Gas estimate + 20%) * gas price (maxFeePerGas).
-    expect(maximumGas.toNumber()).to.equal(120000);
+    expect(maximumGas).to.equal(120000n);
   });
 
   it('Should calculate maximum gas based on gas estimate with minGasPrice', async () => {
-    const gasEstimate = BigNumber.from(1000);
-    const minGasPrice = BigNumber.from(100);
+    const gasEstimate = 1000n;
+    const minGasPrice = 100n;
     createGasEstimateStubs(
       gasEstimate,
       minGasPrice, // unused
@@ -72,7 +72,7 @@ describe('gas-estimate', () => {
     const estimateGasDetails = await getEstimateGasDetailsPublic(
       MOCK_CHAIN,
       evmGasType,
-      getMockPopulatedTransaction(),
+      getMockContractTransaction(),
     );
     const maximumGas = calculateMaximumGasRelayer(
       estimateGasDetails,
@@ -80,6 +80,6 @@ describe('gas-estimate', () => {
     );
 
     // 20% added by gasLimit.
-    expect(maximumGas.toNumber()).to.equal(120000);
+    expect(maximumGas).to.equal(120000n);
   });
 }).timeout(10000);

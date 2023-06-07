@@ -1,5 +1,4 @@
 import * as ed from '@noble/ed25519';
-import { TransactionResponse } from '@ethersproject/providers';
 import {
   hexlify,
   encryptJSONDataWithSharedKey,
@@ -7,7 +6,7 @@ import {
   EncryptedData,
   getRailgunWalletPrivateViewingKey,
   getRailgunWalletAddressData,
-} from '@railgun-community/quickstart';
+} from '@railgun-community/wallet';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
 import { processTransaction } from '../../transactions/process-transaction';
@@ -28,6 +27,8 @@ import {
   versionCompare,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../../util/relayer-version';
+import { TransactionResponse } from 'ethers';
+import { createValidTransaction } from '../../transactions/transaction-validator';
 
 const handledClientPubKeys: string[] = [];
 
@@ -65,7 +66,8 @@ export const transactMethod = async (
     chainID,
     minGasPrice,
     feesID: feeCacheID,
-    serializedTransaction,
+    to,
+    data,
     relayerViewingKey,
     useRelayAdapt,
     devLog,
@@ -134,7 +136,8 @@ export const transactMethod = async (
       chainID == null ||
       minGasPrice == null ||
       feeCacheID == null ||
-      serializedTransaction == null ||
+      to == null ||
+      data == null ||
       relayerViewingKey == null ||
       useRelayAdapt == null
     ) {
@@ -157,11 +160,13 @@ export const transactMethod = async (
       );
     }
 
+    const transaction = createValidTransaction(to, data);
+
     const txResponse = await processTransaction(
       chain,
       feeCacheID,
-      minGasPrice,
-      serializedTransaction,
+      BigInt(minGasPrice),
+      transaction,
       useRelayAdapt ?? false,
       devLog,
     );

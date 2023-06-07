@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { GAS_TOKEN_DECIMALS, Token } from '../../models/token-models';
@@ -13,9 +12,9 @@ import { FeeConfig } from '../../models/fee-config';
 
 export const getAllUnitTokenFeesForChain = (
   chain: RelayerChain,
-): { fees: MapType<BigNumber>; feeCacheID: string } => {
+): { fees: MapType<bigint>; feeCacheID: string } => {
   const tokenAddresses = allTokenAddressesForNetwork(chain);
-  const tokenFeesForChain: MapType<BigNumber> = {};
+  const tokenFeesForChain: MapType<bigint> = {};
   tokenAddresses.forEach((tokenAddress) => {
     try {
       tokenFeesForChain[tokenAddress] = calculateTokenFeePerUnitGasToken(
@@ -34,13 +33,13 @@ export const calculateTokenFeePerUnitGasToken = (
   chain: RelayerChain,
   tokenAddress: string,
 ) => {
-  const oneUnitGas = BigNumber.from(10).pow(BigNumber.from(GAS_TOKEN_DECIMALS));
+  const oneUnitGas = 10n ** BigInt(GAS_TOKEN_DECIMALS);
   return getTokenFee(chain, oneUnitGas, tokenAddress);
 };
 
 export const getTokenFee = (
   chain: RelayerChain,
-  maximumGas: BigNumber,
+  maximumGas: bigint,
   tokenAddress: string,
 ) => {
   const { precision } = configDefaults.transactionFees;
@@ -49,10 +48,7 @@ export const getTokenFee = (
     tokenAddress,
     precision,
   );
-  return maximumGas
-    .mul(roundedPriceRatio)
-    .div(decimalRatio)
-    .div(BigNumber.from(precision));
+  return (maximumGas * roundedPriceRatio) / decimalRatio / BigInt(precision);
 };
 
 const getTokenRatiosFromCachedPrices = (
@@ -84,7 +80,7 @@ export const getRoundedTokenToGasPriceRatio = (
   gasTokenPrice: number,
   fees: FeeConfig,
   precision: number,
-): BigNumber => {
+): bigint => {
   const priceRatio = gasTokenPrice / tokenPrice;
 
   // Adjust price ratio to account for difference between gas limit and actual gas cost.
@@ -104,13 +100,11 @@ export const getRoundedTokenToGasPriceRatio = (
     );
   }
 
-  const roundedPriceRatio = BigNumber.from(Math.round(ratio));
+  const roundedPriceRatio = BigInt(Math.round(ratio));
   return roundedPriceRatio;
 };
 
-export const getTransactionTokenToGasDecimalRatio = (
-  token: Token,
-): BigNumber => {
+export const getTransactionTokenToGasDecimalRatio = (token: Token): bigint => {
   const decimalDifference = GAS_TOKEN_DECIMALS - token.decimals;
-  return BigNumber.from(10).pow(BigNumber.from(decimalDifference));
+  return 10n ** BigInt(decimalDifference);
 };

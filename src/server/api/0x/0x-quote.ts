@@ -1,11 +1,10 @@
-import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits } from '@ethersproject/units';
 import { AxiosError } from 'axios';
 import { ZeroXApiEndpoint, getZeroXData } from './0x-fetch';
-import { TokenAmount } from '../../../models/token-models';
+import { ERC20Amount } from '../../../models/token-models';
 import { logger } from '../../../util/logger';
 import { RelayerChain } from '../../../models/chain-models';
 import { getContractAddressesForChainOrThrow } from '@0x/contract-addresses';
+import { parseUnits } from 'ethers';
 
 export const ZERO_X_PRICE_DECIMALS = 18;
 
@@ -29,9 +28,9 @@ export type ZeroXQuoteParams = {
 };
 
 export type ZeroXFormattedQuoteData = {
-  price: BigNumber;
-  guaranteedPrice: BigNumber;
-  buyTokenAmount: TokenAmount;
+  price: bigint;
+  guaranteedPrice: bigint;
+  buyERC20Amount: ERC20Amount;
   spender: string;
   to: string;
   data: string;
@@ -117,21 +116,21 @@ const getZeroXQuoteInvalidError = (
 
 export const zeroXGetSwapQuote = async (
   chain: RelayerChain,
-  sellTokenAmount: TokenAmount,
+  sellERC20Amount: ERC20Amount,
   buyTokenAddress: string,
   slippagePercentage: number,
 ): Promise<{ quote?: ZeroXFormattedQuoteData; error?: string }> => {
   try {
-    const sellAmount = sellTokenAmount.amount.toString();
+    const sellAmount = sellERC20Amount.amount.toString();
     if (sellAmount === '0') {
       return {};
     }
-    const sellTokenAddress = sellTokenAmount.tokenAddress;
+    const sellTokenAddress = sellERC20Amount.tokenAddress;
     if (sellTokenAddress === buyTokenAddress) {
       return {};
     }
     const params: ZeroXQuoteParams = {
-      sellToken: sellTokenAmount.tokenAddress,
+      sellToken: sellERC20Amount.tokenAddress,
       buyToken: buyTokenAddress,
       sellAmount,
       slippagePercentage: String(slippagePercentage),
@@ -168,9 +167,9 @@ export const zeroXGetSwapQuote = async (
       quote: {
         price: parseUnits(price, ZERO_X_PRICE_DECIMALS),
         guaranteedPrice: parseUnits(guaranteedPrice, ZERO_X_PRICE_DECIMALS),
-        buyTokenAmount: {
+        buyERC20Amount: {
           tokenAddress: buyTokenAddress,
-          amount: BigNumber.from(buyAmount),
+          amount: BigInt(buyAmount),
         },
         spender: allowanceTarget,
         to,

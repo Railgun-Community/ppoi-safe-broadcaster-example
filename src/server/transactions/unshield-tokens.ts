@@ -1,29 +1,26 @@
-import { TransactionResponse } from '@ethersproject/providers';
 import {
   populateProvedUnshield,
   generateUnshieldProof,
   gasEstimateForUnprovenUnshield,
-} from '@railgun-community/quickstart';
+} from '@railgun-community/wallet';
 import {
-  deserializeTransaction,
   getEVMGasTypeForTransaction,
   networkForChain,
   RailgunERC20AmountRecipient,
-  serializeTransactionGasDetails,
   TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import { BigNumber } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
-import { TokenAmount } from '../../models/token-models';
+import { ERC20Amount } from '../../models/token-models';
 import { getStandardGasDetails } from '../fees/gas-by-speed';
 import { getEstimateGasDetailsPublic } from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
+import { TransactionResponse } from 'ethers';
 
 export const generateUnshieldTransaction = async (
   railgunWalletID: string,
   dbEncryptionKey: string,
   toWalletAddress: string,
-  erc20Amounts: TokenAmount[],
+  erc20Amounts: ERC20Amount[],
   chain: RelayerChain,
 ) => {
   const network = networkForChain(chain);
@@ -39,7 +36,7 @@ export const generateUnshieldTransaction = async (
   const erc20AmountRecipients: RailgunERC20AmountRecipient[] = erc20Amounts.map(
     (erc20Amount) => ({
       tokenAddress: erc20Amount.tokenAddress,
-      amountString: erc20Amount.amount.toHexString(),
+      amount: erc20Amount.amount,
       recipientAddress: toWalletAddress,
     }),
   );
@@ -47,18 +44,16 @@ export const generateUnshieldTransaction = async (
   const standardGasDetails = await getStandardGasDetails(evmGasType, chain);
   const originalGasDetails: TransactionGasDetails = {
     ...standardGasDetails,
-    gasEstimate: BigNumber.from(0),
+    gasEstimate: 0n,
   };
-  const originalGasDetailsSerialized =
-    serializeTransactionGasDetails(originalGasDetails);
 
-  const { gasEstimateString } = await gasEstimateForUnprovenUnshield(
+  const { gasEstimate } = await gasEstimateForUnprovenUnshield(
     network.name,
     railgunWalletID,
     dbEncryptionKey,
     erc20AmountRecipients,
     [], // nftAmountRecipients
-    originalGasDetailsSerialized,
+    originalGasDetails,
     undefined, // feeTokenDetails
     sendWithPublicWallet,
   );
@@ -77,12 +72,9 @@ export const generateUnshieldTransaction = async (
 
   const finalGasDetails: TransactionGasDetails = {
     ...originalGasDetails,
-    gasEstimate: BigNumber.from(gasEstimateString),
+    gasEstimate,
   };
-  const finalGasDetailsSerialized =
-    serializeTransactionGasDetails(finalGasDetails);
-
-  const { serializedTransaction } = await populateProvedUnshield(
+  const { transaction } = await populateProvedUnshield(
     network.name,
     railgunWalletID,
     erc20AmountRecipients,
@@ -90,21 +82,16 @@ export const generateUnshieldTransaction = async (
     undefined, // relayerFeeERC20AmountRecipient
     true, // sendWithPublicWallet
     undefined, // overallBatchMinGasPrice
-    finalGasDetailsSerialized,
+    finalGasDetails,
   );
-  const populatedTransaction = deserializeTransaction(
-    serializedTransaction,
-    undefined, // nonce
-    network.chain.id,
-  );
-  return populatedTransaction;
+  return transaction;
 };
 
 export const unshieldTokens = async (
   railgunWalletID: string,
   dbEncryptionKey: string,
   toWalletAddress: string,
-  erc20Amounts: TokenAmount[],
+  erc20Amounts: ERC20Amount[],
   chain: RelayerChain,
 ): Promise<TransactionResponse> => {
   const network = networkForChain(chain);

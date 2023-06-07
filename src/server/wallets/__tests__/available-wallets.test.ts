@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
+
 import {
   setupSingleTestWallet,
   testChainEthereum,
@@ -21,23 +21,21 @@ import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
+const chain = testChainEthereum();
+
 describe('available-wallets', () => {
   before(async () => {
     startEngine();
     await setupSingleTestWallet();
-    await initNetworkProviders();
+    await initNetworkProviders([chain]);
     resetGasTokenBalanceCache();
-    createGasBalanceStub(
-      BigNumber.from('100000000000000000000000000000000000'),
-    );
+    createGasBalanceStub(BigInt('100000000000000000000000000000000000'));
   });
   after(() => {
     restoreGasBalanceStub();
   });
 
   it('Should update available wallets correctly', async () => {
-    const chain = testChainEthereum();
-
     const wallet = getActiveWallets()[0];
     expect(await isWalletAvailableWithEnoughFunds(wallet, chain)).to.be.true;
     expect(await numAvailableWallets(chain)).to.equal(1);

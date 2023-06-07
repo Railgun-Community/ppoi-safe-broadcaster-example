@@ -2,13 +2,13 @@ import { logger } from '../../util/logger';
 import { ErrorMessage } from '../../util/errors';
 import { RelayerChain } from '../../models/chain-models';
 import { EVMGasType } from '@railgun-community/shared-models';
-import { BigNumber } from '@ethersproject/bignumber';
+
 import { getGasDetailsForSpeed } from './gas-by-speed';
 import { GasHistoryPercentile } from '../../models/gas-models';
 
 export const validateMinGasPrice = async (
   chain: RelayerChain,
-  minGasPrice: string,
+  minGasPrice: bigint,
   evmGasType: EVMGasType.Type0 | EVMGasType.Type1,
 ) => {
   logger.log(
@@ -27,9 +27,9 @@ export const validateMinGasPrice = async (
       throw new Error('Incorrect EVMGasType for gas price.');
     }
     const slowGasPrice = slowestGasDetails.gasPrice;
-    const minimumAcceptableGasPrice = slowGasPrice.mul(5000).div(10000);
+    const minimumAcceptableGasPrice = (slowGasPrice * 5000n) / 10000n;
 
-    if (BigNumber.from(minGasPrice).gte(minimumAcceptableGasPrice)) {
+    if (minGasPrice >= minimumAcceptableGasPrice) {
       // Valid gas price.
       return;
     }

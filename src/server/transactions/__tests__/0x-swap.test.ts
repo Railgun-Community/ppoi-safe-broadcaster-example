@@ -1,11 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
+import { Wallet as EthersWallet, TransactionResponse } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
-import {
-  FallbackProvider,
-  TransactionResponse,
-} from '@ethersproject/providers';
 import { getActiveWallets } from '../../wallets/active-wallets';
 import {
   getMockGoerliNetwork,
@@ -47,11 +43,11 @@ const MOCK_TOKEN_ADDRESS = getMockToken().address;
 
 const MOCK_TOKEN_AMOUNT_1 = {
   tokenAddress: MOCK_TOKEN_ADDRESS,
-  amount: BigNumber.from('100000000000000'),
+  amount: BigInt('100000000000000'),
 };
 const MOCK_TOKEN_AMOUNT_2 = {
   tokenAddress: '0xe76C6c83af64e4C60245D8C7dE953DF673a7A33D',
-  amount: BigNumber.from('200000000000000'),
+  amount: BigInt('200000000000000'),
 };
 const TO_SWAP = [MOCK_TOKEN_AMOUNT_1, MOCK_TOKEN_AMOUNT_2];
 
@@ -70,10 +66,10 @@ describe('0x-swap', () => {
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
     walletGetTransactionCountStub = sinon
-      .stub(EthersWallet.prototype, 'getTransactionCount')
+      .stub(EthersWallet.prototype, 'getNonce')
       .resolves(3);
     sendTransactionStub = sinon
-      .stub(FallbackProvider.prototype, 'sendTransaction')
+      .stub(EthersWallet.prototype, 'sendTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
     waitTxStub = sinon
       .stub(ExecuteTransactionModule, 'waitTx')
@@ -83,9 +79,9 @@ describe('0x-swap', () => {
     getBestMatchWalletForNetwork = sinon
       .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')
       .resolves(activeWallet);
-    const gasEstimate = BigNumber.from(1000);
-    const maxFeePerGas = BigNumber.from(90);
-    const maxPriorityFeePerGas = BigNumber.from(10);
+    const gasEstimate = 1000n;
+    const maxFeePerGas = BigInt(90);
+    const maxPriorityFeePerGas = 10n;
     createGasEstimateStubs(gasEstimate, maxFeePerGas, maxPriorityFeePerGas);
   });
 

@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
 import { getActiveWalletsForChain } from './active-wallets';
 import {
@@ -13,7 +12,7 @@ import { randomElement } from '../../util/utils';
 
 export const getBestMatchWalletForNetwork = async (
   chain: RelayerChain,
-  minimumGasNeeded: BigNumber,
+  minimumGasNeeded: bigint,
 ): Promise<ActiveWallet> => {
   const activeWallets = getActiveWalletsForChain(chain);
   const gasTokenBalanceMap = await getActiveWalletGasTokenBalanceMapForChain(
@@ -32,8 +31,7 @@ export const getBestMatchWalletForNetwork = async (
   const lastUsedWalletAddress = getLastUsedWalletAddressForChain(chain);
   const sortedAvailableWallets = availableWallets
     .filter((wallet) => {
-      const balanceMet =
-        gasTokenBalanceMap[wallet.address].gte(minimumGasNeeded);
+      const balanceMet = gasTokenBalanceMap[wallet.address] >= minimumGasNeeded;
       if (randomizeSelection) {
         // if we're using random select,
         // balance for tx must be still met.
@@ -55,23 +53,21 @@ export const getBestMatchWalletForNetwork = async (
       if (!randomizeSelection) {
         return a.priority - b.priority;
       }
-      if (gasTokenBalanceMap[a.address].lt(gasTokenBalanceMap[b.address])) {
+      if (gasTokenBalanceMap[a.address] < gasTokenBalanceMap[b.address]) {
         return 1;
       }
-      if (gasTokenBalanceMap[a.address].gt(gasTokenBalanceMap[b.address])) {
+      if (gasTokenBalanceMap[a.address] > gasTokenBalanceMap[b.address]) {
         return -1;
       }
       return 0;
     });
 
   if (sortedAvailableWallets.length < 1) {
-    const outofFundsWallets = activeWallets.filter((wallet) =>
-      gasTokenBalanceMap[wallet.address].lt(minimumGasNeeded),
+    const outofFundsWallets = activeWallets.filter(
+      (wallet) => gasTokenBalanceMap[wallet.address] < minimumGasNeeded,
     );
     logger.warn(
-      `${availableWallets.length} wallets available. ${
-        outofFundsWallets.length
-      } wallets are out of gas funds. (Need gas: ${minimumGasNeeded.toHexString()})`,
+      `${availableWallets.length} wallets available. ${outofFundsWallets.length} wallets are out of gas funds. (Need gas: ${minimumGasNeeded})`,
     );
     throw new Error(`All wallets busy or out of funds.`);
   }

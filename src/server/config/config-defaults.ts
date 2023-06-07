@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import { DebugLevel } from '../../models/debug-models';
 import { GAS_TOKEN_DECIMALS } from '../../models/token-models';
 import { NetworkChainID } from './config-chains';
@@ -164,10 +163,8 @@ export default {
     /**
      * Minimum gas amount gained from token swap in order to trigger a top-up: Default is 1.5 [ETH]
      */
-    swapThresholdIntoGasToken: BigNumber.from(10)
-      .pow(GAS_TOKEN_DECIMALS)
-      .mul(15000)
-      .div(10000),
+    swapThresholdIntoGasToken:
+      (10 ** Number(GAS_TOKEN_DECIMALS) * 15000) / 10000,
   },
 
   waku: {

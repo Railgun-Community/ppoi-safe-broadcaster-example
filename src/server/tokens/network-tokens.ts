@@ -1,5 +1,4 @@
-import { FallbackProvider } from '@ethersproject/providers';
-import { Contract } from 'ethers';
+import { Contract, FallbackProvider } from 'ethers';
 import configNetworks from '../config/config-networks';
 import configTokens from '../config/config-tokens';
 import { GasTokenConfig, Token } from '../../models/token-models';
@@ -35,7 +34,8 @@ export const initTokens = async () => {
 export const getERC20Decimals = (
   tokenAddress: string,
   provider: FallbackProvider,
-): Promise<number> => {
+): Promise<bigint> => {
+  // TODO: Add contract class
   const contract = new Contract(tokenAddress, ABI_ERC20, provider);
   return contract.decimals();
 };

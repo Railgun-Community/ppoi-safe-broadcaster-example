@@ -4,8 +4,6 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
 import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
-import { BigNumber } from 'ethers';
-import { TransactionResponse } from '@ethersproject/providers';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import {
   verifyRelayerSignature,
@@ -15,7 +13,7 @@ import {
   getRailgunWalletPrivateViewingKey,
   getRandomBytes,
   getRailgunWalletAddressData,
-} from '@railgun-community/quickstart';
+} from '@railgun-community/wallet';
 import { WakuMethodNames, WakuRelayer } from '../waku-relayer';
 import {
   WakuApiClient,
@@ -43,11 +41,7 @@ import { Network } from '../../../models/network-models';
 import * as processTransactionModule from '../../transactions/process-transaction';
 import { WakuMessage } from '../waku-message';
 import { contentTopics } from '../topics';
-import {
-  getMockNetwork,
-  getMockSerializedTransaction,
-  mockTokenConfig,
-} from '../../../test/mocks.test';
+import { getMockNetwork, mockTokenConfig } from '../../../test/mocks.test';
 import { initTokens } from '../../tokens/network-tokens';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
@@ -67,6 +61,7 @@ import {
   getRailgunWalletAddress,
   getRailgunWalletID,
 } from '../../wallets/active-wallets';
+import { TransactionResponse } from 'ethers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -111,7 +106,7 @@ describe('waku-relayer', () => {
       feeExpiration: configDefaults.transactionFees.feeExpirationInMS,
     });
     clientHTTPStub.resetHistory();
-    createGasBalanceStub(BigNumber.from(10).pow(18));
+    createGasBalanceStub(10n ** 18n);
   });
 
   beforeEach(() => {
@@ -180,7 +175,7 @@ describe('waku-relayer', () => {
       'string',
       'No fee for token in broadcast data',
     );
-    expect(BigNumber.from(data.fees[MOCK_TOKEN_ADDRESS]).toString()).to.equal(
+    expect(BigInt(data.fees[MOCK_TOKEN_ADDRESS]).toString()).to.equal(
       '1018193814430000000000',
     );
     expect(data.feeExpiration).to.be.a('number');
@@ -212,7 +207,8 @@ describe('waku-relayer', () => {
       chainType: chain.type,
       feesID: '468abc',
       minGasPrice: '0x1000',
-      serializedTransaction: getMockSerializedTransaction(),
+      to: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
+      data: '0x1234',
       relayerViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
       devLog: true,
@@ -254,7 +250,8 @@ describe('waku-relayer', () => {
       chainType: chain.type,
       feesID: '468abc',
       minGasPrice: '0x1000',
-      serializedTransaction: getMockSerializedTransaction(),
+      to: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
+      data: '0x1234',
       relayerViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
       devLog: true,

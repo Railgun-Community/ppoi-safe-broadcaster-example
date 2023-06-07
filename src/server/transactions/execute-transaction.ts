@@ -1,18 +1,18 @@
 import {
-  TransactionRequest,
-  TransactionResponse,
-} from '@ethersproject/providers';
-import {
   EVMGasType,
   TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import debug from 'debug';
-import { Wallet as EthersWallet } from 'ethers';
+import {
+  ContractTransaction,
+  Wallet as EthersWallet,
+  TransactionResponse,
+} from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
-import { minBigNumber } from '../../util/utils';
+import { minBigInt } from '../../util/utils';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import {
@@ -37,7 +37,7 @@ export const getCurrentWalletNonce = async (
 ): Promise<number> => {
   try {
     const blockTag = 'pending';
-    return await wallet.getTransactionCount(blockTag);
+    return await wallet.getNonce(blockTag);
   } catch (err) {
     return throwErr(err);
   }
@@ -53,14 +53,14 @@ export const getCurrentNonce = async (
   wallet: EthersWallet,
 ): Promise<number> => {
   const blockTag = 'pending';
-  const [txCount, lastTransactionNonce] = await Promise.all([
-    wallet.getTransactionCount(blockTag).catch(throwErr),
+  const [nonce, lastTransactionNonce] = await Promise.all([
+    wallet.getNonce(blockTag).catch(throwErr),
     await getSettingsNumber(getLastNonceKey(chain, wallet)),
   ]);
   if (lastTransactionNonce) {
-    return Math.max(txCount, lastTransactionNonce + 1);
+    return Math.max(nonce, lastTransactionNonce + 1);
   }
-  return txCount;
+  return nonce;
 };
 
 export const storeCurrentNonce = async (
@@ -73,7 +73,7 @@ export const storeCurrentNonce = async (
 
 export const executeTransaction = async (
   chain: RelayerChain,
-  transactionRequest: TransactionRequest,
+  transaction: ContractTransaction,
   gasDetails: TransactionGasDetails,
   wallet?: ActiveWallet,
   overrideNonce?: number,
@@ -90,16 +90,15 @@ export const executeTransaction = async (
   const gasLimit = calculateGasLimitRelayer(gasDetails.gasEstimate, chain);
   dbg('Nonce', nonce);
 
-  const finalTransaction: TransactionRequest = {
-    ...transactionRequest,
-    chainId: chain.id,
+  const finalTransaction: ContractTransaction = {
+    ...transaction,
+    chainId: BigInt(chain.id),
     nonce,
     gasLimit,
   };
 
-  dbg(`Gas limit: ${gasLimit.toString()}`);
-
-  dbg(`Gas details: ${JSON.stringify(gasDetails)}`);
+  dbg(`Gas limit: ${gasLimit}`);
+  dbg(`Gas details: ${gasDetails}`);
 
   finalTransaction.type = gasDetails.evmGasType;
 
@@ -108,18 +107,18 @@ export const executeTransaction = async (
     case EVMGasType.Type1: {
       const { gasPrice } = gasDetails;
       finalTransaction.gasPrice = gasPrice;
-      dbg(`Gas price: ${gasPrice.toString()}`);
+      dbg(`Gas price: ${gasPrice}`);
       break;
     }
     case EVMGasType.Type2: {
       const { maxFeePerGas, maxPriorityFeePerGas } = gasDetails;
       finalTransaction.maxFeePerGas = maxFeePerGas;
-      finalTransaction.maxPriorityFeePerGas = minBigNumber(
+      finalTransaction.maxPriorityFeePerGas = minBigInt(
         maxFeePerGas,
         maxPriorityFeePerGas,
       );
-      dbg(`Max fee per gas: ${maxFeePerGas.toString()}`);
-      dbg(`Max priority fee: ${maxPriorityFeePerGas.toString()}`);
+      dbg(`Max fee per gas: ${maxFeePerGas}`);
+      dbg(`Max priority fee: ${maxPriorityFeePerGas}`);
       break;
     }
   }
@@ -159,7 +158,7 @@ export const executeTransaction = async (
       // Try again with increased nonce.
       return executeTransaction(
         chain,
-        transactionRequest,
+        transaction,
         gasDetails,
         wallet,
         nonce + 1,

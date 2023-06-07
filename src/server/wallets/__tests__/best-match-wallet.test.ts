@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
+import { HDNodeWallet, Mnemonic } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import { startEngine } from '../../engine/engine-init';
 import {
@@ -31,8 +31,8 @@ const MOCK_MNEMONIC =
 let getCachedGasTokenBalanceStub: SinonStub;
 
 const addressForIndex = (index: number): string => {
-  const ethersWallet = EthersWallet.fromMnemonic(
-    MOCK_MNEMONIC,
+  const ethersWallet = HDNodeWallet.fromMnemonic(
+    Mnemonic.fromPhrase(MOCK_MNEMONIC),
     derivationPathForIndex(index),
   );
   return ethersWallet.address;
@@ -43,7 +43,7 @@ describe('best-match-wallet', () => {
     startEngine();
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
-      .resolves(BigNumber.from(10).pow(18));
+      .resolves(10n ** 18n);
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
   });
@@ -77,10 +77,7 @@ describe('best-match-wallet', () => {
     };
     await initWallets();
 
-    const bestWallet = await getBestMatchWalletForNetwork(
-      MOCK_CHAIN,
-      BigNumber.from(100),
-    );
+    const bestWallet = await getBestMatchWalletForNetwork(MOCK_CHAIN, 100n);
     expect(bestWallet.address).to.equal(addressForIndex(2));
   });
 
@@ -113,10 +110,7 @@ describe('best-match-wallet', () => {
     expect(firstWallet.address).to.equal(addressForIndex(0));
     setWalletAvailability(firstActiveWallet, MOCK_CHAIN, false);
 
-    const bestWallet = await getBestMatchWalletForNetwork(
-      MOCK_CHAIN,
-      BigNumber.from(100),
-    );
+    const bestWallet = await getBestMatchWalletForNetwork(MOCK_CHAIN, 100n);
     expect(bestWallet.address).to.equal(addressForIndex(2));
   });
 
@@ -137,7 +131,7 @@ describe('best-match-wallet', () => {
     setWalletAvailability(firstWallet, MOCK_CHAIN, false);
 
     await expect(
-      getBestMatchWalletForNetwork(MOCK_CHAIN, BigNumber.from(100)),
+      getBestMatchWalletForNetwork(MOCK_CHAIN, 100n),
     ).to.be.rejectedWith('All wallets busy or out of funds.');
   }).timeout(10000);
 
@@ -155,7 +149,7 @@ describe('best-match-wallet', () => {
     await initWallets();
 
     await expect(
-      getBestMatchWalletForNetwork(MOCK_CHAIN, BigNumber.from(10).pow(19)),
+      getBestMatchWalletForNetwork(MOCK_CHAIN, 10n ** 19n),
     ).to.be.rejectedWith('All wallets busy or out of funds.');
   }).timeout(10000);
 }).timeout(20000);

@@ -1,11 +1,9 @@
-import { TransactionRequest } from '@ethersproject/providers';
 import {
   ChainType,
   calculateGasPrice,
   EVMGasType,
   TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import { BigNumber } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
 import { logger } from '../../util/logger';
@@ -14,17 +12,18 @@ import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getStandardGasDetails } from './gas-by-speed';
 import configDefaults from '../config/config-defaults';
+import { ContractTransaction } from 'ethers';
 
 export const getEstimateGasDetailsPublic = async (
   chain: RelayerChain,
   evmGasType: EVMGasType,
-  transactionRequest: TransactionRequest,
+  transaction: ContractTransaction,
   devLog?: boolean,
 ): Promise<TransactionGasDetails> => {
   try {
     const provider = getProviderForNetwork(chain);
     const [gasEstimate, gasDetails] = await Promise.all([
-      provider.estimateGas(transactionRequest).catch(throwErr),
+      provider.estimateGas(transaction).catch(throwErr),
       getStandardGasDetails(evmGasType, chain),
     ]);
 
@@ -41,8 +40,8 @@ export const getEstimateGasDetailsPublic = async (
 export const getEstimateGasDetailsRelayed = async (
   chain: RelayerChain,
   evmGasType: EVMGasType,
-  minGasPrice: string,
-  transactionRequest: TransactionRequest,
+  minGasPrice: bigint,
+  transaction: ContractTransaction,
   devLog?: boolean,
   retryCount = 0,
 ): Promise<TransactionGasDetails> => {
@@ -50,9 +49,9 @@ export const getEstimateGasDetailsRelayed = async (
     // minGasPrice not allowed on EVMGasType 2
     throw new Error('EVMGasType 2 not allowed for Relayer transactions.');
   }
-  const gasPrice = BigNumber.from(minGasPrice);
-  const transactionRequestWithOptionalMinGas: TransactionRequest = {
-    ...transactionRequest,
+  const gasPrice = minGasPrice;
+  const transactionWithOptionalMinGas: ContractTransaction = {
+    ...transaction,
     gasPrice,
   };
 
@@ -60,7 +59,7 @@ export const getEstimateGasDetailsRelayed = async (
 
   try {
     const gasEstimate = await provider
-      .estimateGas(transactionRequestWithOptionalMinGas)
+      .estimateGas(transactionWithOptionalMinGas)
       .catch(throwErr);
 
     return { evmGasType, gasEstimate, gasPrice };
@@ -79,7 +78,7 @@ export const getEstimateGasDetailsRelayed = async (
         chain,
         evmGasType,
         minGasPrice,
-        transactionRequest,
+        transaction,
         devLog,
         retryCount + 1,
       );
@@ -93,24 +92,24 @@ export const getEstimateGasDetailsRelayed = async (
 };
 
 export const calculateGasLimitRelayer = (
-  gasEstimate: BigNumber,
+  gasEstimate: bigint,
   chain: RelayerChain,
-): BigNumber => {
+): bigint => {
   switch (chain.type) {
     case ChainType.EVM: {
       switch (chain.id) {
         case NetworkChainID.Arbitrum:
         case NetworkChainID.ArbitrumGoerli:
           // Add 30% to gasEstimate for L2s.
-          return gasEstimate.mul(13000).div(10000);
+          return (gasEstimate * 13000n) / 10000n;
         case NetworkChainID.EthereumGoerli:
         case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
         case NetworkChainID.Hardhat:
         case NetworkChainID.PolygonMumbai:
         case NetworkChainID.Ethereum:
-          // Add 20% to gasEstimate.
-          return gasEstimate.mul(12000).div(10000);
+          // Add 20% to gasEstimate for L1s.
+          return (gasEstimate * 12000n) / 10000n;
       }
     }
   }
@@ -119,8 +118,8 @@ export const calculateGasLimitRelayer = (
 export const calculateMaximumGasRelayer = (
   transactionGasDetails: TransactionGasDetails,
   chain: RelayerChain,
-): BigNumber => {
+): bigint => {
   const gasPrice = calculateGasPrice(transactionGasDetails);
   const { gasEstimate } = transactionGasDetails;
-  return calculateGasLimitRelayer(gasEstimate, chain).mul(gasPrice);
+  return calculateGasLimitRelayer(gasEstimate, chain) * gasPrice;
 };

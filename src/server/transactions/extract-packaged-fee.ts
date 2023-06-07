@@ -1,22 +1,21 @@
-import { BigNumber } from 'ethers';
-import { TransactionRequest } from '@ethersproject/providers';
 import { RelayerChain } from '../../models/chain-models';
 import {
   extractFirstNoteERC20AmountMapFromTransactionRequest,
   parseRailgunTokenAddress,
-} from '@railgun-community/quickstart';
+} from '@railgun-community/wallet';
 import { networkForChain } from '@railgun-community/shared-models';
 import { getRailgunWalletID } from '../wallets/active-wallets';
 import { ErrorMessage } from '../../util/errors';
+import { ContractTransaction } from 'ethers';
 
 type PackagedFee = {
   tokenAddress: string;
-  packagedFeeAmount: BigNumber;
+  packagedFeeAmount: bigint;
 };
 
 export const extractPackagedFeeFromTransaction = async (
   chain: RelayerChain,
-  transactionRequest: TransactionRequest,
+  transaction: ContractTransaction,
   useRelayAdapt: boolean,
 ): Promise<PackagedFee> => {
   const network = networkForChain(chain);
@@ -30,7 +29,7 @@ export const extractPackagedFeeFromTransaction = async (
     await extractFirstNoteERC20AmountMapFromTransactionRequest(
       railgunWalletID,
       network,
-      transactionRequest,
+      transaction,
       useRelayAdapt,
     );
 

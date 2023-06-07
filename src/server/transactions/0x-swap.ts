@@ -1,6 +1,4 @@
-import { TransactionResponse } from '@ethersproject/providers';
-import { BigNumber, PopulatedTransaction } from 'ethers';
-import { TokenAmount } from '../../models/token-models';
+import { ERC20Amount } from '../../models/token-models';
 import {
   zeroXExchangeProxyContractAddress,
   ZeroXFormattedQuoteData,
@@ -18,21 +16,22 @@ import {
   getEVMGasTypeForTransaction,
   networkForChain,
 } from '@railgun-community/shared-models';
+import { ContractTransaction, TransactionResponse } from 'ethers';
 
 const dbg = debug('relayer:swaps');
 
 export const generateSwapTransactions = async (
-  tokenAmounts: TokenAmount[],
+  erc20Amounts: ERC20Amount[],
   chain: RelayerChain,
   shouldThrow = false,
-): Promise<PopulatedTransaction[]> => {
-  const populatedTransactions: Optional<PopulatedTransaction>[] =
+): Promise<ContractTransaction[]> => {
+  const populatedTransactions: Optional<ContractTransaction>[] =
     await Promise.all(
-      tokenAmounts.map(async (tokenAmount) => {
+      erc20Amounts.map(async (erc20Amount) => {
         try {
           const swapQuote = await zeroXGetSwapQuote(
             chain,
-            tokenAmount,
+            erc20Amount,
             configNetworks[chain.type][chain.id].gasToken.symbol,
             configDefaults.topUps.toleratedSlippage,
           );
@@ -40,20 +39,20 @@ export const generateSwapTransactions = async (
             throw new Error(swapQuote.error);
           }
           if (!swapQuote.quote) {
-            const errMessage = `Failed to get zeroX Swap Quote for ${tokenAmount.tokenAddress}`;
+            const errMessage = `Failed to get zeroX Swap Quote for ${erc20Amount.tokenAddress}`;
             if (shouldThrow) {
               throw new Error(errMessage);
             }
             dbg(errMessage);
             return undefined;
           }
-          const populatedSwap = quoteToPopulatedTransaction(
+          const populatedSwap = quoteToContractTransaction(
             chain,
             swapQuote.quote,
           );
           return populatedSwap;
         } catch (err) {
-          const errMessage = `Could not populate swap transaction (during top-up) for token ${tokenAmount.tokenAddress}: ${err.message}`;
+          const errMessage = `Could not populate swap transaction (during top-up) for token ${erc20Amount.tokenAddress}: ${err.message}`;
           if (shouldThrow) {
             throw new Error(errMessage);
           }
@@ -66,24 +65,24 @@ export const generateSwapTransactions = async (
   return removeUndefineds(populatedTransactions);
 };
 
-const quoteToPopulatedTransaction = (
+const quoteToContractTransaction = (
   chain: RelayerChain,
   quote: ZeroXFormattedQuoteData,
-): PopulatedTransaction => {
-  const populatedTransaction: PopulatedTransaction = {
+): ContractTransaction => {
+  const populatedTransaction: ContractTransaction = {
     to: zeroXExchangeProxyContractAddress(chain),
     data: quote.data,
-    value: BigNumber.from(quote.value),
+    value: BigInt(quote.value),
   };
   return populatedTransaction;
 };
 
 export const swapZeroX = async (
   activeWallet: ActiveWallet,
-  tokenAmounts: TokenAmount[],
+  erc20Amounts: ERC20Amount[],
   chain: RelayerChain,
 ): Promise<TransactionResponse[]> => {
-  const populatedSwapTXs = await generateSwapTransactions(tokenAmounts, chain);
+  const populatedSwapTXs = await generateSwapTransactions(erc20Amounts, chain);
   const TransactionResponses: TransactionResponse[] = await Promise.all(
     populatedSwapTXs.map(async (populatedSwap) => {
       const network = networkForChain(chain);

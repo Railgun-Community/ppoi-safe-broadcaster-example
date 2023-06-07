@@ -1,11 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
+import { Wallet as EthersWallet, TransactionResponse } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
-import {
-  FallbackProvider,
-  TransactionResponse,
-} from '@ethersproject/providers';
 import {
   createEthersWallet,
   getActiveWallets,
@@ -18,7 +14,7 @@ import {
   waitForTx,
 } from '../execute-transaction';
 import {
-  getMockPopulatedTransaction,
+  getMockContractTransaction,
   getMockProvider,
   getMockGoerliNetwork,
 } from '../../../test/mocks.test';
@@ -74,10 +70,10 @@ describe('execute-transaction', () => {
     await initNetworkProviders([testChainGoerli()]);
     ethersWallet = createEthersWallet(activeWallet, getMockProvider());
     walletGetTransactionCountStub = sinon
-      .stub(EthersWallet.prototype, 'getTransactionCount')
+      .stub(EthersWallet.prototype, 'getNonce')
       .resolves(3);
     sendTransactionStub = sinon
-      .stub(FallbackProvider.prototype, 'sendTransaction')
+      .stub(EthersWallet.prototype, 'sendTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
     waitTxStub = sinon
       .stub(ExecuteTransactionModule, 'waitTx')
@@ -115,13 +111,13 @@ describe('execute-transaction', () => {
   }).timeout(10000);
 
   it('Should process and sign a transaction', async () => {
-    const populatedTransaction = getMockPopulatedTransaction();
+    const populatedTransaction = getMockContractTransaction();
 
     const gasDetails: TransactionGasDetails = {
       evmGasType: EVMGasType.Type2,
-      gasEstimate: BigNumber.from(10),
-      maxFeePerGas: BigNumber.from(20),
-      maxPriorityFeePerGas: BigNumber.from(30),
+      gasEstimate: 10n,
+      maxFeePerGas: 20n,
+      maxPriorityFeePerGas: 30n,
     };
     const txResponse = await executeTransaction(
       MOCK_CHAIN,
@@ -134,7 +130,7 @@ describe('execute-transaction', () => {
   });
 
   it.skip('Should set wallet unavailable while processing tx', async () => {
-    createGasBalanceStub(BigNumber.from(10).pow(18));
+    createGasBalanceStub(10n ** 18n);
     expect(await isWalletAvailableWithEnoughFunds(activeWallet, MOCK_CHAIN)).to
       .be.true;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

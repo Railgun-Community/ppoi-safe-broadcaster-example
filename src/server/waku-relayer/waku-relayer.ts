@@ -1,10 +1,10 @@
 import debug from 'debug';
 import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
-import { BigNumber } from 'ethers';
+
 import {
   fromUTF8String,
   signWithWalletViewingKey,
-} from '@railgun-community/quickstart';
+} from '@railgun-community/wallet';
 import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
@@ -140,14 +140,14 @@ export class WakuRelayer {
   }
 
   private createFeeBroadcastData = async (
-    fees: MapType<BigNumber>,
+    fees: MapType<bigint>,
     feeCacheID: string,
     chain: RelayerChain,
   ): Promise<RelayerFeeMessage> => {
     const tokenAddresses = Object.keys(fees);
     const feesHex: MapType<string> = {};
     tokenAddresses.forEach((tokenAddress) => {
-      feesHex[tokenAddress] = fees[tokenAddress].toHexString();
+      feesHex[tokenAddress] = `0x${fees[tokenAddress].toString(16)}`;
     });
 
     // Availability must be accurate or Relayer risks automatic blocking by clients.

@@ -41,10 +41,10 @@ const TOKEN_ADDRESS_1 = '0x013573';
 const TOKEN_ADDRESS_2 = '0x73829';
 const TOKEN_ADDRESSES = [TOKEN_ADDRESS_1, TOKEN_ADDRESS_2];
 
-const ropstenNetwork = getMockGoerliNetwork();
+const goerliNetwork = getMockGoerliNetwork();
 
 const chainEthereum = testChainEthereum();
-const chainRopsten = testChainGoerli();
+const chainGoerli = testChainGoerli();
 
 const TOKEN_PRICE_SOURCE = TokenPriceSource.ZeroX;
 
@@ -70,8 +70,8 @@ describe('0x-price', () => {
     startEngine();
 
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
-    configNetworks[chainRopsten.type][chainRopsten.id] = ropstenNetwork;
-    await initNetworkProviders([chainEthereum, chainRopsten]);
+    configNetworks[chainGoerli.type][chainGoerli.id] = goerliNetwork;
+    await initNetworkProviders([chainEthereum, chainGoerli]);
 
     resetTokenPriceCache();
 
@@ -85,9 +85,9 @@ describe('0x-price', () => {
     // @ts-expect-error
     configTokens[chainEthereum.type] ??= {};
     // @ts-expect-error
-    configTokens[chainRopsten.type] ??= {};
+    configTokens[chainGoerli.type] ??= {};
     configTokens[chainEthereum.type][chainEthereum.id] = tokenConfigs;
-    configTokens[chainRopsten.type][chainRopsten.id] = tokenConfigs;
+    configTokens[chainGoerli.type][chainGoerli.id] = tokenConfigs;
     await initTokens();
   });
 
@@ -186,10 +186,10 @@ describe('0x-price', () => {
   it('Should run 0x configured price refresher for Ropsten', async () => {
     await configTokenPriceRefresher.tokenPriceRefreshers[
       TOKEN_PRICE_SOURCE
-    ].refresher(chainRopsten, TOKEN_ADDRESSES);
+    ].refresher(chainGoerli, TOKEN_ADDRESSES);
     const ropstenPrices =
-      getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainRopsten.type][
-        chainRopsten.id
+      getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainGoerli.type][
+        chainGoerli.id
       ];
     expect(ropstenPrices).to.equal(undefined);
   });

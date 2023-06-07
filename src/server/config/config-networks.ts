@@ -35,7 +35,7 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'ETH',
         wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
-        decimals: 18,
+        decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.25),
@@ -51,7 +51,7 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'ETH',
         wrappedAddress: BaseTokenWrappedAddress.EthereumGoerliWETH,
-        decimals: 18,
+        decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.25),
@@ -67,7 +67,7 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'BNB',
         wrappedAddress: BaseTokenWrappedAddress.BinanceWBNB,
-        decimals: 18,
+        decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.2),
@@ -83,7 +83,7 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'MATIC',
         wrappedAddress: BaseTokenWrappedAddress.PolygonWMATIC,
-        decimals: 18,
+        decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.15),
@@ -99,7 +99,7 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'ETH',
         wrappedAddress: BaseTokenWrappedAddress.ArbitrumWETH,
-        decimals: 18,
+        decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
       fees: feeConfigL2(1.5),
@@ -115,7 +115,7 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'MATIC',
         wrappedAddress: BaseTokenWrappedAddress.PolygonMumbaiWMATIC,
-        decimals: 18,
+        decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.15),
@@ -131,7 +131,7 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'ETH',
         wrappedAddress: BaseTokenWrappedAddress.ArbitrumGoerliWETH,
-        decimals: 18,
+        decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
       fees: feeConfigL2(1.5),
@@ -147,7 +147,7 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'ETH',
         wrappedAddress: NO_GAS_TOKEN_ADDRESS,
-        decimals: 18,
+        decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.25),

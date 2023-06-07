@@ -1,4 +1,3 @@
-import { FallbackProvider } from '@ethersproject/providers';
 import configNetworks from '../config/config-networks';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { loadEngineProvider } from '../engine/engine-init';
@@ -9,6 +8,7 @@ import {
   getAvailableProviderJSONs,
 } from '@railgun-community/shared-models';
 import debug from 'debug';
+import { FallbackProvider } from 'ethers';
 
 const dbg = debug('relayer:networks');
 

@@ -1,10 +1,9 @@
-import { BigNumber } from 'ethers';
 import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
 import { RelayerChain } from '../../models/chain-models';
 
 type CachedFees = {
-  tokenFees: MapType<BigNumber>;
+  tokenFees: MapType<bigint>;
   updatedAt: number; // In milliseconds.
 };
 
@@ -42,7 +41,7 @@ const clearExpiredFees = (chain: RelayerChain) => {
 
 export const cacheUnitFeesForTokens = (
   chain: RelayerChain,
-  tokenFees: MapType<BigNumber>,
+  tokenFees: MapType<bigint>,
 ): string => {
   const feeCacheID = generateFeeCacheID();
   const cachedFee: CachedFees = {
@@ -65,7 +64,7 @@ export const lookUpCachedUnitTokenFee = (
   chain: RelayerChain,
   feeCacheID: string,
   tokenAddress: string,
-): Optional<BigNumber> => {
+): Optional<bigint> => {
   transactionFeeCache[chain.type] ??= {};
   transactionFeeCache[chain.type][chain.id] ??= {};
   const cachedFees = transactionFeeCache[chain.type][chain.id][feeCacheID];

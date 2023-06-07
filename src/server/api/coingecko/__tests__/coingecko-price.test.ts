@@ -36,9 +36,9 @@ const TOKEN_ADDRESS_1 = '0x013573';
 const TOKEN_ADDRESS_2 = '0x73829';
 const TOKEN_ADDRESSES = [TOKEN_ADDRESS_1, TOKEN_ADDRESS_2];
 
-const ropstenNetwork = getMockGoerliNetwork();
+const goerliNetwork = getMockGoerliNetwork();
 const chainEthereum = testChainEthereum();
-const chainRopsten = testChainGoerli();
+const chainGoerli = testChainGoerli();
 
 const TOKEN_PRICE_SOURCE = TokenPriceSource.CoinGecko;
 
@@ -74,8 +74,8 @@ describe('coingecko-price', () => {
     startEngine();
 
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
-    configNetworks[chainRopsten.type][chainRopsten.id] = ropstenNetwork;
-    await initNetworkProviders([chainEthereum, chainRopsten]);
+    configNetworks[chainGoerli.type][chainGoerli.id] = goerliNetwork;
+    await initNetworkProviders([chainEthereum, chainGoerli]);
 
     resetTokenPriceCache();
 
@@ -87,9 +87,9 @@ describe('coingecko-price', () => {
     // @ts-expect-error
     configTokens[chainEthereum.type] ??= {};
     // @ts-expect-error
-    configTokens[chainRopsten.type] ??= {};
+    configTokens[chainGoerli.type] ??= {};
     configTokens[chainEthereum.type][chainEthereum.id] = tokenConfigs;
-    configTokens[chainRopsten.type][chainRopsten.id] = tokenConfigs;
+    configTokens[chainGoerli.type][chainGoerli.id] = tokenConfigs;
     await initTokens();
   });
 
@@ -201,14 +201,14 @@ describe('coingecko-price', () => {
   it('Should run CoinGecko configured price refresher for Ropsten', async () => {
     await configTokenPriceRefresher.tokenPriceRefreshers[
       TOKEN_PRICE_SOURCE
-    ].refresher(chainRopsten, TOKEN_ADDRESSES);
+    ].refresher(chainGoerli, TOKEN_ADDRESSES);
     const tokenAddressesToPrice =
-      getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainRopsten.type][
-        chainRopsten.id
+      getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainGoerli.type][
+        chainGoerli.id
       ];
     expect(Object.keys(tokenAddressesToPrice).length).to.equal(3);
     expect(
-      tokenAddressesToPrice[ropstenNetwork.gasToken.wrappedAddress]?.price,
+      tokenAddressesToPrice[goerliNetwork.gasToken.wrappedAddress]?.price,
     ).to.equal(2000);
   });
 }).timeout(30000);

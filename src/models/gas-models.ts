@@ -1,5 +1,11 @@
 import { EVMGasType } from '@railgun-community/shared-models';
-import { BigNumber } from '@ethersproject/bignumber';
+
+export type FeeHistoryResult = {
+  baseFeePerGas: string[];
+  gasUsedRatio: number[];
+  oldestBlock: number;
+  reward: string[][];
+};
 
 export enum GasHistoryPercentile {
   Low = 10,
@@ -11,12 +17,12 @@ export enum GasHistoryPercentile {
 export type GasDetails =
   | {
       evmGasType: EVMGasType.Type0 | EVMGasType.Type1;
-      gasPrice: BigNumber;
+      gasPrice: bigint;
     }
   | {
       evmGasType: EVMGasType.Type2;
-      maxFeePerGas: BigNumber;
-      maxPriorityFeePerGas: BigNumber;
+      maxFeePerGas: bigint;
+      maxPriorityFeePerGas: bigint;
     };
 
 export type GasDetailsBySpeed = {

@@ -1,6 +1,5 @@
-import { TransactionResponse } from '@ethersproject/providers';
-import { Contract, PopulatedTransaction } from 'ethers';
-import { TokenAmount } from '../../models/token-models';
+import { Contract, ContractTransaction, TransactionResponse } from 'ethers';
+import { ERC20Amount } from '../../models/token-models';
 import { ABI_ERC20 } from '../abi/abi';
 import { zeroXExchangeProxyContractAddress } from '../api/0x/0x-quote';
 import { getProviderForNetwork } from '../providers/active-network-providers';
@@ -18,23 +17,25 @@ import {
 const dbg = debug('relayer:approvals');
 
 export const generateApprovalTransactions = async (
-  tokenAmounts: TokenAmount[],
+  erc20Amounts: ERC20Amount[],
   chain: RelayerChain,
-): Promise<PopulatedTransaction[]> => {
-  const populatedTransactions: Optional<PopulatedTransaction>[] =
+): Promise<ContractTransaction[]> => {
+  const populatedTransactions: Optional<ContractTransaction>[] =
     await Promise.all(
-      tokenAmounts.map(async (tokenAmount) => {
+      erc20Amounts.map(async (erc20Amount) => {
         try {
           const provider = getProviderForNetwork(chain);
           const contract = new Contract(
-            tokenAmount.tokenAddress,
+            erc20Amount.tokenAddress,
             ABI_ERC20,
             provider,
           );
-          const approvalAmount = tokenAmount.amount;
-          const value = approvalAmount.toHexString();
+          const approvalAmount = erc20Amount.amount;
           const spender = zeroXExchangeProxyContractAddress(chain);
-          return await contract.populateTransaction.approve(spender, value);
+          return await contract.approve.populateTransaction(
+            spender,
+            approvalAmount,
+          );
         } catch (err) {
           dbg(`Could not populate transaction for some token: ${err.message}`);
           return undefined;
@@ -47,11 +48,11 @@ export const generateApprovalTransactions = async (
 
 export const approveZeroX = async (
   activeWallet: ActiveWallet,
-  tokenAmounts: TokenAmount[],
+  erc20Amounts: ERC20Amount[],
   chain: RelayerChain,
 ): Promise<TransactionResponse[]> => {
   const populatedApprovalTXs = await generateApprovalTransactions(
-    tokenAmounts,
+    erc20Amounts,
     chain,
   );
   const TransactionResponses: TransactionResponse[] = await Promise.all(

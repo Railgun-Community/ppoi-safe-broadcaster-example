@@ -1,8 +1,4 @@
 import {
-  TransactionRequest,
-  TransactionResponse,
-} from '@ethersproject/providers';
-import {
   EVMGasType,
   getEVMGasTypeForTransaction,
   networkForChain,
@@ -20,20 +16,18 @@ import { minimumGasBalanceForAvailability } from '../wallets/available-wallets';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import { executeTransaction } from './execute-transaction';
 import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
-import { deserializeTransaction } from './transaction-deserializer';
+import { ContractTransaction, TransactionResponse } from 'ethers';
 
 const dbg = debug('relayer:transact:validate');
 
 export const processTransaction = async (
   chain: RelayerChain,
   feeCacheID: string,
-  minGasPrice: string,
-  serializedTransaction: string,
+  minGasPrice: bigint,
+  transaction: ContractTransaction,
   useRelayAdapt: boolean,
   devLog?: boolean,
 ): Promise<TransactionResponse> => {
-  const transactionRequest = deserializeTransaction(serializedTransaction);
-
   // Minimum gas for gas estimate wallet: 0.15 (or 0.01 L2).
   const minimumGasNeeded = minimumGasBalanceForAvailability(chain);
 
@@ -56,15 +50,8 @@ export const processTransaction = async (
     throw new Error('Invalid gas type for Relayer transaction.');
   }
 
-  if (evmGasType === EVMGasType.Type0) {
-    delete transactionRequest.accessList;
-  }
-  delete transactionRequest.gasLimit;
-  delete transactionRequest.gasPrice;
-  delete transactionRequest.maxFeePerGas;
-  delete transactionRequest.maxPriorityFeePerGas;
-  const transactionRequestForGasEstimate: TransactionRequest = {
-    ...transactionRequest,
+  const transactionRequestForGasEstimate: ContractTransaction = {
+    ...transaction,
     from: walletForGasEstimate.address,
   };
 
@@ -84,16 +71,12 @@ export const processTransaction = async (
   dbg('Maximum gas:', maximumGas);
 
   const { tokenAddress, packagedFeeAmount } =
-    await extractPackagedFeeFromTransaction(
-      chain,
-      transactionRequest,
-      useRelayAdapt,
-    );
+    await extractPackagedFeeFromTransaction(chain, transaction, useRelayAdapt);
   validateFee(chain, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
   dbg('Fee validated:', packagedFeeAmount, tokenAddress);
   dbg('Transaction gas details:', transactionGasDetails);
 
   await validateMinGasPrice(chain, minGasPrice, evmGasType);
 
-  return executeTransaction(chain, transactionRequest, transactionGasDetails);
+  return executeTransaction(chain, transaction, transactionGasDetails);
 };

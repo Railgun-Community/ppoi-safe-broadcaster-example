@@ -1,5 +1,3 @@
-import { BigNumber } from 'ethers';
-import { formatUnits } from '@ethersproject/units';
 import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
@@ -7,9 +5,10 @@ import { getGasTokenBalance } from './gas-token-balance';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { RelayerChain } from '../../models/chain-models';
+import { formatUnits } from 'ethers';
 
 type CachedBalance = {
-  balance: BigNumber;
+  balance: bigint;
   updatedAt: number;
 };
 
@@ -70,7 +69,7 @@ export const shouldUpdateCachedGasTokenBalance = (
 export const getCachedGasTokenBalance = async (
   chain: RelayerChain,
   walletAddress: string,
-): Promise<BigNumber> => {
+): Promise<bigint> => {
   if (shouldUpdateCachedGasTokenBalance(chain, walletAddress)) {
     await updateCachedGasTokenBalance(chain, walletAddress);
   }
@@ -85,8 +84,8 @@ export const getCachedGasTokenBalance = async (
 export const getActiveWalletGasTokenBalanceMapForChain = async (
   chain: RelayerChain,
   activeWallets: ActiveWallet[],
-): Promise<MapType<BigNumber>> => {
-  const getBalancePromises: Promise<Optional<BigNumber>>[] = [];
+): Promise<MapType<bigint>> => {
+  const getBalancePromises: Promise<Optional<bigint>>[] = [];
   activeWallets.forEach(({ address }) => {
     getBalancePromises.push(
       getCachedGasTokenBalance(chain, address).catch((err) => {
@@ -97,7 +96,7 @@ export const getActiveWalletGasTokenBalanceMapForChain = async (
   });
   const balances = await Promise.all(getBalancePromises);
 
-  const balanceMap: MapType<BigNumber> = {};
+  const balanceMap: MapType<bigint> = {};
   activeWallets.forEach((activeWallet, index) => {
     const balance = balances[index];
     if (balance != null) {
@@ -109,7 +108,7 @@ export const getActiveWalletGasTokenBalanceMapForChain = async (
 };
 
 export const convertToReadableGasTokenBalanceMap = (
-  gasTokenBalanceMap: MapType<BigNumber>,
+  gasTokenBalanceMap: MapType<bigint>,
 ) => {
   const addresses = Object.keys(gasTokenBalanceMap);
   const readableMap: MapType<string> = {};

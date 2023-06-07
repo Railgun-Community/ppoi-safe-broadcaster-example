@@ -1,10 +1,9 @@
 import {
   BalancesUpdatedCallback,
   refreshRailgunBalances,
-} from '@railgun-community/quickstart';
+} from '@railgun-community/wallet';
 import { resetMapObject } from '../../util/utils';
-import { TokenAmount } from '../../models/token-models';
-import { BigNumber } from 'ethers';
+import { ERC20Amount } from '../../models/token-models';
 import { RelayerChain } from '../../models/chain-models';
 import { RailgunBalancesEvent } from '@railgun-community/shared-models';
 import { getRailgunWalletID } from '../wallets/active-wallets';
@@ -12,7 +11,7 @@ import { getRailgunWalletID } from '../wallets/active-wallets';
 // const dbg = debug('relayer:balances:shielded');
 
 export type ShieldedCachedBalance = {
-  tokenAmount: TokenAmount;
+  erc20Amount: ERC20Amount;
   updatedAt: number;
 };
 
@@ -54,15 +53,12 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
   shieldedTokenBalanceCache[chain.type] ??= {};
   shieldedTokenBalanceCache[chain.type][chain.id] ??= {};
 
-  erc20Amounts.forEach(({ tokenAddress, amountString }) => {
-    const tokenAmount: TokenAmount = {
-      tokenAddress,
-      amount: BigNumber.from(amountString),
-    };
-    shieldedTokenBalanceCache[chain.type][chain.id][tokenAddress] = {
-      tokenAmount,
-      updatedAt: Date.now(),
-    };
+  erc20Amounts.forEach((erc20Amount) => {
+    shieldedTokenBalanceCache[chain.type][chain.id][erc20Amount.tokenAddress] =
+      {
+        erc20Amount,
+        updatedAt: Date.now(),
+      };
   });
 
   if (balancePromiseResolve) {

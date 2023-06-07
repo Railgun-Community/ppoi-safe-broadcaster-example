@@ -1,4 +1,4 @@
-import { Database } from '@railgun-community/quickstart';
+import { Database } from '@railgun-community/wallet';
 import leveldown from 'leveldown';
 import { logger } from '../../util/logger';
 import configDefaults from '../config/config-defaults';

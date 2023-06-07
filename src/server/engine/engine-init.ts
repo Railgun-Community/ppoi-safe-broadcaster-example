@@ -6,7 +6,7 @@ import {
   stopRailgunEngine,
   ArtifactStore,
   loadProvider,
-} from '@railgun-community/quickstart';
+} from '@railgun-community/wallet';
 import fs from 'fs';
 import {
   FallbackProviderJsonConfig,
@@ -77,7 +77,5 @@ export const loadEngineProvider = async (
     throw new Error('Network not found.');
   }
 
-  const shouldDebug = configDefaults.debug.logLevel === DebugLevel.VerboseLogs;
-
-  await loadProvider(providerJsonConfig, network.name, shouldDebug);
+  await loadProvider(providerJsonConfig, network.name);
 };

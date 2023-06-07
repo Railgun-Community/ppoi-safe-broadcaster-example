@@ -1,7 +1,7 @@
 /// <reference types="../../../global" />
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
+
 import { validateFee } from '../fee-validator';
 import {
   cacheUnitFeesForTokens,
@@ -31,8 +31,8 @@ const MOCK_CHAIN = testChainEthereum();
 
 const validatePackagedFee = (
   feeCacheID: string,
-  packagedFee: BigNumber,
-  maximumGas: BigNumber,
+  packagedFee: bigint,
+  maximumGas: bigint,
 ) => {
   return validateFee(
     MOCK_CHAIN,
@@ -68,26 +68,24 @@ describe('fee-validator', function test() {
 
   it('Should validate if packaged fee > cached fee', () => {
     const feeCacheID = cacheUnitFeesForTokens(MOCK_CHAIN, {
-      [MOCK_TOKEN_ADDRESS]: BigNumber.from(10),
+      [MOCK_TOKEN_ADDRESS]: 10n,
     });
-    expect(() =>
-      validatePackagedFee(feeCacheID, BigNumber.from(100), BigNumber.from(10)),
-    ).to.not.throw;
+    expect(() => validatePackagedFee(feeCacheID, 100n, 10n)).to.not.throw;
   });
 
   it('Should invalidate if packaged fee < cached fee', () => {
     const feeCacheID = cacheUnitFeesForTokens(MOCK_CHAIN, {
-      [MOCK_TOKEN_ADDRESS]: BigNumber.from(10),
+      [MOCK_TOKEN_ADDRESS]: 10n,
     });
-    expect(() =>
-      validatePackagedFee(feeCacheID, BigNumber.from(50), BigNumber.from(10)),
-    ).to.throw(ErrorMessage.REJECTED_PACKAGED_FEE);
+    expect(() => validatePackagedFee(feeCacheID, BigInt(50), 10n)).to.throw(
+      ErrorMessage.REJECTED_PACKAGED_FEE,
+    );
   });
 
   it('Should invalidate without a cached or calculated fee', () => {
-    expect(() =>
-      validatePackagedFee('mockfeeid', BigNumber.from(15), BigNumber.from(10)),
-    ).to.throw(ErrorMessage.REJECTED_PACKAGED_FEE);
+    expect(() => validatePackagedFee('mockfeeid', BigInt(15), 10n)).to.throw(
+      ErrorMessage.REJECTED_PACKAGED_FEE,
+    );
   });
 
   it('Should validate if packaged fee > calculated fee', () => {
@@ -104,9 +102,8 @@ describe('fee-validator', function test() {
       { price: 20, updatedAt: Date.now() },
     );
     // 10 * 10 + 10%.
-    expect(() =>
-      validatePackagedFee('mockfeeid', BigNumber.from(110), BigNumber.from(10)),
-    ).to.not.throw;
+    expect(() => validatePackagedFee('mockfeeid', BigInt(110), 10n)).to.not
+      .throw;
   });
 
   it('Should validate if packaged fee > calculated fee, with slippage', () => {
@@ -123,14 +120,13 @@ describe('fee-validator', function test() {
       { price: 20, updatedAt: Date.now() },
     );
     // 10 * 10 + 10% - 5% slippage.
-    expect(() =>
-      validatePackagedFee('mockfeeid', BigNumber.from(105), BigNumber.from(10)),
-    ).to.not.throw;
+    expect(() => validatePackagedFee('mockfeeid', BigInt(105), 10n)).to.not
+      .throw;
   });
 
   it('Should invalidate if packaged fee < calculated fee', () => {
-    expect(() =>
-      validatePackagedFee('mockfeeid', BigNumber.from(5), BigNumber.from(10)),
-    ).to.throw(ErrorMessage.REJECTED_PACKAGED_FEE);
+    expect(() => validatePackagedFee('mockfeeid', BigInt(5), 10n)).to.throw(
+      ErrorMessage.REJECTED_PACKAGED_FEE,
+    );
   });
 }).timeout(10000);

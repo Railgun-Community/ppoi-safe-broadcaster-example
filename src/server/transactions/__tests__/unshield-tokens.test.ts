@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, Wallet as EthersWallet } from 'ethers';
+import { Wallet as EthersWallet } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import {
   getActiveWallets,
@@ -21,7 +21,7 @@ import { restoreGasBalanceStub } from '../../../test/stubs/ethers-provider-stubs
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 import { generateUnshieldTransaction } from '../unshield-tokens';
 import configDefaults from '../../config/config-defaults';
-import { getRailgunSmartWalletContractForNetwork } from '@railgun-community/quickstart';
+import { getRailgunSmartWalletContractForNetwork } from '@railgun-community/wallet';
 import { networkForChain } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
@@ -38,17 +38,17 @@ const MOCK_TOKEN_ADDRESS = getMockToken().address;
 
 const MOCK_TOKEN_AMOUNT_1 = {
   tokenAddress: MOCK_TOKEN_ADDRESS,
-  amount: BigNumber.from('100000000000000'),
+  amount: BigInt('100000000000000'),
 };
 const MOCK_TOKEN_AMOUNT_2 = {
   tokenAddress: 'xyz',
-  amount: BigNumber.from('200000000000000'),
+  amount: BigInt('200000000000000'),
 };
 
 const MOCK_CHAIN = testChainGoerli();
 
 // const zeroProof = (): Proof => {
-//   const zero = nToHex(BigInt(0), ByteLength.UINT_8);
+//   const zero = nToHex(0n, ByteLength.UINT_8);
 //   return {
 //     pi_a: [zero, zero],
 //     pi_b: [
@@ -70,7 +70,7 @@ describe('unshield-tokens', () => {
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockGoerliNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
     walletGetTransactionCountStub = sinon
-      .stub(EthersWallet.prototype, 'getTransactionCount')
+      .stub(EthersWallet.prototype, 'getNonce')
       .resolves(3);
     getBestMatchWalletForNetwork = sinon
       .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')

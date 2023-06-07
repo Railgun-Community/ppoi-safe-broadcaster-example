@@ -2,7 +2,6 @@ import {
   TransactionGasDetails,
   EVMGasType,
 } from '@railgun-community/shared-models';
-import { BigNumber } from 'ethers';
 import { RelayerChain } from '../../../models/chain-models';
 import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
@@ -22,7 +21,7 @@ export const createTransactionGasDetailsLegacy = (
   chain: RelayerChain,
   gasEstimateDetails: TransactionGasDetails,
   tokenAddress: string,
-  tokenFee: BigNumber,
+  tokenFee: bigint,
 ): TransactionGasDetails => {
   const { evmGasType, gasEstimate } = gasEstimateDetails;
   const gasLimit = calculateGasLimitRelayer(gasEstimate, chain);
@@ -44,12 +43,10 @@ export const createTransactionGasDetailsLegacy = (
   const decimalRatio = getTransactionTokenToGasDecimalRatio(token);
 
   // This is the inverse of the fee calculation in calculate-token-fee.ts.
-  const translatedTotalGas = tokenFee
-    .mul(BigNumber.from(precision))
-    .mul(decimalRatio)
-    .div(roundedRatio);
+  const translatedTotalGas =
+    (tokenFee * BigInt(precision) * decimalRatio) / roundedRatio;
 
-  const translatedGasPrice = translatedTotalGas.div(gasLimit);
+  const translatedGasPrice = translatedTotalGas / gasLimit;
 
   switch (evmGasType) {
     case EVMGasType.Type0:
@@ -63,7 +60,7 @@ export const createTransactionGasDetailsLegacy = (
     case EVMGasType.Type2: {
       const { maxPriorityFeePerGas } = gasEstimateDetails;
       const maxFeePerGas = translatedGasPrice;
-      if (maxFeePerGas.isNegative()) {
+      if (maxFeePerGas < 0n) {
         throw new Error('Max fee cannot be negative.');
       }
       return {

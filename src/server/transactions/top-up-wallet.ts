@@ -1,4 +1,4 @@
-import { TokenAmount } from '../../models/token-models';
+import { ERC20Amount } from '../../models/token-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { zeroXGetSwapQuote } from '../api/0x/0x-quote';
 import { getERC20TokenBalance } from '../balances/erc20-token-balance';
@@ -26,25 +26,25 @@ import debug from 'debug';
 
 const dbg = debug('relayer:topup');
 
-const getPublicTokenAmountsAfterUnwrap = async (
+const getPublicERC20AmountsAfterUnwrap = async (
   wallet: ActiveWallet,
   chain: RelayerChain,
-): Promise<TokenAmount[]> => {
+): Promise<ERC20Amount[]> => {
   const allTokens = networkTokens[chain.type][chain.id];
-  const newPublicTokenAmounts: TokenAmount[] = await Promise.all(
+  const newPublicERC20Amounts: ERC20Amount[] = await Promise.all(
     allTokens.map(async (token) => {
       const amt = await getERC20TokenBalance(chain, wallet.address, token);
-      const tokenAmount: TokenAmount = {
+      const erc20Amount: ERC20Amount = {
         tokenAddress: token.address,
         amount: amt,
       };
-      return tokenAmount;
+      return erc20Amount;
     }),
   );
-  return newPublicTokenAmounts;
+  return newPublicERC20Amounts;
 };
 
-const getShieldedTokenAmountsForChain = async (
+const getShieldedERC20AmountsForChain = async (
   chain: RelayerChain,
 ): Promise<ShieldedCachedBalance[]> => {
   const fullRescan = false;
@@ -55,12 +55,12 @@ const getShieldedTokenAmountsForChain = async (
 
 // Currently unused.
 // export const filterTopUpTokens = (
-//   topUpTokens: TokenAmount[],
-// ): TokenAmount[] => {
+//   topUpTokens: ERC20Amount[],
+// ): ERC20Amount[] => {
 //   // const desiredTopUpTokens = [];
-//   // const desiredTopUpTokens: Optiona<TokenAmount>[] = await Promise.all (
-//   //   topUpTokens.map( async (tokenAmount) => {
-//   //       if (!configDefaults.topUps.shouldNotSwap.includes(tokenAmount.tokenAddress)){
+//   // const desiredTopUpTokens: Optiona<ERC20Amount>[] = await Promise.all (
+//   //   topUpTokens.map( async (erc20Amount) => {
+//   //       if (!configDefaults.topUps.shouldNotSwap.includes(erc20Amount.tokenAddress)){
 //   //         return
 //   //       }
 //   //     }
@@ -69,29 +69,29 @@ const getShieldedTokenAmountsForChain = async (
 //   return [topUpTokens[0]];
 // };
 
-export const getTopUpTokenAmountsForChain = async (
+export const getTopUpERC20AmountsForChain = async (
   chain: RelayerChain,
-): Promise<TokenAmount[]> => {
-  const tokenAmountsForChain = await getShieldedTokenAmountsForChain(chain);
+): Promise<ERC20Amount[]> => {
+  const erc20AmountsForChain = await getShieldedERC20AmountsForChain(chain);
 
-  const topUpTokenAmountsForChain: Optional<TokenAmount>[] = await Promise.all(
-    tokenAmountsForChain.map(async (shieldedTokenCache) => {
+  const topUpERC20AmountsForChain: Optional<ERC20Amount>[] = await Promise.all(
+    erc20AmountsForChain.map(async (shieldedTokenCache) => {
       const gasTokenSymbol =
         configNetworks[chain.type][chain.id].gasToken.symbol;
 
-      const tokenAmountInGasToken = await zeroXGetSwapQuote(
+      const erc20AmountInGasToken = await zeroXGetSwapQuote(
         chain,
-        shieldedTokenCache.tokenAmount,
+        shieldedTokenCache.erc20Amount,
         gasTokenSymbol,
         configDefaults.topUps.toleratedSlippage,
       );
       try {
+        const amount = erc20AmountInGasToken.quote?.buyERC20Amount.amount;
         if (
-          tokenAmountInGasToken.quote?.buyTokenAmount.amount.gt(
-            configDefaults.topUps.swapThresholdIntoGasToken,
-          )
+          amount &&
+          amount > BigInt(configDefaults.topUps.swapThresholdIntoGasToken)
         ) {
-          return shieldedTokenCache.tokenAmount;
+          return shieldedTokenCache.erc20Amount;
         }
         return undefined;
       } catch (err) {
@@ -100,14 +100,14 @@ export const getTopUpTokenAmountsForChain = async (
       }
     }),
   );
-  return removeUndefineds(topUpTokenAmountsForChain);
+  return removeUndefineds(topUpERC20AmountsForChain);
 };
 
 export const topUpWallet = async (
   topUpWallet: ActiveWallet,
   chain: RelayerChain,
 ) => {
-  const topUpTokens = await getTopUpTokenAmountsForChain(chain);
+  const topUpTokens = await getTopUpERC20AmountsForChain(chain);
 
   if (topUpTokens.length === 0) {
     dbg(
@@ -139,7 +139,7 @@ export const topUpWallet = async (
   await waitForTx(topUpWallet, ethersWallet, chain, batchResponse, nonce);
 
   // get public balances
-  const publicTokenAmounts = await getPublicTokenAmountsAfterUnwrap(
+  const publicERC20Amounts = await getPublicERC20AmountsAfterUnwrap(
     topUpWallet,
     chain,
   );
@@ -147,7 +147,7 @@ export const topUpWallet = async (
   // perform approvals
   const approvalTxResponses = await approveZeroX(
     topUpWallet,
-    publicTokenAmounts,
+    publicERC20Amounts,
     chain,
   );
   await waitForTxs(topUpWallet, ethersWallet, chain, approvalTxResponses);
@@ -156,7 +156,7 @@ export const topUpWallet = async (
   // perform swaps
   const swapTxResponses = await swapZeroX(
     topUpWallet,
-    publicTokenAmounts,
+    publicERC20Amounts,
     chain,
   );
   await waitForTxs(topUpWallet, ethersWallet, chain, swapTxResponses);

@@ -1,4 +1,4 @@
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { Token } from '../../models/token-models';
 import { logger } from '../../util/logger';
 import { getProviderForNetwork } from '../providers/active-network-providers';
@@ -9,14 +9,13 @@ export const getERC20TokenBalance = async (
   chain: RelayerChain,
   walletAddress: string,
   token: Token,
-): Promise<BigNumber> => {
+): Promise<bigint> => {
   try {
     const provider = getProviderForNetwork(chain);
     const contract = new Contract(token.address, ABI_ERC20, provider);
-    const balance: BigNumber = await contract.balanceOf(walletAddress);
-    return balance;
+    return await contract.balanceOf(walletAddress);
   } catch (err) {
     logger.warn(`Could not get gas token balance: ${err.message}`);
-    return BigNumber.from(0);
+    return 0n;
   }
 };

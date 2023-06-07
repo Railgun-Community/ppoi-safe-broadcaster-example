@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { logger } from '../../util/logger';
 import { getTokenFee } from './calculate-token-fee';
 import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
@@ -8,25 +7,24 @@ import { RelayerChain } from '../../models/chain-models';
 
 const comparePackagedFeeToCalculated = (
   chain: RelayerChain,
-  packagedFee: BigNumber,
-  calculatedFee: BigNumber,
+  packagedFee: bigint,
+  calculatedFee: bigint,
 ) => {
   const { gasEstimateVarianceBuffer } =
     configNetworks[chain.type][chain.id].fees;
-  const calculatedFeeWithBuffer = calculatedFee
-    .mul(Math.round(10000 * (1 - gasEstimateVarianceBuffer)))
-    .div(10000);
-  // logger.log(`calculatedFeeWithBuffer: ${calculatedFeeWithBuffer?.toString()}`);
-
-  return packagedFee.gte(calculatedFeeWithBuffer);
+  const calculatedFeeWithBuffer =
+    (calculatedFee *
+      BigInt(Math.round(10000 * (1 - gasEstimateVarianceBuffer)))) /
+    10000n;
+  return packagedFee >= calculatedFeeWithBuffer;
 };
 
 export const validateFee = (
   chain: RelayerChain,
   tokenAddress: string,
-  maximumGas: BigNumber,
+  maximumGas: bigint,
   feeCacheID: string,
-  packagedFee: BigNumber,
+  packagedFee: bigint,
 ) => {
   logger.log(
     `validateFee: token ${tokenAddress} (chain ${chain.type}:${chain.id})`,
@@ -44,7 +42,7 @@ export const validateFee = (
       comparePackagedFeeToCalculated(
         chain,
         packagedFee,
-        cachedUnitTokenFee.mul(maximumGas),
+        cachedUnitTokenFee * maximumGas,
       )
     ) {
       return;
@@ -62,10 +60,10 @@ export const validateFee = (
     logger.log(`error getting current token fee: ${err.message}`);
   }
 
-  logger.log(`maximumGas: ${maximumGas?.toString()}`);
-  logger.log(`cachedUnitTokenFee: ${cachedUnitTokenFee?.toString()}`);
-  logger.log(`calculatedFee: ${calculatedFee?.toString()}`);
-  logger.log(`packagedFee: ${packagedFee.toString()}`);
+  logger.log(`maximumGas: ${maximumGas}`);
+  logger.log(`cachedUnitTokenFee: ${cachedUnitTokenFee}`);
+  logger.log(`calculatedFee: ${calculatedFee}`);
+  logger.log(`packagedFee: ${packagedFee}`);
 
   throw new Error(ErrorMessage.REJECTED_PACKAGED_FEE);
 };

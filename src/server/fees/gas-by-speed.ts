@@ -20,26 +20,21 @@
 // *********************************************
 //
 
-import { BigNumber } from '@ethersproject/bignumber';
 import { ChainType, EVMGasType } from '@railgun-community/shared-models';
-import Web3, { Eth, FeeHistoryResult } from 'web3-eth';
 import { RelayerChain } from '../../models/chain-models';
 import {
   GasHistoryPercentile,
   GasDetailsBySpeed,
   GasDetails,
 } from '../../models/gas-models';
-import { maxBigNumber, minBigNumber } from '../../util/utils';
+import { maxBigInt, minBigInt } from '../../util/utils';
 import {
   getGasDetailsBySpeedBlockNative,
   supportsBlockNativeGasEstimates,
 } from '../api/block-native/gas-by-speed-block-native';
 import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { web3ProviderFromChainID } from '../providers/web3-providers';
-
-// Hack to get the types to apply correctly.
-const Web3Eth = Web3 as unknown as typeof Web3.Eth;
+import { getFeeHistory } from './gas-fee-history';
 
 //
 // THIS CODE WAS MODIFIED FROM METAMASK (MAY 10 2022):
@@ -81,49 +76,41 @@ const Web3Eth = Web3 as unknown as typeof Web3.Eth;
 //
 
 type SuggestedGasDetails = {
-  maxFeePerGas: BigNumber;
-  maxPriorityFeePerGas: BigNumber;
+  maxFeePerGas: bigint;
+  maxPriorityFeePerGas: bigint;
 };
-
-const HISTORICAL_BLOCK_COUNT = 5;
-const REWARD_PERCENTILES: number[] = [
-  GasHistoryPercentile.Low,
-  GasHistoryPercentile.Medium,
-  GasHistoryPercentile.High,
-  GasHistoryPercentile.VeryHigh,
-];
 
 // WARNING: TRANSACTIONS RISK BEING REVERTED IF YOU MODIFY THIS.
 const SETTINGS_BY_PRIORITY_LEVEL = {
   [GasHistoryPercentile.Low]: {
-    baseFeePercentageMultiplier: BigNumber.from(125),
-    priorityFeePercentageMultiplier: BigNumber.from(100),
-    minSuggestedMaxPriorityFeePerGas: BigNumber.from(1_500_000_000),
+    baseFeePercentageMultiplier: BigInt(125),
+    priorityFeePercentageMultiplier: 100n,
+    minSuggestedMaxPriorityFeePerGas: BigInt(1_500_000_000),
   },
   [GasHistoryPercentile.Medium]: {
-    baseFeePercentageMultiplier: BigNumber.from(180),
-    priorityFeePercentageMultiplier: BigNumber.from(110),
-    minSuggestedMaxPriorityFeePerGas: BigNumber.from(2_500_000_000),
+    baseFeePercentageMultiplier: BigInt(180),
+    priorityFeePercentageMultiplier: BigInt(110),
+    minSuggestedMaxPriorityFeePerGas: BigInt(2_500_000_000),
   },
   [GasHistoryPercentile.High]: {
-    baseFeePercentageMultiplier: BigNumber.from(250),
-    priorityFeePercentageMultiplier: BigNumber.from(125),
-    minSuggestedMaxPriorityFeePerGas: BigNumber.from(3_000_000_000),
+    baseFeePercentageMultiplier: BigInt(250),
+    priorityFeePercentageMultiplier: BigInt(125),
+    minSuggestedMaxPriorityFeePerGas: BigInt(3_000_000_000),
   },
   [GasHistoryPercentile.VeryHigh]: {
-    baseFeePercentageMultiplier: BigNumber.from(1000),
-    priorityFeePercentageMultiplier: BigNumber.from(200),
-    minSuggestedMaxPriorityFeePerGas: BigNumber.from(4000000000), // 4_000_000_000
+    baseFeePercentageMultiplier: 1000n,
+    priorityFeePercentageMultiplier: BigInt(200),
+    minSuggestedMaxPriorityFeePerGas: BigInt(4000000000), // 4_000_000_000
   },
 };
 
-const getMedianBigNumber = (feeHistoryOutputs: BigNumber[]): BigNumber => {
+const getMedianBigNumber = (feeHistoryOutputs: bigint[]): bigint => {
   const { length } = feeHistoryOutputs;
   if (length === 0) {
     throw new Error('No fee history outputs');
   }
   const sorted = feeHistoryOutputs.sort((a, b) => {
-    return a.sub(b).isNegative() ? -1 : 1;
+    return a - b < 0 ? -1 : 1;
   });
   // Middle index, rounded down.
   // eg. Should return 2nd item out of 4, 3/5, 3/6 and 4/7, converted to 0-indexed indeces.
@@ -198,11 +185,11 @@ export const getStandardGasDetails = (
 };
 
 const gasPriceForPercentile = (
-  gasPrice: BigNumber,
+  gasPrice: bigint,
   percentile: GasHistoryPercentile,
 ) => {
   const settings = SETTINGS_BY_PRIORITY_LEVEL[percentile];
-  return gasPrice.mul(settings.baseFeePercentageMultiplier).div(100);
+  return (gasPrice * settings.baseFeePercentageMultiplier) / 100n;
 };
 
 export const estimateGasPricesBySpeedUsingHeuristic = async (
@@ -210,7 +197,12 @@ export const estimateGasPricesBySpeedUsingHeuristic = async (
   chain: RelayerChain,
 ): Promise<GasDetailsBySpeed> => {
   const provider = getProviderForNetwork(chain);
-  const gasPrice = await provider.getGasPrice();
+  const { gasPrice } = await provider.getFeeData();
+  if (!gasPrice) {
+    throw new Error(
+      'Could not get current gas price (Type0 or Type1) from provider.',
+    );
+  }
 
   const gasPricesBySpeed: GasDetailsBySpeed = {
     [GasHistoryPercentile.Low]: {
@@ -234,55 +226,6 @@ export const estimateGasPricesBySpeedUsingHeuristic = async (
   return gasPricesBySpeed;
 };
 
-const findHeadBlockInMessage = (message: string): Optional<number> => {
-  try {
-    const headBlockInMessageSplit = message.split(', head ');
-    if (headBlockInMessageSplit.length === 2) {
-      const headBlock = parseInt(headBlockInMessageSplit[1], 10);
-      if (!Number.isNaN(headBlock)) {
-        return headBlock;
-      }
-    }
-    return undefined;
-  } catch (err) {
-    return undefined;
-  }
-};
-
-const getFeeHistory = (
-  web3Eth: Eth,
-  recentBlock?: number,
-  retryCount = 0,
-): Promise<FeeHistoryResult> => {
-  return web3Eth
-    .getFeeHistory(
-      HISTORICAL_BLOCK_COUNT,
-      recentBlock ?? 'latest',
-      REWARD_PERCENTILES,
-    )
-    .catch(async (err) => {
-      if (!(err instanceof Error)) {
-        throw err;
-      }
-      if (err.message && err.message.includes('request beyond head block')) {
-        if (retryCount > 5) {
-          throw new Error(
-            'Recent on-chain fee history not available. Please refresh and try again.',
-          );
-        }
-        const headBlock = findHeadBlockInMessage(err.message);
-        if (headBlock) {
-          return getFeeHistory(web3Eth, headBlock, retryCount + 1);
-        }
-
-        const newRecentBlock =
-          recentBlock ?? (await web3Eth.getBlockNumber()) - 1;
-        return getFeeHistory(web3Eth, newRecentBlock - 1, retryCount + 1);
-      }
-      throw err;
-    });
-};
-
 /**
  * This heuristic is based on Metamask's gas price implementation.
  * We should always use BlockNative as first priority (only available for Ethereum/Polygon).
@@ -291,36 +234,31 @@ const estimateGasMaxFeesBySpeedUsingHeuristic = async (
   evmGasType: EVMGasType.Type2,
   chain: RelayerChain,
 ): Promise<GasDetailsBySpeed> => {
-  const web3Eth = new Web3Eth();
-  const provider = web3ProviderFromChainID(chain);
-  web3Eth.setProvider(provider);
+  const feeHistory = await getFeeHistory(chain);
 
-  const recentBlock = (await web3Eth.getBlockNumber()) - 1;
-  const feeHistory = await getFeeHistory(web3Eth, recentBlock);
-
-  const baseFees: BigNumber[] = feeHistory.baseFeePerGas.map((feeHex) =>
-    BigNumber.from(feeHex),
+  const baseFees: bigint[] = feeHistory.baseFeePerGas.map((feeHex) =>
+    BigInt(feeHex),
   );
   const priorityFeePercentile: {
-    [percentile in GasHistoryPercentile]: BigNumber[];
+    [percentile in GasHistoryPercentile]: bigint[];
   } = {
     [GasHistoryPercentile.Low]: feeHistory.reward.map((feePriorityGroup) =>
-      BigNumber.from(feePriorityGroup[0]),
+      BigInt(feePriorityGroup[0]),
     ),
     [GasHistoryPercentile.Medium]: feeHistory.reward.map((feePriorityGroup) =>
-      BigNumber.from(feePriorityGroup[1]),
+      BigInt(feePriorityGroup[1]),
     ),
     [GasHistoryPercentile.High]: feeHistory.reward.map((feePriorityGroup) =>
-      BigNumber.from(feePriorityGroup[2]),
+      BigInt(feePriorityGroup[2]),
     ),
     [GasHistoryPercentile.VeryHigh]: feeHistory.reward.map(
-      (feePriorityGroup) => BigNumber.from(feePriorityGroup[2]), // Note: same as High
+      (feePriorityGroup) => BigInt(feePriorityGroup[2]), // Note: same as High
     ),
   };
 
-  const baseFeesMedian: BigNumber = getMedianBigNumber(baseFees);
+  const baseFeesMedian: bigint = getMedianBigNumber(baseFees);
   const priorityFeePercentileMedians: {
-    [percentile in GasHistoryPercentile]: BigNumber;
+    [percentile in GasHistoryPercentile]: bigint;
   } = {
     [GasHistoryPercentile.Low]: getMedianBigNumber(
       priorityFeePercentile[GasHistoryPercentile.Low],
@@ -382,30 +320,29 @@ const estimateGasMaxFeesBySpeedUsingHeuristic = async (
 };
 
 const getSuggestedGasDetails = (
-  baseFeesMedian: BigNumber,
+  baseFeesMedian: bigint,
   priorityFeePercentileMedians: {
-    [percentile in GasHistoryPercentile]: BigNumber;
+    [percentile in GasHistoryPercentile]: bigint;
   },
   percentile: GasHistoryPercentile,
 ): SuggestedGasDetails => {
   const settings = SETTINGS_BY_PRIORITY_LEVEL[percentile];
-  const maxBaseFeePerGas = baseFeesMedian
-    .mul(settings.baseFeePercentageMultiplier)
-    .div(100);
+  const maxBaseFeePerGas =
+    (baseFeesMedian * settings.baseFeePercentageMultiplier) / 100n;
 
   // Ensure no lower than min suggested priority fee.
-  const priorityFee = maxBigNumber(
-    priorityFeePercentileMedians[percentile]
-      .mul(settings.priorityFeePercentageMultiplier)
-      .div(100),
+  const priorityFee = maxBigInt(
+    (priorityFeePercentileMedians[percentile] *
+      settings.priorityFeePercentageMultiplier) /
+      100n,
     settings.minSuggestedMaxPriorityFeePerGas,
   );
 
   // Ensure no higher than maxFeePerGas.
-  const maxPriorityFeePerGas = minBigNumber(priorityFee, maxBaseFeePerGas);
+  const maxPriorityFeePerGas = minBigInt(priorityFee, maxBaseFeePerGas);
 
   return {
     maxPriorityFeePerGas,
-    maxFeePerGas: maxBaseFeePerGas.add(maxPriorityFeePerGas),
+    maxFeePerGas: maxBaseFeePerGas + maxPriorityFeePerGas,
   };
 };

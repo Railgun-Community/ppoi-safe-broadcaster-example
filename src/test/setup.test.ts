@@ -35,9 +35,9 @@ const stubDecimalsCall = () => {
     // eslint-disable-next-line require-await
     .callsFake(async (tokenAddress) => {
       if (tokenAddress === MOCK_TOKEN_6_DECIMALS) {
-        return 6;
+        return 6n;
       }
-      return 18;
+      return 18n;
     });
 };
 

@@ -28,12 +28,8 @@ describe('gas-by-speed', () => {
           if (gasDetails.evmGasType !== EVMGasType.Type0) {
             throw new Error('Incorrect gas type');
           }
-          expect(gasDetails.gasPrice.toNumber()).to.be.greaterThan(
-            1_000_000_000,
-          );
-          expect(gasDetails.gasPrice.toNumber()).to.be.lessThan(
-            3_500_000_000_000,
-          );
+          expect(Number(gasDetails.gasPrice)).to.be.greaterThan(1_000_000_000);
+          expect(Number(gasDetails.gasPrice)).to.be.lessThan(3_500_000_000_000);
         }),
     );
   });
@@ -51,16 +47,16 @@ describe('gas-by-speed', () => {
           if (gasDetails.evmGasType !== EVMGasType.Type2) {
             throw new Error('Incorrect gas type');
           }
-          expect(gasDetails.maxFeePerGas.toNumber()).to.be.greaterThan(
+          expect(Number(gasDetails.maxFeePerGas)).to.be.greaterThan(
             1_000_000_000,
           );
-          expect(gasDetails.maxFeePerGas.toNumber()).to.be.lessThan(
+          expect(Number(gasDetails.maxFeePerGas)).to.be.lessThan(
             3_500_000_000_000,
           );
-          expect(gasDetails.maxPriorityFeePerGas.toNumber()).to.be.greaterThan(
+          expect(Number(gasDetails.maxPriorityFeePerGas)).to.be.greaterThan(
             1_000_000_000,
           );
-          expect(gasDetails.maxPriorityFeePerGas.toNumber()).to.be.lessThan(
+          expect(Number(gasDetails.maxPriorityFeePerGas)).to.be.lessThan(
             3_500_000_000_000,
           );
         }),

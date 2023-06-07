@@ -1,8 +1,8 @@
 import { Secrets } from 'models/config-models';
 import { getSecret } from 'docker-secret';
 import _prompt from 'prompt-sync';
-import { sha256 } from 'ethers/lib/utils';
-import { fromUTF8String, hexlify } from '@railgun-community/quickstart';
+import { fromUTF8String, hexlify } from '@railgun-community/wallet';
+import { sha256 } from 'ethers';
 
 const prompt = _prompt({ sigint: true });
 const getEncryptionKey = (): string => {

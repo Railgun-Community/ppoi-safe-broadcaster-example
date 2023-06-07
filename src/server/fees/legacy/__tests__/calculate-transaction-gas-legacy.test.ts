@@ -1,13 +1,12 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
 import { assert } from 'console';
 import configNetworks from '../../../config/config-networks';
 import {
   getMockNetwork,
-  getMockPopulatedTransaction,
   mockTokenConfig,
   MOCK_TOKEN_6_DECIMALS,
+  getMockContractTransaction,
 } from '../../../../test/mocks.test';
 import {
   createGasEstimateStubs,
@@ -44,9 +43,9 @@ const MOCK_GAS_TOKEN = BaseTokenWrappedAddress.EthereumWETH;
 const MOCK_TOKEN_ADDRESS = '0x001';
 
 // 0.10 estimate (est * price), 0.12 ETH total (gas limit).
-const MOCK_GAS_ESTIMATE = BigNumber.from('400000000000');
-const MOCK_MAX_FEE_PER_GAS = BigNumber.from('240000');
-const MOCK_MAX_PRIORITY_FEE_PER_GAS = BigNumber.from('10000');
+const MOCK_GAS_ESTIMATE = 400000000000n;
+const MOCK_MAX_FEE_PER_GAS = 240000n;
+const MOCK_MAX_PRIORITY_FEE_PER_GAS = 10000n;
 const mockGasDetails: TransactionGasDetails = {
   evmGasType: EVMGasType.Type2,
   gasEstimate: MOCK_GAS_ESTIMATE,
@@ -65,7 +64,7 @@ describe('calculate-transaction-gas-legacy', () => {
       MOCK_CHAIN.id
     ].fees.gasEstimateVarianceBuffer = 0.05;
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id].fees.profit = 0.05;
-    await initNetworkProviders();
+    await initNetworkProviders([MOCK_CHAIN]);
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
       MOCK_CHAIN,
@@ -101,7 +100,7 @@ describe('calculate-transaction-gas-legacy', () => {
       MOCK_MAX_PRIORITY_FEE_PER_GAS,
     );
 
-    const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(18)); // $390 "USDC" (0.12 ETH) + 10% profit/buffer fee.
+    const tokenFee = 10n ** 18n * 429n; // $390 "USDC" (0.12 ETH) + 10% profit/buffer fee.
     const gasDetails = createTransactionGasDetailsLegacy(
       MOCK_CHAIN,
       mockGasDetails,
@@ -126,7 +125,7 @@ describe('calculate-transaction-gas-legacy', () => {
       MOCK_MAX_PRIORITY_FEE_PER_GAS,
     );
 
-    const tokenFee = BigNumber.from(429).mul(BigNumber.from(10).pow(6)); // $390 "USDT" (0.12 ETH) + 10% profit/buffer fee.
+    const tokenFee = 10n ** 6n * 429n; // $390 "USDT" (0.12 ETH) + 10% profit/buffer fee.
     const gasDetails = createTransactionGasDetailsLegacy(
       MOCK_CHAIN,
       mockGasDetails,
@@ -151,7 +150,7 @@ describe('calculate-transaction-gas-legacy', () => {
       MOCK_MAX_PRIORITY_FEE_PER_GAS,
     );
 
-    const populatedTransaction = getMockPopulatedTransaction();
+    const populatedTransaction = getMockContractTransaction();
 
     const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
 
@@ -189,14 +188,14 @@ describe('calculate-transaction-gas-legacy', () => {
       MOCK_MAX_PRIORITY_FEE_PER_GAS,
     );
 
-    const populatedTransaction = getMockPopulatedTransaction();
+    const populatedTransaction = getMockContractTransaction();
 
     const evmGasType = getEVMGasTypeForTransaction(NetworkName.Ethereum, false);
 
     const estimateGasDetails = await getEstimateGasDetailsRelayed(
       MOCK_CHAIN,
       evmGasType,
-      MOCK_MAX_FEE_PER_GAS.toHexString(), // minGasPrice
+      MOCK_MAX_FEE_PER_GAS, // minGasPrice
       populatedTransaction,
     );
     const maximumGas = calculateMaximumGasRelayer(

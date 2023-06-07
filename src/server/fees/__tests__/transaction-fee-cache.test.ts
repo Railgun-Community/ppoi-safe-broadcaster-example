@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from 'ethers';
+
 import configDefaults from '../../config/config-defaults';
 import {
   cacheUnitFeesForTokens,
@@ -14,7 +14,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const MOCK_TOKEN_ADDRESS = '0x00';
-const MOCK_FEE = BigNumber.from(10);
+const MOCK_FEE = 10n;
 
 describe('transaction-fee-cache', () => {
   before(() => {

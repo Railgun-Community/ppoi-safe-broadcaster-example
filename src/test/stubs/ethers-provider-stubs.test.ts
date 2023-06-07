@@ -1,21 +1,20 @@
-import { BaseProvider } from '@ethersproject/providers';
 import { EVMGasType } from '@railgun-community/shared-models';
-import { BigNumber } from 'ethers';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
 import * as GasHistoryModule from '../../server/fees/gas-by-speed';
+import { FallbackProvider } from 'ethers';
 
 let estimateGasStub: SinonStub;
 let getHistoricalDataStub: SinonStub;
 let gasBalanceStub: SinonStub;
 
 export const createGasEstimateStubs = (
-  estimateGas: BigNumber,
-  maxFeePerGas: BigNumber,
-  maxPriorityFeePerGas: BigNumber,
+  estimateGas: bigint,
+  maxFeePerGas: bigint,
+  maxPriorityFeePerGas: bigint,
 ) => {
   estimateGasStub = sinon
-    .stub(BaseProvider.prototype, 'estimateGas')
+    .stub(FallbackProvider.prototype, 'estimateGas')
     .resolves(estimateGas);
   getHistoricalDataStub = sinon
     .stub(GasHistoryModule, 'getStandardGasDetails')
@@ -31,9 +30,9 @@ export const restoreGasEstimateStubs = () => {
   getHistoricalDataStub?.restore();
 };
 
-export const createGasBalanceStub = (balance: BigNumber) => {
+export const createGasBalanceStub = (balance: bigint) => {
   gasBalanceStub = sinon
-    .stub(BaseProvider.prototype, 'getBalance')
+    .stub(FallbackProvider.prototype, 'getBalance')
     .resolves(balance);
   gasBalanceStub.calledOnceWithExactly;
 };

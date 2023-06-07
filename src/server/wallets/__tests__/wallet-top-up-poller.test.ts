@@ -8,7 +8,7 @@ import {
 } from '../wallet-top-up-poller';
 import { delay } from '../../../util/promise-utils';
 import { resetAvailableWallets } from '../available-wallets';
-import { BigNumber } from '@ethersproject/bignumber';
+
 import configDefaults from '../../config/config-defaults';
 import { getActiveWallets } from '../active-wallets';
 import {
@@ -27,8 +27,8 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const MOCK_CHAIN = testChainEthereum();
-const MOCK_WALLET_1_GAS_BALANCE = BigNumber.from('9000000000000000');
-const MOCK_WALLET_2_GAS_BALANCE = BigNumber.from('1200000000000000000');
+const MOCK_WALLET_1_GAS_BALANCE = BigInt('9000000000000000');
+const MOCK_WALLET_2_GAS_BALANCE = BigInt('1200000000000000000');
 
 describe('wallet-top-up-poller', () => {
   before(async () => {

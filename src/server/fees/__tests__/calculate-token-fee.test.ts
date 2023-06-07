@@ -1,11 +1,10 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber, utils } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import configTokens from '../../config/config-tokens';
 import { Network } from '../../../models/network-models';
 import {
-  getMockPopulatedTransaction,
+  getMockContractTransaction,
   MOCK_TOKEN_6_DECIMALS,
 } from '../../../test/mocks.test';
 import { setupTestNetwork, testChainEthereum } from '../../../test/setup.test';
@@ -31,6 +30,9 @@ import {
   getEVMGasTypeForTransaction,
   NetworkName,
 } from '@railgun-community/shared-models';
+import { parseEther } from 'ethers';
+import { startEngine } from '../../engine/engine-init';
+import configNetworks from '../../config/config-networks';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -39,12 +41,12 @@ let estimateMaximumGasStub: SinonStub;
 let network: Network;
 const chain = testChainEthereum();
 const MOCK_TOKEN_ADDRESS = '0x12345';
-const MOCK_TRANSACTION = getMockPopulatedTransaction();
+const MOCK_TRANSACTION = getMockContractTransaction();
 
 const stubEstimateGasDetails = (
-  gasEstimate: BigNumber,
-  maxFeePerGas: BigNumber,
-  maxPriorityFeePerGas: BigNumber,
+  gasEstimate: bigint,
+  maxFeePerGas: bigint,
+  maxPriorityFeePerGas: bigint,
 ) => {
   estimateMaximumGasStub = sinon
     .stub(estimateGasModule, 'getEstimateGasDetailsPublic')
@@ -60,9 +62,9 @@ const setupMocks = (
   tokenAddress: string,
   tokenPrice: number,
   gasTokenPrice: number,
-  gasEstimate?: BigNumber,
-  maxFeePerGas?: BigNumber,
-  maxPriorityFeePerGas?: BigNumber,
+  gasEstimate?: bigint,
+  maxFeePerGas?: bigint,
+  maxPriorityFeePerGas?: bigint,
 ) => {
   const gasTokenAddress = network.gasToken.wrappedAddress ?? '';
   cacheTokenPriceForNetwork(TokenPriceSource.CoinGecko, chain, tokenAddress, {
@@ -85,8 +87,12 @@ const setupMocks = (
 
 describe('calculate-token-fee', () => {
   before(async () => {
+    startEngine();
     network = setupTestNetwork();
+    configNetworks[chain.type][chain.id] = network;
     await initNetworkProviders([chain]);
+    // @ts-expect-error
+    configTokens[chain.type] ??= {};
     configTokens[chain.type][chain.id] = {
       [MOCK_TOKEN_ADDRESS]: {
         symbol: 'MOCK1',
@@ -132,9 +138,9 @@ describe('calculate-token-fee', () => {
   it('Should calculate token fee for transaction with precision', async () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
-    const gasEstimate = utils.parseEther('0.001');
-    const maxFeePerGas = BigNumber.from('90000');
-    const maxPriorityFeePerGas = BigNumber.from('10000');
+    const gasEstimate = parseEther('0.001');
+    const maxFeePerGas = BigInt('90000');
+    const maxPriorityFeePerGas = BigInt('10000');
     setupMocks(
       MOCK_TOKEN_ADDRESS,
       tokenPrice,
@@ -166,9 +172,9 @@ describe('calculate-token-fee', () => {
   it('Should calculate token fee for transaction with different decimal amounts', async () => {
     const tokenPrice = 1.067;
     const gasTokenPrice = 1234.56;
-    const gasEstimate = utils.parseEther('0.001');
-    const maxFeePerGas = BigNumber.from('90000');
-    const maxPriorityFeePerGas = BigNumber.from('10000');
+    const gasEstimate = parseEther('0.001');
+    const maxFeePerGas = BigInt('90000');
+    const maxPriorityFeePerGas = BigInt('10000');
     setupMocks(
       MOCK_TOKEN_6_DECIMALS,
       tokenPrice,
@@ -212,11 +218,11 @@ describe('calculate-token-fee', () => {
   });
 
   it('Should error when precision not high enough', async () => {
-    const tokenPrice = 0.00000106;
+    const tokenPrice = 400000000;
     const gasTokenPrice = 1234.56;
-    const gasEstimate = utils.parseEther('0.001');
-    const maxFeePerGas = BigNumber.from('90000');
-    const maxPriorityFeePerGas = BigNumber.from('10000');
+    const gasEstimate = parseEther('0.001');
+    const maxFeePerGas = BigInt('90000');
+    const maxPriorityFeePerGas = BigInt('10000');
     setupMocks(
       MOCK_TOKEN_ADDRESS,
       tokenPrice,
@@ -234,6 +240,9 @@ describe('calculate-token-fee', () => {
       MOCK_TRANSACTION,
     );
     const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails, chain);
-    expect(() => getTokenFee(chain, maximumGas, MOCK_TOKEN_ADDRESS)).to.throw();
+    expect(() => getTokenFee(chain, maximumGas, MOCK_TOKEN_ADDRESS)).to.throw(
+      `Price ratio between token (400000000) and gas token (1234.56)
+      is not precise enough to provide an accurate fee.`,
+    );
   });
 }).timeout(10000);

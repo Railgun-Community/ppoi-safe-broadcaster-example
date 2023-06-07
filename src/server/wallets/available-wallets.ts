@@ -1,4 +1,4 @@
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
@@ -6,7 +6,6 @@ import { resetMapObject } from '../../util/utils';
 import { getCachedGasTokenBalance } from '../balances/balance-cache';
 import configNetworks from '../config/config-networks';
 import debug from 'debug';
-import { BigNumber } from '@ethersproject/bignumber';
 
 const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
@@ -60,7 +59,7 @@ export const isWalletAvailableWithEnoughFunds = async (
 
 export const minimumGasBalanceForAvailability = (
   chain: RelayerChain,
-): BigNumber => {
+): bigint => {
   const { gasToken } = configNetworks[chain.type][chain.id];
   return parseUnits(
     String(gasToken.minBalanceForAvailability),
@@ -75,7 +74,7 @@ export const isBelowMinimumGasTokenBalance = async (
   try {
     const balance = await getCachedGasTokenBalance(chain, wallet.address);
     const minBalance = minimumGasBalanceForAvailability(chain);
-    if (balance.lt(minBalance)) {
+    if (balance < minBalance) {
       return true;
     }
     return false;
