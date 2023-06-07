@@ -130,7 +130,9 @@ export class WakuApiClient {
     if (data.error) {
       throw data.error;
     }
-    const messages: WakuRelayMessage[] = data.result.map(WakuApiClient.fromJSON);
+    const messages: WakuRelayMessage[] = data.result.map(
+      WakuApiClient.fromJSON,
+    );
 
     if (!messages) {
       this.dbg('No messages, got data:', data);

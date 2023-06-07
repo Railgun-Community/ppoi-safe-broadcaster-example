@@ -199,10 +199,8 @@ const replaceErrorMessageNonDev = (
     case ErrorMessage.GAS_PRICE_TOO_LOW:
     case ErrorMessage.MISSING_REQUIRED_FIELD:
     case ErrorMessage.FAILED_QUORUM:
-    case ErrorMessage.REJECTED_PACKAGED_FEE :
-    case ErrorMessage.UNKNOWN_ERROR:
-    case ErrorMessage.FAILED_QUORUM:
     case ErrorMessage.REJECTED_PACKAGED_FEE:
+    case ErrorMessage.UNKNOWN_ERROR:
       return errMsg;
   }
   return ErrorMessage.UNKNOWN_ERROR;
