@@ -1,4 +1,4 @@
-import { FallbackProviderJsonConfig } from '../../../models/provider-models';
+import { FallbackProviderJsonConfig } from '@railgun-community/shared-models';
 
 const config: FallbackProviderJsonConfig = {
   chainId: 56,
@@ -8,16 +8,19 @@ const config: FallbackProviderJsonConfig = {
       priority: 2,
       weight: 2,
       stallTimeout: 2500,
+      disableBatching: true,
     },
     {
       provider: 'https://bsc-dataseed1.defibit.io/',
-      priority: 2,
+      priority: 3,
       weight: 1,
+      disableBatching: true,
     },
     {
       provider: 'https://bsc-dataseed1.ninicoin.io/',
-      priority: 2,
+      priority: 3,
       weight: 1,
+      disableBatching: true,
     },
   ],
 };

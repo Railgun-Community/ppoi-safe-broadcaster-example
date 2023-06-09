@@ -2,9 +2,9 @@ import {
   RailgunProxyContract,
   RelayAdaptContract,
   RailgunProxyDeploymentBlock,
+  FallbackProviderJsonConfig,
 } from '@railgun-community/shared-models';
 import { CoingeckoNetworkID } from './api-constants';
-import { FallbackProviderJsonConfig } from './provider-models';
 import { GasTokenConfig } from './token-models';
 import { FeeConfig } from './fee-config';
 

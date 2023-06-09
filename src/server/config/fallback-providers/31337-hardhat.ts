@@ -1,4 +1,4 @@
-import { FallbackProviderJsonConfig } from '../../../models/provider-models';
+import { FallbackProviderJsonConfig } from '@railgun-community/shared-models';
 
 const config: FallbackProviderJsonConfig = {
   chainId: 31337,

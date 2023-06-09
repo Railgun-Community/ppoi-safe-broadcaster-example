@@ -8,8 +8,8 @@ dependencies:
     specifier: ^1.7.1
     version: 1.7.1
   '@railgun-community/shared-models':
-    specifier: 5.1.8
-    version: 5.1.8(ethers@6.5.1)
+    specifier: 5.1.14
+    version: 5.1.14(ethers@6.5.1)
   '@railgun-community/wallet':
     specifier: 5.1.3
     version: 5.1.3(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.5.1)(react-native@0.71.8)(tslib@2.4.1)
@@ -2566,6 +2566,14 @@ packages:
       - encoding
       - supports-color
       - utf-8-validate
+    dev: false
+
+  /@railgun-community/shared-models@5.1.14(ethers@6.5.1):
+    resolution: {integrity: sha512-wPNtMQhdMN7o6vFioAEbdPNnoWfn4CwMoMuTRpSLS5sM/1Lmr3Hxh/wSZ70yaeUyjNZE10oQ26U8rjiiZmls4A==}
+    peerDependencies:
+      ethers: ^6.5.1
+    dependencies:
+      ethers: 6.5.1
     dev: false
 
   /@railgun-community/shared-models@5.1.8(ethers@6.5.1):
