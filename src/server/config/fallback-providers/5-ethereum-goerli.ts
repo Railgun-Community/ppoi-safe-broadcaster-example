@@ -10,6 +10,18 @@ const config: FallbackProviderJsonConfig = {
       stallTimeout: 2500,
       disableBatching: true,
     },
+    {
+      provider: 'https://endpoints.omniatech.io/v1/eth/goerli/public',
+      priority: 3,
+      weight: 1,
+      disableBatching: true,
+    },
+    {
+      provider: 'https://ethereum-goerli.publicnode.com',
+      priority: 3,
+      weight: 1,
+      disableBatching: true,
+    },
   ],
 };
 

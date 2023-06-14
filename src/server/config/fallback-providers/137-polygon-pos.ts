@@ -13,13 +13,7 @@ const config: FallbackProviderJsonConfig = {
     {
       provider: 'https://rpc.ankr.com/polygon',
       priority: 2,
-      weight: 1,
-      disableBatching: true,
-    },
-    {
-      provider: 'https://rpc-mainnet.maticvigil.com',
-      priority: 3,
-      weight: 1,
+      weight: 2,
       disableBatching: true,
     },
   ],
