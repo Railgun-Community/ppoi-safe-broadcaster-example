@@ -8,11 +8,11 @@ dependencies:
     specifier: ^1.7.1
     version: 1.7.1
   '@railgun-community/shared-models':
-    specifier: 5.1.14
-    version: 5.1.14(ethers@6.5.1)
+    specifier: 5.1.15
+    version: 5.1.15(ethers@6.5.1)
   '@railgun-community/wallet':
-    specifier: 5.1.3
-    version: 5.1.3(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.5.1)(react-native@0.71.8)(tslib@2.4.1)
+    specifier: 5.1.4
+    version: 5.1.4(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.5.1)(react-native@0.71.8)(tslib@2.4.1)
   '@walletconnect/jsonrpc-types':
     specifier: ^1.0.2
     version: 1.0.2
@@ -2543,8 +2543,8 @@ packages:
     resolution: {integrity: sha512-8F5S6nGAZ/xO3mgFegLtwB9dcEs1Hynn+h775or4dFhWNP+Eh6c8N2vrdlkIfLZ+lFIP798lELBrQC0mplXE7A==}
     dev: false
 
-  /@railgun-community/engine@5.0.3(chai@4.3.7):
-    resolution: {integrity: sha512-ltRFVkmcQZxjIDPNF2teZE4JNKO98YX8O39MwFnZjlULD0zgdQN0auPcwHUibHlk6DOKV+kXH98ncDaf6L9rDg==}
+  /@railgun-community/engine@5.0.5(chai@4.3.7):
+    resolution: {integrity: sha512-qIDpgSqeT1Jq3pvxGij33gAB76d6Lkcb6pjUpKZX/64vvkCZxpFd4NVFynZdgU92Ik0s6nmleyejteS/lK9b+w==}
     dependencies:
       '@noble/ed25519': 1.7.1
       '@noble/hashes': 1.3.1
@@ -2568,24 +2568,16 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@railgun-community/shared-models@5.1.14(ethers@6.5.1):
-    resolution: {integrity: sha512-wPNtMQhdMN7o6vFioAEbdPNnoWfn4CwMoMuTRpSLS5sM/1Lmr3Hxh/wSZ70yaeUyjNZE10oQ26U8rjiiZmls4A==}
+  /@railgun-community/shared-models@5.1.15(ethers@6.5.1):
+    resolution: {integrity: sha512-9XUnxcequMhwehKUoYMz4v0VRSXWkTcH9YiA5X5N4NRvRauxuTrOGrRzLPehnSovBmMgJKIkQ/3utoTmcRrpDQ==}
     peerDependencies:
       ethers: ^6.5.1
     dependencies:
       ethers: 6.5.1
     dev: false
 
-  /@railgun-community/shared-models@5.1.8(ethers@6.5.1):
-    resolution: {integrity: sha512-m4P9jGJS0XefMlO1xUgxk4hGpN0FbSxjZZsc48pCbx6nlFrck2TXxr+VNMAsDKV6ohVxQbuxT/AAbpNs8BxvQA==}
-    peerDependencies:
-      ethers: ^6.5.1
-    dependencies:
-      ethers: 6.5.1
-    dev: false
-
-  /@railgun-community/wallet@5.1.3(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.5.1)(react-native@0.71.8)(tslib@2.4.1):
-    resolution: {integrity: sha512-dvZduX4nhpH8A/K1w9YTgfOs2YevYXBiyGfoemZ/BaIWfJ+oMGlgWZuCtNMZlWQRa2L+TM2FCxiq3p942BdERA==}
+  /@railgun-community/wallet@5.1.4(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.5.1)(react-native@0.71.8)(tslib@2.4.1):
+    resolution: {integrity: sha512-vrekab7lMAs9arY6A9HNawhTMJ8R6o9qvd1rvSI56I5jEIc0+u+k/1zwGYNjqoel9l+rj1qtxDRdj12lED4vhQ==}
     peerDependencies:
       ethers: ^6.4.0
     dependencies:
@@ -2599,8 +2591,8 @@ packages:
       '@graphql-mesh/types': 0.91.15(@graphql-mesh/store@0.9.20)(@graphql-tools/utils@9.2.1)(graphql@16.6.0)(tslib@2.4.1)
       '@graphql-mesh/utils': 0.43.23(@graphql-mesh/cross-helpers@0.3.4)(@graphql-mesh/types@0.91.15)(@graphql-tools/utils@9.2.1)(graphql@16.6.0)(tslib@2.4.1)
       '@noble/ed25519': 1.7.1
-      '@railgun-community/engine': 5.0.3(chai@4.3.7)
-      '@railgun-community/shared-models': 5.1.8(ethers@6.5.1)
+      '@railgun-community/engine': 5.0.5(chai@4.3.7)
+      '@railgun-community/shared-models': 5.1.15(ethers@6.5.1)
       '@whatwg-node/fetch': 0.8.5
       axios: 0.27.2(debug@4.3.4)
       brotli: 1.3.3

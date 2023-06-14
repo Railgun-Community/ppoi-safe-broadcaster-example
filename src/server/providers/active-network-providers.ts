@@ -50,9 +50,9 @@ const initNetworkProvider = async (chain: RelayerChain) => {
     chainId: fallbackProviderConfig.chainId,
     providers: [],
   };
-  const possibleProviderJSONs = [...fallbackProviderConfig.providers];
   const availableProviders = await getAvailableProviderJSONs(
-    possibleProviderJSONs,
+    fallbackProviderConfig.chainId,
+    [...fallbackProviderConfig.providers],
     dbg,
   );
   finalConfig.providers = availableProviders;
