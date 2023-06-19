@@ -7,7 +7,6 @@ const config: FallbackProviderJsonConfig = {
       provider: 'https://rpc-mumbai.maticvigil.com',
       priority: 2,
       weight: 2,
-      disableBatching: true,
     },
   ],
 };

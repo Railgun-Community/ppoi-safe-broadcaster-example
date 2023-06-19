@@ -7,20 +7,18 @@ const config: FallbackProviderJsonConfig = {
       provider: 'https://rpc.ankr.com/eth_goerli',
       priority: 2,
       weight: 2,
+      maxLogsPerBatch: 10,
       stallTimeout: 2500,
-      disableBatching: true,
     },
     {
       provider: 'https://endpoints.omniatech.io/v1/eth/goerli/public',
       priority: 3,
       weight: 1,
-      disableBatching: true,
     },
     {
       provider: 'https://ethereum-goerli.publicnode.com',
       priority: 3,
       weight: 1,
-      disableBatching: true,
     },
   ],
 };
