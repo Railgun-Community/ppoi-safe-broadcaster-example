@@ -11,8 +11,8 @@ dependencies:
     specifier: 5.2.1
     version: 5.2.1(ethers@6.6.0)
   '@railgun-community/wallet':
-    specifier: 5.2.2
-    version: 5.2.2(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.6.0)(react-native@0.71.8)(tslib@2.4.1)
+    specifier: 5.2.4
+    version: 5.2.4(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.6.0)(react-native@0.71.8)(tslib@2.4.1)
   '@walletconnect/jsonrpc-types':
     specifier: ^1.0.2
     version: 1.0.2
@@ -2543,8 +2543,8 @@ packages:
     resolution: {integrity: sha512-8F5S6nGAZ/xO3mgFegLtwB9dcEs1Hynn+h775or4dFhWNP+Eh6c8N2vrdlkIfLZ+lFIP798lELBrQC0mplXE7A==}
     dev: false
 
-  /@railgun-community/engine@5.1.1(chai@4.3.7):
-    resolution: {integrity: sha512-Zv2ShWogmOPLgBxAPqSyoCxOkJ/AFoBqJiHWu2kxyPAStO0jklBWUjmk7PisIAZraWhLQRd9t0mYQSN718M9JA==}
+  /@railgun-community/engine@5.1.3(chai@4.3.7):
+    resolution: {integrity: sha512-MWPX1cqkbFybl1KIicD325Ot0+KMXoMEDT91t6YEc/R4E1kh+YTUnEjxcJD6mryp4ZZaElBu4QwLYk7gV85ZrA==}
     dependencies:
       '@noble/ed25519': 1.7.1
       '@noble/hashes': 1.3.1
@@ -2576,8 +2576,8 @@ packages:
       ethers: 6.6.0
     dev: false
 
-  /@railgun-community/wallet@5.2.2(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.6.0)(react-native@0.71.8)(tslib@2.4.1):
-    resolution: {integrity: sha512-p8krgzJDG6wYOj1gwdSaGrBVPRtI7mPMHCvTkmdUkZ6AIMw19rGyMqedDbgS9DK+FUpwD8qN9Kgw+2rfq6TtSA==}
+  /@railgun-community/wallet@5.2.4(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.6.0)(react-native@0.71.8)(tslib@2.4.1):
+    resolution: {integrity: sha512-vr3vOOUl0iaHAjgzL9Cinu+Tp5xjoIpo+aZme93A40xGcfUTCemiHH45Lchk+hBn1fFAhixFhTbuRBfAZmC8Lw==}
     peerDependencies:
       ethers: 6.6.0
     dependencies:
@@ -2591,7 +2591,7 @@ packages:
       '@graphql-mesh/types': 0.91.15(@graphql-mesh/store@0.9.20)(@graphql-tools/utils@9.2.1)(graphql@16.6.0)(tslib@2.4.1)
       '@graphql-mesh/utils': 0.43.23(@graphql-mesh/cross-helpers@0.3.4)(@graphql-mesh/types@0.91.15)(@graphql-tools/utils@9.2.1)(graphql@16.6.0)(tslib@2.4.1)
       '@noble/ed25519': 1.7.1
-      '@railgun-community/engine': 5.1.1(chai@4.3.7)
+      '@railgun-community/engine': 5.1.3(chai@4.3.7)
       '@railgun-community/shared-models': 5.2.1(ethers@6.6.0)
       '@whatwg-node/fetch': 0.8.5
       axios: 0.27.2(debug@4.3.4)
