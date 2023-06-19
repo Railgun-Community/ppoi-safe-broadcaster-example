@@ -14,6 +14,7 @@ const config: FallbackProviderJsonConfig = {
       provider: 'https://polygon-rpc.com',
       priority: 3,
       weight: 2,
+      maxLogsPerBatch: 10,
     },
   ],
 };
