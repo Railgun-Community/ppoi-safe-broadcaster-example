@@ -1,6 +1,7 @@
 *
 
 !scripts
+!patches
 !src
 !package.json
 !package-lock.json

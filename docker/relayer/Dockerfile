@@ -3,7 +3,7 @@ FROM node:lts-bullseye-slim as base
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt install -y --no-install-recommends jq build-essential netcat python3 && rm -rf /var/lib/apt/lists/*
-RUN corepack prepare pnpm@8.2.0 --activate
+RUN corepack prepare pnpm@8.6.3 --activate
 
 ###
 FROM base as buildenv
@@ -13,6 +13,7 @@ FROM base as buildenv
 FROM buildenv as fetch
 WORKDIR /app
 COPY pnpm-lock.yaml ./
+COPY patches ./patches
 
 RUN corepack pnpm fetch
 
@@ -21,6 +22,7 @@ RUN corepack pnpm fetch
 FROM fetch as pnpmi
 WORKDIR /app
 COPY package.json ./
+COPY patches ./patches
 RUN corepack pnpm install --offline --frozen-lockfile
 
 ### compile
@@ -29,6 +31,7 @@ FROM pnpmi as compile
 WORKDIR /app
 COPY src ./src
 COPY ./tsconfig.json ./
+COPY patches ./patches
 
 RUN corepack pnpm tsc && corepack pnpm tsc-alias
 
