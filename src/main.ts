@@ -47,5 +47,12 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
+process.on('unhandledRejection', (err: Error | string) => {
+  dbg('unhandledRejection', err);
+});
+process.on('uncaughtException', (err: Error | string) => {
+  dbg('uncaughtException', err);
+});
+
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();

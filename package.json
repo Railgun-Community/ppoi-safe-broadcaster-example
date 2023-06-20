@@ -72,5 +72,10 @@
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.2",
     "typescript": "^4.9.4"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "ethers@6.6.0": "patches/ethers@6.6.0.patch"
+    }
   }
 }

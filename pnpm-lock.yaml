@@ -1,5 +1,10 @@
 lockfileVersion: '6.0'
 
+patchedDependencies:
+  ethers@6.6.0:
+    hash: ngkeupbmt3akdmyvauz7ztkmty
+    path: patches/ethers@6.6.0.patch
+
 dependencies:
   '@0x/contract-addresses':
     specifier: ^8.0.0
@@ -30,7 +35,7 @@ dependencies:
     version: 1.2.4
   ethers:
     specifier: 6.6.0
-    version: 6.6.0
+    version: 6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty)
   i:
     specifier: ^0.3.7
     version: 0.3.7
@@ -2557,7 +2562,7 @@ packages:
       circomlibjs: github.com/hsg88/circomlibjs/fee5b3c479caa3db1e34cbfdedad763d74277844
       encoding-down: 7.1.0
       ethereum-cryptography: 2.0.0
-      ethers: 6.6.0
+      ethers: 6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty)
       levelup: 5.1.1
       msgpack-lite: 0.1.26
     transitivePeerDependencies:
@@ -2573,7 +2578,7 @@ packages:
     peerDependencies:
       ethers: ^6.5.1
     dependencies:
-      ethers: 6.6.0
+      ethers: 6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty)
     dev: false
 
   /@railgun-community/wallet@5.2.4(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.6.0)(react-native@0.71.8)(tslib@2.4.1):
@@ -2596,7 +2601,7 @@ packages:
       '@whatwg-node/fetch': 0.8.5
       axios: 0.27.2(debug@4.3.4)
       brotli: 1.3.3
-      ethers: 6.6.0
+      ethers: 6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty)
       graphql: 16.6.0
     transitivePeerDependencies:
       - '@graphql-tools/utils'
@@ -5302,7 +5307,7 @@ packages:
       rlp: 2.2.7
     dev: false
 
-  /ethers@6.6.0:
+  /ethers@6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty):
     resolution: {integrity: sha512-7D2U+n8eZYmh592VZqap9vBu50jN7YUDHqAmwBYTMntmUKC9RVgcqcFbd+3DTCOQ1jMyK6QHv1usbcfgiGaHOA==}
     engines: {node: '>=14.0.0'}
     dependencies:
@@ -5317,6 +5322,7 @@ packages:
       - bufferutil
       - utf-8-validate
     dev: false
+    patched: true
 
   /ethjs-unit@0.1.6:
     resolution: {integrity: sha1-xmWSHkduh7ziqdWIpv4EBbLEFpk=}
