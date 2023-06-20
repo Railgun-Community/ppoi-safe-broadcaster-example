@@ -40,20 +40,8 @@ export const BLUECHIP_ETH: AddressToTokenMap = {
 };
 
 export const REN_TOKENS_ETH: AddressToTokenMap = {
-  [TokenAddressEthereum.REN]: {
-    symbol: 'REN',
-  },
   [TokenAddressEthereum.RENBTC]: {
     symbol: 'RENBTC',
-  },
-  [TokenAddressEthereum.RENZEC]: {
-    symbol: 'RENZEC',
-  },
-  [TokenAddressEthereum.RENDOGE]: {
-    symbol: 'RENDOGE',
-  },
-  [TokenAddressEthereum.RENFIL]: {
-    symbol: 'RENFIL',
   },
 };
 
