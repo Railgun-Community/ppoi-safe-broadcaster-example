@@ -24,6 +24,7 @@ import configNetworks from '../../config/config-networks';
 import {
   RelayerEncryptedMethodParams,
   RelayerRawParamsTransact,
+  isDefined,
   versionCompare,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../../util/relayer-version';
@@ -150,7 +151,10 @@ export const transactMethod = async (
       );
     }
 
-    if (!configNetworks[chain.type] || !configNetworks[chain.type][chain.id]) {
+    if (
+      !isDefined(configNetworks[chain.type]) ||
+      !isDefined(configNetworks[chain.type][chain.id])
+    ) {
       return errorResponse(
         id,
         chain,
@@ -191,7 +195,7 @@ const replaceErrorMessageNonDev = (
   errMsg: string,
   devLog?: boolean,
 ): string => {
-  if (devLog) {
+  if (devLog ?? false) {
     return errMsg;
   }
   const knownError = errMsg as ErrorMessage;

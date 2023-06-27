@@ -23,6 +23,7 @@ import {
 import { removeUndefineds } from '../../util/utils';
 import { RelayerChain } from '../../models/chain-models';
 import debug from 'debug';
+import { isDefined } from '@railgun-community/shared-models';
 
 const dbg = debug('relayer:topup');
 
@@ -88,7 +89,7 @@ export const getTopUpERC20AmountsForChain = async (
       try {
         const amount = erc20AmountInGasToken.quote?.buyERC20Amount.amount;
         if (
-          amount &&
+          isDefined(amount) &&
           amount > BigInt(configDefaults.topUps.swapThresholdIntoGasToken)
         ) {
           return shieldedTokenCache.erc20Amount;

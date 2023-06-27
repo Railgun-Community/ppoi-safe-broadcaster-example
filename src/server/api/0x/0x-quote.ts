@@ -5,6 +5,7 @@ import { logger } from '../../../util/logger';
 import { RelayerChain } from '../../../models/chain-models';
 import { getContractAddressesForChainOrThrow } from '@0x/contract-addresses';
 import { parseUnits } from 'ethers';
+import { isDefined } from '@railgun-community/shared-models';
 
 export const ZERO_X_PRICE_DECIMALS = 18;
 
@@ -159,7 +160,7 @@ export const zeroXGetSwapQuote = async (
       sellTokenAddress,
       buyTokenAddress,
     );
-    if (invalidError) {
+    if (isDefined(invalidError)) {
       return { error: invalidError };
     }
 

@@ -5,6 +5,7 @@ import {
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { RelayerChain } from '../../models/chain-models';
 import { JsonRpcProvider } from 'ethers';
+import { isDefined } from '@railgun-community/shared-models';
 
 const HISTORICAL_BLOCK_COUNT = 5;
 const REWARD_PERCENTILES: number[] = [
@@ -55,7 +56,7 @@ export const getFeeHistory = async (
         );
       }
       const headBlock = findHeadBlockInMessage(err.message);
-      if (headBlock) {
+      if (isDefined(headBlock)) {
         return getFeeHistory(chain, headBlock, retryCount + 1);
       }
 

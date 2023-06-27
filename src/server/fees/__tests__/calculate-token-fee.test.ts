@@ -28,6 +28,7 @@ import { initNetworkProviders } from '../../providers/active-network-providers';
 import {
   EVMGasType,
   getEVMGasTypeForTransaction,
+  isDefined,
   NetworkName,
 } from '@railgun-community/shared-models';
 import { parseEther } from 'ethers';
@@ -80,7 +81,11 @@ const setupMocks = (
       updatedAt: Date.now(),
     },
   );
-  if (gasEstimate && maxFeePerGas && maxPriorityFeePerGas) {
+  if (
+    isDefined(gasEstimate) &&
+    isDefined(maxFeePerGas) &&
+    isDefined(maxPriorityFeePerGas)
+  ) {
     stubEstimateGasDetails(gasEstimate, maxFeePerGas, maxPriorityFeePerGas);
   }
 };

@@ -16,10 +16,11 @@ import {
 } from '../wallets/wallet-top-up-poller';
 import { setOnBalanceUpdateCallback } from '@railgun-community/wallet';
 import { onBalanceUpdateCallback } from '../balances/shielded-balance-cache';
+import { isDefined } from '@railgun-community/shared-models';
 
 export const initRelayerModules = async (forTest = false) => {
   if (!forTest) {
-    myConfigOverrides && myConfigOverrides();
+    isDefined(myConfigOverrides) && myConfigOverrides();
   }
   initSettingsDB();
   startEngine();

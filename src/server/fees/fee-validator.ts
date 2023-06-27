@@ -4,6 +4,7 @@ import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
 import configNetworks from '../config/config-networks';
 import { ErrorMessage } from '../../util/errors';
 import { RelayerChain } from '../../models/chain-models';
+import { isDefined } from '@railgun-community/shared-models';
 
 const comparePackagedFeeToCalculated = (
   chain: RelayerChain,
@@ -37,7 +38,7 @@ export const validateFee = (
     feeCacheID,
     tokenAddress,
   );
-  if (cachedUnitTokenFee) {
+  if (isDefined(cachedUnitTokenFee)) {
     if (
       comparePackagedFeeToCalculated(
         chain,

@@ -20,7 +20,11 @@
 // *********************************************
 //
 
-import { ChainType, EVMGasType } from '@railgun-community/shared-models';
+import {
+  ChainType,
+  EVMGasType,
+  isDefined,
+} from '@railgun-community/shared-models';
 import { RelayerChain } from '../../models/chain-models';
 import {
   GasHistoryPercentile,
@@ -198,7 +202,7 @@ export const estimateGasPricesBySpeedUsingHeuristic = async (
 ): Promise<GasDetailsBySpeed> => {
   const provider = getProviderForNetwork(chain);
   const { gasPrice } = await provider.getFeeData();
-  if (!gasPrice) {
+  if (!isDefined(gasPrice)) {
     throw new Error(
       'Could not get current gas price (Type0 or Type1) from provider.',
     );

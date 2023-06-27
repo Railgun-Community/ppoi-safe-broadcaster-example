@@ -17,6 +17,7 @@ import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
 import { createRailgunWallet } from '@railgun-community/wallet';
+import { isDefined } from '@railgun-community/shared-models';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -35,7 +36,7 @@ export const derivationPathForIndex = (index: number) => {
 
 const initRailgunWallet = async (mnemonic: string) => {
   const encryptionKey = configDefaults.engine.dbEncryptionKey;
-  if (!encryptionKey) {
+  if (!isDefined(encryptionKey) || encryptionKey === '') {
     throw new Error(
       'DB_ENCRYPTION_KEY not set (use docker secret, or env-cmdrc for insecure testing)',
     );
