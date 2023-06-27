@@ -14,6 +14,7 @@ import { RelayerChain } from '../../models/chain-models';
 import configDefaults from '../config/config-defaults';
 import {
   getEVMGasTypeForTransaction,
+  isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
 import { ContractTransaction, TransactionResponse } from 'ethers';
@@ -35,7 +36,7 @@ export const generateSwapTransactions = async (
             configNetworks[chain.type][chain.id].gasToken.symbol,
             configDefaults.topUps.toleratedSlippage,
           );
-          if (swapQuote.error) {
+          if (isDefined(swapQuote.error)) {
             throw new Error(swapQuote.error);
           }
           if (!swapQuote.quote) {

@@ -30,7 +30,7 @@ export const getEstimateGasDetailsPublic = async (
     return { gasEstimate, ...gasDetails };
   } catch (err) {
     logger.error(err);
-    if (devLog) {
+    if (devLog ?? false) {
       throw sanitizeRelayerError(err);
     }
     throw new Error(ErrorMessage.GAS_ESTIMATE_ERROR);
@@ -84,7 +84,7 @@ export const getEstimateGasDetailsRelayed = async (
       );
     }
     logger.error(err);
-    if (devLog) {
+    if (devLog ?? false) {
       throw sanitizeRelayerError(err);
     }
     throw new Error(ErrorMessage.GAS_ESTIMATE_ERROR);

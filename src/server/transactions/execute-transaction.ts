@@ -1,6 +1,7 @@
 import {
   EVMGasType,
   TransactionGasDetails,
+  isDefined,
 } from '@railgun-community/shared-models';
 import debug from 'debug';
 import {
@@ -57,7 +58,7 @@ export const getCurrentNonce = async (
     wallet.getNonce(blockTag).catch(throwErr),
     await getSettingsNumber(getLastNonceKey(chain, wallet)),
   ]);
-  if (lastTransactionNonce) {
+  if (isDefined(lastTransactionNonce)) {
     return Math.max(nonce, lastTransactionNonce + 1);
   }
   return nonce;
@@ -150,11 +151,12 @@ export const executeTransaction = async (
 
     setWalletAvailability(activeWallet, chain, true);
 
-    if (err?.message?.includes('Timed out')) {
+    const errMsg: Optional<string> = err?.message;
+    if (isDefined(errMsg) && errMsg.includes('Timed out')) {
       throw new Error(ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR);
     }
 
-    if (err?.message?.includes('Nonce already used')) {
+    if (isDefined(errMsg) && errMsg.includes('Nonce already used')) {
       // Try again with increased nonce.
       return executeTransaction(
         chain,

@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
 import { WakuMessage } from '../waku-relayer/waku-message';
+import { isDefined } from '@railgun-community/shared-models';
 
 export type WakuRelayMessage = {
   contentTopic: string;
@@ -58,10 +59,10 @@ export class WakuApiClient {
   async getDebug(): Promise<string[]> {
     const data = await this.request(WakuRequestMethods.DebugInfo, []);
     const { result, error } = data;
-    if (result) {
+    if (isDefined(result)) {
       return result.listenAddresses;
     }
-    if (error) {
+    if (isDefined(error)) {
       this.dbg(error.message);
     }
     return [];
@@ -108,8 +109,8 @@ export class WakuApiClient {
   static fromJSON(obj: any): WakuRelayMessage {
     const msg: WakuRelayMessage = {
       contentTopic: obj.contentTopic,
-      payload: Buffer.from(obj?.payload || [], 'base64'),
-      version: obj.version || 0,
+      payload: Buffer.from(obj?.payload ?? [], 'base64'),
+      version: obj.version ?? 0,
       timestamp: obj.timestamp ?? undefined,
     };
     return msg;
@@ -127,14 +128,14 @@ export class WakuApiClient {
   ): Promise<WakuRelayMessage[]> {
     const data = await this.request(WakuRequestMethods.GetMessages, [topic]);
 
-    if (data.error) {
+    if (isDefined(data.error)) {
       throw data.error;
     }
     const messages: WakuRelayMessage[] = data.result.map(
       WakuApiClient.fromJSON,
     );
 
-    if (!messages) {
+    if (!isDefined(messages)) {
       this.dbg('No messages, got data:', data);
       return [];
     }
