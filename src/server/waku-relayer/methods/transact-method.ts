@@ -209,6 +209,7 @@ const replaceErrorMessageNonDev = (
     case ErrorMessage.MISSING_REQUIRED_FIELD:
     case ErrorMessage.FAILED_QUORUM:
     case ErrorMessage.REJECTED_PACKAGED_FEE:
+    case ErrorMessage.FAILED_TO_EXTRACT_PACKAGED_FEE:
     case ErrorMessage.UNKNOWN_ERROR:
       return errMsg;
   }
