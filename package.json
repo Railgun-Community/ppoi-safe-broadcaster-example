@@ -30,14 +30,14 @@
   "dependencies": {
     "@0x/contract-addresses": "^8.0.0",
     "@noble/ed25519": "^1.7.1",
-    "@railgun-community/shared-models": "5.2.1",
-    "@railgun-community/wallet": "5.2.4",
+    "@railgun-community/shared-models": "5.2.4",
+    "@railgun-community/wallet": "5.2.11",
     "@walletconnect/jsonrpc-types": "^1.0.2",
     "@walletconnect/jsonrpc-utils": "^1.0.4",
     "axios": "1.2.3",
     "debug": "^4.3.4",
     "docker-secret": "^1.2.4",
-    "ethers": "6.6.0",
+    "ethers": "6.6.2",
     "i": "^0.3.7",
     "leveldown": "^6.1.1",
     "npm": "^9.3.1",
@@ -75,7 +75,7 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "ethers@6.6.0": "patches/ethers@6.6.0.patch"
+      "ethers@6.6.2": "patches/ethers@6.6.2.patch"
     }
   }
 }

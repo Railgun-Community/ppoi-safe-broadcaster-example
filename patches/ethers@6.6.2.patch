@@ -1,12 +1,12 @@
 diff --git a/lib.commonjs/providers/provider-jsonrpc.js b/lib.commonjs/providers/provider-jsonrpc.js
-index a246dca95577b1195d4c8067ddb40540848eb3f9..be22762f5b4126ef9c8d005659b2c4c4c1518a1b 100644
+index 05eab9888ace4a4fdd15a3a230c96cf46888b45b..9c4b169c0224bf9384952f71c9c122b3ae0aa39c 100644
 --- a/lib.commonjs/providers/provider-jsonrpc.js
 +++ b/lib.commonjs/providers/provider-jsonrpc.js
-@@ -644,7 +644,12 @@ class JsonRpcApiProvider extends abstract_provider_js_1.AbstractProvider {
-                 operation: payload.method, info: { error }
+@@ -650,7 +650,12 @@ class JsonRpcApiProvider extends abstract_provider_js_1.AbstractProvider {
+                 operation: payload.method, info: { error, payload }
              });
          }
--        return (0, index_js_5.makeError)("could not coalesce error", "UNKNOWN_ERROR", { error });
+-        return (0, index_js_5.makeError)("could not coalesce error", "UNKNOWN_ERROR", { error, payload });
 +
 +        let url = 'unknown';
 +        if (this instanceof JsonRpcProvider) {

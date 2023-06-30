@@ -1,9 +1,9 @@
 lockfileVersion: '6.0'
 
 patchedDependencies:
-  ethers@6.6.0:
-    hash: ngkeupbmt3akdmyvauz7ztkmty
-    path: patches/ethers@6.6.0.patch
+  ethers@6.6.2:
+    hash: h2oswxww7c5zr3ok6bxgid2qzq
+    path: patches/ethers@6.6.2.patch
 
 dependencies:
   '@0x/contract-addresses':
@@ -13,11 +13,11 @@ dependencies:
     specifier: ^1.7.1
     version: 1.7.1
   '@railgun-community/shared-models':
-    specifier: 5.2.1
-    version: 5.2.1(ethers@6.6.0)
-  '@railgun-community/wallet':
     specifier: 5.2.4
-    version: 5.2.4(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.6.0)(react-native@0.71.8)(tslib@2.4.1)
+    version: 5.2.4(ethers@6.6.2)
+  '@railgun-community/wallet':
+    specifier: 5.2.11
+    version: 5.2.11(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(react-native@0.71.8)(tslib@2.4.1)
   '@walletconnect/jsonrpc-types':
     specifier: ^1.0.2
     version: 1.0.2
@@ -34,8 +34,8 @@ dependencies:
     specifier: ^1.2.4
     version: 1.2.4
   ethers:
-    specifier: 6.6.0
-    version: 6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty)
+    specifier: 6.6.2
+    version: 6.6.2(patch_hash=h2oswxww7c5zr3ok6bxgid2qzq)
   i:
     specifier: ^0.3.7
     version: 0.3.7
@@ -2548,8 +2548,8 @@ packages:
     resolution: {integrity: sha512-8F5S6nGAZ/xO3mgFegLtwB9dcEs1Hynn+h775or4dFhWNP+Eh6c8N2vrdlkIfLZ+lFIP798lELBrQC0mplXE7A==}
     dev: false
 
-  /@railgun-community/engine@5.1.3(chai@4.3.7):
-    resolution: {integrity: sha512-MWPX1cqkbFybl1KIicD325Ot0+KMXoMEDT91t6YEc/R4E1kh+YTUnEjxcJD6mryp4ZZaElBu4QwLYk7gV85ZrA==}
+  /@railgun-community/engine@5.1.12(chai@4.3.7):
+    resolution: {integrity: sha512-p6ks0P0oXDAi09MHs2tavTmxhWWPKBr9NIgj3RBC2e3TRDvpnXUTgSehGMb5eHOedVEgukmKBZ/vjjANBLzOFw==}
     dependencies:
       '@noble/ed25519': 1.7.1
       '@noble/hashes': 1.3.1
@@ -2562,7 +2562,8 @@ packages:
       circomlibjs: github.com/hsg88/circomlibjs/fee5b3c479caa3db1e34cbfdedad763d74277844
       encoding-down: 7.1.0
       ethereum-cryptography: 2.0.0
-      ethers: 6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty)
+      ethers: 6.6.2(patch_hash=h2oswxww7c5zr3ok6bxgid2qzq)
+      fast-text-encoding: 1.0.6
       levelup: 5.1.1
       msgpack-lite: 0.1.26
     transitivePeerDependencies:
@@ -2573,18 +2574,24 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@railgun-community/shared-models@5.2.1(ethers@6.6.0):
-    resolution: {integrity: sha512-taraQAbemKQT6tI0lF010KcDeq9m6bbyIJzMQ1+QiVLO9Ss9hKM0NblNr0gFxIhjA5dB+cmJPg2giU6w8MeBaw==}
+  /@railgun-community/shared-models@5.2.3(ethers@6.6.2):
+    resolution: {integrity: sha512-SzuVCgSwB/aCoeRMU+vjoHvif+PXVVovvyMArJxRkSOY9703QiAyKqqlEecq97WeRx2D0yQteWaOjT80NCHmyQ==}
     peerDependencies:
-      ethers: ^6.5.1
+      ethers: 6.6.2
     dependencies:
-      ethers: 6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty)
+      ethers: 6.6.2(patch_hash=h2oswxww7c5zr3ok6bxgid2qzq)
     dev: false
 
-  /@railgun-community/wallet@5.2.4(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(ethers@6.6.0)(react-native@0.71.8)(tslib@2.4.1):
-    resolution: {integrity: sha512-vr3vOOUl0iaHAjgzL9Cinu+Tp5xjoIpo+aZme93A40xGcfUTCemiHH45Lchk+hBn1fFAhixFhTbuRBfAZmC8Lw==}
+  /@railgun-community/shared-models@5.2.4(ethers@6.6.2):
+    resolution: {integrity: sha512-bYefW7L0ajXW7k1MwAQRYXFkfkE+67onIw6SutHwzBl5om+TZhvnFqy5/yl3f/Qtvt04W/ucsZOatk1PP0SCcw==}
     peerDependencies:
-      ethers: 6.6.0
+      ethers: 6.6.2
+    dependencies:
+      ethers: 6.6.2(patch_hash=h2oswxww7c5zr3ok6bxgid2qzq)
+    dev: false
+
+  /@railgun-community/wallet@5.2.11(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(react-native@0.71.8)(tslib@2.4.1):
+    resolution: {integrity: sha512-vMiBDpaxJhVYjo3ytH+CmKWKvzVIIqBjRZXD+TuA/c3difYGq1FPkfxPE6UNBy9hoK/cg1+tH9+s67AefcEvGA==}
     dependencies:
       '@graphql-mesh/cache-localforage': 0.7.20(@graphql-mesh/types@0.91.15)(@graphql-mesh/utils@0.43.23)(graphql@16.6.0)(tslib@2.4.1)
       '@graphql-mesh/cross-helpers': 0.3.4(@graphql-tools/utils@9.2.1)(graphql@16.6.0)(react-native@0.71.8)
@@ -2596,12 +2603,12 @@ packages:
       '@graphql-mesh/types': 0.91.15(@graphql-mesh/store@0.9.20)(@graphql-tools/utils@9.2.1)(graphql@16.6.0)(tslib@2.4.1)
       '@graphql-mesh/utils': 0.43.23(@graphql-mesh/cross-helpers@0.3.4)(@graphql-mesh/types@0.91.15)(@graphql-tools/utils@9.2.1)(graphql@16.6.0)(tslib@2.4.1)
       '@noble/ed25519': 1.7.1
-      '@railgun-community/engine': 5.1.3(chai@4.3.7)
-      '@railgun-community/shared-models': 5.2.1(ethers@6.6.0)
+      '@railgun-community/engine': 5.1.12(chai@4.3.7)
+      '@railgun-community/shared-models': 5.2.3(ethers@6.6.2)
       '@whatwg-node/fetch': 0.8.5
       axios: 0.27.2(debug@4.3.4)
       brotli: 1.3.3
-      ethers: 6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty)
+      ethers: 6.6.2(patch_hash=h2oswxww7c5zr3ok6bxgid2qzq)
       graphql: 16.6.0
     transitivePeerDependencies:
       - '@graphql-tools/utils'
@@ -5307,8 +5314,8 @@ packages:
       rlp: 2.2.7
     dev: false
 
-  /ethers@6.6.0(patch_hash=ngkeupbmt3akdmyvauz7ztkmty):
-    resolution: {integrity: sha512-7D2U+n8eZYmh592VZqap9vBu50jN7YUDHqAmwBYTMntmUKC9RVgcqcFbd+3DTCOQ1jMyK6QHv1usbcfgiGaHOA==}
+  /ethers@6.6.2(patch_hash=h2oswxww7c5zr3ok6bxgid2qzq):
+    resolution: {integrity: sha512-vyWfVAj2g7xeZIivOqlbpt7PbS2MzvJkKgsncgn4A/1xZr8Q3BznBmEBRQyPXKCgHmX4PzRQLpnYG7jl/yutMg==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.9.2
@@ -5499,6 +5506,10 @@ packages:
     resolution: {integrity: sha512-qR2r+e3HvhEFmpdHMv//U8FnFlnYjaC6QKDuaXALDkw2kvHO8WDjxH+f/rHGR4Me4pnk8p9JAkRNTjYHAKRn2Q==}
     dependencies:
       fast-decode-uri-component: 1.0.1
+    dev: false
+
+  /fast-text-encoding@1.0.6:
+    resolution: {integrity: sha512-VhXlQgj9ioXCqGstD37E/HBeqEGV/qOD/kmbVG8h5xKBYvM1L3lR1Zn4555cQ8GkYbJa8aJSipLPndE1k6zK2w==}
     dev: false
 
   /fast-url-parser@1.1.3:

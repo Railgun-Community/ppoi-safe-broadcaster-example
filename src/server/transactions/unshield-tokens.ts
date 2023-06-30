@@ -14,7 +14,7 @@ import { ERC20Amount } from '../../models/token-models';
 import { getStandardGasDetails } from '../fees/gas-by-speed';
 import { getEstimateGasDetailsPublic } from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
-import { TransactionResponse } from 'ethers';
+import { ContractTransaction, TransactionResponse } from 'ethers';
 
 export const generateUnshieldTransaction = async (
   railgunWalletID: string,
@@ -22,7 +22,7 @@ export const generateUnshieldTransaction = async (
   toWalletAddress: string,
   erc20Amounts: ERC20Amount[],
   chain: RelayerChain,
-) => {
+): Promise<ContractTransaction> => {
   const network = networkForChain(chain);
   if (!network) {
     throw new Error(`Unsupported network for chain ${chain.type}:${chain.id}`);
