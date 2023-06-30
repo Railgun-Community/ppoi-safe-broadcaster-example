@@ -25,13 +25,18 @@ export const extractPackagedFeeFromTransaction = async (
 
   const railgunWalletID = getRailgunWalletID();
 
-  const firstNoteERC20Map =
-    await extractFirstNoteERC20AmountMapFromTransactionRequest(
-      railgunWalletID,
-      network,
-      transaction,
-      useRelayAdapt,
-    );
+  let firstNoteERC20Map;
+  try {
+    firstNoteERC20Map =
+      await extractFirstNoteERC20AmountMapFromTransactionRequest(
+        railgunWalletID,
+        network,
+        transaction,
+        useRelayAdapt,
+      );
+  } catch (err) {
+    throw new Error(ErrorMessage.FAILED_TO_EXTRACT_PACKAGED_FEE);
+  }
 
   const tokens = Object.keys(firstNoteERC20Map);
   if (tokens.length < 1) {

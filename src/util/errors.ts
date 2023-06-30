@@ -11,6 +11,7 @@ export enum ErrorMessage {
   NO_RELAYER_FEE = 'No Relayer Fee included in transaction.',
   UNKNOWN_ERROR = 'Unknown Relayer error.',
   REJECTED_PACKAGED_FEE = 'Network Gas Price has changed dramatically and the Relayer Fee was rejected.',
+  FAILED_TO_EXTRACT_PACKAGED_FEE = 'Failed to extract Relayer Fee from transaction. Please try again.',
 }
 
 const sanitizeEthersError = (errMessage: string) => {
