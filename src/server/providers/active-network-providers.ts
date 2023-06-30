@@ -9,7 +9,7 @@ import {
   isDefined,
 } from '@railgun-community/shared-models';
 import debug from 'debug';
-import { FallbackProvider } from 'ethers';
+import { FallbackProvider, JsonRpcProvider } from 'ethers';
 
 const dbg = debug('relayer:networks');
 
@@ -74,4 +74,12 @@ export const getProviderForNetwork = (
     throw new Error(`No active provider for chain ${chain.type}:${chain.id}.`);
   }
   return provider;
+};
+
+export const getFirstJsonRpcProviderForNetwork = (
+  chain: RelayerChain,
+): JsonRpcProvider => {
+  const fallbackProvider = getProviderForNetwork(chain);
+  return fallbackProvider.provider.providerConfigs[0]
+    .provider as JsonRpcProvider;
 };

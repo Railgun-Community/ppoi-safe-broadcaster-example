@@ -20,7 +20,7 @@ import {
   calculateGasLimitRelayer,
   calculateMaximumGasRelayer,
 } from '../fees/gas-estimate';
-import { getProviderForNetwork } from '../providers/active-network-providers';
+import { getFirstJsonRpcProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
 import { setWalletAvailability } from '../wallets/available-wallets';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
@@ -85,7 +85,7 @@ export const executeTransaction = async (
   const activeWallet =
     wallet ?? (await getBestMatchWalletForNetwork(chain, maximumGas));
 
-  const provider = getProviderForNetwork(chain);
+  const provider = getFirstJsonRpcProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(activeWallet, provider);
   const nonce = overrideNonce ?? (await getCurrentWalletNonce(ethersWallet));
   const gasLimit = calculateGasLimitRelayer(gasDetails.gasEstimate, chain);
