@@ -54,7 +54,7 @@ services:
     depends_on:
       - swag
     healthcheck:
-      test: curl --fail http://localhost:8546 || exit 1
+      test: curl --fail http://localhost:8547 || exit 1
       interval: 30s
       retries: 4
       start_period: 10s
