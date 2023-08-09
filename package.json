@@ -1,6 +1,6 @@
 {
   "name": "@railgun-community/relayer",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "",
   "main": "dist/main.js",
   "packageManager": "pnpm@8.6.3",
