@@ -33,6 +33,8 @@ import {
   testChainGoerli,
 } from '../../../../test/setup.test';
 import { startEngine } from '../../../engine/engine-init';
+import configDefaults from '../../../config/config-defaults';
+import { testConfig } from '../../../../test/test-config.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -68,6 +70,8 @@ const validatePriceRefresherOutput = (chain: RelayerChain) => {
 describe('0x-price', () => {
   before(async () => {
     startEngine();
+
+    configDefaults.api.zeroXApiKey = testConfig.zeroXApiKey;
 
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
     configNetworks[chainGoerli.type][chainGoerli.id] = goerliNetwork;

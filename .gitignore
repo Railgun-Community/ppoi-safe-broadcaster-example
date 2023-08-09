@@ -29,6 +29,7 @@ run-dev.sh
 start-relayer.sh
 src/MY-CONFIG.ts
 docker/secret
+src/test/test-config-overrides.test.ts
 
 # Leveldown database
 *.db/
