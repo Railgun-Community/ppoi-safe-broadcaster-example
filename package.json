@@ -37,7 +37,7 @@
     "axios": "1.2.3",
     "debug": "^4.3.4",
     "docker-secret": "^1.2.4",
-    "ethers": "github:Railgun-Community/ethers.js#v6.7.2",
+    "ethers": "github:Railgun-Community/ethers.js#v6.7.3",
     "i": "^0.3.7",
     "leveldown": "^6.1.1",
     "npm": "^9.3.1",
