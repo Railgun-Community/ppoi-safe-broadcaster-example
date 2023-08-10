@@ -8,11 +8,11 @@ dependencies:
     specifier: ^1.7.1
     version: 1.7.1
   '@railgun-community/shared-models':
-    specifier: 5.3.0
-    version: 5.3.0(ethers@6.7.4)
+    specifier: 5.3.4
+    version: 5.3.4(ethers@6.7.5)
   '@railgun-community/wallet':
-    specifier: 5.5.0
-    version: 5.5.0(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(react-native@0.71.8)(tslib@2.4.1)
+    specifier: 5.5.5
+    version: 5.5.5(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(react-native@0.71.8)(tslib@2.4.1)
   '@walletconnect/jsonrpc-types':
     specifier: ^1.0.2
     version: 1.0.2
@@ -29,8 +29,8 @@ dependencies:
     specifier: ^1.2.4
     version: 1.2.4
   ethers:
-    specifier: github:Railgun-Community/ethers.js#v6.7.3
-    version: github.com/Railgun-Community/ethers.js/1fdd1b5705d3a44e407fa9eb00f7946fe4ac58f1
+    specifier: github:Railgun-Community/ethers.js#v6.7.5
+    version: github.com/Railgun-Community/ethers.js/1c5f6181ca4edfbe84e5afecb7cd9addc2284b1c
   i:
     specifier: ^0.3.7
     version: 0.3.7
@@ -2543,8 +2543,8 @@ packages:
     resolution: {integrity: sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==}
     dev: false
 
-  /@railgun-community/engine@5.2.0(chai@4.3.7):
-    resolution: {integrity: sha512-1bFza9ozugyp0mjNZAzm+36ni9JducSTCVfuwD4K3V82TAdih/cvkctgfDD3QmkjK5YnjG24uuM5h7XObm7DDA==}
+  /@railgun-community/engine@5.2.6(chai@4.3.7):
+    resolution: {integrity: sha512-+v4bIo8Iob5ux/BHBdStw/9kyXFvtfHZmXaCLLE3GMHSoRtcYMd/8WkS0a1TjKL5X/68YwGjgtbxN+eoFnNiMw==}
     dependencies:
       '@noble/ed25519': 1.7.1
       '@noble/hashes': 1.3.1
@@ -2558,7 +2558,7 @@ packages:
       circomlibjs: github.com/hsg88/circomlibjs/fee5b3c479caa3db1e34cbfdedad763d74277844
       encoding-down: 7.1.0
       ethereum-cryptography: 2.0.0
-      ethers: github.com/Railgun-Community/ethers.js/0427e0f47e2a9fb0e90885cfa1b5cbd9d829c21d
+      ethers: github.com/Railgun-Community/ethers.js/1c5f6181ca4edfbe84e5afecb7cd9addc2284b1c
       fast-text-encoding: 1.0.6
       levelup: 5.1.1
       msgpack-lite: 0.1.26
@@ -2570,24 +2570,16 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@railgun-community/shared-models@5.3.0(ethers@6.7.2):
-    resolution: {integrity: sha512-KZXAdxDdjhlGZNsM26usUrIA1o16hTrWKlVse7E1bbPlPeFnZfobC4mEHJhf/X5l/hepKDXKwfH85VPZEKFd0g==}
+  /@railgun-community/shared-models@5.3.4(ethers@6.7.5):
+    resolution: {integrity: sha512-4BkOXwIaOGoSp/Qok8oAlAdSMtWPnd4eWk8CLw321wn6jPmOBxJZ8zxCmT8FFOhOu+C3SSXti6TQigy/8XUl3w==}
     peerDependencies:
-      ethers: github:Railgun-Community/ethers.js#v6.7.2
+      ethers: github:Railgun-Community/ethers.js#v6.7.5
     dependencies:
-      ethers: github.com/Railgun-Community/ethers.js/0427e0f47e2a9fb0e90885cfa1b5cbd9d829c21d
+      ethers: github.com/Railgun-Community/ethers.js/1c5f6181ca4edfbe84e5afecb7cd9addc2284b1c
     dev: false
 
-  /@railgun-community/shared-models@5.3.0(ethers@6.7.4):
-    resolution: {integrity: sha512-KZXAdxDdjhlGZNsM26usUrIA1o16hTrWKlVse7E1bbPlPeFnZfobC4mEHJhf/X5l/hepKDXKwfH85VPZEKFd0g==}
-    peerDependencies:
-      ethers: github:Railgun-Community/ethers.js#v6.7.2
-    dependencies:
-      ethers: github.com/Railgun-Community/ethers.js/1fdd1b5705d3a44e407fa9eb00f7946fe4ac58f1
-    dev: false
-
-  /@railgun-community/wallet@5.5.0(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(react-native@0.71.8)(tslib@2.4.1):
-    resolution: {integrity: sha512-4B+rjq7Kw1MZPWQjJR0NqKokWGuA9k0iLNtDQ0ZHlTkyGa8KxV0mn6J5N2O3T4e5Pbz0n2dJvwfH/RxAnV4JLw==}
+  /@railgun-community/wallet@5.5.5(@graphql-tools/utils@9.2.1)(@types/node@18.11.18)(chai@4.3.7)(debug@4.3.4)(react-native@0.71.8)(tslib@2.4.1):
+    resolution: {integrity: sha512-uhrgypG+HVTjdSfjkh+/9IUK8u6Ps8D+y3ut5MiB1/4/njOi5D5bd0E2lEueHhFOVW0KkuOh70QNmSwL5K8jFA==}
     requiresBuild: true
     dependencies:
       '@graphql-mesh/cache-localforage': 0.7.20(@graphql-mesh/types@0.91.15)(@graphql-mesh/utils@0.43.23)(graphql@16.6.0)(tslib@2.4.1)
@@ -2600,8 +2592,8 @@ packages:
       '@graphql-mesh/types': 0.91.15(@graphql-mesh/store@0.9.20)(@graphql-tools/utils@9.2.1)(graphql@16.6.0)(tslib@2.4.1)
       '@graphql-mesh/utils': 0.43.23(@graphql-mesh/cross-helpers@0.3.4)(@graphql-mesh/types@0.91.15)(@graphql-tools/utils@9.2.1)(graphql@16.6.0)(tslib@2.4.1)
       '@noble/ed25519': 1.7.1
-      '@railgun-community/engine': 5.2.0(chai@4.3.7)
-      '@railgun-community/shared-models': 5.3.0(ethers@6.7.2)
+      '@railgun-community/engine': 5.2.6(chai@4.3.7)
+      '@railgun-community/shared-models': 5.3.4(ethers@6.7.5)
       '@whatwg-node/fetch': 0.8.5
       assert: 2.0.0
       axios: 0.27.2(debug@4.3.4)
@@ -2609,7 +2601,7 @@ packages:
       buffer: 6.0.3
       crypto-browserify: 3.12.0
       ethereum-cryptography: 2.0.0
-      ethers: github.com/Railgun-Community/ethers.js/0427e0f47e2a9fb0e90885cfa1b5cbd9d829c21d
+      ethers: github.com/Railgun-Community/ethers.js/1c5f6181ca4edfbe84e5afecb7cd9addc2284b1c
       events: 3.3.0
       graphql: 16.6.0
       stream-browserify: 3.0.0
@@ -10702,28 +10694,10 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  github.com/Railgun-Community/ethers.js/0427e0f47e2a9fb0e90885cfa1b5cbd9d829c21d:
-    resolution: {tarball: https://codeload.github.com/Railgun-Community/ethers.js/tar.gz/0427e0f47e2a9fb0e90885cfa1b5cbd9d829c21d}
+  github.com/Railgun-Community/ethers.js/1c5f6181ca4edfbe84e5afecb7cd9addc2284b1c:
+    resolution: {tarball: https://codeload.github.com/Railgun-Community/ethers.js/tar.gz/1c5f6181ca4edfbe84e5afecb7cd9addc2284b1c}
     name: ethers
-    version: 6.7.2
-    engines: {node: '>=14.0.0'}
-    dependencies:
-      '@adraffy/ens-normalize': 1.9.2
-      '@noble/hashes': 1.1.2
-      '@noble/secp256k1': 1.7.1
-      '@types/node': 18.15.13
-      aes-js: 4.0.0-beta.5
-      tslib: 2.4.0
-      ws: 8.5.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false
-
-  github.com/Railgun-Community/ethers.js/1fdd1b5705d3a44e407fa9eb00f7946fe4ac58f1:
-    resolution: {tarball: https://codeload.github.com/Railgun-Community/ethers.js/tar.gz/1fdd1b5705d3a44e407fa9eb00f7946fe4ac58f1}
-    name: ethers
-    version: 6.7.4
+    version: 6.7.5
     engines: {node: '>=14.0.0'}
     dependencies:
       '@adraffy/ens-normalize': 1.9.2
