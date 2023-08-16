@@ -2,6 +2,8 @@
 export let testConfig = {
   // OVERRIDES - override using test-config-overrides.ts
 
+  // API Domain for a proxy server equipped with 0x nginx config that includes private API key.
+  zeroXProxyApiDomain: process.env.ZERO_X_PROXY_API_DOMAIN ?? '',
   // API Key for 0x API.
   zeroXApiKey: process.env.ZERO_X_API_KEY ?? '',
 };
