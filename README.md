@@ -1,4 +1,4 @@
-[![Node.js CI Actions Status](https://github.com/Railgun-Community/relayer/actions/workflows/unit-tests.yml/badge.svg?branch=master)](https://github.com/Railgun-Community/relayer/actions)
+[![Unit Tests](https://github.com/Railgun-Community/relayer/actions/workflows/unit-tests.yml/badge.svg?branch=master)](https://github.com/Railgun-Community/relayer/actions)
 
 # Transaction anonymizing relayer for RAILGUN
 
