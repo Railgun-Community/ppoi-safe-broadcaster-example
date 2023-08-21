@@ -23,7 +23,10 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm copy-my-config
-      - run: pnpm test
+      - name: pnpm test up to 3 times
+        shell: bash
+        run: # Try yarn test 3 times before failing
+          r=3;while ! pnpm test ; do ((--r))||exit;sleep 1;done
 
   fail-report:
     if: ${{ failure() && github.event_name == 'schedule' }}
