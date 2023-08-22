@@ -4,21 +4,17 @@ const config: FallbackProviderJsonConfig = {
   chainId: 5,
   providers: [
     {
-      provider: 'https://rpc.ankr.com/eth_goerli',
+      provider: 'https://ethereum-goerli.publicnode.com',
       priority: 2,
       weight: 2,
-      maxLogsPerBatch: 1, // Supports up to 10, but at 1 ethers handles getLogs differently, and this seems to be more stable.
+      maxLogsPerBatch: 10,
       stallTimeout: 2500,
     },
     {
-      provider: 'https://endpoints.omniatech.io/v1/eth/goerli/public',
-      priority: 3,
-      weight: 1,
-    },
-    {
-      provider: 'https://ethereum-goerli.publicnode.com',
-      priority: 3,
-      weight: 1,
+      provider: 'https://rpc.ankr.com/eth_goerli',
+      priority: 2,
+      weight: 2,
+      maxLogsPerBatch: 10,
     },
   ],
 };
