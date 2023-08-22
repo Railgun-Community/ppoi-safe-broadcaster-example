@@ -109,7 +109,7 @@ describe('0x-price', () => {
     expect(zeroXPriceData).to.be.an('object');
     expect(zeroXPriceData.price).to.be.a('string');
     expect(parseFloat(zeroXPriceData.price)).to.be.a('number');
-  }).timeout(20000);
+  }).timeout(5000);
 
   it('Should format prices from mock ZeroX response', async () => {
     const stubGetZeroXData = sinon

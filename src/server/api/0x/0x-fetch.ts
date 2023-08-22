@@ -92,6 +92,10 @@ export const getZeroXData = async <T>(
 ): Promise<T> => {
   const url = createUrl(endpoint, chain, params);
   const apiKey = configDefaults.api.zeroXApiKey;
+  if (!apiKey) {
+    throw new Error('Requires 0x API Key for prices/quotes.');
+  }
+
   try {
     const rsp = await axios.get(url, {
       method: 'GET',

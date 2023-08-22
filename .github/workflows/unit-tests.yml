@@ -26,7 +26,7 @@ jobs:
       - name: pnpm test up to 3 times
         shell: bash
         run: # Try yarn test 3 times before failing
-          r=3;while ! pnpm test ; do ((--r))||exit;sleep 1;done
+          r=3;while ! env ZERO_X_API_KEY=${{ secrets.ZERO_X_API_KEY }} pnpm test ; do ((--r))||exit;sleep 1;done
 
   fail-report:
     if: ${{ failure() && github.event_name == 'schedule' }}
