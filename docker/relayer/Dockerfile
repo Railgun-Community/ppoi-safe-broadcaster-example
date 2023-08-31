@@ -3,52 +3,40 @@ FROM node:lts-bullseye-slim as base
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt install -y --no-install-recommends jq build-essential netcat python3 && rm -rf /var/lib/apt/lists/*
-RUN corepack prepare pnpm@8.6.3 --activate
-
-###
-FROM base as buildenv
-
-### fetch
-# fetch packages from network for later offline use
-FROM buildenv as fetch
-WORKDIR /app
-COPY pnpm-lock.yaml ./
-COPY patches ./patches
-
-RUN corepack pnpm fetch
+RUN corepack prepare yarn@1.22.19 --activate
 
 ### install
 # install from lockfile; wont change unless packages have
-FROM fetch as pnpmi
+FROM base as buildenv
 WORKDIR /app
+
 COPY package.json ./
-COPY patches ./patches
-RUN corepack pnpm install --offline --frozen-lockfile
+COPY yarn.lock ./
+# COPY patches ./patches
+RUN corepack yarn install
 
 ### compile
 # compile typescript to /dist
-FROM pnpmi as compile
+FROM buildenv as compile
 WORKDIR /app
+
 COPY src ./src
 COPY ./tsconfig.json ./
-COPY patches ./patches
+# COPY patches ./patches
 
-RUN corepack pnpm tsc && corepack pnpm tsc-alias
+RUN corepack yarn tsc && corepack yarn tsc-alias
 
-FROM compile as pnpmi-prod
+FROM compile as build-prod
 WORKDIR /app
 
-RUN corepack pnpm install --prod --offline --frozen-lockfile
+RUN corepack yarn install
 
 ### prod
 # copy compiled source and prod dependencies and run
 FROM base as prod
-
 WORKDIR /app
 
 COPY --from=compile /app/dist ./dist
-COPY --from=pnpmi-prod /app/node_modules ./node_modules
-COPY package.json pnpm-lock.yaml ./
+COPY --from=build-prod /app/node_modules ./node_modules
+COPY package.json yarn.lock ./
 COPY scripts ./scripts
-
-CMD corepack pnpm run start
