@@ -12,15 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8.5
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm copy-my-config
-      - name: pnpm test
+          cache: 'yarn'
+      - run: yarn install
+      - run: yarn copy-my-config
+      - name: yarn test
         shell: bash
-        run: env ZERO_X_API_KEY=${{ secrets.ZERO_X_API_KEY }} pnpm test
+        run: env ZERO_X_API_KEY=${{ secrets.ZERO_X_API_KEY }} yarn test
