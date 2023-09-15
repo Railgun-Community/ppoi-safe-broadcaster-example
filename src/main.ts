@@ -23,7 +23,10 @@ const main = async (): Promise<void> => {
   // Note that this default can be overridden in initRelayerModules().
   dbg(`Connecting to ${config.waku.rpcURL}`);
 
-  const client = new WakuApiClient({ url: config.waku.rpcURL });
+  const client = new WakuApiClient({
+    url: config.waku.rpcURL,
+    urlBackup: config.waku.rpcURLBackup,
+  });
   const options: WakuRelayerOptions = {
     topic: config.waku.pubSubTopic,
     feeExpiration: config.transactionFees.feeExpirationInMS,
