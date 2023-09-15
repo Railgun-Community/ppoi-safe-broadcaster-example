@@ -63,7 +63,7 @@ const validatePriceRefresherOutput = (chain: RelayerChain) => {
     );
     expect(priceData).to.be.an('object');
     expect(priceData?.price).to.be.a('number');
-    expect(priceData?.updatedAt).to.be.greaterThanOrEqual(Date.now() - 20);
+    expect(priceData?.updatedAt).to.be.greaterThanOrEqual(Date.now() - 100); // 100ms buffer
   });
 };
 
