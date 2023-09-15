@@ -20,6 +20,7 @@ import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { testChainEthereum } from '../../../test/setup.test';
+import { ErrorMessage } from '../../../util/errors';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -132,7 +133,7 @@ describe('best-match-wallet', () => {
 
     await expect(
       getBestMatchWalletForNetwork(MOCK_CHAIN, 100n),
-    ).to.be.rejectedWith('All wallets busy or out of funds.');
+    ).to.be.rejectedWith(ErrorMessage.RELAYER_OUT_OF_GAS);
   }).timeout(10000);
 
   it('Should error if all wallets out of funds', async () => {
@@ -150,6 +151,6 @@ describe('best-match-wallet', () => {
 
     await expect(
       getBestMatchWalletForNetwork(MOCK_CHAIN, 10n ** 19n),
-    ).to.be.rejectedWith('All wallets busy or out of funds.');
+    ).to.be.rejectedWith(ErrorMessage.RELAYER_OUT_OF_GAS);
   }).timeout(10000);
 }).timeout(20000);

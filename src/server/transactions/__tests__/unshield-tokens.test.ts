@@ -41,7 +41,7 @@ const MOCK_TOKEN_AMOUNT_1 = {
   amount: BigInt('100000000000000'),
 };
 const MOCK_TOKEN_AMOUNT_2 = {
-  tokenAddress: 'xyz',
+  tokenAddress: MOCK_TOKEN_ADDRESS,
   amount: BigInt('200000000000000'),
 };
 
@@ -89,15 +89,17 @@ describe('unshield-tokens', () => {
   });
 
   it('Should fail with insufficient token balance', async () => {
-    await expect(
-      generateUnshieldTransaction(
-        railgunWalletID,
-        configDefaults.engine.dbEncryptionKey,
-        activeWallet.address,
-        [MOCK_TOKEN_AMOUNT_2],
-        MOCK_CHAIN,
-      ),
-    ).to.be.rejectedWith('');
+    const populatedTransaction = generateUnshieldTransaction(
+      railgunWalletID,
+      configDefaults.engine.dbEncryptionKey,
+      activeWallet.address,
+      [MOCK_TOKEN_AMOUNT_2],
+      MOCK_CHAIN,
+    );
+
+    await expect(populatedTransaction).to.be.rejectedWith(
+      `RAILGUN private token balance too low for ${MOCK_TOKEN_AMOUNT_2.tokenAddress.toLowerCase()}. Amount required: ${MOCK_TOKEN_AMOUNT_2.amount.toString()}. Balance: 0.`,
+    );
   });
 
   it.skip(

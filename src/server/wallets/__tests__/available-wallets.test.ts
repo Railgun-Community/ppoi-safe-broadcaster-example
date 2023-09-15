@@ -17,6 +17,7 @@ import {
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
+import { delay } from '../../../util/promise-utils';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -28,6 +29,7 @@ describe('available-wallets', () => {
     startEngine();
     await setupSingleTestWallet();
     await initNetworkProviders([chain]);
+    await delay(500);
     resetGasTokenBalanceCache();
     createGasBalanceStub(BigInt('100000000000000000000000000000000000'));
   });

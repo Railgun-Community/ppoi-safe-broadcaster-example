@@ -80,7 +80,7 @@ const chain = testChainEthereum();
 
 // eslint-disable-next-line require-await
 const handleHTTPPost = async (url: string, data?: unknown) => {
-  expect(url).to.equal('/');
+  expect(url).to.equal('');
   requestData = data as JsonRpcRequest;
   return { data: { result: {} } } as unknown as JsonRpcResult;
 };
@@ -99,7 +99,7 @@ describe('waku-relayer', () => {
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
 
-    client = new WakuApiClient({ url: '' });
+    client = new WakuApiClient({ url: '', urlBackup: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
     wakuRelayer = await WakuRelayer.init(client, {
       topic: configDefaults.waku.pubSubTopic,
@@ -283,7 +283,7 @@ describe('waku-relayer', () => {
     // After transact-response sent.
     expect(clientHTTPStub.calledOnce).to.be.true;
     const postCall = clientHTTPStub.getCall(0);
-    expect(postCall.args[0]).to.equal('/');
+    expect(postCall.args[0]).to.equal('');
     const rpcArgs = postCall.args[1];
     expect(rpcArgs.id).to.be.a('number');
     expect(rpcArgs.method).to.equal(WakuRequestMethods.PublishMessage);

@@ -66,15 +66,17 @@ describe('balance-cache', () => {
   });
 
   it('Should only refresh balances when necessary', async () => {
-    configDefaults.balances.gasTokenBalanceCacheTTLInMS = 10;
+    configDefaults.balances.gasTokenBalanceCacheTTLInMS = 1000;
     expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.true;
     await updateCachedGasTokenBalance(MOCK_CHAIN, MOCK_WALLET_ADDRESS);
     expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.false;
 
-    await delay(15);
-    expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.true;
-
+    await delay(1500);
+    const shouldUpdate = shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS);
+    expect(shouldUpdate).to.be.true;
+    await delay(1500);
     await getCachedGasTokenBalance(MOCK_CHAIN, MOCK_WALLET_ADDRESS);
+    await delay(100);
     expect(shouldUpdateEthWalletBalance(MOCK_WALLET_ADDRESS)).to.be.false;
   });
 }).timeout(30000);
