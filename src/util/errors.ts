@@ -5,13 +5,19 @@ export enum ErrorMessage {
   FAILED_QUORUM = 'Gas Price was rejected as too low to guarantee inclusion into the next block.',
   GAS_PRICE_TOO_LOW = 'Gas price rejected as too low.',
   GAS_ESTIMATE_ERROR = 'Gas estimate error. Possible connection failure.',
+  GAS_ESTIMATE_REVERT = 'Gas estimate error. Possible connection failure. Please try again.',
   TRANSACTION_SEND_TIMEOUT_ERROR = `WARNING: Timed out while sending to the blockchain. The transaction may be processing on-chain, but we can't find the receipt. This can occur when a Relayer has a connection issue. You will not see this transaction in your history, but your balance will reflect it if successful. We recommend waiting at least 15 minutes before trying again.`,
+  TRANSACTION_SEND_RPC_ERROR = `WARNING: Relayer received an error while sending the transaction, The transaction may still be processing on-chain, but we can't find the receipt. This can occur when a Relayer has a connection issue. Your balance should reflect it if successful.  We recommend waiting at least 15 minutes before trying again.`,
+  REPEAT_TRANSACTION = 'Transaction has already been sent.',
   UNSUPPORTED_NETWORK = `Relayer does not support this network.`,
   MISSING_REQUIRED_FIELD = `Missing required field.`,
   NO_RELAYER_FEE = 'No Relayer Fee included in transaction.',
   UNKNOWN_ERROR = 'Unknown Relayer error.',
   REJECTED_PACKAGED_FEE = 'Network Gas Price has changed dramatically and the Relayer Fee was rejected.',
   FAILED_TO_EXTRACT_PACKAGED_FEE = 'Failed to extract Relayer Fee from transaction. Please try again.',
+  RELAYER_OUT_OF_GAS = 'Relayer is out of gas, or currently does not have enough to process this transaction.',
+  NOTE_ALREADY_SPENT = 'ALREADY SPENT: One of the notes contained in this transaction have already been spent!',
+  TRANSACTION_UNDERPRICED = 'RPC Rejected Transction: Gas fee too low. Please select a higher gas price and resubmit.',
 }
 
 const sanitizeEthersError = (errMessage: string) => {

@@ -164,7 +164,7 @@ export const transactMethod = async (
       );
     }
 
-    const transaction = createValidTransaction(to, data);
+    const transaction = createValidTransaction(to, data, 0n);
 
     const txResponse = await processTransaction(
       chain,
@@ -176,6 +176,13 @@ export const transactMethod = async (
     );
     return resultResponse(id, chain, sharedKey, txResponse);
   } catch (err) {
+    // custom error message
+    if (err.message.indexOf('CMsg_') !== -1) {
+      // strip the custom message. CM
+      const newErrorString = err.message.slice(5);
+      const newErr = new Error(newErrorString);
+      return errorResponse(id, chain, sharedKey, newErr, true);
+    }
     dbg(err);
     return errorResponse(id, chain, sharedKey, err, devLog);
   }
@@ -200,16 +207,22 @@ const replaceErrorMessageNonDev = (
   }
   const knownError = errMsg as ErrorMessage;
   switch (knownError) {
+    case ErrorMessage.TRANSACTION_UNDERPRICED:
     case ErrorMessage.BAD_TOKEN_FEE:
     case ErrorMessage.NO_RELAYER_FEE:
     case ErrorMessage.GAS_ESTIMATE_ERROR:
+    case ErrorMessage.GAS_ESTIMATE_REVERT:
     case ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR:
+    case ErrorMessage.TRANSACTION_SEND_RPC_ERROR:
     case ErrorMessage.UNSUPPORTED_NETWORK:
     case ErrorMessage.GAS_PRICE_TOO_LOW:
     case ErrorMessage.MISSING_REQUIRED_FIELD:
     case ErrorMessage.FAILED_QUORUM:
     case ErrorMessage.REJECTED_PACKAGED_FEE:
     case ErrorMessage.FAILED_TO_EXTRACT_PACKAGED_FEE:
+    case ErrorMessage.REPEAT_TRANSACTION:
+    case ErrorMessage.RELAYER_OUT_OF_GAS:
+    case ErrorMessage.NOTE_ALREADY_SPENT:
     case ErrorMessage.UNKNOWN_ERROR:
       return errMsg;
   }
