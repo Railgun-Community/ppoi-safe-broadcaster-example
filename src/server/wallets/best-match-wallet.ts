@@ -9,6 +9,7 @@ import { logger } from '../../util/logger';
 import { RelayerChain } from '../../models/chain-models';
 import configDefaults from '../config/config-defaults';
 import { randomElement } from '../../util/utils';
+import { ErrorMessage } from '../../util/errors';
 
 export const getBestMatchWalletForNetwork = async (
   chain: RelayerChain,
@@ -69,7 +70,7 @@ export const getBestMatchWalletForNetwork = async (
     logger.warn(
       `${availableWallets.length} wallets available. ${outofFundsWallets.length} wallets are out of gas funds. (Need gas: ${minimumGasNeeded})`,
     );
-    throw new Error(`All wallets busy or out of funds.`);
+    throw new Error(ErrorMessage.RELAYER_OUT_OF_GAS);
   }
 
   if (randomizeSelection) {
