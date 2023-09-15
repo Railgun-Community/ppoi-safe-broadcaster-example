@@ -1,4 +1,3 @@
-import { logger } from '../../util/logger';
 import { ErrorMessage } from '../../util/errors';
 import { RelayerChain } from '../../models/chain-models';
 import { EVMGasType, isDefined } from '@railgun-community/shared-models';
@@ -6,13 +5,15 @@ import { EVMGasType, isDefined } from '@railgun-community/shared-models';
 import { getGasDetailsForSpeed } from './gas-by-speed';
 import { GasHistoryPercentile } from '../../models/gas-models';
 import { promiseTimeout } from '../../util/promise-utils';
+import debug from 'debug';
 
+const dbg = debug('relayer:gas-price:validate');
 export const validateMinGasPrice = async (
   chain: RelayerChain,
   minGasPrice: bigint,
   evmGasType: EVMGasType.Type0 | EVMGasType.Type1,
 ) => {
-  logger.log(
+  dbg(
     `validateMinGasPrice: minGasPrice ${minGasPrice} (chain ${chain.type}:${chain.id})`,
   );
 
@@ -39,7 +40,7 @@ export const validateMinGasPrice = async (
       return;
     }
   } catch (err) {
-    logger.log(`error getting current gas price: ${err.message}`);
+    dbg(`error getting current gas price: ${err.message}`);
   }
 
   throw new Error(ErrorMessage.GAS_PRICE_TOO_LOW);
