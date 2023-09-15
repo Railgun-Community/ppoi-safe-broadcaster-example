@@ -7,6 +7,7 @@ import { networkForChain } from '@railgun-community/shared-models';
 import { getRailgunWalletID } from '../wallets/active-wallets';
 import { ErrorMessage } from '../../util/errors';
 import { ContractTransaction } from 'ethers';
+import { promiseTimeout } from '../../util/promise-utils';
 
 type PackagedFee = {
   tokenAddress: string;
@@ -27,13 +28,15 @@ export const extractPackagedFeeFromTransaction = async (
 
   let firstNoteERC20Map;
   try {
-    firstNoteERC20Map =
-      await extractFirstNoteERC20AmountMapFromTransactionRequest(
+    firstNoteERC20Map = await promiseTimeout(
+      extractFirstNoteERC20AmountMapFromTransactionRequest(
         railgunWalletID,
         network,
         transaction,
         useRelayAdapt,
-      );
+      ),
+      60 * 1000,
+    );
   } catch (err) {
     throw new Error(ErrorMessage.FAILED_TO_EXTRACT_PACKAGED_FEE);
   }
