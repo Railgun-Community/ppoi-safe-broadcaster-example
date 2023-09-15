@@ -1,6 +1,6 @@
 import { logger } from '../../util/logger';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { throwErr } from '../../util/promise-utils';
+import { promiseTimeout, throwErr } from '../../util/promise-utils';
 import { RelayerChain } from '../../models/chain-models';
 
 export const getGasTokenBalance = async (
@@ -9,7 +9,11 @@ export const getGasTokenBalance = async (
 ): Promise<Optional<bigint>> => {
   try {
     const provider = getProviderForNetwork(chain);
-    return await provider.getBalance(walletAddress).catch(throwErr);
+    const balance = await promiseTimeout(
+      provider.getBalance(walletAddress),
+      25 * 1000,
+    ).catch(throwErr);
+    return balance;
   } catch (err) {
     logger.error(new Error(`Could not get gas token balance: ${err.message}`));
     return undefined;
