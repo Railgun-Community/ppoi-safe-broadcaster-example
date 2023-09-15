@@ -1,10 +1,11 @@
 import { logger } from '../../util/logger';
 import { ErrorMessage } from '../../util/errors';
 import { RelayerChain } from '../../models/chain-models';
-import { EVMGasType } from '@railgun-community/shared-models';
+import { EVMGasType, isDefined } from '@railgun-community/shared-models';
 
 import { getGasDetailsForSpeed } from './gas-by-speed';
 import { GasHistoryPercentile } from '../../models/gas-models';
+import { promiseTimeout } from '../../util/promise-utils';
 
 export const validateMinGasPrice = async (
   chain: RelayerChain,
@@ -18,11 +19,15 @@ export const validateMinGasPrice = async (
   try {
     // Low speed is 95th percentile to include in the next block.
     // Block gas submissions that are 50% below this level.
-    const slowestGasDetails = await getGasDetailsForSpeed(
-      evmGasType,
-      chain,
-      GasHistoryPercentile.Low,
-    );
+    const slowestGasDetails = await promiseTimeout(
+      getGasDetailsForSpeed(evmGasType, chain, GasHistoryPercentile.Low),
+      10 * 1000,
+    ).catch(() => {
+      return undefined;
+    });
+    if (!isDefined(slowestGasDetails)) {
+      return;
+    }
     if (slowestGasDetails.evmGasType === EVMGasType.Type2) {
       throw new Error('Incorrect EVMGasType for gas price.');
     }
