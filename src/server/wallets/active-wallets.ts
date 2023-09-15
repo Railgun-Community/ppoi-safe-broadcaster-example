@@ -18,6 +18,7 @@ import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
 import { createRailgunWallet } from '@railgun-community/wallet';
 import { isDefined } from '@railgun-community/shared-models';
+import { delay } from '../../util/promise-utils';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -136,10 +137,15 @@ export const getActiveWalletsForChain = (
 export const numAvailableWallets = async (
   chain: RelayerChain,
 ): Promise<number> => {
-  const walletAvailability = await Promise.all(
-    getActiveWallets().map(
-      async (wallet) => await isWalletAvailableWithEnoughFunds(wallet, chain),
-    ),
-  );
+  const walletPromises: Promise<boolean>[] = [];
+
+  for (const wallet of getActiveWallets()) {
+    walletPromises.push(isWalletAvailableWithEnoughFunds(wallet, chain));
+    // eslint-disable-next-line no-await-in-loop
+    await delay(100);
+  }
+
+  const walletAvailability = await Promise.all(walletPromises);
+
   return walletAvailability.filter((available) => available).length;
 };
