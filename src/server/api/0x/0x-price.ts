@@ -13,9 +13,9 @@ import debug from 'debug';
 
 const dbg = debug('relayer:0xPrice');
 
-// The current limit for the Free Tier of our APIs is approximately 2 Requests Per Second (RPS) and 200K API calls per month globally.
+// The current limit for the Free Tier of our APIs is approximately 1 Requests Per Second (RPS) and 200K API calls per month globally.
 // https://0x.org/docs/0x-swap-api/advanced-topics/rate-limiting
-let ZERO_X_PRICE_LOOKUP_DELAY = 600;
+let ZERO_X_PRICE_LOOKUP_DELAY = 1500;
 
 const refreshLocks: NumMapType<NumMapType<boolean>> = {};
 
@@ -89,29 +89,29 @@ export const zeroXUpdatePricesByAddresses = async (
 
   for (const tokenAddress of tokenAddresses) {
     // eslint-disable-next-line no-await-in-loop
-    const zeroXPriceData = await promiseTimeout(
-      zeroXPriceLookupByAddress(chain, tokenAddress),
-      10000, // 10 second price fetch timeout
-    ).catch((err) => {
-      const errMsg: Optional<string> = err?.message;
-      if (isDefined(errMsg) && errMsg.includes('Timed out')) {
-        dbg(
-          `Token ${tokenAddress} timed out on chain ${chain.type}:${chain.id}`,
-        );
-      }
-    });
-    if (zeroXPriceData) {
-      const tokenPrice: TokenPrice = {
-        price: zeroXPriceData.price,
-        updatedAt: Date.now(),
-      };
-      updater(tokenAddress, tokenPrice);
-    }
+    await promiseTimeout(zeroXPriceLookupByAddress(chain, tokenAddress), 5000)
+      .then((zeroXPriceData) => {
+        if (zeroXPriceData) {
+          const tokenPrice: TokenPrice = {
+            price: zeroXPriceData.price,
+            updatedAt: Date.now(),
+          };
+          updater(tokenAddress, tokenPrice);
+        }
+      })
+      .catch((err: Error) => {
+        if (isDefined(err) && err.message.includes('Timed out')) {
+          dbg(
+            `Token ${tokenAddress} timed out on chain ${chain.type}:${chain.id}`,
+          );
+        }
+      });
 
     // eslint-disable-next-line no-await-in-loop
     await delay(ZERO_X_PRICE_LOOKUP_DELAY);
   }
   dbg(`Ended chain ${chain.type}:${chain.id}`);
+  await delay(ZERO_X_PRICE_LOOKUP_DELAY);
 
   refreshLocks[chain.type][chain.id] = false;
 };
