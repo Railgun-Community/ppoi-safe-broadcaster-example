@@ -9,7 +9,7 @@ import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
 import { transactMethod } from './methods/transact-method';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
-import { delay } from '../../util/promise-utils';
+import { delay, promiseTimeout } from '../../util/promise-utils';
 import { contentTopics } from './topics';
 import {
   getRailgunWalletAddress,
@@ -23,6 +23,7 @@ import { RelayerChain } from '../../models/chain-models';
 import {
   RelayerFeeMessage,
   RelayerFeeMessageData,
+  isDefined,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../util/relayer-version';
 import configDefaults from '../config/config-defaults';
@@ -183,23 +184,45 @@ export class WakuRelayer {
   async broadcastFeesForChain(chain: RelayerChain): Promise<void> {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chain);
-    const feeBroadcastData = await this.createFeeBroadcastData(
-      fees,
-      feeCacheID,
-      chain,
-    );
+    const feeBroadcastData = await promiseTimeout(
+      this.createFeeBroadcastData(fees, feeCacheID, chain),
+      1 * 1000,
+    )
+      .then((result: RelayerFeeMessage) => {
+        return result;
+      })
+      .catch((err: Error) => {
+        this.dbg(err.message);
+        return undefined;
+      });
+    if (!isDefined(feeBroadcastData)) {
+      return;
+    }
     const contentTopic = contentTopics.fees(chain);
     return this.publish(feeBroadcastData, contentTopic);
   }
 
   async broadcastFeesOnInterval(interval: number): Promise<void> {
-    if (this.stopping) return;
+    if (this.stopping) {
+      return;
+    }
     const chains = configuredNetworkChains();
-    const broadcastPromises: Promise<void>[] = chains.map((chain) =>
-      this.broadcastFeesForChain(chain),
-    );
+    this.dbg('BroadcastingFees:');
+    for (const chain of chains) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await promiseTimeout(this.broadcastFeesForChain(chain), 3 * 1000).catch(
+          (error) => {
+            this.dbg(`Waku Failed Broadcast ${error.message}`);
+          },
+        );
+        // eslint-disable-next-line no-await-in-loop
+        await delay(300);
+      } catch (error) {
+        this.dbg('BROADCASTFAIL', error.message);
+      }
+    }
 
-    await Promise.all(broadcastPromises);
     await delay(interval);
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -219,7 +242,13 @@ export class WakuRelayer {
         }
         return [];
       });
-    await Promise.all(messages.map((message) => this.handleMessage(message)));
+    const messagePromises = [];
+    for (const message of messages) {
+      messagePromises.push(this.handleMessage(message));
+      // eslint-disable-next-line no-await-in-loop
+      await delay(100);
+    }
+    await Promise.allSettled(messagePromises);
     await delay(frequency);
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

@@ -3,6 +3,7 @@ import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
 import { WakuMessage } from '../waku-relayer/waku-message';
 import { isDefined } from '@railgun-community/shared-models';
+import { promiseTimeout } from '../../util/promise-utils';
 
 export type WakuRelayMessage = {
   contentTopic: string;
@@ -13,6 +14,7 @@ export type WakuRelayMessage = {
 
 export type WakuApiClientOptions = {
   url: string;
+  urlBackup: string;
 };
 
 export enum WakuRequestMethods {
@@ -30,11 +32,16 @@ export class WakuApiClient {
 
   http: AxiosInstance;
 
+  mainNwaku: string;
+
+  backupNwaku: string;
+
   constructor(options: WakuApiClientOptions) {
     this.dbg = debug('waku:jsonrpc-api');
+    this.mainNwaku = options.url;
+    this.backupNwaku = options.urlBackup;
     const httpConfig = {
       timeout: 60000,
-      baseURL: options.url,
       headers: { 'Content-Type': 'application/json' },
     };
     this.http = axios.create(httpConfig);
@@ -44,7 +51,12 @@ export class WakuApiClient {
   async request(method: string, params: any, retry = 0): Promise<any> {
     const req = formatJsonRpcRequest(method, params);
     try {
-      const response = await this.http.post('/', req);
+      const postURL = retry === 0 ? this.mainNwaku : this.backupNwaku;
+
+      const response = await promiseTimeout(
+        this.http.post(postURL, req),
+        10 * 1000,
+      );
       return response.data;
     } catch (err) {
       if (retry < MAX_RETRIES) {
@@ -99,6 +111,17 @@ export class WakuApiClient {
     const { timestamp } = message;
     const payload = Buffer.from(message.payload).toString('base64');
     const { contentTopic } = message;
+
+    if (contentTopic?.includes('fees') === true) {
+      // we have fee message.. dont try to resend.
+      const data = await this.request(
+        WakuRequestMethods.PublishMessage,
+        [topic, { payload, timestamp, contentTopic }],
+        MAX_RETRIES,
+      );
+      return data.result;
+    }
+
     const data = await this.request(WakuRequestMethods.PublishMessage, [
       topic,
       { payload, timestamp, contentTopic },
