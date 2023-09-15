@@ -6,6 +6,7 @@ import { resetMapObject } from '../../util/utils';
 import { getCachedGasTokenBalance } from '../balances/balance-cache';
 import configNetworks from '../config/config-networks';
 import debug from 'debug';
+import { delay } from '../../util/promise-utils';
 
 const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
@@ -113,11 +114,15 @@ export const getAvailableWallets = async (
   activeWallets: ActiveWallet[],
   chain: RelayerChain,
 ) => {
-  const walletAvailability = await Promise.all(
-    activeWallets.map((wallet) =>
-      isWalletAvailableWithEnoughFunds(wallet, chain),
-    ),
-  );
+  const walletPromises: Promise<boolean>[] = [];
+
+  for (const wallet of activeWallets) {
+    walletPromises.push(isWalletAvailableWithEnoughFunds(wallet, chain));
+    // eslint-disable-next-line no-await-in-loop
+    await delay(100);
+  }
+
+  const walletAvailability = await Promise.all(walletPromises);
   return activeWallets.filter((_wallet, index) => walletAvailability[index]);
 };
 
