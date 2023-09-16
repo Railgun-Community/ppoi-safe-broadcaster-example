@@ -77,7 +77,7 @@ describe('best-match-wallet', () => {
       ],
     };
     await initWallets();
-
+    console.log(getActiveWallets());
     const bestWallet = await getBestMatchWalletForNetwork(MOCK_CHAIN, 100n);
     expect(bestWallet.address).to.equal(addressForIndex(2));
   });
