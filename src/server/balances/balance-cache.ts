@@ -96,9 +96,14 @@ export const getActiveWalletGasTokenBalanceMapForChain = async (
   chain: RelayerChain,
   activeWallets: ActiveWallet[],
 ): Promise<MapType<bigint>> => {
-  const balancePromises: Promise<bigint>[] = [];
+  const balancePromises: Promise<bigint | undefined>[] = [];
   for (const { address } of activeWallets) {
-    balancePromises.push(getCachedGasTokenBalance(chain, address));
+    balancePromises.push(
+      getCachedGasTokenBalance(chain, address).catch((err) => {
+        logger.error(err);
+        return undefined;
+      }),
+    );
     // eslint-disable-next-line no-await-in-loop
     await delay(100);
   }
