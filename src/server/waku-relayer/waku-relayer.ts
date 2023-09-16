@@ -244,7 +244,12 @@ export class WakuRelayer {
       });
     const messagePromises = [];
     for (const message of messages) {
-      messagePromises.push(this.handleMessage(message));
+      messagePromises.push(
+        this.handleMessage(message).catch((err) => {
+          this.dbg(err);
+          return undefined;
+        }),
+      );
       // eslint-disable-next-line no-await-in-loop
       await delay(100);
     }
