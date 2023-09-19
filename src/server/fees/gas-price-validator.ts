@@ -27,7 +27,7 @@ export const validateMinGasPrice = async (
       return undefined;
     });
     if (!isDefined(slowestGasDetails)) {
-      return;
+      throw new Error(ErrorMessage.GAS_ESTIMATE_ERROR);
     }
     if (slowestGasDetails.evmGasType === EVMGasType.Type2) {
       throw new Error('Incorrect EVMGasType for gas price.');
