@@ -5,6 +5,7 @@ import { resetMapObject } from '../../util/utils';
 import { tokenForAddress } from './network-tokens';
 import { RelayerChain } from '../../models/chain-models';
 import { isDefined } from '@railgun-community/shared-models';
+import { NetworkChainID } from '../config/config-chains';
 
 export enum TokenPriceSource {
   CoinGecko = 'CoinGecko',
@@ -79,7 +80,14 @@ export const cachedTokenPriceForSource = (
   }
   const cachedNetworkPrices = pricesForSource[chain.type][chain.id];
   if (!isDefined(cachedNetworkPrices)) {
-    logTokenLookupError(`[${source}] No network prices`, chain, tokenAddress);
+    // 0x testnets are disabled.
+    if (
+      chain.id !== NetworkChainID.EthereumGoerli &&
+      source !== TokenPriceSource.ZeroX
+    ) {
+      logTokenLookupError(`[${source}] No network prices`, chain, tokenAddress);
+    }
+
     return undefined;
   }
 
