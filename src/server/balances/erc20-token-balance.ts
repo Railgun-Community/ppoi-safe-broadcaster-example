@@ -11,11 +11,11 @@ const BALANCE_TIMEOUT = 10 * 1000;
 export const getERC20TokenBalance = async (
   chain: RelayerChain,
   walletAddress: string,
-  token: Token,
+  tokenAddress: string,
 ): Promise<bigint> => {
   try {
     const provider = getProviderForNetwork(chain);
-    const contract = new Contract(token.address, ABI_ERC20, provider);
+    const contract = new Contract(tokenAddress, ABI_ERC20, provider);
 
     const balance = await promiseTimeout(
       contract.balanceOf(walletAddress),
