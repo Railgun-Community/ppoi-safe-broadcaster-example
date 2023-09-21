@@ -35,6 +35,7 @@ export const cacheGasPrice = (
   };
   cachedGasPrice[chain.type][chain.id][walletAddress] = newCache;
 };
+
 export const clearCachedGasPrice = (
   chain: RelayerChain,
   walletAddress: string,
@@ -93,7 +94,7 @@ export const cleanupSubmittedTxs = (chain: RelayerChain) => {
     chain.id
   ].filter((tx) => {
     const timeDifference = Date.now() - tx.timestamp;
-    const timeThreshold = 10 * 60 * 1000;
+    const timeThreshold = 1 * 60 * 1000; // timeout after 1 minute.
     return timeDifference < timeThreshold;
   });
   cachedSubmittedTxs[chain.type][chain.id] = newArray;
