@@ -21,6 +21,7 @@ export type Network = {
   isTestNetwork?: boolean;
   skipQuickScan?: boolean;
   topUp: TopUpConfig;
+  retryGasBuffer: bigint;
 };
 
 type TopUpConfig = {
