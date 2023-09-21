@@ -65,6 +65,7 @@ const networksConfig: NetworksConfig = {
       coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
       fallbackProviderConfig: fallbackProvidersEthereum,
       priceTTLInMS: defaultTokenPriceTTL,
+      retryGasBuffer: parseUnits('0.1', 'gwei'),
       topUp: {
         allowMultiTokenTopUp: true,
         accumulateNativeToken: true,
@@ -96,6 +97,8 @@ const networksConfig: NetworksConfig = {
         swapThresholdIntoGasToken: ONE_AND_HALF,
         minimumGasBalanceForTopup: HALF_TOKEN,
       },
+      retryGasBuffer: parseUnits('0.1', 'gwei'),
+
       isTestNetwork: true,
     },
     [NetworkChainID.BNBChain]: {
@@ -121,6 +124,7 @@ const networksConfig: NetworksConfig = {
         swapThresholdIntoGasToken: HALF_TOKEN,
         minimumGasBalanceForTopup: HALF_TOKEN,
       },
+      retryGasBuffer: parseUnits('0.1', 'gwei'),
     },
     [NetworkChainID.PolygonPOS]: {
       name: 'Polygon PoS',
@@ -145,6 +149,7 @@ const networksConfig: NetworksConfig = {
         swapThresholdIntoGasToken: TEN_TOKENS,
         minimumGasBalanceForTopup: FIVE_TOKENS,
       },
+      retryGasBuffer: parseUnits('1', 'gwei'),
     },
     [NetworkChainID.Arbitrum]: {
       name: 'Arbitrum',
@@ -169,6 +174,7 @@ const networksConfig: NetworksConfig = {
         swapThresholdIntoGasToken: QUARTER_TOKEN / 2n,
         minimumGasBalanceForTopup: ONE_TOKEN / 20n, // 1/20th = 0.05
       },
+      retryGasBuffer: parseUnits('0.1', 'gwei'),
     },
     [NetworkChainID.PolygonMumbai]: {
       name: 'Mumbai Testnet',
@@ -192,6 +198,8 @@ const networksConfig: NetworksConfig = {
         swapThresholdIntoGasToken: TEN_TOKENS,
         minimumGasBalanceForTopup: FIVE_TOKENS,
       },
+      retryGasBuffer: parseUnits('1', 'gwei'),
+
       isTestNetwork: true,
     },
     [NetworkChainID.ArbitrumGoerli]: {
@@ -216,6 +224,7 @@ const networksConfig: NetworksConfig = {
         swapThresholdIntoGasToken: QUARTER_TOKEN / 2n,
         minimumGasBalanceForTopup: ONE_TOKEN / 20n, // 1/20th = 0.05
       },
+      retryGasBuffer: parseUnits('0.1', 'gwei'),
       isTestNetwork: true,
     },
     [NetworkChainID.Hardhat]: {
@@ -240,6 +249,7 @@ const networksConfig: NetworksConfig = {
         swapThresholdIntoGasToken: ONE_AND_HALF,
         minimumGasBalanceForTopup: HALF_TOKEN,
       },
+      retryGasBuffer: parseUnits('0.1', 'gwei'),
       isTestNetwork: true,
       skipQuickScan: true,
     },

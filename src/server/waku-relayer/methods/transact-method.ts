@@ -28,12 +28,24 @@ import {
   versionCompare,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../../util/relayer-version';
-import { TransactionResponse } from 'ethers';
+import { TransactionResponse, formatUnits, parseUnits } from 'ethers';
 import { createValidTransaction } from '../../transactions/transaction-validator';
 
 const handledClientPubKeys: string[] = [];
 
 const dbg = debug('relayer:transact');
+
+const sanitizeSuggestedFee = (errorString: string) => {
+  const pattern = /Suggested Gas Price was (\d+\.\d+)/;
+
+  const match = errorString.match(pattern);
+  if (isDefined(match)) {
+    const suggestedFee = match[1];
+    return suggestedFee;
+  }
+  dbg('No Sanitized Suggestion Found');
+  return undefined;
+};
 
 export const transactMethod = async (
   params: RelayerEncryptedMethodParams,
@@ -180,6 +192,55 @@ export const transactMethod = async (
     if (err.message.indexOf('CMsg_') !== -1) {
       // strip the custom message. CM
       const newErrorString = err.message.slice(5);
+      const suggestedFee = sanitizeSuggestedFee(newErrorString);
+      dbg('Suggested Fee', suggestedFee);
+
+      if (isDefined(suggestedFee)) {
+        dbg('Suggested Fee Found');
+        // check if the fee is within 4 gwei of the min. if it is. try again.
+        // additionallly, store original error, to then pass if we error again.
+
+        const suggestedFeeBN = parseUnits(suggestedFee, 'gwei');
+        const minGasPriceBN = BigInt(minGasPrice);
+
+        const { retryGasBuffer } = configNetworks[chain.type][chain.id];
+
+        const inflatedMinGasPrice = minGasPriceBN + retryGasBuffer;
+
+        if (suggestedFeeBN < inflatedMinGasPrice) {
+          const firstErrorResponse = new Error(newErrorString);
+          try {
+            dbg(
+              `LOW FEE DETECTED: Retrying Transaction with minGasPrice: ${formatUnits(
+                inflatedMinGasPrice,
+                'gwei',
+              )}`,
+            );
+            const transaction = createValidTransaction(to, data, 0n);
+            const txResponse = await processTransaction(
+              chain,
+              feeCacheID,
+              inflatedMinGasPrice,
+              transaction,
+              useRelayAdapt ?? false,
+              devLog,
+            );
+            return resultResponse(id, chain, sharedKey, txResponse);
+          } catch (err) {
+            // any error here. we just return original response instead.
+            dbg('We Errored twice.', err);
+            return errorResponse(
+              id,
+              chain,
+              sharedKey,
+              firstErrorResponse,
+              true,
+            );
+          }
+        }
+      }
+      // check if this is a
+
       const newErr = new Error(newErrorString);
       return errorResponse(id, chain, sharedKey, newErr, true);
     }
