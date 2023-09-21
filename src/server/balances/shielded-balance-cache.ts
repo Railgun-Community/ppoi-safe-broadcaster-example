@@ -5,10 +5,11 @@ import {
 import { resetMapObject } from '../../util/utils';
 import { ERC20Amount } from '../../models/token-models';
 import { RelayerChain } from '../../models/chain-models';
-import { RailgunBalancesEvent } from '@railgun-community/shared-models';
+import { RailgunBalancesEvent, isDefined } from '@railgun-community/shared-models';
 import { getRailgunWalletID } from '../wallets/active-wallets';
+import debug from 'debug';
 
-// const dbg = debug('relayer:balances:shielded');
+const dbg = debug('relayer:balances:shielded');
 
 export type ShieldedCachedBalance = {
   erc20Amount: ERC20Amount;
@@ -33,10 +34,12 @@ export const updateShieldedBalances = async (
   balancePromiseResolve = undefined;
 
   const railgunWalletID = getRailgunWalletID();
-  await refreshRailgunBalances(chain, railgunWalletID, fullRescan);
-  return new Promise<void>((resolve) => {
+  const balancePromise = new Promise<void>((resolve) => {
     balancePromiseResolve = resolve;
   });
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  refreshRailgunBalances(chain, railgunWalletID, fullRescan);
+  return balancePromise;
 };
 
 // Called by RAILGUN Engine when balances updated.
@@ -61,13 +64,12 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
       };
   });
 
-  if (balancePromiseResolve) {
+  if (isDefined(balancePromiseResolve)) {
     balancePromiseResolve();
   }
-  // dbg(
-  //   `Shielded balances updated for ${chain.type}:${chain.id}`,
-  //   shieldedTokenBalanceCache[chain.type][chain.id],
-  // );
+  dbg(
+    `Shielded balances updated for ${chain.type}:${chain.id}`,
+  );
 };
 
 export const getPrivateTokenBalanceCache = (
@@ -75,5 +77,9 @@ export const getPrivateTokenBalanceCache = (
 ): ShieldedCachedBalance[] => {
   shieldedTokenBalanceCache[chain.type] ??= {};
   shieldedTokenBalanceCache[chain.type][chain.id] ??= {};
-  return Object.values(shieldedTokenBalanceCache[chain.type][chain.id]);
+  return Object.values(shieldedTokenBalanceCache[chain.type][chain.id]).map(
+    (o) => {
+      return { erc20Amount: { ...o.erc20Amount }, updatedAt: o.updatedAt };
+    },
+  );
 };
