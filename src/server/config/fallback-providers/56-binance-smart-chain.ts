@@ -7,26 +7,22 @@ const config: FallbackProviderJsonConfig = {
       provider: 'https://bsc.publicnode.com',
       priority: 1,
       weight: 2,
-      maxLogsPerBatch: 10,
       stallTimeout: 2500,
     },
     {
-      provider: 'https://bsc-dataseed.binance.org',
-      priority: 1,
-      weight: 2,
-      maxLogsPerBatch: 10,
-    },
-    {
-      provider: 'https://bsc-dataseed1.defibit.io',
-      priority: 2,
-      weight: 2,
-      maxLogsPerBatch: 10,
-    },
-    {
-      provider: 'https://bsc-dataseed1.ninicoin.io',
+      provider: 'https://bsc-dataseed.binance.org/',
       priority: 3,
-      weight: 2,
-      maxLogsPerBatch: 10,
+      weight: 1,
+    },
+    {
+      provider: 'https://bsc-dataseed1.defibit.io/',
+      priority: 3,
+      weight: 1,
+    },
+    {
+      provider: 'https://bsc-dataseed1.ninicoin.io/',
+      priority: 3,
+      weight: 1,
     },
   ],
 };
