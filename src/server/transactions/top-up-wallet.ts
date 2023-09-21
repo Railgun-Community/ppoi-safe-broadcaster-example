@@ -33,10 +33,14 @@ const getPublicERC20AmountsAfterUnwrap = async (
 ): Promise<ERC20Amount[]> => {
   const allTokens = networkTokens[chain.type][chain.id];
   const newPublicERC20Amounts: ERC20Amount[] = await Promise.all(
-    allTokens.map(async (token) => {
-      const amt = await getERC20TokenBalance(chain, wallet.address, token);
+    allTokens.map(async ({ address: tokenAddress }) => {
+      const amt = await getERC20TokenBalance(
+        chain,
+        wallet.address,
+        tokenAddress,
+      );
       const erc20Amount: ERC20Amount = {
-        tokenAddress: token.address,
+        tokenAddress,
         amount: amt,
       };
       return erc20Amount;
