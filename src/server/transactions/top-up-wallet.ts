@@ -27,7 +27,7 @@ import {
   getPublicERC20AmountsBeforeUnwrap,
   getPublicERC20AmountsAfterUnwrap,
 } from '../balances/top-up-balance';
-import { clearCachedBalances } from 'server/balances/public-balance-cache';
+import { clearCachedBalances } from '../balances/public-balance-cache';
 import {
   initTopUpTokenCache,
   cachedTopUpTokens,

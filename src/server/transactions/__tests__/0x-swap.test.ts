@@ -101,6 +101,7 @@ describe('0x-swap', () => {
     const swapTxs = await generateSwapTransactions(
       TO_SWAP,
       MOCK_LOW_LIQUIDITY_CHAIN,
+      '0x00',
     );
     expect(swapTxs.length).to.equal(0);
   }).timeout(200000);
@@ -109,14 +110,18 @@ describe('0x-swap', () => {
   it.skip(
     'Should generate the correct number of swap transactions',
     async () => {
-      const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN);
+      const swapTxs = await generateSwapTransactions(
+        TO_SWAP,
+        MOCK_CHAIN,
+        '0x00',
+      );
       expect(swapTxs.length).to.equal(2);
     },
   ).timeout(200000);
 
   // Skip: Hitting 429s.
   it.skip('Should generate approval transactions to each token', async () => {
-    const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN);
+    const swapTxs = await generateSwapTransactions(TO_SWAP, MOCK_CHAIN, '0x00');
     expect(swapTxs.length).to.equal(2);
     expect(swapTxs[0].to).to.equal(
       zeroXExchangeProxyContractAddress(MOCK_CHAIN),
