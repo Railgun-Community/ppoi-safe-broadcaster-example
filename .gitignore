@@ -37,6 +37,7 @@ tsconfig.tsbuildinfo
 docker/.env
 docker/config.toml
 docker/docker-stack.yml
+docker/docker-stack-swagless.yml
 docker/appdata
 docker/custom.yml
 
