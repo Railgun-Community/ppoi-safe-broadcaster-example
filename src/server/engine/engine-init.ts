@@ -6,6 +6,8 @@ import {
   stopRailgunEngine,
   ArtifactStore,
   loadProvider,
+  getProver,
+  Groth16,
 } from '@railgun-community/wallet';
 import fs from 'fs';
 import {
@@ -13,6 +15,7 @@ import {
   networkForChain,
 } from '@railgun-community/shared-models';
 import { DebugLevel } from '../../models/debug-models';
+import { groth16 } from 'snarkjs';
 
 let engineStarted = false;
 
@@ -27,7 +30,7 @@ const fileExists = (path: string): Promise<boolean> => {
 
 const testArtifactStore = new ArtifactStore(
   fs.promises.readFile,
-  async (dir, path, data) => {
+  async (dir: any, path: any, data: any) => {
     await fs.promises.mkdir(dir, { recursive: true });
     await fs.promises.writeFile(path, data);
   },
@@ -51,6 +54,7 @@ export const startEngine = () => {
     false, // skipMerkletreeScans
   );
   engineStarted = true;
+  getProver().setSnarkJSGroth16(groth16 as Groth16);
 };
 
 export const stopEngine = async () => {
