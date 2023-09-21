@@ -1,123 +1,121 @@
 import { ERC20Amount } from '../../models/token-models';
 import { ActiveWallet } from '../../models/wallet-models';
-import { zeroXGetSwapQuote } from '../api/0x/0x-quote';
-import { getERC20TokenBalance } from '../balances/erc20-token-balance';
-import configNetworks from '../config/config-networks';
-import { networkTokens } from '../tokens/network-tokens';
 import {
   createEthersWallet,
   getRailgunWalletID,
 } from '../wallets/active-wallets';
 import { setWalletAvailability } from '../wallets/available-wallets';
 import { unshieldTokens } from './unshield-tokens';
-import { getProviderForNetwork } from '../providers/active-network-providers';
-import { getCurrentNonce, waitForTx, waitForTxs } from './execute-transaction';
+import { getFirstJsonRpcProviderForNetwork } from '../providers/active-network-providers';
+import {
+  getCurrentWalletNonce,
+  waitForTx,
+  waitForTxs,
+} from './execute-transaction';
 import { approveZeroX } from './approve-spender';
 import configDefaults from '../config/config-defaults';
-import { swapZeroX } from './0x-swap';
-import {
-  getPrivateTokenBalanceCache,
-  ShieldedCachedBalance,
-  updateShieldedBalances,
-} from '../balances/shielded-balance-cache';
-import { removeUndefineds } from '../../util/utils';
-import { RelayerChain } from '../../models/chain-models';
+import configNetworks from '../config/config-networks';
 import debug from 'debug';
-import { isDefined } from '@railgun-community/shared-models';
+import { swapZeroX } from './0x-swap';
+import { RelayerChain } from '../../models/chain-models';
+import { Wallet } from 'ethers';
+import { nativeUnwrap } from './native-unwrap';
+import { delay } from '../../util/promise-utils';
+import { clearCachedTransaction } from '../fees/gas-price-cache';
+import {
+  getWrappedNativeTokenAddressForChain,
+  getPublicERC20AmountsBeforeUnwrap,
+  getPublicERC20AmountsAfterUnwrap,
+} from '../balances/top-up-balance';
+import { clearCachedBalances } from 'server/balances/public-balance-cache';
+import {
+  initTopUpTokenCache,
+  cachedTopUpTokens,
+  getMultiTopUpTokenAmountsForChain,
+  getTopUpTokenAmountsForChain,
+  clearCachedTokens,
+} from './top-up-util';
+import { NetworkChainID } from '../config/config-chains';
+import { ChainType } from '@railgun-community/shared-models';
 
-const dbg = debug('relayer:topup');
+const dbg = debug('relayer:topup-util');
 
-const getPublicERC20AmountsAfterUnwrap = async (
-  wallet: ActiveWallet,
-  chain: RelayerChain,
-): Promise<ERC20Amount[]> => {
-  const allTokens = networkTokens[chain.type][chain.id];
-  const newPublicERC20Amounts: ERC20Amount[] = await Promise.all(
-    allTokens.map(async ({ address: tokenAddress }) => {
-      const amt = await getERC20TokenBalance(
-        chain,
-        wallet.address,
-        tokenAddress,
-      );
-      const erc20Amount: ERC20Amount = {
-        tokenAddress,
-        amount: amt,
-      };
-      return erc20Amount;
-    }),
-  );
-  return newPublicERC20Amounts;
-};
+const getTopUpTokens = async (chain: RelayerChain): Promise<ERC20Amount[]> => {
+  initTopUpTokenCache(chain);
+  if (typeof cachedTopUpTokens[chain.type][chain.id] !== 'undefined') {
+    dbg('Using cached topUpTokens');
+    return cachedTopUpTokens[chain.type][chain.id];
+  }
 
-const getShieldedERC20AmountsForChain = async (
-  chain: RelayerChain,
-): Promise<ShieldedCachedBalance[]> => {
-  const fullRescan = false;
-  await updateShieldedBalances(chain, fullRescan);
-  const shieldedBalancesForChain = getPrivateTokenBalanceCache(chain);
-  return shieldedBalancesForChain;
-};
+  const { allowMultiTokenTopUp, accumulateNativeToken } =
+    configNetworks[chain.type][chain.id].topUp;
 
-// Currently unused.
-// export const filterTopUpTokens = (
-//   topUpTokens: ERC20Amount[],
-// ): ERC20Amount[] => {
-//   // const desiredTopUpTokens = [];
-//   // const desiredTopUpTokens: Optiona<ERC20Amount>[] = await Promise.all (
-//   //   topUpTokens.map( async (erc20Amount) => {
-//   //       if (!configDefaults.topUps.shouldNotSwap.includes(erc20Amount.tokenAddress)){
-//   //         return
-//   //       }
-//   //     }
-//   //   )
-//   // )
-//   return [topUpTokens[0]];
-// };
-
-export const getTopUpERC20AmountsForChain = async (
-  chain: RelayerChain,
-): Promise<ERC20Amount[]> => {
-  const erc20AmountsForChain = await getShieldedERC20AmountsForChain(chain);
-
-  const topUpERC20AmountsForChain: Optional<ERC20Amount>[] = await Promise.all(
-    erc20AmountsForChain.map(async (shieldedTokenCache) => {
-      const gasTokenSymbol =
-        configNetworks[chain.type][chain.id].gasToken.symbol;
-
-      const erc20AmountInGasToken = await zeroXGetSwapQuote(
-        chain,
-        shieldedTokenCache.erc20Amount,
-        gasTokenSymbol,
-        configDefaults.topUps.toleratedSlippage,
-      );
-      try {
-        const amount = erc20AmountInGasToken.quote?.buyERC20Amount.amount;
-        if (
-          isDefined(amount) &&
-          amount > BigInt(configDefaults.topUps.swapThresholdIntoGasToken)
-        ) {
-          return shieldedTokenCache.erc20Amount;
-        }
-        return undefined;
-      } catch (err) {
-        dbg(`Quote for token failed - ${err.message}`);
-        throw err;
-      }
-    }),
-  );
-  return removeUndefineds(topUpERC20AmountsForChain);
+  const topUpTokens = allowMultiTokenTopUp
+    ? await getMultiTopUpTokenAmountsForChain(chain, accumulateNativeToken)
+    : await getTopUpTokenAmountsForChain(chain);
+  if (topUpTokens.length > 0) {
+    // only cache if we get a result. don't store empty array.
+    cachedTopUpTokens[chain.type][chain.id] = topUpTokens;
+  }
+  return topUpTokens;
 };
 
 export const topUpWallet = async (
   topUpWallet: ActiveWallet,
   chain: RelayerChain,
 ) => {
-  const topUpTokens = await getTopUpERC20AmountsForChain(chain);
+  const topUpTokens = await getTopUpTokens(chain);
+  // also cache the topUpTokens. this is to prevent it from halting if the balances increase to a point at which
+  // the thresholds no longer aremet, and it doesnt get past the check for tokens to use.
+  // do it this way instead of attempting to control the quantities of tokens used. just store, as those values are the
+  // ones cached in the transaction anyway. so recalculating every time is also unnecessary.
 
+  for (const t of topUpTokens) {
+    const { amount, tokenAddress } = t;
+    dbg(`Token ${tokenAddress} ${amount.toString()}`);
+  }
+  // this pulls cached balances anyway after first go until it finishes a top up
+  // always check these, otherwise we could end up re-unshielding to this address
+  // in the event that, the top up process doesnt complete after unshielding &
+  // there are more tokens that can be 'unshielded'
+  const unwrappedTokensWaiting = await getPublicERC20AmountsBeforeUnwrap(
+    topUpWallet,
+    chain,
+    // true,
+  );
+  // check to see if we have anything.
+  const provider = getFirstJsonRpcProviderForNetwork(chain, true);
+  const ethersWallet = createEthersWallet(topUpWallet, provider);
+  if (unwrappedTokensWaiting.length > 0) {
+    dbg('We have tokens awaiting swapping, lets figure it out. ');
+
+    setWalletAvailability(topUpWallet, chain, false, false);
+    await handlePublicTokens(
+      unwrappedTokensWaiting,
+      chain,
+      topUpWallet,
+      ethersWallet,
+    ).catch((err) => {
+      // clear the topup cache, if any failure happens here.
+      dbg('handlePublicTokens error, clearing caches.');
+      setWalletAvailability(topUpWallet, chain, true);
+      clearTopUpCaches(chain, topUpWallet);
+      throw err;
+    });
+    setWalletAvailability(topUpWallet, chain, true);
+    dbg('Topup complete');
+    return;
+  }
   if (topUpTokens.length === 0) {
     dbg(
       `No tokens to top up wallet ${topUpWallet.address} on chain ${chain.id}`,
     );
+
+    // check to see if we have any tokens to unwrap, maybe the last topup failed?
+    // cache these balances per address,
+    // clear the cache for address when we fall through this length check.
+    // current availalble token balances should be re-gathered
+
     return;
   }
 
@@ -125,13 +123,10 @@ export const topUpWallet = async (
   dbg(
     `Begin top up for wallet with address ${topUpWallet.address} and index ${topUpWallet.index} on chain ${chain.type}:${chain.id}`,
   );
-
   const railgunWalletID = getRailgunWalletID();
+  setWalletAvailability(topUpWallet, chain, false, false);
 
-  setWalletAvailability(topUpWallet, chain, false);
-  const provider = getProviderForNetwork(chain);
-  const ethersWallet = createEthersWallet(topUpWallet, provider);
-  const nonce = await getCurrentNonce(chain, ethersWallet);
+  const nonce = await getCurrentWalletNonce(ethersWallet);
 
   // unshield tokens intended to swap
   const batchResponse = await unshieldTokens(
@@ -140,33 +135,160 @@ export const topUpWallet = async (
     topUpWallet.address,
     topUpTokens,
     chain,
-  );
-  await waitForTx(topUpWallet, ethersWallet, chain, batchResponse, nonce);
+  ).catch((err) => {
+    setWalletAvailability(topUpWallet, chain, true);
+    dbg('unshieldTokens error');
+
+    dbg(err.message);
+
+    // if its arbitrum, gasError happens on first prove each time, idk why?
+    const isArbitrum =
+      chain.type === ChainType.EVM && chain.id === NetworkChainID.Arbitrum;
+
+    const secondaryCheck = isArbitrum
+      ? err.message !== 'there was an error calculating gas details.'
+      : err.message !== 'Gas estimate error. Possible connection failure.';
+
+    if (err.message !== 'Top Up too costly, skipping!' && secondaryCheck) {
+      clearTopUpCaches(chain, topUpWallet);
+      dbg('Clearing Caches');
+    }
+    throw err;
+  });
+  await waitForTx(
+    topUpWallet,
+    ethersWallet,
+    chain,
+    batchResponse,
+    nonce,
+    false,
+  ).catch((err) => {
+    // clear the topup cache, if any failure happens here.
+    dbg('WaitForTx error, clearing caches.');
+
+    setWalletAvailability(topUpWallet, chain, true);
+    clearTopUpCaches(chain, topUpWallet);
+
+    throw err;
+  });
+
+  // need to make sure, if the balances change between wallets, and changes which one is actively topped up,
+  // the caches will desync and it will attempt to process old info.
+  // the unshield & topUpTokens cache soley by chain, instead of by address.
+  // it wont matter as long as it follows through, with any address and clears the cache afterwards.
+  // the proof & the tokens dont matter, but if one wallet uses the proof with the tokens, and the other address also had a proof with those tokens
+  // the second address will just fail.
+
+  // clear the caches
+  clearTopUpCaches(chain, topUpWallet);
+
+  // wait 5 seconds to allow tx info to disperse.
+  await delay(5000);
 
   // get public balances
   const publicERC20Amounts = await getPublicERC20AmountsAfterUnwrap(
     topUpWallet,
     chain,
-  );
+    topUpTokens,
+  ).catch((err) => {
+    // clear the topup cache, if any failure happens here.
+    dbg('getPublicTokenAmountsAfterUnwrap error, clearing caches.');
 
-  // perform approvals
-  const approvalTxResponses = await approveZeroX(
-    topUpWallet,
+    setWalletAvailability(topUpWallet, chain, true);
+    clearTopUpCaches(chain, topUpWallet);
+
+    throw err;
+  });
+  // .finally(() => {
+  //   clearTopUpCaches(chain, topUpWallet);
+  // });
+
+  // determine if we are just able to unwrap, or if we should swap.
+
+  await handlePublicTokens(
     publicERC20Amounts,
     chain,
-  );
-  await waitForTxs(topUpWallet, ethersWallet, chain, approvalTxResponses);
-  dbg('Approvals complete');
-
-  // perform swaps
-  const swapTxResponses = await swapZeroX(
     topUpWallet,
-    publicERC20Amounts,
-    chain,
-  );
-  await waitForTxs(topUpWallet, ethersWallet, chain, swapTxResponses);
+    ethersWallet,
+  ).catch((err) => {
+    // clear the topup cache, if any failure happens here.
+    dbg('handlePublicTokens error, clearing caches.');
+    setWalletAvailability(topUpWallet, chain, true);
+    clearTopUpCaches(chain, topUpWallet);
+    throw err;
+  });
+  // .finally(() => {
+  //   clearTopUpCaches(chain, topUpWallet);
+  // });
 
   // set wallet available and conclude
   setWalletAvailability(topUpWallet, chain, true);
   dbg('Topup complete');
 };
+
+const handlePublicTokens = async (
+  publicTokenAmounts: ERC20Amount[],
+  chain: RelayerChain,
+  topUpWallet: ActiveWallet,
+  ethersWallet: Wallet,
+) => {
+  const wrappedNativeTokenAddress =
+    getWrappedNativeTokenAddressForChain(chain).toLowerCase();
+
+  const filteredNativeTokens = publicTokenAmounts.filter(
+    (token) => token.tokenAddress.toLowerCase() === wrappedNativeTokenAddress,
+  );
+  const filteredPublicTokens = publicTokenAmounts.filter(
+    (token) => token.tokenAddress.toLowerCase() !== wrappedNativeTokenAddress,
+  );
+
+  if (filteredNativeTokens.length > 0) {
+    // preform unwrap on those tokens
+    const unwrapTxResponses = await nativeUnwrap(
+      topUpWallet,
+      filteredNativeTokens,
+      chain,
+    );
+    await waitForTxs(
+      topUpWallet,
+      ethersWallet,
+      chain,
+      unwrapTxResponses,
+      false,
+    );
+    dbg(`Unwrapping on chain ID: ${chain.id} complete.`);
+  }
+
+  if (filteredPublicTokens.length > 0) {
+    // perform approvals
+    const approvalTxResponses = await approveZeroX(
+      topUpWallet,
+      filteredPublicTokens,
+      chain,
+    );
+    await waitForTxs(
+      topUpWallet,
+      ethersWallet,
+      chain,
+      approvalTxResponses,
+      false,
+    );
+    dbg('Approvals complete');
+
+    // perform swaps
+    const swapTxResponses = await swapZeroX(
+      topUpWallet,
+      filteredPublicTokens,
+      chain,
+    );
+    await waitForTxs(topUpWallet, ethersWallet, chain, swapTxResponses, false);
+  }
+};
+function clearTopUpCaches(chain: RelayerChain, topUpWallet: ActiveWallet) {
+  dbg('Clearing Topup Cache');
+  clearCachedBalances(chain, topUpWallet.address);
+
+  // change these two to be soley chain based.
+  clearCachedTokens(chain);
+  clearCachedTransaction(chain);
+}
