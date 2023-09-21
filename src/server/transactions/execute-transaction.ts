@@ -31,10 +31,9 @@ import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import {
   cacheSubmittedTx,
   cleanupSubmittedTxs,
+  removeSubmittedTx,
   txWasAlreadySent,
 } from '../fees/gas-price-cache';
-
-
 
 const dbg = debug('relayer:transact:execute');
 
@@ -139,6 +138,7 @@ export const executeTransaction = async (
       break;
     }
   }
+  let hashGlobal = '';
 
   try {
     dbg('Submitting transaction');
@@ -147,11 +147,10 @@ export const executeTransaction = async (
     // hash the finalTransaction.data, cache this for 3 minutes, or until the tx mines.
     // having multiple tx come through with different pub keys, at the same time.
     // they both get submitted. because the second ones gas estimate doesnt fail because its not mined yet.
-    // let hashGlobal = '';
     if (setTxCached) {
       const hashOfData = hashTransactionRequest(finalTransaction);
       if (isDefined(hashOfData)) {
-        // hashGlobal = hashOfData;
+        hashGlobal = hashOfData;
         // cache this so we can compare if its been used or not.
         // this should stop the double transactions making their way through.
         // idea is to set this, and before we go further here. check if the hash has been used successfuly
@@ -188,16 +187,19 @@ export const executeTransaction = async (
       txResponse,
       nonce,
       setAvailability,
-    );
-    //   .then(() => {
-    //   if (hashGlobal !== '') {
-    //     removeSubmittedTx(chain, hashGlobal);
-    //   }
-    // });
+    ).finally(() => {
+      if (hashGlobal !== '') {
+        removeSubmittedTx(chain, hashGlobal);
+      }
+    });
 
     return txResponse;
   } catch (err) {
     dbg(err);
+    // if theres an error, clear submitted tx hash so it can be resent again.
+    if (hashGlobal !== '') {
+      removeSubmittedTx(chain, hashGlobal);
+    }
 
     setWalletAvailability(activeWallet, chain, true);
 
