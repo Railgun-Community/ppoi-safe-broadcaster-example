@@ -1,4 +1,4 @@
-import { ContractTransaction, Provider } from 'ethers';
+import { ContractTransaction, Provider, parseUnits } from 'ethers';
 import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import {
@@ -46,6 +46,15 @@ export const getMockNetwork = (): Network => {
     coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
     priceTTLInMS: 5 * 60 * 1000,
+    retryGasBuffer: parseUnits('0.1', 'gwei'),
+    topUp: {
+      allowMultiTokenTopUp: true,
+      accumulateNativeToken: true,
+      toleratedSlippage: 0.01,
+      maxSpendPercentage: 0.05,
+      swapThresholdIntoGasToken: parseUnits('1', 18),
+      minimumGasBalanceForTopup: parseUnits('0.5', 18),
+    },
   };
 };
 
@@ -68,6 +77,15 @@ export const getMockGoerliNetwork = (): Network => {
     fallbackProviderConfig: fallbackProvidersEthereumGoerli,
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,
+    retryGasBuffer: parseUnits('0.1', 'gwei'),
+    topUp: {
+      allowMultiTokenTopUp: true,
+      accumulateNativeToken: true,
+      toleratedSlippage: 0.01,
+      maxSpendPercentage: 0.05,
+      swapThresholdIntoGasToken: parseUnits('1', 18),
+      minimumGasBalanceForTopup: parseUnits('0.5', 18),
+    },
   };
 };
 

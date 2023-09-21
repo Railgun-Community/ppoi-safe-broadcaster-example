@@ -93,6 +93,7 @@ describe('approve-spender', () => {
     const approvalTxs = await generateApprovalTransactions(
       TO_APPROVE,
       MOCK_CHAIN,
+      '0x00',
     );
     expect(approvalTxs.length).to.equal(2);
   });
@@ -101,6 +102,7 @@ describe('approve-spender', () => {
     const approvalTxs = await generateApprovalTransactions(
       TO_APPROVE,
       MOCK_CHAIN,
+      '0x00',
     );
     expect(approvalTxs[0].to).to.equal(TO_APPROVE[0].tokenAddress);
     expect(approvalTxs[1].to).to.equal(TO_APPROVE[1].tokenAddress);

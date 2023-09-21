@@ -25,7 +25,8 @@ describe('erc20-token-balance', () => {
 
   it('Should pull erc20 token balance of live wallet', async () => {
     const token = getMockToken(); // SHIB
-    await expect(getERC20TokenBalance(MOCK_CHAIN, MOCK_WALLET_ADDRESS, token))
-      .to.not.be.rejected;
+    await expect(
+      getERC20TokenBalance(MOCK_CHAIN, MOCK_WALLET_ADDRESS, token.address),
+    ).to.not.be.rejected;
   }).timeout(30000);
 }).timeout(60000);
