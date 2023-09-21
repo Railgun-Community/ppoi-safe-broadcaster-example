@@ -1,0 +1,81 @@
+version: '3.9'
+
+volumes:
+  nwaku1:
+    name: 'nwaku1'
+  nwaku2:
+    name: 'nwaku2'
+  relayer:
+    name: 'relayer'
+
+services:
+  nwaku1:
+    image: nwaku:latest
+    hostname: 'nwaku1'
+    ports:
+      - '60000:60000'
+      - '9000:9000'
+      - '8000:8000'
+      - '8546:8546'
+    restart: always
+    volumes:
+      - nwaku1:/data
+      - ./appdata/swag/etc/letsencrypt:/ssl
+      - ../scripts/nwaku:/app/scripts
+    healthcheck:
+      test: curl --fail http://localhost:8546 || exit 1
+      interval: 30s
+      retries: 4
+      start_period: 10s
+      timeout: 5s
+    entrypoint: >
+      wakunode2 --config-file=/app/config.toml
+      --nat="extip:${EXTIP}"
+      --nodekey=${NODEKEY_1}
+
+  nwaku2:
+    image: nwaku:latest
+    hostname: 'nwaku2'
+    ports:
+      - '60001:60001' # p2p
+      - '9001:9001' # ENR
+      - '8001:8001' # wss
+      - '8547:8547'
+    volumes:
+      - nwaku2:/data
+      - ./appdata/swag/etc/letsencrypt:/ssl
+      - ../scripts/nwaku:/app/scripts
+    healthcheck:
+      test: curl --fail http://localhost:8547 || exit 1
+      interval: 30s
+      retries: 4
+      start_period: 10s
+      timeout: 5s
+    entrypoint: >
+      wakunode2
+        --config-file=/app/config.toml
+        --nat="extip:${EXTIP}"
+        --nodekey=${NODEKEY_2}
+        --ports-shift=1
+
+  relayer:
+    image: relayer:latest
+    hostname: 'relayer'
+    environment:
+      WAKU_RPC_URL: 'http://nwaku1:8546'
+      LEPTON_DB: '/mnt/relayer.db'
+      LOG_LEVEL: 'debug'
+      DEBUG: 'relayer*,waku:jsonrpc-api'
+    depends_on:
+      - nwaku1
+    restart: always
+    tty: true
+    volumes:
+      - relayer:/mnt
+    command: sh -c './scripts/wait-for nwaku1:8546 -t 30 -- npm start'
+
+secrets:
+  MNEMONIC:
+    external: true
+  DB_ENCRYPTION_KEY:
+    external: true
