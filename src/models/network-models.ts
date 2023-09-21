@@ -20,4 +20,15 @@ export type Network = {
   fees: FeeConfig;
   isTestNetwork?: boolean;
   skipQuickScan?: boolean;
+  topUp: TopUpConfig;
+};
+
+type TopUpConfig = {
+  allowMultiTokenTopUp: boolean;
+  accumulateNativeToken: boolean;
+  shouldNotSwap: string[];
+  toleratedSlippage: number;
+  maxSpendPercentage: number;
+  swapThresholdIntoGasToken: bigint;
+  minimumGasBalanceForTopup: bigint;
 };
