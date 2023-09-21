@@ -2,13 +2,16 @@ import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { topUpWallet } from '../transactions/top-up-wallet';
-import { shouldTopUpWallet } from './available-wallets';
-import { getActiveWallets } from './active-wallets';
+import { isWalletUnavailable } from './available-wallets';
+import { getActiveWallets, getActiveWalletsForChain } from './active-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
 import configDefaults from '../config/config-defaults';
+import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
 import { removeUndefineds } from '../../util/utils';
 import debug from 'debug';
+import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
+import { getPublicERC20AmountsBeforeUnwrap } from '../balances/top-up-balance';
 
 const dbg = debug('relayer:top-up-poller');
 
@@ -16,21 +19,46 @@ const dbg = debug('relayer:top-up-poller');
 export let shouldPollTopUp = true;
 
 const pollTopUp = async () => {
+  let walletFound = false;
+
   try {
-    const chainIDs = configuredNetworkChains();
-    await Promise.all(
-      chainIDs.map(async (chainID) => {
-        const walletToTopUp = await getTopUpWallet(chainID);
-        if (walletToTopUp) {
-          await topUpWallet(walletToTopUp, chainID);
-        }
-      }),
+    const { topUpChains } = configDefaults.topUps;
+    const chains = configuredNetworkChains().filter((c) =>
+      topUpChains.includes(c.id),
     );
+
+    logger.warn(`Starting top up on ${chains.length} Chains.`);
+
+    for (const chain of chains) {
+      // eslint-disable-next-line no-await-in-loop
+      const walletToTopUp = await getTopUpWallet(chain);
+      if (walletToTopUp) {
+        walletFound = true;
+        logger.warn('We have a wallet to top up!');
+        // eslint-disable-next-line no-await-in-loop
+        await topUpWallet(walletToTopUp, chain).catch((err) => {
+          logger.warn(
+            `Failed to top up wallet ${walletToTopUp.address} chain:${chain.id}`,
+          );
+          if (err.message.indexOf('Top Up too costly, skipping!') === -1) {
+            logger.error(err);
+          }
+        });
+      }
+    }
   } catch (err) {
     logger.warn('top up error');
     logger.error(err);
   } finally {
-    await delay(configDefaults.topUps.refreshDelayInMS);
+    // select delay based on if we found a wallet to top up or not.
+    const { refreshDelayInMS, foundRefreshDelayInMS } = configDefaults.topUps;
+    const currentDelay = walletFound ? foundRefreshDelayInMS : refreshDelayInMS;
+    if (walletFound) {
+      logger.warn('Speed up the mojo-jojo!');
+    } else {
+      logger.warn('Ohhh that slooow burn.');
+    }
+    await delay(currentDelay);
     if (shouldPollTopUp) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       pollTopUp();
@@ -42,7 +70,7 @@ export const stopTopUpPolling = () => {
   shouldPollTopUp = false;
 };
 
-export const initTopUpPoller = () => {
+export const initTopUpPoller = async () => {
   if (!configDefaults.topUps.shouldTopUp) {
     return;
   }
@@ -52,6 +80,8 @@ export const initTopUpPoller = () => {
     return;
   }
 
+  await delay(2 * 60 * 1000);
+
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   pollTopUp();
 };
@@ -59,17 +89,38 @@ export const initTopUpPoller = () => {
 export const getTopUpWallet = async (
   chain: RelayerChain,
 ): Promise<Optional<ActiveWallet>> => {
-  const activeWallets = getActiveWallets();
+  const activeWallets = getActiveWalletsForChain(chain);
 
-  const topUpWallets: Optional<ActiveWallet>[] = await Promise.all(
-    activeWallets.map(async (activeWallet) => {
-      const needsTopUp = await shouldTopUpWallet(activeWallet, chain);
-      if (needsTopUp) {
-        return activeWallet;
-      }
-      return undefined;
-    }),
+  const gasTokenBalanceMap = await getActiveWalletGasTokenBalanceMapForChain(
+    chain,
+    activeWallets,
   );
+
+  // asending sort
+  const topUpWallets: Optional<ActiveWallet>[] = activeWallets
+    .filter((wallet) => {
+      const { minimumGasBalanceForTopup } =
+        configNetworks[chain.type][chain.id].topUp;
+
+      const thresholdMet =
+        gasTokenBalanceMap[wallet.address] < minimumGasBalanceForTopup;
+
+      if (thresholdMet) {
+        logger.warn(
+          `Wallet ${wallet.address} on chain ${chain.type}:${chain.id} is below the threshold. Topping Up!`,
+        );
+      }
+
+      return thresholdMet && !isWalletUnavailable(wallet, chain);
+    })
+    .sort((a, b) => {
+      if (gasTokenBalanceMap[a.address] > gasTokenBalanceMap[b.address])
+        return 1;
+      if (gasTokenBalanceMap[a.address] < gasTokenBalanceMap[b.address])
+        return -1;
+      return 0;
+    });
+
   if (removeUndefineds(topUpWallets).length === 0) {
     return undefined;
   }
