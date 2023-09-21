@@ -43,9 +43,9 @@ export const getCachedPublicBalance = (
       tokenAddress
     ].balance;
   }
-  dbg(
-    `[${chain.type}:${chain.id}] NO PUBLIC BALANCE: Token: ${tokenAddress} Wallet: ${walletAddress}`,
-  );
+  // dbg(
+  //   `[${chain.type}:${chain.id}] NO PUBLIC BALANCE: Token: ${tokenAddress} Wallet: ${walletAddress}`,
+  // );
 
   return undefined;
 };

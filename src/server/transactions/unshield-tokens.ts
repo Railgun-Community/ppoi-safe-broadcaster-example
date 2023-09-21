@@ -61,7 +61,19 @@ export const generateUnshieldTransaction = async (
 
   logger.warn('Getting standard gas details for unshield.');
 
-  const standardGasDetails = await getStandardGasDetails(evmGasType, chain);
+  const standardGasDetails = await promiseTimeout(
+    getStandardGasDetails(evmGasType, chain),
+    5 * 60 * 1000,
+  ).catch(() => {
+    return undefined;
+  });
+
+  if (!isDefined(standardGasDetails)) {
+    throw new Error(
+      `Unshield gas estimate: Unable to get Standard Gas Details`,
+    );
+  }
+
   const originalGasDetails: TransactionGasDetails = {
     ...standardGasDetails,
     gasEstimate: 0n,
@@ -80,7 +92,7 @@ export const generateUnshieldTransaction = async (
       sendWithPublicWallet,
     ),
     5 * 60 * 1000,
-  ).catch((err: Error) => {
+  ).catch(() => {
     return { gasEstimate: undefined };
   });
 

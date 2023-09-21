@@ -37,6 +37,7 @@ import {
 } from './top-up-util';
 import { NetworkChainID } from '../config/config-chains';
 import { ChainType } from '@railgun-community/shared-models';
+import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 
 const dbg = debug('relayer:topup-util');
 
@@ -50,9 +51,10 @@ const getTopUpTokens = async (chain: RelayerChain): Promise<ERC20Amount[]> => {
   const { allowMultiTokenTopUp, accumulateNativeToken } =
     configNetworks[chain.type][chain.id].topUp;
 
-  const topUpTokens = allowMultiTokenTopUp
-    ? await getMultiTopUpTokenAmountsForChain(chain, accumulateNativeToken)
-    : await getTopUpTokenAmountsForChain(chain);
+  const topUpTokens =
+    allowMultiTokenTopUp === true
+      ? await getMultiTopUpTokenAmountsForChain(chain, accumulateNativeToken)
+      : await getTopUpTokenAmountsForChain(chain);
   if (topUpTokens.length > 0) {
     // only cache if we get a result. don't store empty array.
     cachedTopUpTokens[chain.type][chain.id] = topUpTokens;
@@ -168,7 +170,8 @@ export const topUpWallet = async (
 
     setWalletAvailability(topUpWallet, chain, true);
     clearTopUpCaches(chain, topUpWallet);
-
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    updateCachedGasTokenBalance(chain, topUpWallet.address);
     throw err;
   });
 
@@ -196,7 +199,8 @@ export const topUpWallet = async (
 
     setWalletAvailability(topUpWallet, chain, true);
     clearTopUpCaches(chain, topUpWallet);
-
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    updateCachedGasTokenBalance(chain, topUpWallet.address);
     throw err;
   });
   // .finally(() => {
@@ -215,12 +219,15 @@ export const topUpWallet = async (
     dbg('handlePublicTokens error, clearing caches.');
     setWalletAvailability(topUpWallet, chain, true);
     clearTopUpCaches(chain, topUpWallet);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    updateCachedGasTokenBalance(chain, topUpWallet.address);
+
     throw err;
   });
   // .finally(() => {
   //   clearTopUpCaches(chain, topUpWallet);
   // });
-
+  await updateCachedGasTokenBalance(chain, topUpWallet.address);
   // set wallet available and conclude
   setWalletAvailability(topUpWallet, chain, true);
   dbg('Topup complete');
