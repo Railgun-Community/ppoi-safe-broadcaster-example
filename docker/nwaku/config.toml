@@ -10,21 +10,28 @@ rpc-admin=true
 rpc-private=true
 rpc-address='0.0.0.0'
 rpc-port=8546
-relay-peer-exchange=true
-peer-exchange-node='/dns4/relayer.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg'
+#relay-peer-exchange=false
+#peer-exchange-node='/dns4/fleet.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAkyCqm8368Z1Y1pvrBcQQtb66Mjj7uvyAKGdwur3uCbqfb'
+#peer-exchange=true
 #keep-alive=true
-listen-address="0.0.0.0"
+#listen-address='0.0.0.0'
 staticnode=[
   '/dns4/dev.of.holdings/tcp/60000/p2p/16Uiu2HAmKjyaCBNtnRyyUeVefpCA88fm9TqY1XFQSnCmkLmvFh2X',
   '/dns4/relayer.crabdance.com/tcp/60000/p2p/16Uiu2HAm9TiCU9ZRPoKMUyo6QQvZTSceSH5ZtX6u353NHgVCtr1W',
   '/dns4/relayer.chickenkiller.com/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD',
-  '/ip4/18.117.34.173/tcp/60000/p2p/16Uiu2HAmEvDM3qLuS1fcAjwgDww9UqutSBCGX6yZEu9sVnLgUomj',
   '/dns4/relayer.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg',
+  '/dns4/fleet.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAkyCqm8368Z1Y1pvrBcQQtb66Mjj7uvyAKGdwur3uCbqfb',
+  '/dns4/fleet.wecamefromapes.com/tcp/60001/p2p/16Uiu2HAmTCCZFbQxDNF1TL9TKSPXtfF9QJtNWhCFE5M8UNzk7DQv',
+  '/dns4/fleet.wecamefromapes.com/tcp/60002/p2p/16Uiu2HAm2g9z6PyWCAe6RXXQto6ykD4EM6YH67mmQYfBQtb6ZxFi',
+  '/dns4/fleet.wecamefromapes.com/tcp/60003/p2p/16Uiu2HAmDii55GGfHZBz1XsJD6xmmC22baFyYQMaygv8a1yiuvEw',
+  '/dns4/fleet.wecamefromapes.com/tcp/60004/p2p/16Uiu2HAmCEDPo7wFZUdFT3iE8ntAxTxRSZHKs6cEf9Rg44NwduNr',
+  '/dns4/fleet.wecamefromapes.com/tcp/60005/p2p/16Uiu2HAkzkgDGEEah58RpR8ooFg3YbRhxJZ3pRZiZm3KGWreBfiw'
 ]
 dns-discovery=false
-#dns-discovery-url='enrtree://AOGECG2SPND25EEFMAJ5WF3KSGJNSGV356DSTL2YVLLZWIV6SAYBM@prod.waku.nodes.status.im'
-discv5-discovery=true
+discv5-discovery=false
 discv5-bootstrap-node=[
+  # fleet
+  'enr:-Ni4QNUg5tVpxoM2g3Xy-m5ASzZ3jjPxTJt2oeASwNa0d4gTFfGaKu4HvXgvoS-t9RWfynLzWZO-WUmG6RnGwhPD84sBgmlkgnY0gmlwhC0gpwuKbXVsdGlhZGRyc7hAAB02GGZsZWV0LndlY2FtZWZyb21hcGVzLmNvbQbqYAAfNhhmbGVldC53ZWNhbWVmcm9tYXBlcy5jb20GH0DeA4lzZWNwMjU2azGhAjglQdea_Nbq0ATBaxLcx4N9XizR4Y8Ghqs-Ksq3WBP-g3RjcILqYIV3YWt1MgE',
   # roh
   'enr:-Lq4QDa0zxNXjR6g_WSroaQnZDVG7FoIxhTyrvnFAhiX9GqsKAN7u4cyQDDzYnuPLzaN0gmUvZD90UsTAJ9PjDcjlMYBgmlkgnY0gmlwhKdH8B6KbXVsdGlhZGRyc5wAGjYTcmVsYXllci5vZi5ob2xkaW5ncwYfQN4DiXNlY3AyNTZrMaEDgxhTW1QQXUp6rmDAj8RflocYG0_fxiW9GnU_pzl_7XWDdGNwgupgg3VkcIIjKIV3YWt1MgE',
   # crabdance
@@ -36,7 +43,6 @@ discv5-bootstrap-node=[
 ]
 topic=[
   '/waku/2/railgun-relayer',
-#  '/waku/2/default-waku/proto'
 ]
-metrics-server=true
-max-connections=200
+metrics-server=false
+max-connections=300

@@ -13,9 +13,11 @@ services:
     image: nwaku:latest
     hostname: 'nwaku1'
     ports:
-      - 60000:60000 # p2p
-      - 9000:9000 # ENR
-      - 8000:8000 # wss
+      - '60000:60000'
+      - '9000:9000'
+      - '8000:8000'
+      - '8546:8546'
+    restart: always
     volumes:
       - nwaku1:/data
       - ./appdata/swag/etc/letsencrypt:/ssl
@@ -29,24 +31,23 @@ services:
       start_period: 10s
       timeout: 5s
     entrypoint: >
-      wakunode2
-        --config-file=/app/config.toml
-        --nat="extip:${EXTIP}"
-        --listen-address="${LISTENIP}"
-        --dns4-domain-name="${SUBDOMAIN}.${BASEDOMAIN}"
-        --nodekey="${NODEKEY_1}"
-        --websocket-support=true
-        --websocket-secure-support=true
-        --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
-        --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
+      wakunode2 --config-file=/app/config.toml
+      --nat="extip:${EXTIP}"
+      --dns4-domain-name=${SUBDOMAIN}.${BASEDOMAIN}
+      --nodekey=${NODEKEY_1}
+      --websocket-support=true
+      --websocket-secure-support=true
+      --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
+      --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
 
   nwaku2:
     image: nwaku:latest
     hostname: 'nwaku2'
     ports:
-      - 60001:60001 # p2p
-      - 9001:9001 # ENR
-      - 8001:8001 # wss
+      - '60001:60001' # p2p
+      - '9001:9001' # ENR
+      - '8001:8001' # wss
+      - '8547:8547'
     volumes:
       - nwaku2:/data
       - ./appdata/swag/etc/letsencrypt:/ssl
@@ -63,15 +64,14 @@ services:
       wakunode2
         --config-file=/app/config.toml
         --nat="extip:${EXTIP}"
-        --listen-address="${LISTENIP}"
-        --dns4-domain-name="${SUBDOMAIN}.${BASEDOMAIN}"
-        --nodekey="${NODEKEY_2}"
+        --nodekey=${NODEKEY_2}
+        --dns4-domain-name=${SUBDOMAIN}.${BASEDOMAIN}
         --websocket-support=true
         --websocket-secure-support=true
         --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"
         --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
         --ports-shift=1
-        
+
   relayer:
     image: relayer:latest
     hostname: 'relayer'
@@ -80,11 +80,10 @@ services:
       LEPTON_DB: '/mnt/relayer.db'
       LOG_LEVEL: 'debug'
       DEBUG: 'relayer*,waku:jsonrpc-api'
-    secrets:
-      - MNEMONIC
-      - DB_ENCRYPTION_KEY
     depends_on:
-      - nwaku
+      - nwaku1
+    restart: always
+    tty: true
     volumes:
       - relayer:/mnt
     command: sh -c './scripts/wait-for nwaku1:8546 -t 30 -- npm start'
@@ -104,11 +103,10 @@ services:
       - EMAIL=${EMAIL}
     volumes:
       - ./appdata/swag:/config
-      - ./swag/nwaku.subdomain.conf:/config/nginx/proxy-confs/nwaku.subdomain.conf
     ports:
       - 443:443
-      - 80:80 # must be available to obtain ssl cert from letsencrypt
-
+      - 80:80
+    restart: unless-stopped
 secrets:
   MNEMONIC:
     external: true
