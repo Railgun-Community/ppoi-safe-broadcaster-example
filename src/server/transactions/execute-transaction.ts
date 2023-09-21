@@ -8,6 +8,7 @@ import {
   ContractTransaction,
   Wallet as EthersWallet,
   TransactionResponse,
+  keccak256,
 } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
@@ -20,10 +21,20 @@ import {
   calculateGasLimitRelayer,
   calculateMaximumGasRelayer,
 } from '../fees/gas-estimate';
-import { getFirstJsonRpcProviderForNetwork } from '../providers/active-network-providers';
+import { getProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
-import { setWalletAvailability } from '../wallets/available-wallets';
+import {
+  setWalletAvailability,
+  updatePendingTransactions,
+} from '../wallets/available-wallets';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
+import {
+  cacheSubmittedTx,
+  cleanupSubmittedTxs,
+  txWasAlreadySent,
+} from '../fees/gas-price-cache';
+
+
 
 const dbg = debug('relayer:transact:execute');
 
@@ -38,7 +49,10 @@ export const getCurrentWalletNonce = async (
 ): Promise<number> => {
   try {
     const blockTag = 'pending';
-    return await wallet.getNonce(blockTag);
+
+    const result = await promiseTimeout(wallet.getNonce(blockTag), 10 * 1000);
+
+    return result;
   } catch (err) {
     return throwErr(err);
   }
@@ -78,6 +92,8 @@ export const executeTransaction = async (
   gasDetails: TransactionGasDetails,
   wallet?: ActiveWallet,
   overrideNonce?: number,
+  setAvailability = true,
+  setTxCached = true,
 ): Promise<TransactionResponse> => {
   dbg('Execute transaction');
 
@@ -85,11 +101,11 @@ export const executeTransaction = async (
   const activeWallet =
     wallet ?? (await getBestMatchWalletForNetwork(chain, maximumGas));
 
-  const provider = getFirstJsonRpcProviderForNetwork(chain);
+  const provider = getProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(activeWallet, provider);
   const nonce = overrideNonce ?? (await getCurrentWalletNonce(ethersWallet));
   const gasLimit = calculateGasLimitRelayer(gasDetails.gasEstimate, chain);
-  dbg('Nonce', nonce);
+  // dbg('Nonce', nonce);
 
   const finalTransaction: ContractTransaction = {
     ...transaction,
@@ -98,8 +114,8 @@ export const executeTransaction = async (
     gasLimit,
   };
 
-  dbg(`Gas limit: ${gasLimit}`);
-  dbg(`Gas details: ${gasDetails}`);
+  // dbg(`Gas limit: ${gasLimit}`);
+  // dbg(`Gas details: ${gasDetails}`);
 
   finalTransaction.type = gasDetails.evmGasType;
 
@@ -108,7 +124,7 @@ export const executeTransaction = async (
     case EVMGasType.Type1: {
       const { gasPrice } = gasDetails;
       finalTransaction.gasPrice = gasPrice;
-      dbg(`Gas price: ${gasPrice}`);
+      // dbg(`Gas price: ${gasPrice}`);
       break;
     }
     case EVMGasType.Type2: {
@@ -118,8 +134,8 @@ export const executeTransaction = async (
         maxFeePerGas,
         maxPriorityFeePerGas,
       );
-      dbg(`Max fee per gas: ${maxFeePerGas}`);
-      dbg(`Max priority fee: ${maxPriorityFeePerGas}`);
+      // dbg(`Max fee per gas: ${maxFeePerGas}`);
+      // dbg(`Max priority fee: ${maxPriorityFeePerGas}`);
       break;
     }
   }
@@ -128,9 +144,33 @@ export const executeTransaction = async (
     dbg('Submitting transaction');
     dbg(finalTransaction);
 
+    // hash the finalTransaction.data, cache this for 3 minutes, or until the tx mines.
+    // having multiple tx come through with different pub keys, at the same time.
+    // they both get submitted. because the second ones gas estimate doesnt fail because its not mined yet.
+    // let hashGlobal = '';
+    if (setTxCached) {
+      const hashOfData = hashTransactionRequest(finalTransaction);
+      if (isDefined(hashOfData)) {
+        // hashGlobal = hashOfData;
+        // cache this so we can compare if its been used or not.
+        // this should stop the double transactions making their way through.
+        // idea is to set this, and before we go further here. check if the hash has been used successfuly
+        // cache object will have tx completed status,
+        // these will clear out after 10 minute expiry.
+
+        // run cleanup first,
+        cleanupSubmittedTxs(chain);
+
+        if (txWasAlreadySent(chain, hashOfData)) {
+          throw new Error(ErrorMessage.REPEAT_TRANSACTION);
+        }
+        cacheSubmittedTx(chain, hashOfData);
+      }
+    }
+
     setWalletAvailability(activeWallet, chain, false);
 
-    const txResponse = await promiseTimeout(
+    const txResponse: TransactionResponse = await promiseTimeout(
       ethersWallet.sendTransaction(finalTransaction),
       // 45-second time-out. A shorter or longer timeout may cause issues with frontends.
       // Frontends submit to relayers with their own timeout; the frontend timeout may lapse before the Relayer timeout.
@@ -138,12 +178,22 @@ export const executeTransaction = async (
     );
 
     dbg('Submitted transaction:', txResponse.hash);
+    updatePendingTransactions(activeWallet, chain, true);
 
-    // Perform this action synchronously - return txResponse immediately.
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce).then(() => {
-      setWalletAvailability(activeWallet, chain, true);
-    });
+    waitForTx(
+      activeWallet,
+      ethersWallet,
+      chain,
+      txResponse,
+      nonce,
+      setAvailability,
+    );
+    //   .then(() => {
+    //   if (hashGlobal !== '') {
+    //     removeSubmittedTx(chain, hashGlobal);
+    //   }
+    // });
 
     return txResponse;
   } catch (err) {
@@ -156,19 +206,43 @@ export const executeTransaction = async (
       throw new Error(ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR);
     }
 
-    if (isDefined(errMsg) && errMsg.includes('Nonce already used')) {
+    if (
+      isDefined(errMsg) &&
+      (errMsg.includes('Nonce already used') ||
+        errMsg.includes('server response 512') ||
+        errMsg.includes('nonce has already been used') ||
+        errMsg.includes('missing response for request'))
+    ) {
+      dbg('WEIRD BAD RETURN?... ');
+      // await delay(45000); // force the mined pickup?
+      throw new Error(ErrorMessage.TRANSACTION_SEND_RPC_ERROR);
       // Try again with increased nonce.
-      return executeTransaction(
-        chain,
-        transaction,
-        gasDetails,
-        wallet,
-        nonce + 1,
-      );
+      // return executeTransaction(
+      //   chain,
+      //   transaction,
+      //   gasDetails,
+      //   activeWallet,
+      //   nonce + 1,
+      //   setAvailability,
+      // );
     }
 
+    if (isDefined(errMsg) && errMsg.includes('transaction underpriced')) {
+      dbg('Underpriced Error');
+      throw new Error(ErrorMessage.TRANSACTION_UNDERPRICED);
+    }
     throw sanitizeRelayerError(err);
   }
+};
+
+const hashTransactionRequest = (
+  request: ContractTransaction,
+): Optional<string> => {
+  if (request.data) {
+    const dataHash = keccak256(request.data);
+    return dataHash;
+  }
+  return undefined;
 };
 
 export const waitForTx = async (
@@ -177,15 +251,18 @@ export const waitForTx = async (
   chain: RelayerChain,
   txResponse: TransactionResponse,
   nonce: number,
+  setAvailability = true,
 ) => {
   try {
     await waitTx(txResponse);
     dbg(`Transaction completed/mined: ${txResponse.hash}`);
+    updatePendingTransactions(activeWallet, chain, false);
     await storeCurrentNonce(chain, nonce, ethersWallet);
   } catch (err) {
     dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
   } finally {
     await updateCachedGasTokenBalance(chain, activeWallet.address);
+    if (setAvailability) setWalletAvailability(activeWallet, chain, true);
   }
 };
 
@@ -194,11 +271,19 @@ export const waitForTxs = async (
   ethersWallet: EthersWallet,
   chain: RelayerChain,
   txResponses: TransactionResponse[],
+  setAvailability?: boolean,
 ) => {
   await Promise.all(
     txResponses.map(async (txResponse) => {
-      const nonce = await getCurrentNonce(chain, ethersWallet);
-      await waitForTx(activeWallet, ethersWallet, chain, txResponse, nonce);
+      const nonce = await getCurrentWalletNonce(ethersWallet);
+      await waitForTx(
+        activeWallet,
+        ethersWallet,
+        chain,
+        txResponse,
+        nonce,
+        setAvailability,
+      );
     }),
   );
 };
