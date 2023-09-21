@@ -17,7 +17,27 @@ import {
 } from '@railgun-community/shared-models';
 import { NetworkChainID } from './config-chains';
 import { NetworksConfig } from '../../models/config-models';
-import { NO_GAS_TOKEN_ADDRESS } from '../../models/token-models';
+import {
+  GAS_TOKEN_DECIMALS,
+  NO_GAS_TOKEN_ADDRESS,
+} from '../../models/token-models';
+import { parseUnits } from 'ethers';
+
+const tokenValue = (value: number) => {
+  return parseUnits(String(value), GAS_TOKEN_DECIMALS);
+};
+
+const QUARTER_TOKEN = tokenValue(0.25);
+
+const HALF_TOKEN = tokenValue(0.5);
+
+const ONE_TOKEN = tokenValue(1);
+
+const ONE_AND_HALF = tokenValue(1.5);
+
+const FIVE_TOKENS = tokenValue(5);
+
+const TEN_TOKENS = tokenValue(10);
 
 // 0.15 ETH minimum for L1 availability.
 const MINIMUM_BALANCE_FOR_AVAILABILITY_L1 = 0.15;
@@ -45,6 +65,15 @@ const networksConfig: NetworksConfig = {
       coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
       fallbackProviderConfig: fallbackProvidersEthereum,
       priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        shouldNotSwap: [] as string[],
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.05,
+        swapThresholdIntoGasToken: ONE_AND_HALF,
+        minimumGasBalanceForTopup: HALF_TOKEN,
+      },
     },
     [NetworkChainID.EthereumGoerli]: {
       name: 'Görli Testnet',
@@ -60,6 +89,15 @@ const networksConfig: NetworksConfig = {
       deploymentBlock: RailgunProxyDeploymentBlock.EthereumGoerli,
       fallbackProviderConfig: fallbackProvidersEthereumGoerli,
       priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        shouldNotSwap: [] as string[],
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.05,
+        swapThresholdIntoGasToken: ONE_AND_HALF,
+        minimumGasBalanceForTopup: HALF_TOKEN,
+      },
       isTestNetwork: true,
     },
     [NetworkChainID.BNBChain]: {
@@ -77,6 +115,15 @@ const networksConfig: NetworksConfig = {
       coingeckoNetworkId: CoingeckoNetworkID.BNBChain,
       fallbackProviderConfig: fallbackProvidersBNBChain,
       priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        shouldNotSwap: [] as string[],
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.05,
+        swapThresholdIntoGasToken: HALF_TOKEN,
+        minimumGasBalanceForTopup: HALF_TOKEN,
+      },
     },
     [NetworkChainID.PolygonPOS]: {
       name: 'Polygon PoS',
@@ -93,6 +140,15 @@ const networksConfig: NetworksConfig = {
       deploymentBlock: RailgunProxyDeploymentBlock.PolygonPOS,
       fallbackProviderConfig: fallbackProvidersPolygon,
       priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        shouldNotSwap: [] as string[],
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.05,
+        swapThresholdIntoGasToken: TEN_TOKENS,
+        minimumGasBalanceForTopup: FIVE_TOKENS,
+      },
     },
     [NetworkChainID.Arbitrum]: {
       name: 'Arbitrum',
@@ -109,6 +165,15 @@ const networksConfig: NetworksConfig = {
       deploymentBlock: RailgunProxyDeploymentBlock.Arbitrum,
       fallbackProviderConfig: fallbackProvidersArbitrum,
       priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        shouldNotSwap: [] as string[],
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.15,
+        swapThresholdIntoGasToken: QUARTER_TOKEN / 2n,
+        minimumGasBalanceForTopup: ONE_TOKEN / 20n, // 1/20th = 0.05
+      },
     },
     [NetworkChainID.PolygonMumbai]: {
       name: 'Mumbai Testnet',
@@ -124,6 +189,15 @@ const networksConfig: NetworksConfig = {
       deploymentBlock: RailgunProxyDeploymentBlock.PolygonMumbai,
       fallbackProviderConfig: fallbackProvidersPolygonMumbai,
       priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        shouldNotSwap: [] as string[],
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.05,
+        swapThresholdIntoGasToken: TEN_TOKENS,
+        minimumGasBalanceForTopup: FIVE_TOKENS,
+      },
       isTestNetwork: true,
     },
     [NetworkChainID.ArbitrumGoerli]: {
@@ -140,6 +214,15 @@ const networksConfig: NetworksConfig = {
       deploymentBlock: RailgunProxyDeploymentBlock.ArbitrumGoerli,
       fallbackProviderConfig: fallbackProvidersArbitrumGoerli,
       priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        shouldNotSwap: [] as string[],
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.05,
+        swapThresholdIntoGasToken: QUARTER_TOKEN / 2n,
+        minimumGasBalanceForTopup: ONE_TOKEN / 20n, // 1/20th = 0.05
+      },
       isTestNetwork: true,
     },
     [NetworkChainID.Hardhat]: {
@@ -156,6 +239,15 @@ const networksConfig: NetworksConfig = {
       deploymentBlock: RailgunProxyDeploymentBlock.Hardhat,
       fallbackProviderConfig: fallbackProvidersHardhat,
       priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        shouldNotSwap: [] as string[],
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.05,
+        swapThresholdIntoGasToken: ONE_AND_HALF,
+        minimumGasBalanceForTopup: HALF_TOKEN,
+      },
       isTestNetwork: true,
       skipQuickScan: true,
     },

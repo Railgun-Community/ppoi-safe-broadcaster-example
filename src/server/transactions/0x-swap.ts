@@ -24,44 +24,41 @@ const dbg = debug('relayer:swaps');
 export const generateSwapTransactions = async (
   erc20Amounts: ERC20Amount[],
   chain: RelayerChain,
-  shouldThrow = false,
+  walletAddress: string,
 ): Promise<ContractTransaction[]> => {
-  const populatedTransactions: Optional<ContractTransaction>[] =
-    await Promise.all(
-      erc20Amounts.map(async (erc20Amount) => {
-        try {
-          const swapQuote = await zeroXGetSwapQuote(
-            chain,
-            erc20Amount,
-            configNetworks[chain.type][chain.id].gasToken.symbol,
-            configDefaults.topUps.toleratedSlippage,
-          );
-          if (isDefined(swapQuote.error)) {
-            throw new Error(swapQuote.error);
-          }
-          if (!swapQuote.quote) {
-            const errMessage = `Failed to get zeroX Swap Quote for ${erc20Amount.tokenAddress}`;
-            if (shouldThrow) {
-              throw new Error(errMessage);
-            }
-            dbg(errMessage);
-            return undefined;
-          }
-          const populatedSwap = quoteToContractTransaction(
-            chain,
-            swapQuote.quote,
-          );
-          return populatedSwap;
-        } catch (err) {
-          const errMessage = `Could not populate swap transaction (during top-up) for token ${erc20Amount.tokenAddress}: ${err.message}`;
-          if (shouldThrow) {
-            throw new Error(errMessage);
-          }
-          dbg(errMessage);
-          return undefined;
-        }
-      }),
-    );
+  const populatedTransactions: Optional<ContractTransaction>[] = [];
+  for (const erc20Amount of erc20Amounts) {
+    try {
+      const { gasToken, topUp } = configNetworks[chain.type][chain.id];
+
+      // eslint-disable-next-line no-await-in-loop
+      const swapQuote = await zeroXGetSwapQuote(
+        chain,
+        erc20Amount,
+        gasToken.symbol,
+        topUp.toleratedSlippage,
+      );
+      if (isDefined(swapQuote.error)) {
+        throw new Error(swapQuote.error);
+      }
+      if (!swapQuote.quote) {
+        dbg(`Failed to get zeroX Swap Quote for ${erc20Amount.tokenAddress}`);
+        continue;
+      }
+      const populatedSwap = quoteToContractTransaction(
+        chain,
+        swapQuote.quote,
+        walletAddress,
+      );
+      populatedTransactions.push(populatedSwap);
+    } catch (err) {
+      dbg(
+        `Could not populate transaction for token ${erc20Amount.tokenAddress} being swapped for top up: ${err.message}`,
+      );
+      continue;
+    }
+  }
+  await Promise.all(populatedTransactions);
 
   return removeUndefineds(populatedTransactions);
 };
@@ -69,9 +66,11 @@ export const generateSwapTransactions = async (
 const quoteToContractTransaction = (
   chain: RelayerChain,
   quote: ZeroXFormattedQuoteData,
+  walletAddress: string,
 ): ContractTransaction => {
   const populatedTransaction: ContractTransaction = {
     to: zeroXExchangeProxyContractAddress(chain),
+    from: walletAddress,
     data: quote.data,
     value: BigInt(quote.value),
   };
@@ -83,34 +82,43 @@ export const swapZeroX = async (
   erc20Amounts: ERC20Amount[],
   chain: RelayerChain,
 ): Promise<TransactionResponse[]> => {
-  const populatedSwapTXs = await generateSwapTransactions(erc20Amounts, chain);
-  const TransactionResponses: TransactionResponse[] = await Promise.all(
-    populatedSwapTXs.map(async (populatedSwap) => {
-      const network = networkForChain(chain);
-      if (!network) {
-        throw new Error(
-          `Unsupported network for chain ${chain.type}:${chain.id}`,
-        );
-      }
-      const sendWithPublicWallet = true;
-      const evmGasType = getEVMGasTypeForTransaction(
-        network.name,
-        sendWithPublicWallet,
-      );
-      const gasDetails = await getEstimateGasDetailsPublic(
-        chain,
-        evmGasType,
-        populatedSwap,
-      );
-      const txResponse = await executeTransaction(
-        chain,
-        populatedSwap,
-        gasDetails,
-        activeWallet,
-      );
-      return txResponse;
-    }),
+  const populatedSwapTXs = await generateSwapTransactions(
+    erc20Amounts,
+    chain,
+    activeWallet.address,
   );
+  const TransactionResponses: TransactionResponse[] = [];
+  const network = networkForChain(chain);
+  for (const populatedSwap of populatedSwapTXs) {
+    if (!network) {
+      throw new Error(
+        `Unsupported network for chain ${chain.type}:${chain.id}`,
+      );
+    }
+    const sendWithPublicWallet = true;
+    const evmGasType = getEVMGasTypeForTransaction(
+      network.name,
+      sendWithPublicWallet,
+    );
+    // eslint-disable-next-line no-await-in-loop
+    const gasDetails = await getEstimateGasDetailsPublic(
+      chain,
+      evmGasType,
+      populatedSwap,
+    );
+    // eslint-disable-next-line no-await-in-loop
+    const txResponse = await executeTransaction(
+      chain,
+      populatedSwap,
+      gasDetails,
+      activeWallet,
+      undefined, // overrideNonce
+      false, // setAvailability
+      false, // setTxCached
+    );
+    TransactionResponses.push(txResponse);
+  }
+  await Promise.all(TransactionResponses);
 
   return TransactionResponses;
 };
