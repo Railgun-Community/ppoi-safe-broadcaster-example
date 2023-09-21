@@ -25,11 +25,12 @@ export const initRelayerModules = async (forTest = false) => {
   initSettingsDB();
   startEngine();
   await initNetworkProviders();
-  await Promise.all([initWallets(), initTokens()]);
+  await initWallets();
+  await initTokens();
   setOnBalanceUpdateCallback(onBalanceUpdateCallback);
   initPricePoller();
-  initTopUpPoller();
   logger.log('Relayer ready.');
+  initTopUpPoller();
 };
 
 export const uninitRelayerModules = async () => {
