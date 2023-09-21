@@ -11,7 +11,6 @@ import { RelayerChain } from '../../models/chain-models';
 import { removeUndefineds } from '../../util/utils';
 import debug from 'debug';
 import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
-import { getPublicERC20AmountsBeforeUnwrap } from '../balances/top-up-balance';
 
 const dbg = debug('relayer:top-up-poller');
 
