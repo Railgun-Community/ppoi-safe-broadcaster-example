@@ -1,10 +1,11 @@
 import { logger } from '../../util/logger';
-import { getTokenFee } from './calculate-token-fee';
+import { convertCachedTokenFee, getTokenFee } from './calculate-token-fee';
 import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
 import configNetworks from '../config/config-networks';
 import { ErrorMessage } from '../../util/errors';
 import { RelayerChain } from '../../models/chain-models';
 import { isDefined } from '@railgun-community/shared-models';
+import { tokenForAddress } from '../tokens/network-tokens';
 
 const comparePackagedFeeToCalculated = (
   chain: RelayerChain,
@@ -38,14 +39,14 @@ export const validateFee = (
     feeCacheID,
     tokenAddress,
   );
+  const token = tokenForAddress(chain, tokenAddress);
   if (isDefined(cachedUnitTokenFee)) {
-    if (
-      comparePackagedFeeToCalculated(
-        chain,
-        packagedFee,
-        cachedUnitTokenFee * maximumGas,
-      )
-    ) {
+    const unitTokenFee = convertCachedTokenFee(
+      cachedUnitTokenFee,
+      maximumGas,
+      token,
+    );
+    if (comparePackagedFeeToCalculated(chain, packagedFee, unitTokenFee)) {
       return;
     }
   }
