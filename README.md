@@ -24,6 +24,7 @@ The fields to configure are described below. Note that you may leave the domain 
 
 - `EXTIP` - this is the IP address at which your system can be reached by the rest of the world
 - `LISTENIP` - if your system has its own public ip, this is the same as `EXTIP`. If you are running inside docker or behind a router with NAT, this will be '0.0.0.0'
+##### Required if running with Swag
 - `BASEDOMAIN` - If your full domain were 'relayer.railgun.org, this would be 'railgun.org'
 - `SUBDOMAIN` - If your domain were `relayer.railgun.org', this would be 'relayer'
 - `TZ` - timezone code; eg 'EST'
@@ -58,7 +59,8 @@ configDefaults.networks.active = [
 Specify a waku server to use for your relayer's p2p communication. It defaults to http://localhost:8546.
 
 ```
-configDefaults.waku.rpcURL = 'http://127.0.0.1:8546'
+configDefaults.waku.rpcURL = 'http://nwaku1:8546'
+configDefaults.waku.rpcURLBackup = 'http://nwaku2:8547'
 ```
 
 - configDefaults.wallet.mnemonic
@@ -130,18 +132,33 @@ configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
       echo "sw0rdf1sh" -n | sha256sum | awk '{print $1}' | docker secret create DB_ENCRYPTION_KEY -
 
 - Generate `NODEKEY` docker secret:
+```sh 
+      # step 1:
+            ./scripts/nodekey.sh 
+      # this will generate NODEKEY_1 & NODEKEY_2 
+      # and fill them into .env if they're not already present.
 
-      scripts/nodekey.sh | docker secret create NODEKEY -
-
+      # Step 2:
+            ./scripts/nodekey.sh --set-secret 
+      # This will run the above command, but store the secrets if they're already setup. 
+```
+##### Manual Completion Example
+```sh
+docker secret create NODEKEY_1 - 0xaf46f851e0d9c2f520c89ad95d67b5d098f1d79fae2fef3f562102eca9310a66
+docker secret create NODEKEY_2 - 0xc5af820e2fb37a65470a8a7c82ba415605c83009ffcbf87916707183942bbb68
+# do not use these for your NODEKEYs
+```
 - Register `MNEMONIC` docker secret. This is an example. Your actual mnemonic is not 'my mnemonic words...'
 
       echo "my mnemonic words..." | docker secret create MNEMONIC -
 
-- Run docker/build.sh to build the `relayer` and `nwaku` docker images from your `docker/.env` environment definition
-
-      docker/build.sh
+- Run `docker/build.sh` to build the `relayer` and `nwaku` docker images from your `docker/.env` environment definition. This will compose a 'swag' version (`creates SSL certs for DOMAINS, only needed if you're using a domain`) and one that just uses the `$EXTIP` for its nwaku visibility.
+```sh
+      ./docker/build.sh
+```
 
 - Deploy stack with `./docker/run.sh`:
+- Deploy `SWAGLESS` stack with `./docker/runswagless.sh`:
 
         $ ./docker/run.sh
 
@@ -170,13 +187,13 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
       docker/build.sh
 
-- run image interactively (useful for first setup):
+- run image interactively (useful for first setup): replace `$EXTIP` with your external IP.
 
-      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -it nwaku
+      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -it nwaku --config-file=/app/config.toml --nat="extip:$EXTIP"
 
-- run image in background/detached:
+- run image in background/detached: replace `$EXTIP` with your external IP.
 
-      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -d nwaku
+      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -d nwaku --config-file=/app/config.toml --nat="extip:$EXTIP"
 
 - verify that you can communicate with your nwaku instance over json-rpc:
 

@@ -22,7 +22,8 @@
     "test": "npm run compile-test && env-cmd --no-override -e all,test mocha 'src/**/__tests__/*.test.ts'",
     "test-coverage": "npm run compile-test && env-cmd --no-override -e all,test nyc mocha 'src/**/__tests__/*.test.ts'",
     "copy-my-config": "./scripts/copy-my-config.sh",
-    "local": "npm run compile && npm run debug"
+    "local": "npm run compile && npm run debug",
+    "generate-nodekeys": "./scripts/nodekey.sh"
   },
   "keywords": [],
   "author": "",

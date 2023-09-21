@@ -12,7 +12,9 @@ if [ -f .env ]; then
   if [ ! -f docker-stack.yml ]; then
     export $(cat .env | xargs)
     envsubst < docker-stack.yml.in > docker-stack.yml
+    envsubst < docker-stack-swagless.yml.in > docker-stack-swagless.yml
     echo "generated docker-stack.yml from .env and docker-stack.yml.in"
+    echo "generated docker-stack-swagless.yml from .env and docker-stack-swagless.yml.in"
   fi
 else echo "please copy .env.example to .env and enter your config"; exit 1
 fi
