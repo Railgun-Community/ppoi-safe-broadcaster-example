@@ -174,6 +174,10 @@ export default {
       NetworkChainID.PolygonPOS,
       NetworkChainID.Arbitrum,
     ],
+    /**
+     * List of tokens not to swap.
+     */
+    shouldNotSwap: [] as string[],
   },
 
   waku: {

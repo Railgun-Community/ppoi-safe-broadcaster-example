@@ -68,7 +68,6 @@ const networksConfig: NetworksConfig = {
       topUp: {
         allowMultiTokenTopUp: true,
         accumulateNativeToken: true,
-        shouldNotSwap: [] as string[],
         toleratedSlippage: 0.01,
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: ONE_AND_HALF,
@@ -92,7 +91,6 @@ const networksConfig: NetworksConfig = {
       topUp: {
         allowMultiTokenTopUp: true,
         accumulateNativeToken: true,
-        shouldNotSwap: [] as string[],
         toleratedSlippage: 0.01,
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: ONE_AND_HALF,
@@ -118,7 +116,6 @@ const networksConfig: NetworksConfig = {
       topUp: {
         allowMultiTokenTopUp: true,
         accumulateNativeToken: true,
-        shouldNotSwap: [] as string[],
         toleratedSlippage: 0.01,
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: HALF_TOKEN,
@@ -143,7 +140,6 @@ const networksConfig: NetworksConfig = {
       topUp: {
         allowMultiTokenTopUp: true,
         accumulateNativeToken: true,
-        shouldNotSwap: [] as string[],
         toleratedSlippage: 0.01,
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: TEN_TOKENS,
@@ -168,7 +164,6 @@ const networksConfig: NetworksConfig = {
       topUp: {
         allowMultiTokenTopUp: true,
         accumulateNativeToken: true,
-        shouldNotSwap: [] as string[],
         toleratedSlippage: 0.01,
         maxSpendPercentage: 0.15,
         swapThresholdIntoGasToken: QUARTER_TOKEN / 2n,
@@ -192,7 +187,6 @@ const networksConfig: NetworksConfig = {
       topUp: {
         allowMultiTokenTopUp: true,
         accumulateNativeToken: true,
-        shouldNotSwap: [] as string[],
         toleratedSlippage: 0.01,
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: TEN_TOKENS,
@@ -217,7 +211,6 @@ const networksConfig: NetworksConfig = {
       topUp: {
         allowMultiTokenTopUp: true,
         accumulateNativeToken: true,
-        shouldNotSwap: [] as string[],
         toleratedSlippage: 0.01,
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: QUARTER_TOKEN / 2n,
@@ -242,7 +235,6 @@ const networksConfig: NetworksConfig = {
       topUp: {
         allowMultiTokenTopUp: true,
         accumulateNativeToken: true,
-        shouldNotSwap: [] as string[],
         toleratedSlippage: 0.01,
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: ONE_AND_HALF,

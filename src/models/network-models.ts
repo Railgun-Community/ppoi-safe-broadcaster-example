@@ -26,7 +26,6 @@ export type Network = {
 type TopUpConfig = {
   allowMultiTokenTopUp: boolean;
   accumulateNativeToken: boolean;
-  shouldNotSwap: string[];
   toleratedSlippage: number;
   maxSpendPercentage: number;
   swapThresholdIntoGasToken: bigint;
