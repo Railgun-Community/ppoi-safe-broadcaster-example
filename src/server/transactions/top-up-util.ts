@@ -168,7 +168,7 @@ const getConsolidatedTokenAmounts = (
       // we want to split it up into thirds to keep the tx's atleast somewhat smart with the 'funding used'
       // max publicToken 2/3 min public token 1/3 this should keep any hiccups at bay.
       totalSwapValue += swapAmount;
-      dbg(`totalSwapValue: ${totalSwapValue}`);
+      // dbg(`totalSwapValue: ${totalSwapValue}`);
       consolidatedAmounts.push(tokenInfo);
     }
   }
@@ -262,7 +262,7 @@ export const getMultiTopUpTokenAmountsForChain = async (
       gasToken.decimals,
     );
 
-    dbg('token amount', tokenAmountInGasToken);
+    // dbg('token amount', tokenAmountInGasToken);
 
     // instead lets use the cached prices, otherwise we're going to be leaking info about our balances with each api call.
     try {
@@ -278,7 +278,7 @@ export const getMultiTopUpTokenAmountsForChain = async (
       throw err;
     }
   }
-  dbg('top up amounts', topUpTokenAmountsForChain);
+  // dbg('top up amounts', topUpTokenAmountsForChain);
   // sort the array by swapValue here.
   topUpTokenAmountsForChain.sort(decendingTokenSort);
   const nativeWrappedToken = getWrappedNativeTokenAddressForChain(chain);

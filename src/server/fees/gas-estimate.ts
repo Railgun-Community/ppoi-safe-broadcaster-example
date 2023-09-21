@@ -167,6 +167,61 @@ export const getEstimateGasDetailsRelayed = async (
             `CMsg_ERROR: Relayer timed out attempting gas estimation. Please try again.`,
           );
         }
+        const formattedProvidedGas = parseFloat(
+          formatUnits(minGasPrice, 'gwei'),
+        ).toFixed(2);
+
+        try {
+          const feeData = await provider.getFeeData().catch((err) => {
+            console.log(err);
+            // throw new Error(ErrorMessage.FAILED_QUORUM);
+          });
+
+          if (feeData) {
+            const { gasPrice } = feeData;
+            console.log(feeData);
+            if (gasPrice != null) {
+              const formattedBaseFeeGas = parseFloat(
+                formatUnits(gasPrice, 'gwei'),
+              ).toFixed(2);
+              const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
+              throw new Error(newErrorMessage);
+              // console.log('GasPrice Error', newErrorMessage);
+            }
+          }
+
+          const latestBlock = await provider.getBlock('latest').catch((err) => {
+            console.log(err);
+            // throw new Error(ErrorMessage.FAILED_QUORUM);
+          });
+
+          if (latestBlock != null) {
+            const { baseFeePerGas } = latestBlock;
+            if (baseFeePerGas != null) {
+              const formattedBaseFeeGas = parseFloat(
+                formatUnits(baseFeePerGas, 'gwei'),
+              ).toFixed(2);
+              const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
+              // console.log('latestBlockError', newErrorMessage);
+              throw new Error(newErrorMessage);
+            }
+          }
+        } catch (error) {
+          if (error.message.indexOf('CMsg_') !== -1) {
+            // strip the custom message. CM
+            const newErr = new Error(error.message);
+            throw newErr;
+          } else {
+            console.log(error);
+          }
+          // console.log('ERROR', newErr);
+        }
+        const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
+        throw new Error(newErrorMessage);
+
+        // const feeData = await provider.getFeeData();
+
+        // throw new Error(ErrorMessage.FAILED_QUORUM);
       }
       return getEstimateGasDetailsRelayed(
         chain,
