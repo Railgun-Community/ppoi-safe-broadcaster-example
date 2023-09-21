@@ -161,10 +161,19 @@ export default {
     toleratedSlippage: 0.01,
 
     /**
-     * Minimum gas amount gained from token swap in order to trigger a top-up: Default is 1.5 [ETH]
+     * How often poller attempts to top-up wallets once we have found an available wallet.
      */
-    swapThresholdIntoGasToken:
-      (10 ** Number(GAS_TOKEN_DECIMALS) * 15000) / 10000,
+    foundRefreshDelayInMS: 1 * 60 * 1000,
+
+    /**
+     * List of chains that will be processed for topUps.
+     */
+    topUpChains: [
+      NetworkChainID.Ethereum,
+      NetworkChainID.BNBChain,
+      NetworkChainID.PolygonPOS,
+      NetworkChainID.Arbitrum,
+    ],
   },
 
   waku: {
