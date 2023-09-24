@@ -107,6 +107,5 @@ export const approveZeroX = async (
     // return txResponse;
     TransactionResponses.push(txResponse);
   }
-  await Promise.all(TransactionResponses);
   return removeUndefineds(TransactionResponses);
 };
