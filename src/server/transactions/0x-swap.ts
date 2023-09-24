@@ -11,8 +11,8 @@ import configNetworks from '../config/config-networks';
 import debug from 'debug';
 import { removeUndefineds } from '../../util/utils';
 import { RelayerChain } from '../../models/chain-models';
-import configDefaults from '../config/config-defaults';
 import {
+  delay,
   getEVMGasTypeForTransaction,
   isDefined,
   networkForChain,
@@ -117,8 +117,9 @@ export const swapZeroX = async (
       false, // setTxCached
     );
     TransactionResponses.push(txResponse);
+    // eslint-disable-next-line no-await-in-loop
+    await delay(2 * 1000);
   }
-  await Promise.all(TransactionResponses);
 
   return TransactionResponses;
 };

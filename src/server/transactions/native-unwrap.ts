@@ -99,27 +99,27 @@ export const gasEstimateNativeUnwrap = async (
     erc20Amounts,
     chain,
   );
-  const transactionResponses: TransactionGasDetails[] = await Promise.all(
-    populatedUnwrapTXs.map(async (populatedSwap) => {
-      const network = networkForChain(chain);
-      if (!network) {
-        throw new Error(
-          `Unsupported network for chain ${chain.type}:${chain.id}`,
-        );
-      }
-      const sendWithPublicWallet = true;
-      const evmGasType = getEVMGasTypeForTransaction(
-        network.name,
-        sendWithPublicWallet,
+  const transactionResponses: TransactionGasDetails[] = [];
+  for (const populatedSwap of populatedUnwrapTXs) {
+    const network = networkForChain(chain);
+    if (!network) {
+      throw new Error(
+        `Unsupported network for chain ${chain.type}:${chain.id}`,
       );
-      const gasDetails = await getEstimateGasDetailsPublic(
-        chain,
-        evmGasType,
-        populatedSwap,
-      );
-      return gasDetails;
-    }),
-  );
+    }
+    const sendWithPublicWallet = true;
+    const evmGasType = getEVMGasTypeForTransaction(
+      network.name,
+      sendWithPublicWallet,
+    );
+    // eslint-disable-next-line no-await-in-loop
+    const gasDetails = await getEstimateGasDetailsPublic(
+      chain,
+      evmGasType,
+      populatedSwap,
+    );
+    transactionResponses.push(gasDetails);
+  }
 
   return transactionResponses;
 };
