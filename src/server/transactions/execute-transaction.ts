@@ -1,6 +1,7 @@
 import {
   EVMGasType,
   TransactionGasDetails,
+  delay,
   isDefined,
 } from '@railgun-community/shared-models';
 import debug from 'debug';
@@ -216,7 +217,6 @@ export const executeTransaction = async (
         errMsg.includes('missing response for request'))
     ) {
       dbg('WEIRD BAD RETURN?... ');
-      // await delay(45000); // force the mined pickup?
       throw new Error(ErrorMessage.TRANSACTION_SEND_RPC_ERROR);
       // Try again with increased nonce.
       // return executeTransaction(
@@ -232,6 +232,10 @@ export const executeTransaction = async (
     if (isDefined(errMsg) && errMsg.includes('transaction underpriced')) {
       dbg('Underpriced Error');
       throw new Error(ErrorMessage.TRANSACTION_UNDERPRICED);
+    }
+
+    if (isDefined(errMsg) && errMsg.includes('already known')) {
+      await delay(45000); // force the mined pickup?
     }
     throw sanitizeRelayerError(err);
   }
