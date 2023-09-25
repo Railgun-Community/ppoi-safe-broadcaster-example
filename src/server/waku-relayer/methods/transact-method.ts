@@ -197,30 +197,48 @@ export const transactMethod = async (
 
       if (isDefined(suggestedFee)) {
         dbg('Suggested Fee Found');
-        // check if the fee is within 4 gwei of the min. if it is. try again.
+        // check if the fee is within X gwei of the min. if it is. try again.
         // additionallly, store original error, to then pass if we error again.
 
-        const suggestedFeeBN = parseUnits(suggestedFee, 'gwei');
         const minGasPriceBN = BigInt(minGasPrice);
+        const suggestedFeeBN = parseUnits(suggestedFee, 'gwei');
 
         const { retryGasBuffer } = configNetworks[chain.type][chain.id];
+        const inflatedMaxGasPrice = minGasPriceBN + retryGasBuffer;
 
-        const inflatedMinGasPrice = minGasPriceBN + retryGasBuffer;
+        const minDifference = parseUnits('0.01', 'gwei');
 
-        if (suggestedFeeBN < inflatedMinGasPrice) {
+        const suggestedDifferenceBN = suggestedFeeBN - minGasPriceBN;
+
+        const constrainedDifference =
+          minDifference > suggestedDifferenceBN
+            ? minDifference
+            : suggestedDifferenceBN;
+
+        const inflatedDifferenceBN = (constrainedDifference * 12000n) / 10000n;
+
+        const inflatedSuggestedFeeBN = minGasPriceBN + inflatedDifferenceBN;
+
+        const formattedInflatedSuggestion = parseFloat(
+          formatUnits(inflatedSuggestedFeeBN, 'gwei'),
+        ).toFixed(8);
+
+        const formattedInflatedSuggestionBN = parseUnits(
+          formattedInflatedSuggestion,
+          'gwei',
+        );
+
+        if (inflatedSuggestedFeeBN < inflatedMaxGasPrice) {
           const firstErrorResponse = new Error(newErrorString);
           try {
             dbg(
-              `LOW FEE DETECTED: Retrying Transaction with minGasPrice: ${formatUnits(
-                inflatedMinGasPrice,
-                'gwei',
-              )}`,
+              `LOW FEE DETECTED: Retrying Transaction with minGasPrice: ${formattedInflatedSuggestion}`,
             );
             const transaction = createValidTransaction(to, data, 0n);
             const txResponse = await processTransaction(
               chain,
               feeCacheID,
-              inflatedMinGasPrice,
+              formattedInflatedSuggestionBN,
               transaction,
               useRelayAdapt ?? false,
               devLog,
