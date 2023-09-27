@@ -7,8 +7,11 @@ import { delay } from '../../util/promise-utils';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { allTokenAddressesForNetwork } from './network-tokens';
 import { TokenPriceSource } from './token-price-cache';
+import debug from 'debug';
 
 let shouldPoll = true;
+
+const dbg = debug('relayer:price-poller');
 
 const pullAndCacheCurrentPricesForAllNetworks = async (
   tokenPriceRefresher: TokenPriceRefresher,
@@ -32,8 +35,8 @@ const pollPrices = async (source: TokenPriceSource) => {
   try {
     await pullAndCacheCurrentPricesForAllNetworks(tokenPriceRefresher);
   } catch (err) {
-    logger.warn('pollPrices error');
-    logger.error(err);
+    dbg('pollPrices error');
+    dbg(err);
   } finally {
     await delay(tokenPriceRefresher.refreshDelayInMS);
     if (shouldPoll) {
@@ -47,10 +50,16 @@ export const stopTokenPricePolling = () => {
   shouldPoll = false;
 };
 
-export const initPricePoller = () => {
+export const initPricePoller = async () => {
   shouldPoll = true;
-  const sources = Object.keys(
+  const priceSources = Object.keys(
     configTokenPriceRefresher.tokenPriceRefreshers,
   ) as TokenPriceSource[];
-  sources.forEach((source) => pollPrices(source));
+  for (const priceSource of priceSources) {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    pollPrices(priceSource);
+    // eslint-disable-next-line no-await-in-loop
+    await delay(5 * 1000); // give it 60 seconds
+  }
+  dbg('Price Pollers Initialized.');
 };

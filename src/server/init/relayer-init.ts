@@ -28,8 +28,10 @@ export const initRelayerModules = async (forTest = false) => {
   await initWallets();
   await initTokens();
   setOnBalanceUpdateCallback(onBalanceUpdateCallback);
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   initPricePoller();
   logger.log('Relayer ready.');
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   initTopUpPoller();
 };
 
