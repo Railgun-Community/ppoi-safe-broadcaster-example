@@ -89,7 +89,10 @@ export const zeroXUpdatePricesByAddresses = async (
 
   for (const tokenAddress of tokenAddresses) {
     // eslint-disable-next-line no-await-in-loop
-    await promiseTimeout(zeroXPriceLookupByAddress(chain, tokenAddress), 5000)
+    await promiseTimeout(
+      zeroXPriceLookupByAddress(chain, tokenAddress),
+      10 * 1000,
+    )
       .then((zeroXPriceData) => {
         if (zeroXPriceData) {
           const tokenPrice: TokenPrice = {
