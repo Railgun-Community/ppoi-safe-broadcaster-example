@@ -201,10 +201,14 @@ export const executeTransaction = async (
     if (hashGlobal !== '') {
       removeSubmittedTx(chain, hashGlobal);
     }
+    const errMsg: Optional<string> = err?.message;
 
+    if (isDefined(errMsg) && errMsg.includes('already known')) {
+      await delay(45000); // force the mined pickup?
+      throw sanitizeRelayerError(err);
+    }
     setWalletAvailability(activeWallet, chain, true);
 
-    const errMsg: Optional<string> = err?.message;
     if (isDefined(errMsg) && errMsg.includes('Timed out')) {
       throw new Error(ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR);
     }
@@ -234,9 +238,7 @@ export const executeTransaction = async (
       throw new Error(ErrorMessage.TRANSACTION_UNDERPRICED);
     }
 
-    if (isDefined(errMsg) && errMsg.includes('already known')) {
-      await delay(45000); // force the mined pickup?
-    }
+
     throw sanitizeRelayerError(err);
   }
 };
