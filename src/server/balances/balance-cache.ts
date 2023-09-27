@@ -28,6 +28,7 @@ export const updateCachedGasTokenBalance = async (
   const balance = await getGasTokenBalance(chain, walletAddress);
   if (!isDefined(balance)) {
     if (retryCount < 3) {
+      await delay(1000);
       return updateCachedGasTokenBalance(chain, walletAddress, retryCount + 1);
     }
     return;
