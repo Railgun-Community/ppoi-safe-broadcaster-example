@@ -8,6 +8,7 @@ const config: FallbackProviderJsonConfig = {
       priority: 1,
       weight: 2,
       stallTimeout: 2500,
+      maxLogsPerBatch: 1, // Supports up to 10, but at 1 ethers handles getLogs differently, and this seems to be more stable.
     },
     {
       provider: 'https://bsc-dataseed.binance.org/',
