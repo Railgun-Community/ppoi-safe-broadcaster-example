@@ -44,21 +44,27 @@ The standard relayer configurations are set in config files in `src/server/confi
 
 Configure the networks on which you want to run a relayer. Simply add or remove networks from `configDefaults.networks.active`
 
-```
-import {NetworkChainID} from './server/config/config-chain-ids';
+```ts
+import { ChainType } from '@railgun-community/shared-models';
+import { NetworkChainID } from './server/config/config-chain-ids';
 
+export const myConfigOverrides = () => {
+//...
 configDefaults.networks.active = [
     NetworkChainID.Ropsten,
     NetworkChainID.Ethereum,
     NetworkChainID.BNBChain,
   ];
+//...
+
 ```
 
 - configDefaults.waku.rpcURL
 
 Specify a waku server to use for your relayer's p2p communication. It defaults to http://localhost:8546.
 
-```
+```ts
+//...
 configDefaults.waku.rpcURL = 'http://nwaku1:8546'
 configDefaults.waku.rpcURLBackup = 'http://nwaku2:8547'
 ```
@@ -67,7 +73,8 @@ configDefaults.waku.rpcURLBackup = 'http://nwaku2:8547'
 
 Set the mnemonic used to fund the relayer
 
-```
+```ts
+//...
 configDefaults.wallet.mnemonic = "word1 word2  ..."
 ```
 
@@ -75,7 +82,8 @@ configDefaults.wallet.mnemonic = "word1 word2  ..."
 
 Set the derivation paths you want to use
 
-```
+```ts
+//...
 configDefaults.wallet.hdWallets = [
     {
       index: 0,
@@ -88,7 +96,8 @@ configDefaults.wallet.hdWallets = [
 
 Set network provider
 
-```
+```ts
+//...
 configNetworks[ChainType.EVM][NetworkChainID.Ethereum].fallbackProviderConfig.providers.unshift({
       provider: 'http://<IP>:<PORT>',
       priority: 1,
@@ -100,7 +109,8 @@ configNetworks[ChainType.EVM][NetworkChainID.Ethereum].fallbackProviderConfig.pr
 
 Set the tokens you want to accept for each network.
 
-```
+```ts
+//...
 configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
     symbol: 'TOKEN1',
   };
@@ -108,20 +118,20 @@ configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
 
 ## Run RAILGUN relayer
 
-- `npm run copy-my-config`, run in root
+- `yarn copy-my-config`, run in root
 - Make config changes to src/MY-CONFIG.ts
-- `npm install`
-- `npm start` or
-- `npm run debug` (DEBUG mode, with logs)
+- `yarn install`
 
-## Use docker
+## Running Options: 
+
+
+### Docker stack
 
 - Prereqs: Install docker
-- Create a secret key (`NODEKEY`) for your node. This is not currently used for encryption, but does establish your node's identity: `scripts/nodekey.sh`
+- Create a secret key (`NODEKEY_1 & NODEKEY_2`) for your node. This is not currently used for encryption, but does establish your node's identity: running `scripts/nodekey.sh` will generate these. (see below.)
 - Know your external IP (`EXTIP`) and verify that ports 60000 and 8000 are exposed to the outside world (see https://www.canyouseeme.org/ or similar).
 - If you have a stable ip and domain and would like to join the community fleet of bootstrap nodes, be sure to enter your `BASEDOMAIN` and optionally `SUBDOMAIN`. The `swag` service will automatically generate an SSL certificate for you through letsencrypt.
 
-### docker stack
 
 - Initialize docker swarm if you don't already have one:
 
@@ -153,6 +163,7 @@ docker secret create NODEKEY_2 - 0xc5af820e2fb37a65470a8a7c82ba415605c83009ffcbf
       echo "my mnemonic words..." | docker secret create MNEMONIC -
 
 - Run `docker/build.sh` to build the `relayer` and `nwaku` docker images from your `docker/.env` environment definition. This will compose a 'swag' version (`creates SSL certs for DOMAINS, only needed if you're using a domain`) and one that just uses the `$EXTIP` for its nwaku visibility.
+
 ```sh
       ./docker/build.sh
 ```
@@ -179,7 +190,11 @@ If you get an error about the `relayer_relayer` network not existing, just execu
       docker service logs relayer_nwaku         # nwaku network node
       docker service logs relayer_swag          # letsencrypt generation
 
-### regular docker
+<br>
+
+## Regular : 
+
+### setup & start docker nwaku 
 
 - copy `docker/.env.empty` to `docker/.env` and fill in `EXTIP`, `NODEKEY`, `LISTENIP` (see above)
 
@@ -197,15 +212,18 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 - verify that you can communicate with your nwaku instance over json-rpc:
 
-      scripts/nwaku/whoami.sh
+`scripts/nwaku/whoami.sh`
 
 - verify that nwaku is connected to other nwaku nodes:
 
-      scripts/nwaku/peers.sh
+`scripts/nwaku/peers.sh`
 
+### start relayer 
+- `yarn start` or
+- `yarn debug` (DEBUG mode, with logs)
 ## Diagnostics
 
-- should be able to run ./scripts/nwaku/whoami.sh and see something like:
+- run `./scripts/nwaku/whoami.sh` and see something like:
 
 ```
 {
@@ -217,7 +235,7 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 }
 ```
 
-- should be able to run ./scripts/nwaku/peers.sh and see something like:
+- run `./scripts/nwaku/peers.sh` and see something like:
 
 ```
 [
@@ -259,5 +277,5 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 ## Run tests
 
-- `npm run test`
-- `npm run test-coverage` (with code coverage visualizer)
+- `yarn test`
+- `yarn test-coverage` (with code coverage visualizer)
