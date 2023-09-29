@@ -90,6 +90,20 @@ export default {
     failedRetryAttempts: 3,
   },
 
+  /**
+   * Amount of times the pending TX poller will loop, if at the end it
+   * still has pending transactions; it will attempt to 'reset' the transaction
+   * and clear the pending queue.
+   */
+  maxPendingTxRetryCount: 20,
+
+  /**
+   * Interval at which the pending transaction poller will fire off.
+   * It will take (maxPendingTxRetryCount * pendingPollingTxDelay / 1000) seconds
+   * to reach the point at which it will attempt to trigger the termination transaction.
+   */
+  pendingTxPollingDelay: 1 * 60 * 1000, // 1 minute
+
   tokenPrices: {
     /**
      * Number of times to retry price lookup.
@@ -174,8 +188,9 @@ export default {
       NetworkChainID.PolygonPOS,
       NetworkChainID.Arbitrum,
     ],
+
     /**
-     * List of tokens not to swap.
+     * List of token addresses not to swap. This list can be composed of tokens across chains.
      */
     shouldNotSwap: [] as string[],
   },

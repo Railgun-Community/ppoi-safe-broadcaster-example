@@ -6,16 +6,11 @@ import { resetMapObject } from '../../util/utils';
 import { getCachedGasTokenBalance } from '../balances/balance-cache';
 import configNetworks from '../config/config-networks';
 import debug from 'debug';
-import { delay } from '../../util/promise-utils';
-import {
-  getFirstJsonRpcProviderForNetwork,
-  getProviderForNetwork,
-} from '../providers/active-network-providers';
-import { isDefined, promiseTimeout } from '@railgun-community/shared-models';
+import { hasPendingTransactions } from './pending-wallet';
 
 const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
-const dbg = debug('relayer:wallets:availability');
+export const dbg = debug('relayer:wallets:availability');
 
 const lastUsedWalletAddressMap: NumMapType<NumMapType<string>> = {};
 
@@ -144,72 +139,5 @@ export const resetAvailableWallets = (chain: RelayerChain) => {
   resetMapObject(unavailableWalletMap[chain.type][chain.id]);
 };
 
-const pendingTransactionCache: NumMapType<NumMapType<MapType<boolean>>> = {};
 
-const initPendingTransactionCache = (chain: RelayerChain) => {
-  pendingTransactionCache[chain.type] ??= {};
-  pendingTransactionCache[chain.type][chain.id] ??= {};
-};
-
-export const hasPendingTransactions = (
-  wallet: ActiveWallet,
-  chain: RelayerChain,
-): boolean => {
-  // create cache for this.
-  // and update based on tx completion.
-
-  initPendingTransactionCache(chain);
-
-  const cached = pendingTransactionCache[chain.type][chain.id][wallet.address];
-  if (isDefined(cached)) {
-    // if cached is true means we need to lazyload poll it to update. keep true state for now, it will update on its own.
-    if (cached === true) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      checkForPendingTransactions(chain, wallet);
-      //
-    }
-    return cached;
-  }
-  // upon initial start of the relayer, no accounts should have pending transactions.
-  // or any subsequent restarts. please make sure to clear them out then restart if they become an issue.
-  pendingTransactionCache[chain.type][chain.id][wallet.address] = false;
-
-  // idea is to setup a poller once we've identified a pending tx situation, and then just watch it explicitly.
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  checkForPendingTransactions(chain, wallet);
-  return false;
-};
-
-export const updatePendingTransactions = (
-  wallet: ActiveWallet,
-  chain: RelayerChain,
-  value: boolean,
-) => {
-  //
-  initPendingTransactionCache(chain);
-  pendingTransactionCache[chain.type][chain.id][wallet.address] = value;
-};
-
-async function checkForPendingTransactions(
-  chain: RelayerChain,
-  wallet: ActiveWallet,
-) {
-  const provider = getFirstJsonRpcProviderForNetwork(chain);
-  try {
-    const txCountPending = await promiseTimeout(
-      provider.getTransactionCount(wallet.address, 'pending'),
-      5 * 1000,
-    );
-    await delay(200);
-    const txCountLatest = await promiseTimeout(
-      provider.getTransactionCount(wallet.address, 'latest'),
-      5 * 1000,
-    );
-    const pendingCount = txCountPending - txCountLatest;
-    const hasTransactions = pendingCount > 0;
-    updatePendingTransactions(wallet, chain, hasTransactions);
-  } catch (error) {
-    dbg(error.message);
-  }
-}
 
