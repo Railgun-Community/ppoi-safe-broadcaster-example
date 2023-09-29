@@ -110,6 +110,16 @@ const pollPendingTransactions = async (
   wallet: ActiveWallet,
   retryCount = 0,
 ) => {
+  const {
+    maxPendingTxRetryCount,
+    pendingTxPollingDelay,
+    terminatePendingTransactions,
+  } = configDefaults;
+
+  if (!terminatePendingTransactions) {
+    return;
+  }
+
   if (retryCount === 0) {
     dbg('Initializing Pending Transaction Poller.');
     dbg('Awaiting transaction to send...');
@@ -119,7 +129,6 @@ const pollPendingTransactions = async (
     `Polling Pending Transactions for ${wallet.address} on ${chain.type}:${chain.id}`,
   );
 
-  const { maxPendingTxRetryCount, pendingTxPollingDelay } = configDefaults;
   const hasPending = getPendingCache(chain, wallet);
 
   if (hasPending) {

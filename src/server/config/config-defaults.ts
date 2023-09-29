@@ -91,6 +91,11 @@ export default {
   },
 
   /**
+   * Enables auto-removal of pending transactions that don't mine immediately and hang for a while.
+   */
+  terminatePendingTransactions: false,
+
+  /**
    * Amount of times the pending TX poller will loop, if at the end it
    * still has pending transactions; it will attempt to 'reset' the transaction
    * and clear the pending queue.
