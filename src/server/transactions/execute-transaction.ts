@@ -24,10 +24,8 @@ import {
 } from '../fees/gas-estimate';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
-import {
-  setWalletAvailability,
-  updatePendingTransactions,
-} from '../wallets/available-wallets';
+import { setWalletAvailability } from '../wallets/available-wallets';
+import { updatePendingTransactions } from '../wallets/pending-wallet';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import {
   cacheSubmittedTx,
@@ -169,6 +167,7 @@ export const executeTransaction = async (
     }
 
     setWalletAvailability(activeWallet, chain, false);
+    updatePendingTransactions(activeWallet, chain, true); // set it before, incase we encounter error and dont get hash, it should still properly poll.
 
     const txResponse: TransactionResponse = await promiseTimeout(
       ethersWallet.sendTransaction(finalTransaction),
@@ -178,7 +177,6 @@ export const executeTransaction = async (
     );
 
     dbg('Submitted transaction:', txResponse.hash);
-    updatePendingTransactions(activeWallet, chain, true);
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     waitForTx(
@@ -237,7 +235,6 @@ export const executeTransaction = async (
       dbg('Underpriced Error');
       throw new Error(ErrorMessage.TRANSACTION_UNDERPRICED);
     }
-
 
     throw sanitizeRelayerError(err);
   }
