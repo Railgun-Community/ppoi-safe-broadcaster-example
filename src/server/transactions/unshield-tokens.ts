@@ -2,6 +2,7 @@ import {
   populateProvedUnshield,
   generateUnshieldProof,
   gasEstimateForUnprovenUnshield,
+  rescanFullMerkletreesAndWallets,
 } from '@railgun-community/wallet';
 import {
   getEVMGasTypeForTransaction,
@@ -31,6 +32,7 @@ import configNetworks from '../config/config-networks';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import { TransactionResponse, ContractTransaction, formatUnits } from 'ethers';
 import debug from 'debug';
+import { delay } from '../../util/promise-utils';
 
 const dbg = debug('relayer:top-up-unshield');
 
@@ -80,6 +82,9 @@ export const generateUnshieldTransaction = async (
   };
 
   logger.warn('Getting gas estimate for unshield.');
+
+  const unshieldEstimateTimeout = 5 * 60 * 1000;
+
   const { gasEstimate } = await promiseTimeout(
     gasEstimateForUnprovenUnshield(
       network.name,
@@ -91,15 +96,21 @@ export const generateUnshieldTransaction = async (
       undefined, // feeTokenDetails
       sendWithPublicWallet,
     ),
-    5 * 60 * 1000,
-  ).catch(() => {
+    unshieldEstimateTimeout,
+  ).catch(async (err) => {
+    dbg('Unshield Gas Error:', err.message);
+    if (err.message.includes('Invalid Merkle Root') === true) {
+      dbg('SYNC ERROR: Invalid Merkle Root');
+      await rescanFullMerkletreesAndWallets(chain);
+      dbg('Merkle Rescan Complete.');
+    }
     return { gasEstimate: undefined };
   });
 
   if (!isDefined(gasEstimate)) {
     throw new Error(`Unshield gas estimate: No gas estimate returned`);
   }
-  logger.warn('Generating Proof for unshield.');
+  dbg('Generating Proof for unshield.');
 
   await generateUnshieldProof(
     network.name,
