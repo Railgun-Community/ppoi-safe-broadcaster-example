@@ -50,7 +50,7 @@ export const stopTokenPricePolling = () => {
   shouldPoll = false;
 };
 
-export const initPricePoller = async () => {
+export const initPricePoller = () => {
   shouldPoll = true;
   const priceSources = Object.keys(
     configTokenPriceRefresher.tokenPriceRefreshers,
@@ -59,7 +59,7 @@ export const initPricePoller = async () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     pollPrices(priceSource);
     // eslint-disable-next-line no-await-in-loop
-    await delay(5 * 1000); // give it 60 seconds
+    // await delay(5 * 1000); // give it 60 seconds
   }
   dbg('Price Pollers Initialized.');
 };
