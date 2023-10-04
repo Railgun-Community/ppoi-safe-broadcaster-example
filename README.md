@@ -1,10 +1,10 @@
 [![Unit Tests](https://github.com/Railgun-Community/relayer/actions/workflows/unit-tests.yml/badge.svg?branch=master)](https://github.com/Railgun-Community/relayer/actions)
 
-# Transaction anonymizing relayer for RAILGUN
+# Example Relayer code for RAILGUN transactions
 
-The RAILGUN relayer network runs on [Waku](https://wakunetwork.com/), a secure and decentralized messaging protocol.
+This network runs on [Waku](https://wakunetwork.com/), a secure and decentralized messaging protocol.
 
-`relayer` is a node application which relays transactions for RAILGUN users so that their transactions are signed by your address rather than their own. Your relayer will broadcast fees on the tokens you configure it to accept at the rates you define. Messages are sent over the waku peer to peer network.
+`relayer-example` is a node application which relays transactions for RAILGUN users so that their transactions are signed and forwarded by your address to the blockchain. The relayer will broadcast fees on the tokens you configure it to accept at the rates you define. Messages are sent over the waku peer to peer network.
 
 ## Prerequisites
 
@@ -24,7 +24,9 @@ The fields to configure are described below. Note that you may leave the domain 
 
 - `EXTIP` - this is the IP address at which your system can be reached by the rest of the world
 - `LISTENIP` - if your system has its own public ip, this is the same as `EXTIP`. If you are running inside docker or behind a router with NAT, this will be '0.0.0.0'
+
 ##### Required if running with Swag
+
 - `BASEDOMAIN` - If your full domain were 'relayer.railgun.org, this would be 'railgun.org'
 - `SUBDOMAIN` - If your domain were `relayer.railgun.org', this would be 'relayer'
 - `TZ` - timezone code; eg 'EST'
@@ -65,8 +67,8 @@ Specify a waku server to use for your relayer's p2p communication. It defaults t
 
 ```ts
 //...
-configDefaults.waku.rpcURL = 'http://nwaku1:8546'
-configDefaults.waku.rpcURLBackup = 'http://nwaku2:8547'
+configDefaults.waku.rpcURL = 'http://nwaku1:8546';
+configDefaults.waku.rpcURLBackup = 'http://nwaku2:8547';
 ```
 
 - configDefaults.wallet.mnemonic
@@ -75,7 +77,7 @@ Set the mnemonic used to fund the relayer
 
 ```ts
 //...
-configDefaults.wallet.mnemonic = "word1 word2  ..."
+configDefaults.wallet.mnemonic = 'word1 word2  ...';
 ```
 
 - configDefaults.wallet.hdWallets
@@ -85,11 +87,11 @@ Set the derivation paths you want to use
 ```ts
 //...
 configDefaults.wallet.hdWallets = [
-    {
-      index: 0,
-      priority: 1,
-    },
-  ];
+  {
+    index: 0,
+    priority: 1,
+  },
+];
 ```
 
 - configNetworks
@@ -98,10 +100,12 @@ Set network provider
 
 ```ts
 //...
-configNetworks[ChainType.EVM][NetworkChainID.Ethereum].fallbackProviderConfig.providers.unshift({
-      provider: 'http://<IP>:<PORT>',
-      priority: 1,
-      weight: 1,
+configNetworks[ChainType.EVM][
+  NetworkChainID.Ethereum
+].fallbackProviderConfig.providers.unshift({
+  provider: 'http://<IP>:<PORT>',
+  priority: 1,
+  weight: 1,
 });
 ```
 
@@ -112,18 +116,17 @@ Set the tokens you want to accept for each network.
 ```ts
 //...
 configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
-    symbol: 'TOKEN1',
-  };
+  symbol: 'TOKEN1',
+};
 ```
 
-## Run RAILGUN relayer
+## Run relayer-example
 
 - `yarn copy-my-config`, run in root
 - Make config changes to src/MY-CONFIG.ts
 - `yarn install`
 
-## Running Options: 
-
+## Running Options:
 
 ### Docker stack
 
@@ -131,7 +134,6 @@ configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
 - Create a secret key (`NODEKEY_1 & NODEKEY_2`) for your node. This is not currently used for encryption, but does establish your node's identity: running `scripts/nodekey.sh` will generate these. (see below.)
 - Know your external IP (`EXTIP`) and verify that ports 60000 and 8000 are exposed to the outside world (see https://www.canyouseeme.org/ or similar).
 - If you have a stable ip and domain and would like to join the community fleet of bootstrap nodes, be sure to enter your `BASEDOMAIN` and optionally `SUBDOMAIN`. The `swag` service will automatically generate an SSL certificate for you through letsencrypt.
-
 
 - Initialize docker swarm if you don't already have one:
 
@@ -142,22 +144,26 @@ configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
       echo "sw0rdf1sh" -n | sha256sum | awk '{print $1}' | docker secret create DB_ENCRYPTION_KEY -
 
 - Generate `NODEKEY` docker secret:
-```sh 
+
+```sh
       # step 1:
-            ./scripts/nodekey.sh 
-      # this will generate NODEKEY_1 & NODEKEY_2 
+            ./scripts/nodekey.sh
+      # this will generate NODEKEY_1 & NODEKEY_2
       # and fill them into .env if they're not already present.
 
       # Step 2:
-            ./scripts/nodekey.sh --set-secret 
-      # This will run the above command, but store the secrets if they're already setup. 
+            ./scripts/nodekey.sh --set-secret
+      # This will run the above command, but store the secrets if they're already setup.
 ```
+
 ##### Manual Completion Example
+
 ```sh
 docker secret create NODEKEY_1 - 0xaf46f851e0d9c2f520c89ad95d67b5d098f1d79fae2fef3f562102eca9310a66
 docker secret create NODEKEY_2 - 0xc5af820e2fb37a65470a8a7c82ba415605c83009ffcbf87916707183942bbb68
 # do not use these for your NODEKEYs
 ```
+
 - Register `MNEMONIC` docker secret. This is an example. Your actual mnemonic is not 'my mnemonic words...'
 
       echo "my mnemonic words..." | docker secret create MNEMONIC -
@@ -192,9 +198,9 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 <br>
 
-## Regular : 
+## Regular :
 
-### setup & start docker nwaku 
+### setup & start docker nwaku
 
 - copy `docker/.env.empty` to `docker/.env` and fill in `EXTIP`, `NODEKEY`, `LISTENIP` (see above)
 
@@ -218,9 +224,11 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 `scripts/nwaku/peers.sh`
 
-### start relayer 
+### start relayer
+
 - `yarn start` or
 - `yarn debug` (DEBUG mode, with logs)
+
 ## Diagnostics
 
 - run `./scripts/nwaku/whoami.sh` and see something like:
