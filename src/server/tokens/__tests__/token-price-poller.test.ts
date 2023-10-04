@@ -89,7 +89,7 @@ describe('token-price-poller', () => {
   });
 
   it('Should pull prices immediately on init', async () => {
-    initPricePoller();
+    await initPricePoller();
 
     // Wait for async call to finish.
     await delay(10);

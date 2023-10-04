@@ -22,10 +22,7 @@ import {
   calculateGasLimitRelayer,
   calculateMaximumGasRelayer,
 } from '../fees/gas-estimate';
-import {
-  getFirstJsonRpcProviderForNetwork,
-  getProviderForNetwork,
-} from '../providers/active-network-providers';
+import { getFirstJsonRpcProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
 import { setWalletAvailability } from '../wallets/available-wallets';
 import { updatePendingTransactions } from '../wallets/pending-wallet';

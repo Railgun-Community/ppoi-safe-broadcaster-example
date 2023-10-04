@@ -1,5 +1,4 @@
 import { Contract } from 'ethers';
-import { Token } from '../../models/token-models';
 import { logger } from '../../util/logger';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { RelayerChain } from '../../models/chain-models';

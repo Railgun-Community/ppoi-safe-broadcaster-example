@@ -1,5 +1,4 @@
 import { DebugLevel } from '../../models/debug-models';
-import { GAS_TOKEN_DECIMALS } from '../../models/token-models';
 import { NetworkChainID } from './config-chains';
 import secrets from './config-secrets';
 

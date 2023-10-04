@@ -32,7 +32,6 @@ import configNetworks from '../config/config-networks';
 import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import { TransactionResponse, ContractTransaction, formatUnits } from 'ethers';
 import debug from 'debug';
-import { delay } from '../../util/promise-utils';
 
 const dbg = debug('relayer:top-up-unshield');
 

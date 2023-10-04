@@ -60,7 +60,7 @@ describe('wallet-top-up-poller', () => {
 
   it('Should find no active wallets during top up', async () => {
     createGasBalanceStub(MOCK_WALLET_1_GAS_BALANCE);
-    initTopUpPoller();
+    await initTopUpPoller();
     // Wait for async call to finish.
     await delay(10);
     stopTopUpPolling();
@@ -68,8 +68,8 @@ describe('wallet-top-up-poller', () => {
     restoreGasBalanceStub();
   });
 
-  it('Should not poll for top up if less than two active wallets', () => {
-    initTopUpPoller();
+  it('Should not poll for top up if less than two active wallets', async () => {
+    await initTopUpPoller();
     expect(shouldPollTopUp).to.equal(false);
   });
 }).timeout(20000);

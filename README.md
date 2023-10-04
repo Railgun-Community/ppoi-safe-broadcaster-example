@@ -1,4 +1,4 @@
-[![Unit Tests](https://github.com/Railgun-Community/relayer/actions/workflows/unit-tests.yml/badge.svg?branch=master)](https://github.com/Railgun-Community/relayer/actions)
+[![Unit Tests](https://github.com/Railgun-Community/relayer-example/actions/workflows/unit-tests.yml/badge.svg?branch=master)](https://github.com/Railgun-Community/relayer-example/actions)
 
 # Example Relayer code for RAILGUN transactions
 

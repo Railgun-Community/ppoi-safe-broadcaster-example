@@ -30,7 +30,7 @@ describe('relayer-init', () => {
       .resolves();
     const stubInitPricePoller = sinon
       .stub(activeTokenPricePollerModule, 'initPricePoller')
-      .returns();
+      .resolves();
 
     const forTest = true;
     await initRelayerModules(forTest);
