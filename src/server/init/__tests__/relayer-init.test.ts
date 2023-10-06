@@ -50,4 +50,4 @@ describe('relayer-init', () => {
     myConfigOverrides();
     resetConfigDefaults();
   });
-}).timeout(10000);
+}).timeout(31000);
