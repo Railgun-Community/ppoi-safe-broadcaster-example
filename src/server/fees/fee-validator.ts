@@ -18,6 +18,12 @@ const comparePackagedFeeToCalculated = (
     (calculatedFee *
       BigInt(Math.round(10000 * (1 - gasEstimateVarianceBuffer)))) /
     10000n;
+
+  console.log('gasEstimateVarianceBuffer', gasEstimateVarianceBuffer);
+  console.log('calculatedFeeWithBuffer', calculatedFeeWithBuffer);
+  console.log('packageFee', packagedFee);
+  console.log('result', packagedFee >= calculatedFeeWithBuffer);
+
   return packagedFee >= calculatedFeeWithBuffer;
 };
 
@@ -28,7 +34,7 @@ export const validateFee = (
   feeCacheID: string,
   packagedFee: bigint,
 ) => {
-  logger.log(
+  console.log(
     `validateFee: token ${tokenAddress} (chain ${chain.type}:${chain.id})`,
   );
 
@@ -46,26 +52,30 @@ export const validateFee = (
       maximumGas,
       token,
     );
+    console.log('unitTokenFee', unitTokenFee);
     if (comparePackagedFeeToCalculated(chain, packagedFee, unitTokenFee)) {
+      console.log('unit fee passed');
       return;
     }
   }
 
   // Re-calculate the fee based on current pricing if cache is expired.
+  console.log('recalculating the fee');
   let calculatedFee;
   try {
     calculatedFee = getTokenFee(chain, maximumGas, tokenAddress);
+    console.log('recalculatedFee', calculatedFee);
     if (comparePackagedFeeToCalculated(chain, packagedFee, calculatedFee)) {
       return;
     }
   } catch (err) {
-    logger.log(`error getting current token fee: ${err.message}`);
+    console.log(`error getting current token fee: ${err.message}`);
   }
 
-  logger.log(`maximumGas: ${maximumGas}`);
-  logger.log(`cachedUnitTokenFee: ${cachedUnitTokenFee}`);
-  logger.log(`calculatedFee: ${calculatedFee}`);
-  logger.log(`packagedFee: ${packagedFee}`);
+  console.log(`maximumGas: ${maximumGas}`);
+  console.log(`cachedUnitTokenFee: ${cachedUnitTokenFee}`);
+  console.log(`calculatedFee: ${calculatedFee}`);
+  console.log(`packagedFee: ${packagedFee}`);
 
   throw new Error(ErrorMessage.REJECTED_PACKAGED_FEE);
 };

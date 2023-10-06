@@ -39,7 +39,7 @@ describe('wallet-top-up-poller', () => {
     await setupSingleTestWallet();
   });
 
-  after(() => {
+  afterEach(() => {
     restoreGasBalanceStub();
     resetConfigDefaults();
   });
