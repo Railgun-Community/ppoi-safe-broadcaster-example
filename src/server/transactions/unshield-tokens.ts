@@ -106,11 +106,6 @@ export const generateUnshieldTransaction = async (
     return { gasEstimate: undefined };
   });
 
-  if (!isDefined(gasEstimate)) {
-    throw new Error(`Unshield gas estimate: No gas estimate returned`);
-  }
-  dbg('Generating Proof for unshield.');
-
   await generateUnshieldProof(
     network.name,
     railgunWalletID,
@@ -125,6 +120,10 @@ export const generateUnshieldTransaction = async (
     }, // progressCallback
   );
 
+  if (!isDefined(gasEstimate)) {
+    throw new Error(`Unshield gas estimate: No gas estimate returned`);
+  }
+  dbg('Generating Proof for unshield.');
   const finalGasDetails: TransactionGasDetails = {
     ...originalGasDetails,
     gasEstimate,

@@ -1,6 +1,12 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { Wallet as EthersWallet, TransactionResponse } from 'ethers';
+import {
+  Wallet as EthersWallet,
+  TransactionResponse,
+  Contract,
+  FallbackProvider,
+  zeroPadValue,
+} from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import { getActiveWallets } from '../../wallets/active-wallets';
 import { getMockGoerliNetwork, getMockToken } from '../../../test/mocks.test';
@@ -22,7 +28,13 @@ import {
   restoreGasEstimateStubs,
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
-import { generateApprovalTransactions, approveZeroX } from '../approve-spender';
+import {
+  generateApprovalTransactions,
+  approveZeroX,
+  MAX_UINT_ALLOWANCE,
+} from '../approve-spender';
+import { ABI_ERC20 } from '../../abi/abi';
+import { bigIntToHex } from '../../../util/utils';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -32,6 +44,7 @@ let walletGetTransactionCountStub: SinonStub;
 let sendTransactionStub: SinonStub;
 let waitTxStub: SinonStub;
 let getBestMatchWalletForNetwork: SinonStub;
+let allowanceStub: SinonStub;
 
 const MOCK_TOKEN_ADDRESS = getMockToken().address;
 
@@ -46,6 +59,7 @@ const MOCK_TOKEN_AMOUNT_2 = {
 const TO_APPROVE = [MOCK_TOKEN_AMOUNT_1, MOCK_TOKEN_AMOUNT_2];
 
 const MOCK_CHAIN = testChainGoerli();
+const MOCK_UINT_ALLOWANCE = 1000n;
 
 describe('approve-spender', () => {
   before(async () => {
@@ -70,6 +84,10 @@ describe('approve-spender', () => {
     getBestMatchWalletForNetwork = sinon
       .stub(BestWalletMatchModule, 'getBestMatchWalletForNetwork')
       .resolves(activeWallet);
+    const resolvedAllowance = zeroPadValue(bigIntToHex(100n), 32);
+    allowanceStub = sinon
+      .stub(FallbackProvider.prototype, 'call')
+      .resolves(resolvedAllowance);
     const gasEstimate = 1000n;
     const maxFeePerGas = BigInt(90);
     const maxPriorityFeePerGas = 10n;
@@ -86,6 +104,7 @@ describe('approve-spender', () => {
     sendTransactionStub.restore();
     waitTxStub.restore();
     getBestMatchWalletForNetwork.restore();
+    allowanceStub.restore();
     restoreGasEstimateStubs();
   });
 
@@ -93,7 +112,7 @@ describe('approve-spender', () => {
     const approvalTxs = await generateApprovalTransactions(
       TO_APPROVE,
       MOCK_CHAIN,
-      '0x00',
+      activeWallet.address,
     );
     expect(approvalTxs.length).to.equal(2);
   });
@@ -102,7 +121,7 @@ describe('approve-spender', () => {
     const approvalTxs = await generateApprovalTransactions(
       TO_APPROVE,
       MOCK_CHAIN,
-      '0x00',
+      activeWallet.address,
     );
     expect(approvalTxs[0].to).to.equal(TO_APPROVE[0].tokenAddress);
     expect(approvalTxs[1].to).to.equal(TO_APPROVE[1].tokenAddress);

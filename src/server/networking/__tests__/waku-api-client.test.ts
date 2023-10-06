@@ -4,6 +4,7 @@ import sinon, { SinonStub } from 'sinon';
 import { WakuApiClient, WakuRelayMessage } from '../waku-api-client';
 import {
   setupSingleTestWallet,
+  setupTestNetwork,
   testChainEthereum,
 } from '../../../test/setup.test';
 import { startEngine } from '../../engine/engine-init';
@@ -12,6 +13,9 @@ import { resetTokenPriceCache } from '../../tokens/token-price-cache';
 import { resetTransactionFeeCache } from '../../fees/transaction-fee-cache';
 import configTokens from '../../config/config-tokens';
 import { initTokens } from '../../tokens/network-tokens';
+import { getMockNetwork } from '../../../test/mocks.test';
+import configNetworks from '../../config/config-networks';
+import { initNetworkProviders } from '../../providers/active-network-providers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -31,7 +35,7 @@ describe('waku-api-client', () => {
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',
     };
-    await initTokens();
+    await initTokens(MOCK_CHAIN);
 
     client = new WakuApiClient({ url: '', urlBackup: '' });
     clientHTTPStub = sinon.stub(client.http, 'post');

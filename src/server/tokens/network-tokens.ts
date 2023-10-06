@@ -12,8 +12,15 @@ import { isDefined } from '@railgun-community/shared-models';
 
 export const networkTokens: NumMapType<NumMapType<Token[]>> = {};
 
-export const initTokens = async () => {
+export const initTokens = async (testChain?: RelayerChain) => {
   for (const chain of configuredNetworkChains()) {
+    if (isDefined(testChain)) {
+      if (testChain.id !== chain.id) {
+        console.log('SKIPPING UNTESTED CHAINS');
+        continue;
+      }
+    }
+
     const tokensForChain = configTokens[chain.type][chain.id];
     if (!isDefined(tokensForChain)) {
       networkTokens[chain.type] ??= [];

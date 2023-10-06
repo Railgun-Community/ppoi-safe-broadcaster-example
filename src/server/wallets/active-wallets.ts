@@ -55,7 +55,7 @@ const initRailgunWallet = async (mnemonic: string) => {
   railgunWalletID = railgunWalletInfo.id;
 };
 
-export const initWallets = async () => {
+export const initWallets = async (testing = false) => {
   resetWallets();
   const { mnemonic, hdWallets } = configDefaults.wallet;
   hdWallets.forEach(({ index, priority, chains }) => {
@@ -73,7 +73,9 @@ export const initWallets = async () => {
     });
   });
   await initRailgunWallet(mnemonic);
-  printDebugWalletData();
+  if (!testing) {
+    printDebugWalletData();
+  }
 };
 
 const printDebugWalletData = () => {
