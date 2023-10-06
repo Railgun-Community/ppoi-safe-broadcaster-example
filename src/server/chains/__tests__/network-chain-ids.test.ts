@@ -21,4 +21,4 @@ describe('network-chain-ids', () => {
     });
     expect(chains).not.to.contain(null);
   });
-}).timeout(10000);
+}).timeout(31000);

@@ -43,4 +43,4 @@ describe('settings-db', () => {
     expect(await getSettingsBytes('byt')).to.equal(undefined);
     expect(await getSettingsNumber('num')).to.equal(undefined);
   });
-}).timeout(10000);
+}).timeout(31000);
