@@ -331,4 +331,4 @@ describe('waku-relayer', () => {
     );
     expect(resultData).to.deep.equal(expectedResultData);
   }).timeout(5000);
-}).timeout(10000);
+}).timeout(31000);

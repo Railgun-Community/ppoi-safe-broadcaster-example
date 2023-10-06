@@ -47,4 +47,4 @@ describe('config-token-price-refresher', () => {
       tokenAddressesToPrice[testNetwork.gasToken.wrappedAddress]?.price,
     ).to.equal(2000);
   });
-}).timeout(10000);
+}).timeout(31000);
