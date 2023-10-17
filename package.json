@@ -1,6 +1,6 @@
 {
-  "name": "@railgun-community/relayer",
-  "version": "4.1.0",
+  "name": "@railgun-community/poi-compliant-relayer-example",
+  "version": "5.0.0",
   "description": "",
   "main": "dist/main.js",
   "packageManager": "yarn@1.22.19",

@@ -1,6 +1,6 @@
-[![Unit Tests](https://github.com/Railgun-Community/relayer-example/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/relayer-example/actions)
+[![Unit Tests](https://github.com/Railgun-Community/poi-compliant-relayer-example/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/poi-compliant-relayer-example/actions)
 
-# Example Relayer code for RAILGUN transactions
+# Example code for POI-Compliant RAILGUN transactions
 
 This network runs on [Waku](https://wakunetwork.com/), a secure and decentralized messaging protocol.
 

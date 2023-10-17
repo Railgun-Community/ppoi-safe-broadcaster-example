@@ -17,6 +17,7 @@ import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import { executeTransaction } from './execute-transaction';
 import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
 import { ContractTransaction, TransactionResponse } from 'ethers';
+import { validatePOI } from './poi-validator';
 
 const dbg = debug('relayer:transact:validate');
 
@@ -77,6 +78,8 @@ export const processTransaction = async (
   dbg('Transaction gas details:', transactionGasDetails);
 
   await validateMinGasPrice(chain, minGasPrice, evmGasType);
+
+  await validatePOI();
 
   return executeTransaction(chain, transaction, transactionGasDetails);
 };
