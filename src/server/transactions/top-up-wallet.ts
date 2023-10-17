@@ -36,12 +36,15 @@ import {
   clearCachedTokens,
 } from './top-up-util';
 import { NetworkChainID } from '../config/config-chains';
-import { ChainType } from '@railgun-community/shared-models';
+import { ChainType, TXIDVersion } from '@railgun-community/shared-models';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 
 const dbg = debug('relayer:topup-util');
 
-const getTopUpTokens = async (chain: RelayerChain): Promise<ERC20Amount[]> => {
+const getTopUpTokens = async (
+  txidVersion: TXIDVersion,
+  chain: RelayerChain,
+): Promise<ERC20Amount[]> => {
   initTopUpTokenCache(chain);
   if (typeof cachedTopUpTokens[chain.type][chain.id] !== 'undefined') {
     dbg('Using cached topUpTokens');
@@ -53,8 +56,12 @@ const getTopUpTokens = async (chain: RelayerChain): Promise<ERC20Amount[]> => {
 
   const topUpTokens =
     allowMultiTokenTopUp === true
-      ? await getMultiTopUpTokenAmountsForChain(chain, accumulateNativeToken)
-      : await getTopUpTokenAmountsForChain(chain);
+      ? await getMultiTopUpTokenAmountsForChain(
+          txidVersion,
+          chain,
+          accumulateNativeToken,
+        )
+      : await getTopUpTokenAmountsForChain(txidVersion, chain);
   if (topUpTokens.length > 0) {
     // only cache if we get a result. don't store empty array.
     cachedTopUpTokens[chain.type][chain.id] = topUpTokens;
@@ -64,9 +71,10 @@ const getTopUpTokens = async (chain: RelayerChain): Promise<ERC20Amount[]> => {
 
 export const topUpWallet = async (
   topUpWallet: ActiveWallet,
+  txidVersion: TXIDVersion,
   chain: RelayerChain,
 ) => {
-  const topUpTokens = await getTopUpTokens(chain);
+  const topUpTokens = await getTopUpTokens(txidVersion, chain);
   // also cache the topUpTokens. this is to prevent it from halting if the balances increase to a point at which
   // the thresholds no longer aremet, and it doesnt get past the check for tokens to use.
   // do it this way instead of attempting to control the quantities of tokens used. just store, as those values are the
@@ -110,7 +118,7 @@ export const topUpWallet = async (
   }
   if (topUpTokens.length === 0) {
     dbg(
-      `No tokens to top up wallet ${topUpWallet.address} on chain ${chain.id}`,
+      `No tokens to top up wallet ${topUpWallet.address} on chain ${chain.id}, txidVersion ${txidVersion}`,
     );
 
     // check to see if we have any tokens to unwrap, maybe the last topup failed?
@@ -123,7 +131,7 @@ export const topUpWallet = async (
 
   // begin topup
   dbg(
-    `Begin top up for wallet with address ${topUpWallet.address} and index ${topUpWallet.index} on chain ${chain.type}:${chain.id}`,
+    `Begin top up for wallet with address ${topUpWallet.address} and index ${topUpWallet.index} on chain ${chain.type}:${chain.id}, txidVersion ${txidVersion}`,
   );
   const railgunWalletID = getRailgunWalletID();
   setWalletAvailability(topUpWallet, chain, false, false);
@@ -132,6 +140,7 @@ export const topUpWallet = async (
 
   // unshield tokens intended to swap
   const batchResponse = await unshieldTokens(
+    txidVersion,
     railgunWalletID,
     configDefaults.engine.dbEncryptionKey,
     topUpWallet.address,

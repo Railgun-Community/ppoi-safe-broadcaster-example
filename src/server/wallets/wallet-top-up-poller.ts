@@ -11,6 +11,7 @@ import { RelayerChain } from '../../models/chain-models';
 import { removeUndefineds } from '../../util/utils';
 import debug from 'debug';
 import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
+import { TXIDVersion } from '@railgun-community/shared-models';
 
 const dbg = debug('relayer:top-up-poller');
 
@@ -34,15 +35,17 @@ const pollTopUp = async () => {
       if (walletToTopUp) {
         walletFound = true;
         logger.warn('We have a wallet to top up!');
-        // eslint-disable-next-line no-await-in-loop
-        await topUpWallet(walletToTopUp, chain).catch((err) => {
-          logger.warn(
-            `Failed to top up wallet ${walletToTopUp.address} chain:${chain.id}`,
-          );
-          if (err.message.indexOf('Top Up too costly, skipping!') === -1) {
-            logger.error(err);
-          }
-        });
+        for (const txidVersion of Object.values(TXIDVersion)) {
+          // eslint-disable-next-line no-await-in-loop
+          await topUpWallet(walletToTopUp, txidVersion, chain).catch((err) => {
+            logger.warn(
+              `Failed to top up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${txidVersion}`,
+            );
+            if (err.message.indexOf('Top Up too costly, skipping!') === -1) {
+              logger.error(err);
+            }
+          });
+        }
       }
     }
   } catch (err) {

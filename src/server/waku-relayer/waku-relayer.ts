@@ -2,6 +2,7 @@ import debug from 'debug';
 import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
 
 import {
+  POIRequired,
   fromUTF8String,
   signWithWalletViewingKey,
 } from '@railgun-community/wallet';
@@ -24,6 +25,7 @@ import {
   RelayerFeeMessage,
   RelayerFeeMessageData,
   isDefined,
+  networkForChain,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../util/relayer-version';
 import configDefaults from '../config/config-defaults';
@@ -154,6 +156,15 @@ export class WakuRelayer {
     // Availability must be accurate or Relayer risks automatic blocking by clients.
     const availableWallets = await numAvailableWallets(chain);
 
+    const network = networkForChain(chain);
+    if (!network) {
+      throw new Error('No network found');
+    }
+    // DO NOT CHANGE : Required in order to make relayer fees spendable
+    const requiredPOIListKeys = await POIRequired.getRequiredListKeys(
+      network.name,
+    );
+
     const data: RelayerFeeMessageData = {
       fees: feesHex,
       // client can't rely on message timestamp to calculate expiration
@@ -164,6 +175,7 @@ export class WakuRelayer {
       availableWallets,
       version: getRelayerVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
+      requiredPOIListKeys, // DO NOT CHANGE : Required in order to make relayer fees spendable
     };
     const message = fromUTF8String(JSON.stringify(data));
     const signature = await signWithWalletViewingKey(

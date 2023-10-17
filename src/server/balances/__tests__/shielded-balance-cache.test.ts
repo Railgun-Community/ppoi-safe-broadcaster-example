@@ -7,7 +7,7 @@ import {
 } from '../shielded-balance-cache';
 import { setupSingleTestWallet } from '../../../test/setup.test';
 import { startEngine } from '../../engine/engine-init';
-import { ChainType } from '@railgun-community/shared-models';
+import { ChainType, TXIDVersion } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -16,6 +16,8 @@ const MOCK_CHAIN = {
   type: ChainType.EVM,
   id: NetworkChainID.Ethereum,
 };
+
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 const MOCK_TOKEN_AMOUNT = BigInt('1000000000000000000000');
 
@@ -31,7 +33,7 @@ describe('shielded-balance-cache', () => {
 
   // Skipped because balances aren't necessarily scanned yet.
   it.skip('Should pull shielded token balance of live wallet', async () => {
-    await updateShieldedBalances(MOCK_CHAIN, false);
+    await updateShieldedBalances(txidVersion, MOCK_CHAIN, false);
     const mockBalance =
       getPrivateTokenBalanceCache(MOCK_CHAIN)[0].erc20Amount.amount;
     expect(mockBalance).to.equal(MOCK_TOKEN_AMOUNT);

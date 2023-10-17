@@ -24,6 +24,7 @@ import configNetworks from '../../config/config-networks';
 import {
   RelayerEncryptedMethodParams,
   RelayerRawParamsTransact,
+  TXIDVersion,
   isDefined,
   versionCompare,
 } from '@railgun-community/shared-models';
@@ -67,7 +68,10 @@ export const transactMethod = async (
   const viewingPrivateKey = getRailgunWalletPrivateViewingKey(railgunWalletID);
   const sharedKey = await ed.getSharedSecret(viewingPrivateKey, clientPubKey);
 
-  const decrypted = await tryDecryptData(encryptedData, sharedKey);
+  const decrypted = (await tryDecryptData(
+    encryptedData,
+    sharedKey,
+  )) as RelayerRawParamsTransact;
   if (decrypted == null) {
     // Incorrect key. Skipping transact message.
     dbg('Cannot decrypt - Not intended receiver');
@@ -86,7 +90,11 @@ export const transactMethod = async (
     devLog,
     minVersion,
     maxVersion,
-  } = decrypted as RelayerRawParamsTransact;
+  } = decrypted;
+
+  const txidVersion = decrypted.txidVersion ?? TXIDVersion.V2_PoseidonMerkle;
+  const preTransactionPOIsPerTxidLeafPerList =
+    decrypted.preTransactionPOIsPerTxidLeafPerList ?? {};
 
   const chain: RelayerChain = {
     type: chainType,
@@ -179,11 +187,13 @@ export const transactMethod = async (
     const transaction = createValidTransaction(to, data, 0n);
 
     const txResponse = await processTransaction(
+      txidVersion,
       chain,
       feeCacheID,
       BigInt(minGasPrice),
       transaction,
       useRelayAdapt ?? false,
+      preTransactionPOIsPerTxidLeafPerList,
       devLog,
     );
     return resultResponse(id, chain, sharedKey, txResponse);
@@ -236,11 +246,13 @@ export const transactMethod = async (
             );
             const transaction = createValidTransaction(to, data, 0n);
             const txResponse = await processTransaction(
+              txidVersion,
               chain,
               feeCacheID,
               formattedInflatedSuggestionBN,
               transaction,
               useRelayAdapt ?? false,
+              preTransactionPOIsPerTxidLeafPerList,
               devLog,
             );
             return resultResponse(id, chain, sharedKey, txResponse);
@@ -303,6 +315,7 @@ const replaceErrorMessageNonDev = (
     case ErrorMessage.RELAYER_OUT_OF_GAS:
     case ErrorMessage.NOTE_ALREADY_SPENT:
     case ErrorMessage.UNKNOWN_ERROR:
+    case ErrorMessage.POI_INVALID:
       return errMsg;
   }
   return ErrorMessage.UNKNOWN_ERROR;

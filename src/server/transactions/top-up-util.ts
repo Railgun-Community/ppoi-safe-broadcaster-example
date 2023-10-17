@@ -13,13 +13,14 @@ import debug from 'debug';
 import { getTokenPricesFromCachedPrices } from '../fees/calculate-token-fee';
 import { formatEther, formatUnits, parseUnits } from 'ethers';
 import { getWrappedNativeTokenAddressForChain } from '../balances/top-up-balance';
-import { promiseTimeout } from '@railgun-community/shared-models';
+import { promiseTimeout, TXIDVersion } from '@railgun-community/shared-models';
 
 const dbg = debug('relayer:topup-util');
 
 let initialRun = true;
 
 const getShieldedTokenAmountsForChain = async (
+  txidVersion: TXIDVersion,
   chain: RelayerChain,
 ): Promise<ShieldedCachedBalance[]> => {
   const shieldedBalancesForChain = getPrivateTokenBalanceCache(chain);
@@ -34,7 +35,7 @@ const getShieldedTokenAmountsForChain = async (
   if (forceRefresh) {
     const fullRescan = false;
     await promiseTimeout(
-      updateShieldedBalances(chain, fullRescan),
+      updateShieldedBalances(txidVersion, chain, fullRescan),
       5 * 60 * 1000,
     ).catch((err: Error) => {
       dbg(err.message);
@@ -182,10 +183,14 @@ const getConsolidatedTokenAmounts = (
 };
 
 export const getMultiTopUpTokenAmountsForChain = async (
+  txidVersion: TXIDVersion,
   chain: RelayerChain,
   setNativeLast: boolean,
 ): Promise<ERC20Amount[]> => {
-  const tokenAmountsForChain = await getShieldedTokenAmountsForChain(chain);
+  const tokenAmountsForChain = await getShieldedTokenAmountsForChain(
+    txidVersion,
+    chain,
+  );
   const topUpThreshold =
     configNetworks[chain.type][chain.id].topUp.swapThresholdIntoGasToken;
 
@@ -334,7 +339,11 @@ export const getMultiTopUpTokenAmountsForChain = async (
 
   if (setNativeLast) {
     dbg(`Retrying attempt of finding tokens to unshield.`);
-    const retry = await getMultiTopUpTokenAmountsForChain(chain, false);
+    const retry = await getMultiTopUpTokenAmountsForChain(
+      txidVersion,
+      chain,
+      false,
+    );
     return retry;
   }
 
@@ -342,9 +351,13 @@ export const getMultiTopUpTokenAmountsForChain = async (
 };
 
 export const getTopUpTokenAmountsForChain = async (
+  txidVersion: TXIDVersion,
   chain: RelayerChain,
 ): Promise<ERC20Amount[]> => {
-  const tokenAmountsForChain = await getShieldedTokenAmountsForChain(chain);
+  const tokenAmountsForChain = await getShieldedTokenAmountsForChain(
+    txidVersion,
+    chain,
+  );
   const topUpTokenAmountsForChain: Optional<ERC20Amount>[] = [];
 
   for (const shieldedTokenCache of tokenAmountsForChain) {

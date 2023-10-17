@@ -1,5 +1,7 @@
 import {
   EVMGasType,
+  PreTransactionPOIsPerTxidLeafPerList,
+  TXIDVersion,
   getEVMGasTypeForTransaction,
   networkForChain,
 } from '@railgun-community/shared-models';
@@ -22,11 +24,13 @@ import { validatePOI } from './poi-validator';
 const dbg = debug('relayer:transact:validate');
 
 export const processTransaction = async (
+  txidVersion: TXIDVersion,
   chain: RelayerChain,
   feeCacheID: string,
   minGasPrice: bigint,
   transaction: ContractTransaction,
   useRelayAdapt: boolean,
+  preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList,
   devLog?: boolean,
 ): Promise<TransactionResponse> => {
   // Minimum gas for gas estimate wallet: 0.15 (or 0.01 L2).
@@ -79,7 +83,16 @@ export const processTransaction = async (
 
   await validateMinGasPrice(chain, minGasPrice, evmGasType);
 
-  await validatePOI();
+  // DO NOT MODIFY.
+  // WARNING: If you modify POI validation, you risk fees that aren't spendable, as they won't have valid POIs.
+  await validatePOI(
+    txidVersion,
+    chain,
+    transaction,
+    useRelayAdapt,
+    preTransactionPOIsPerTxidLeafPerList,
+  );
+  // DO NOT MODIFY.
 
   return executeTransaction(chain, transaction, transactionGasDetails);
 };

@@ -35,6 +35,11 @@ export default {
     ],
   },
 
+  poi: {
+    /** Proof of Innocence aggregator node URL */
+    nodeURL: process.env.POI_NODE_URL ?? 'todo-poi-url', // TODO: Add a default from community-run POI aggregator.
+  },
+
   debug: {
     /**
      * Log extra information about tokens, fees and incoming transactions.

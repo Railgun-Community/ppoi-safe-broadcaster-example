@@ -2,7 +2,7 @@ import {
   populateProvedUnshield,
   generateUnshieldProof,
   gasEstimateForUnprovenUnshield,
-  rescanFullMerkletreesAndWallets,
+  rescanFullUTXOMerkletreesAndWallets,
 } from '@railgun-community/wallet';
 import {
   getEVMGasTypeForTransaction,
@@ -11,6 +11,7 @@ import {
   promiseTimeout,
   RailgunERC20AmountRecipient,
   TransactionGasDetails,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { RelayerChain } from '../../models/chain-models';
 import { ERC20Amount } from '../../models/token-models';
@@ -36,6 +37,7 @@ import debug from 'debug';
 const dbg = debug('relayer:top-up-unshield');
 
 export const generateUnshieldTransaction = async (
+  txidVersion: TXIDVersion,
   railgunWalletID: string,
   dbEncryptionKey: string,
   toWalletAddress: string,
@@ -86,6 +88,7 @@ export const generateUnshieldTransaction = async (
 
   const { gasEstimate } = await promiseTimeout(
     gasEstimateForUnprovenUnshield(
+      txidVersion,
       network.name,
       railgunWalletID,
       dbEncryptionKey,
@@ -100,7 +103,7 @@ export const generateUnshieldTransaction = async (
     dbg('Unshield Gas Error:', err.message);
     if (err.message.includes('Invalid Merkle Root') === true) {
       dbg('SYNC ERROR: Invalid Merkle Root');
-      await rescanFullMerkletreesAndWallets(chain);
+      await rescanFullUTXOMerkletreesAndWallets(chain);
       dbg('Merkle Rescan Complete.');
     }
     return { gasEstimate: undefined };
@@ -112,6 +115,7 @@ export const generateUnshieldTransaction = async (
   dbg('Generating Proof for unshield.');
 
   await generateUnshieldProof(
+    txidVersion,
     network.name,
     railgunWalletID,
     dbEncryptionKey,
@@ -130,6 +134,7 @@ export const generateUnshieldTransaction = async (
     gasEstimate,
   };
   const { transaction } = await populateProvedUnshield(
+    txidVersion,
     network.name,
     railgunWalletID,
     erc20AmountRecipients,
@@ -144,6 +149,7 @@ export const generateUnshieldTransaction = async (
 };
 
 export const unshieldTokens = async (
+  txidVersion: TXIDVersion,
   railgunWalletID: string,
   dbEncryptionKey: string,
   toWalletAddress: string,
@@ -170,6 +176,7 @@ export const unshieldTokens = async (
 
   if (!cachedTransaction) {
     populatedTransaction = await generateUnshieldTransaction(
+      txidVersion,
       railgunWalletID,
       dbEncryptionKey,
       toWalletAddress,

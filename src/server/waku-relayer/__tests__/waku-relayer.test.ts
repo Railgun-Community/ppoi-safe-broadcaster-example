@@ -55,6 +55,7 @@ import {
   RelayerFeeMessage,
   RelayerFeeMessageData,
   RelayerRawParamsTransact,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../../util/relayer-version';
 import {
@@ -203,6 +204,7 @@ describe('waku-relayer', () => {
       getRailgunWalletAddressData(railgunWalletAddress);
 
     const data: RelayerRawParamsTransact = {
+      txidVersion: TXIDVersion.V2_PoseidonMerkle,
       chainID: chain.id,
       chainType: chain.type,
       feesID: '468abc',
@@ -214,6 +216,7 @@ describe('waku-relayer', () => {
       devLog: true,
       minVersion: getRelayerVersion(),
       maxVersion: getRelayerVersion(),
+      preTransactionPOIsPerTxidLeafPerList: {},
     };
     const randomPrivKey = getRandomBytes(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
@@ -246,6 +249,7 @@ describe('waku-relayer', () => {
       getRailgunWalletAddressData(railgunWalletAddress);
 
     const data: RelayerRawParamsTransact = {
+      txidVersion: TXIDVersion.V2_PoseidonMerkle,
       chainID: chain.id,
       chainType: chain.type,
       feesID: '468abc',
@@ -257,6 +261,7 @@ describe('waku-relayer', () => {
       devLog: true,
       minVersion: getRelayerVersion(),
       maxVersion: getRelayerVersion(),
+      preTransactionPOIsPerTxidLeafPerList: {},
     };
     const randomPrivKey = getRandomBytes(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);

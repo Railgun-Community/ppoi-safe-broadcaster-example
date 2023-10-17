@@ -30,6 +30,7 @@ start-relayer.sh
 src/MY-CONFIG.ts
 docker/secret
 src/test/test-config-overrides.test.ts
+artifacts-v2.1
 
 # Leveldown database
 *.db/

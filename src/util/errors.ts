@@ -18,6 +18,7 @@ export enum ErrorMessage {
   RELAYER_OUT_OF_GAS = 'Relayer is out of gas, or currently does not have enough to process this transaction.',
   NOTE_ALREADY_SPENT = 'ALREADY SPENT: One of the notes contained in this transaction have already been spent!',
   TRANSACTION_UNDERPRICED = 'RPC Rejected Transction: Gas fee too low. Please select a higher gas price and resubmit.',
+  POI_INVALID = 'Could not validate Proof of Innocence - Relayer cannot process this transaction.',
 }
 
 const sanitizeEthersError = (errMessage: string) => {

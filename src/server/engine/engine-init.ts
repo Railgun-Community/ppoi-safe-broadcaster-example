@@ -7,7 +7,7 @@ import {
   ArtifactStore,
   loadProvider,
   getProver,
-  Groth16,
+  SnarkJSGroth16,
 } from '@railgun-community/wallet';
 import fs from 'fs';
 import {
@@ -52,9 +52,10 @@ export const startEngine = () => {
     testArtifactStore,
     false, // useNativeArtifacts
     false, // skipMerkletreeScans
+    configDefaults.poi.nodeURL,
   );
   engineStarted = true;
-  getProver().setSnarkJSGroth16(groth16 as Groth16);
+  getProver().setSnarkJSGroth16(groth16 as SnarkJSGroth16);
 };
 
 export const stopEngine = async () => {

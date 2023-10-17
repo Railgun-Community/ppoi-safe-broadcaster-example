@@ -5,7 +5,11 @@ import {
 import { resetMapObject } from '../../util/utils';
 import { ERC20Amount } from '../../models/token-models';
 import { RelayerChain } from '../../models/chain-models';
-import { RailgunBalancesEvent, isDefined } from '@railgun-community/shared-models';
+import {
+  RailgunBalancesEvent,
+  TXIDVersion,
+  isDefined,
+} from '@railgun-community/shared-models';
 import { getRailgunWalletID } from '../wallets/active-wallets';
 import debug from 'debug';
 
@@ -28,6 +32,7 @@ export const resetShieldedTokenBalanceCache = () => {
 let balancePromiseResolve: Optional<() => void>;
 
 export const updateShieldedBalances = async (
+  txidVersion: TXIDVersion,
   chain: RelayerChain,
   fullRescan: boolean,
 ) => {
@@ -38,7 +43,7 @@ export const updateShieldedBalances = async (
     balancePromiseResolve = resolve;
   });
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  refreshRailgunBalances(chain, railgunWalletID, fullRescan);
+  refreshRailgunBalances(txidVersion, chain, railgunWalletID, fullRescan);
   return balancePromise;
 };
 
@@ -67,9 +72,7 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
   if (isDefined(balancePromiseResolve)) {
     balancePromiseResolve();
   }
-  dbg(
-    `Shielded balances updated for ${chain.type}:${chain.id}`,
-  );
+  dbg(`Shielded balances updated for ${chain.type}:${chain.id}`);
 };
 
 export const getPrivateTokenBalanceCache = (

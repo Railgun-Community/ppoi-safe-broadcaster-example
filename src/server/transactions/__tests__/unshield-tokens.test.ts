@@ -22,7 +22,7 @@ import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 import { generateUnshieldTransaction } from '../unshield-tokens';
 import configDefaults from '../../config/config-defaults';
 import { getRailgunSmartWalletContractForNetwork } from '@railgun-community/wallet';
-import { networkForChain } from '@railgun-community/shared-models';
+import { TXIDVersion, networkForChain } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -46,6 +46,8 @@ const MOCK_TOKEN_AMOUNT_2 = {
 };
 
 const MOCK_CHAIN = testChainGoerli();
+
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 // const zeroProof = (): Proof => {
 //   const zero = nToHex(0n, ByteLength.UINT_8);
@@ -90,6 +92,7 @@ describe('unshield-tokens', () => {
 
   it('Should fail with insufficient token balance', async () => {
     const populatedTransaction = generateUnshieldTransaction(
+      txidVersion,
       railgunWalletID,
       configDefaults.engine.dbEncryptionKey,
       activeWallet.address,
@@ -106,6 +109,7 @@ describe('unshield-tokens', () => {
     'Should generate populated transaction to railgun contract ready for execute transaction',
     async () => {
       const populatedTransaction = await generateUnshieldTransaction(
+        txidVersion,
         railgunWalletID,
         configDefaults.engine.dbEncryptionKey,
         activeWallet.address,
