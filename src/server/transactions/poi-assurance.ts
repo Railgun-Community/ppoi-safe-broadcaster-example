@@ -11,10 +11,13 @@ import { ValidatedPOIData } from './poi-validator';
 import { RelayerChain } from '../../models/chain-models';
 import debug from 'debug';
 import {
+  ByteLength,
   Database,
   POINodeRequest,
+  formatToByteLength,
   getRailgunTransactionsForTxid,
   refreshReceivePOIsForWallet,
+  walletForID,
 } from '@railgun-community/wallet';
 import { getRailgunWalletID } from '../wallets/active-wallets';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
@@ -173,7 +176,23 @@ export class POIAssurance {
         await refreshReceivePOIsForWallet(txidVersion, network.name, walletID);
       }
 
+      const wallet = walletForID(walletID);
+      const spendableReceivedTxids = (
+        await wallet.getSpendableReceivedChainTxids(txidVersion, chain)
+      ).map((txid) => formatToByteLength(txid, ByteLength.UINT_256));
+
       for (const validatedPOI of validatedPOIs) {
+        const txidFormatted = formatToByteLength(
+          validatedPOI.txid,
+          ByteLength.UINT_256,
+        );
+        if (spendableReceivedTxids.includes(txidFormatted)) {
+          dbg('TXID is spendable - deleting validated POI');
+          // eslint-disable-next-line no-await-in-loop
+          await this.deleteValidatedPOI(txidVersion, chain, validatedPOI.txid);
+          continue;
+        }
+
         // eslint-disable-next-line no-await-in-loop
         await this.submitValidatedPOI(txidVersion, chain, validatedPOI);
       }
@@ -237,7 +256,7 @@ export class POIAssurance {
         singleCommitmentProofsData,
       );
 
-      await this.deleteValidatedPOI(txidVersion, chain, txid);
+      dbg('Submitted single commitment proof to POI node');
     } catch (err) {
       dbg(
         `Could not submit validated POI for railgun txid ${railgunTxid} ${chain.type}:${chain.id} for ${txidVersion}: ${err.message}`,
