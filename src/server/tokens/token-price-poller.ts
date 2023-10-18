@@ -2,7 +2,6 @@ import configNetworks from '../config/config-networks';
 import configTokenPriceRefresher, {
   TokenPriceRefresher,
 } from '../config/config-token-price-refresher';
-import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { allTokenAddressesForNetwork } from './network-tokens';

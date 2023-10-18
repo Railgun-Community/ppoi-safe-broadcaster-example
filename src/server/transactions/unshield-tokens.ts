@@ -222,6 +222,8 @@ export const unshieldTokens = async (
     chain,
     populatedTransaction,
     gasDetails,
+    undefined, // txidVersion
+    undefined, // validatedPOIData
     unshieldWallet,
   );
 

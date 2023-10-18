@@ -1,5 +1,6 @@
 import {
   EVMGasType,
+  TXIDVersion,
   TransactionGasDetails,
   delay,
   isDefined,
@@ -33,6 +34,8 @@ import {
   removeSubmittedTx,
   txWasAlreadySent,
 } from '../fees/gas-price-cache';
+import { ValidatedPOIData } from './poi-validator';
+import { POIAssurance } from './poi-assurance';
 
 const dbg = debug('relayer:transact:execute');
 
@@ -88,6 +91,8 @@ export const executeTransaction = async (
   chain: RelayerChain,
   transaction: ContractTransaction,
   gasDetails: TransactionGasDetails,
+  txidVersion?: TXIDVersion,
+  validatedPOIData?: ValidatedPOIData,
   wallet?: ActiveWallet,
   overrideNonce?: number,
   setAvailability = true,
@@ -191,6 +196,19 @@ export const executeTransaction = async (
         removeSubmittedTx(chain, hashGlobal);
       }
     });
+
+    if (validatedPOIData) {
+      if (!isDefined(txidVersion)) {
+        dbg('WARNING: No txidVersion - cannot queue validated poi');
+      } else {
+        await POIAssurance.queueValidatedPOI(
+          txidVersion,
+          chain,
+          txResponse.hash,
+          validatedPOIData,
+        );
+      }
+    }
 
     return txResponse;
   } catch (err) {

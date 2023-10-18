@@ -3,7 +3,6 @@ import {
   POIRequired,
   POIValidation,
   nToHex,
-  // POIValidation
 } from '@railgun-community/wallet';
 import { RelayerChain } from '../../models/chain-models';
 import {
@@ -23,6 +22,8 @@ export type ValidatedPOIData = {
   railgunTxid: string;
   utxoTreeIn: number;
   notePublicKey: string;
+  commitment: string;
+  preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
 };
 
 // DO NOT MODIFY.
@@ -65,7 +66,10 @@ export const validatePOI = async (
     }
     const feeTransactionData = extractedRailgunTransactionData.find(
       (transactionData) => {
-        return isDefined(transactionData.walletAddressedNotePublicKey);
+        return (
+          isDefined(transactionData.firstCommitment) &&
+          isDefined(transactionData.firstCommitmentNotePublicKey)
+        );
       },
     );
     if (!isDefined(feeTransactionData)) {
@@ -77,10 +81,12 @@ export const validatePOI = async (
       railgunTxid: feeTransactionData.railgunTxid,
       utxoTreeIn: Number(feeTransactionData.utxoTreeIn),
       notePublicKey: nToHex(
-        feeTransactionData.walletAddressedNotePublicKey as bigint,
+        feeTransactionData.firstCommitmentNotePublicKey as bigint,
         ByteLength.UINT_256,
         true,
       ),
+      commitment: feeTransactionData.firstCommitment as string,
+      preTransactionPOIsPerTxidLeafPerList,
     };
     return validatedPOIData;
   } catch (err) {

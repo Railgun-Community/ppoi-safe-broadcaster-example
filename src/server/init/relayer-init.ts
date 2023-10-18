@@ -17,6 +17,7 @@ import {
 import { setOnBalanceUpdateCallback } from '@railgun-community/wallet';
 import { onBalanceUpdateCallback } from '../balances/shielded-balance-cache';
 import { isDefined } from '@railgun-community/shared-models';
+import { POIAssurance } from '../transactions/poi-assurance';
 
 export const initRelayerModules = async (forTest = false) => {
   if (!forTest) {
@@ -30,6 +31,8 @@ export const initRelayerModules = async (forTest = false) => {
   setOnBalanceUpdateCallback(onBalanceUpdateCallback);
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   initPricePoller();
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  POIAssurance.init();
   logger.log('Relayer ready.');
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   initTopUpPoller();
@@ -42,6 +45,8 @@ export const uninitRelayerModules = async () => {
   logger.log('stopping wallet top up polling');
   await closeSettingsDB();
   logger.log('closed settings db');
+  await POIAssurance.deinit();
+  logger.log('closed poi assurance db');
   await stopEngine();
   logger.log('unloaded engine');
 };

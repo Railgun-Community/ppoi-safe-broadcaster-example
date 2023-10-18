@@ -19,7 +19,7 @@ import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import { executeTransaction } from './execute-transaction';
 import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
 import { ContractTransaction, TransactionResponse } from 'ethers';
-import { validatePOI } from './poi-validator';
+import { ValidatedPOIData, validatePOI } from './poi-validator';
 
 const dbg = debug('relayer:transact:validate');
 
@@ -85,7 +85,7 @@ export const processTransaction = async (
 
   // DO NOT MODIFY.
   // WARNING: If you modify POI validation, you risk fees that aren't spendable, as they won't have valid POIs.
-  await validatePOI(
+  const validatedPOIData: Optional<ValidatedPOIData> = await validatePOI(
     txidVersion,
     chain,
     transaction,
@@ -94,5 +94,11 @@ export const processTransaction = async (
   );
   // DO NOT MODIFY.
 
-  return executeTransaction(chain, transaction, transactionGasDetails);
+  return executeTransaction(
+    chain,
+    transaction,
+    transactionGasDetails,
+    txidVersion,
+    validatedPOIData,
+  );
 };

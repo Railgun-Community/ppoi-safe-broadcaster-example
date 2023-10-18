@@ -79,6 +79,8 @@ export const nativeUnwrap = async (
       chain,
       populatedSwap,
       gasDetails,
+      undefined, // txidVersion
+      undefined, // validatedPOIData
       activeWallet,
       undefined, // overrideNonce
       false, // setAvailability

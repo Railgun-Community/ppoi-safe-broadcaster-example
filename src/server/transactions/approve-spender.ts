@@ -99,6 +99,8 @@ export const approveZeroX = async (
       chain,
       populatedApproval,
       gasDetails,
+      undefined, // txidVersion
+      undefined, // validatedPOIData
       activeWallet,
       undefined, // overrideNonce
       false, // setAvailability
