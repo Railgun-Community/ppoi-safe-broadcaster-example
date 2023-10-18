@@ -35,7 +35,10 @@ export const derivationPathForIndex = (index: number) => {
   return `m/44'/60'/0'/0/${index}`;
 };
 
-const initRailgunWallet = async (mnemonic: string) => {
+const initRailgunWallet = async (
+  mnemonic: string,
+  railgunWalletDerivationIndex = 0,
+) => {
   const encryptionKey = configDefaults.engine.dbEncryptionKey;
   if (!isDefined(encryptionKey) || encryptionKey === '') {
     throw new Error(
@@ -50,12 +53,13 @@ const initRailgunWallet = async (mnemonic: string) => {
     encryptionKey,
     mnemonic,
     creationBlockNumbers,
+    railgunWalletDerivationIndex,
   );
   railgunWalletAddress = railgunWalletInfo.railgunAddress;
   railgunWalletID = railgunWalletInfo.id;
 };
 
-export const initWallets = async () => {
+export const initWallets = async (railgunWalletDerivationIndex = 0) => {
   resetWallets();
   const { mnemonic, hdWallets } = configDefaults.wallet;
   hdWallets.forEach(({ index, priority, chains }) => {
@@ -72,7 +76,7 @@ export const initWallets = async () => {
       chains,
     });
   });
-  await initRailgunWallet(mnemonic);
+  await initRailgunWallet(mnemonic, railgunWalletDerivationIndex);
   printDebugWalletData();
 };
 

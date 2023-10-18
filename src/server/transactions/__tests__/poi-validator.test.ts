@@ -12,6 +12,7 @@ import { initNetworkProviders } from '../../providers/active-network-providers';
 import { startEngine } from '../../engine/engine-init';
 import { POIValidation } from '@railgun-community/wallet';
 import { validatePOI } from '../poi-validator';
+import { setupSingleTestWallet } from '../../../test/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -30,6 +31,9 @@ describe('poi-validator', () => {
     startEngine();
 
     await initNetworkProviders([chain]);
+
+    // Deriv index 1
+    await setupSingleTestWallet(1);
 
     // Set a mock validator for poi merkleroots.
     POIValidation.init(async () => true);
@@ -83,13 +87,20 @@ describe('poi-validator', () => {
       },
     };
 
-    await validatePOI(
+    const validatedPOIData = await validatePOI(
       txidVersion,
       chain,
       contractTransaction,
       false, // useRelayAdapt
       pois,
     );
+    expect(validatedPOIData).to.deep.equal({
+      notePublicKey:
+        '0x0630ebf7bb25061ed25456a453912fd502a5b8ebc19ca3f8b88cb51ef6b88c92',
+      railgunTxid:
+        '0fefd169291c1deec2affa8dcbfbee4a4bbeddfc3b5723c031665ba631725c62',
+      utxoTreeIn: 0,
+    });
 
     // Invalid value
     pois.test_list[

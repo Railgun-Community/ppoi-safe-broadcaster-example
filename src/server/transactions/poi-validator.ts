@@ -1,19 +1,29 @@
 import {
+  ByteLength,
   POIRequired,
   POIValidation,
+  nToHex,
   // POIValidation
 } from '@railgun-community/wallet';
 import { RelayerChain } from '../../models/chain-models';
 import {
   PreTransactionPOIsPerTxidLeafPerList,
   TXIDVersion,
+  isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
 import debug from 'debug';
 import { ErrorMessage } from '../../util/errors';
 import { ContractTransaction } from 'ethers';
+import { getRailgunWalletID } from '../wallets/active-wallets';
 
 const dbg = debug('relayer:poi-validator');
+
+export type ValidatedPOIData = {
+  railgunTxid: string;
+  utxoTreeIn: number;
+  notePublicKey: string;
+};
 
 // DO NOT MODIFY.
 // WARNING: If you modify POI validation, you risk fees that aren't spendable, as they won't have valid POIs.
@@ -23,7 +33,7 @@ export const validatePOI = async (
   transactionRequest: ContractTransaction,
   useRelayAdapt: boolean,
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList,
-): Promise<void> => {
+): Promise<Optional<ValidatedPOIData>> => {
   try {
     const network = networkForChain(chain);
     if (!network) {
@@ -35,19 +45,44 @@ export const validatePOI = async (
       return;
     }
 
-    const { isValid, error } = await POIValidation.isValidSpendableTXID(
-      txidVersion,
-      chain,
-      transactionRequest,
-      useRelayAdapt,
-      preTransactionPOIsPerTxidLeafPerList,
-    );
+    const railgunWalletID = getRailgunWalletID();
+
+    const { isValid, error, extractedRailgunTransactionData } =
+      await POIValidation.isValidSpendableTransaction(
+        railgunWalletID,
+        txidVersion,
+        chain,
+        transactionRequest,
+        useRelayAdapt,
+        preTransactionPOIsPerTxidLeafPerList,
+      );
     if (!isValid) {
       // Invalid POIs.
-      throw new Error(`Invalid POIs - ${error}`);
+      throw new Error(`Invalid POIs for spendability - ${error}`);
+    }
+    if (!isDefined(extractedRailgunTransactionData)) {
+      throw new Error('No extracted data from POI validation');
+    }
+    const feeTransactionData = extractedRailgunTransactionData.find(
+      (transactionData) => {
+        return isDefined(transactionData.walletAddressedNotePublicKey);
+      },
+    );
+    if (!isDefined(feeTransactionData)) {
+      throw new Error('No extracted fee transaction data found');
     }
 
     // Valid POI. Continue.
+    const validatedPOIData: ValidatedPOIData = {
+      railgunTxid: feeTransactionData.railgunTxid,
+      utxoTreeIn: Number(feeTransactionData.utxoTreeIn),
+      notePublicKey: nToHex(
+        feeTransactionData.walletAddressedNotePublicKey as bigint,
+        ByteLength.UINT_256,
+        true,
+      ),
+    };
+    return validatedPOIData;
   } catch (err) {
     dbg(`Could not validate POI for transaction - ${err.message}`);
     throw new Error(ErrorMessage.POI_INVALID);

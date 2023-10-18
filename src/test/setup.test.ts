@@ -57,10 +57,12 @@ after(() => {
   stubERC20Decimals.restore();
 });
 
-export const setupSingleTestWallet = async () => {
+export const setupSingleTestWallet = async (
+  railgunWalletDerivationIndex = 0,
+) => {
   configDefaults.wallet.mnemonic =
     'test test test test test test test test test test test junk';
-  await initWallets();
+  await initWallets(railgunWalletDerivationIndex);
 };
 
 export const resetConfigDefaults = () => {
