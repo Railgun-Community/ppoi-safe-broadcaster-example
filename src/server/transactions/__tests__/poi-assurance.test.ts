@@ -22,6 +22,10 @@ describe('poi-assurance', () => {
     POIAssurance.init();
   });
 
+  after(async () => {
+    await POIAssurance.deinit();
+  });
+
   it('Should insert and get items from poi assurance DB', async () => {
     const txid =
       '0x1234567890123456789012345678901234567890123456789012345678901234';

@@ -38,6 +38,8 @@ export default {
   poi: {
     /** Proof of Innocence aggregator node URL */
     nodeURL: process.env.POI_NODE_URL ?? 'todo-poi-url', // TODO: Add a default from community-run POI aggregator.
+
+    dbDir: process.env.POI_DB ?? 'poi.db',
   },
 
   debug: {

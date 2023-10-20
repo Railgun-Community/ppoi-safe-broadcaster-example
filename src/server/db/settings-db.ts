@@ -16,8 +16,12 @@ export const initSettingsDB = () => {
 };
 
 export const closeSettingsDB = async () => {
-  await db?.close();
-  db = undefined;
+  try {
+    await db?.close();
+    db = undefined;
+  } catch (err) {
+    logger.error(err);
+  }
 };
 
 export const clearSettingsDB = async () => {

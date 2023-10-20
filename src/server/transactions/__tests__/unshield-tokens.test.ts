@@ -12,7 +12,11 @@ import {
   testChainGoerli,
 } from '../../../test/setup.test';
 import { startEngine } from '../../engine/engine-init';
-import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
+import {
+  clearSettingsDB,
+  closeSettingsDB,
+  initSettingsDB,
+} from '../../db/settings-db';
 import * as BestWalletMatchModule from '../../wallets/best-match-wallet';
 import { ActiveWallet } from '../../../models/wallet-models';
 import { initNetworkProviders } from '../../providers/active-network-providers';
@@ -84,7 +88,8 @@ describe('unshield-tokens', () => {
     restoreGasBalanceStub();
   });
 
-  after(() => {
+  after(async () => {
+    await closeSettingsDB();
     walletGetTransactionCountStub.restore();
     getBestMatchWalletForNetwork.restore();
     railProveStub?.restore();
@@ -101,7 +106,7 @@ describe('unshield-tokens', () => {
     );
 
     await expect(populatedTransaction).to.be.rejectedWith(
-      `RAILGUN private token balance too low for ${MOCK_TOKEN_AMOUNT_2.tokenAddress.toLowerCase()}. Amount required: ${MOCK_TOKEN_AMOUNT_2.amount.toString()}. Balance: 0.`,
+      `RAILGUN spendable private balance too low for ${MOCK_TOKEN_AMOUNT_2.tokenAddress.toLowerCase()}. Amount required: ${MOCK_TOKEN_AMOUNT_2.amount.toString()}. Balance: 0.`,
     );
   });
 

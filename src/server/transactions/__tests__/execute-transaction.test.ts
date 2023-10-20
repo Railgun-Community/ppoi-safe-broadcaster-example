@@ -25,6 +25,7 @@ import {
 import { startEngine } from '../../engine/engine-init';
 import {
   clearSettingsDB,
+  closeSettingsDB,
   getSettingsNumber,
   initSettingsDB,
 } from '../../db/settings-db';
@@ -90,7 +91,8 @@ describe('execute-transaction', () => {
     restoreGasBalanceStub();
   });
 
-  after(() => {
+  after(async () => {
+    await closeSettingsDB();
     walletGetTransactionCountStub.restore();
     sendTransactionStub.restore();
     waitTxStub.restore();

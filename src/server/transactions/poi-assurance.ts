@@ -37,7 +37,7 @@ export class POIAssurance {
   private static db: Optional<Database>;
 
   static init() {
-    const level = leveldown(configDefaults.settings.dbDir);
+    const level = leveldown(configDefaults.poi.dbDir);
     this.db = new Database(level);
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

@@ -9,6 +9,7 @@ import * as activeTokenPricePollerModule from '../../tokens/token-price-poller';
 import { closeSettingsDB } from '../../db/settings-db';
 import { resetConfigDefaults } from '../../../test/setup.test';
 import { myConfigOverrides } from '../../../MY-CONFIG';
+import { POIAssurance } from '../../transactions/poi-assurance';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -16,6 +17,7 @@ const { expect } = chai;
 describe('relayer-init', () => {
   after(async () => {
     await closeSettingsDB();
+    await POIAssurance.deinit();
   });
 
   it('Should run init scripts', async () => {

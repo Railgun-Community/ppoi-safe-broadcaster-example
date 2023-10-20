@@ -14,7 +14,11 @@ import {
   testChainGoerli,
 } from '../../../test/setup.test';
 import { startEngine } from '../../engine/engine-init';
-import { clearSettingsDB, initSettingsDB } from '../../db/settings-db';
+import {
+  clearSettingsDB,
+  closeSettingsDB,
+  initSettingsDB,
+} from '../../db/settings-db';
 import { delay } from '../../../util/promise-utils';
 import * as ExecuteTransactionModule from '../execute-transaction';
 import * as BestWalletMatchModule from '../../wallets/best-match-wallet';
@@ -90,7 +94,8 @@ describe('0x-swap', () => {
     restoreGasBalanceStub();
   });
 
-  after(() => {
+  after(async () => {
+    await closeSettingsDB();
     walletGetTransactionCountStub.restore();
     sendTransactionStub.restore();
     waitTxStub.restore();
