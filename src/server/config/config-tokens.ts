@@ -3,6 +3,7 @@ import {
   TokenAddressArbitrumGoerli,
   TokenAddressGoerli,
   TokenAddressPolygonMumbai,
+  TokenAddressSepolia,
 } from './config-token-addresses';
 import {
   STABLES_ETH,
@@ -70,6 +71,20 @@ const tokensConfig: NetworkTokensConfig = {
       },
       [TokenAddressArbitrumGoerli.USDC]: {
         symbol: 'USDC',
+      },
+    },
+    [NetworkChainID.EthereumSepolia]: {
+      [TokenAddressSepolia.WETH]: {
+        symbol: 'WETH',
+      },
+      [TokenAddressSepolia.WETH_ALT]: {
+        symbol: 'WETH_ALT',
+      },
+      [TokenAddressSepolia.DAI]: {
+        symbol: 'DAI',
+      },
+      [TokenAddressSepolia.USDT]: {
+        symbol: 'USDT',
       },
     },
     [NetworkChainID.Hardhat]: {

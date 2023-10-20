@@ -136,6 +136,7 @@ const gasHistoryPercentileForChain = (
         case NetworkChainID.ArbitrumGoerli:
           return GasHistoryPercentile.Medium;
         case NetworkChainID.EthereumGoerli:
+        case NetworkChainID.EthereumSepolia:
         case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
           return GasHistoryPercentile.High;

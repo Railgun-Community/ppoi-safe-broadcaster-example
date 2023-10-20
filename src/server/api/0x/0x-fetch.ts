@@ -20,6 +20,7 @@ export const getStablecoinReferenceSymbol = (chain: RelayerChain): string => {
       switch (chain.id) {
         case NetworkChainID.Ethereum:
         case NetworkChainID.EthereumGoerli:
+        case NetworkChainID.EthereumSepolia:
         case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
         case NetworkChainID.PolygonMumbai:
@@ -52,6 +53,7 @@ const zeroXApiUrl = (chain: RelayerChain): string => {
         case NetworkChainID.PolygonMumbai:
           return 'https://mumbai.api.0x.org/';
         case NetworkChainID.ArbitrumGoerli:
+        case NetworkChainID.EthereumSepolia:
         case NetworkChainID.Hardhat:
           throw new Error(`No 0x API URL for chain ${chain.type}:${chain.id}`);
       }

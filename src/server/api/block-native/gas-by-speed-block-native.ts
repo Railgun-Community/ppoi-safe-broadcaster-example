@@ -49,6 +49,7 @@ export const supportsBlockNativeGasEstimates = (chain: RelayerChain) => {
     case NetworkChainID.BNBChain:
     case NetworkChainID.Arbitrum:
     case NetworkChainID.EthereumGoerli:
+    case NetworkChainID.EthereumSepolia:
     case NetworkChainID.ArbitrumGoerli:
     case NetworkChainID.PolygonMumbai:
     case NetworkChainID.Hardhat:

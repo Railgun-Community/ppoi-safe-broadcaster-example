@@ -1,16 +1,12 @@
 import { ContractTransaction, Provider, parseUnits } from 'ethers';
 import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
-import {
-  BaseTokenWrappedAddress,
-  RailgunProxyContract,
-  RelayAdaptContract,
-} from '@railgun-community/shared-models';
-import { Network } from '../models/network-models';
+import { NETWORK_CONFIG, NetworkName } from '@railgun-community/shared-models';
 import { Token, TokenConfig } from '../models/token-models';
 import { RelayerChain } from '../models/chain-models';
 import fallbackProvidersEthereum from '../server/config/fallback-providers/1-ethereum';
 import fallbackProvidersEthereumGoerli from '../server/config/fallback-providers/5-ethereum-goerli';
+import { Network } from '../models/network-models';
 
 export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
   // @ts-expect-error
@@ -32,7 +28,8 @@ export const getMockNetwork = (): Network => {
     name: 'Ethereum',
     gasToken: {
       symbol: 'ETH',
-      wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
+      wrappedAddress:
+        NETWORK_CONFIG[NetworkName.Ethereum].baseToken.wrappedAddress,
       decimals: 18n,
       minBalanceForAvailability: 0.1,
     },
@@ -41,10 +38,11 @@ export const getMockNetwork = (): Network => {
       gasEstimateLimitToActualRatio: 1.25,
       profit: 0.07,
     },
-    proxyContract: '0x00' as RailgunProxyContract,
-    relayAdaptContract: '0x00' as RelayAdaptContract,
+    proxyContract: '0x00',
+    relayAdaptContract: '0x00',
     coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
     fallbackProviderConfig: fallbackProvidersEthereum,
+    deploymentBlock: 100,
     priceTTLInMS: 5 * 60 * 1000,
     retryGasBuffer: parseUnits('0.1', 'gwei'),
     topUp: {
@@ -72,8 +70,10 @@ export const getMockGoerliNetwork = (): Network => {
       gasEstimateLimitToActualRatio: 1.25,
       profit: 0.05,
     },
-    proxyContract: RailgunProxyContract.EthereumGoerli,
-    relayAdaptContract: RelayAdaptContract.EthereumGoerli,
+    proxyContract: NETWORK_CONFIG[NetworkName.EthereumGoerli].proxyContract,
+    relayAdaptContract:
+      NETWORK_CONFIG[NetworkName.EthereumGoerli].relayAdaptContract,
+    deploymentBlock: NETWORK_CONFIG[NetworkName.EthereumGoerli].deploymentBlock,
     fallbackProviderConfig: fallbackProvidersEthereumGoerli,
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,

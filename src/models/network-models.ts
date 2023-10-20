@@ -1,18 +1,13 @@
-import {
-  RailgunProxyContract,
-  RelayAdaptContract,
-  RailgunProxyDeploymentBlock,
-  FallbackProviderJsonConfig,
-} from '@railgun-community/shared-models';
+import { FallbackProviderJsonConfig } from '@railgun-community/shared-models';
 import { CoingeckoNetworkID } from './api-constants';
 import { GasTokenConfig } from './token-models';
 import { FeeConfig } from './fee-config';
 
 export type Network = {
   name: string;
-  proxyContract: RailgunProxyContract;
-  relayAdaptContract: RelayAdaptContract;
-  deploymentBlock?: RailgunProxyDeploymentBlock;
+  proxyContract: string;
+  relayAdaptContract: string;
+  deploymentBlock: number;
   fallbackProviderConfig: FallbackProviderJsonConfig;
   gasToken: GasTokenConfig;
   coingeckoNetworkId?: CoingeckoNetworkID;

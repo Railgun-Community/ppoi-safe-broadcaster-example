@@ -7,4 +7,5 @@ export enum NetworkChainID {
   Hardhat = 31337,
   PolygonMumbai = 80001,
   ArbitrumGoerli = 421613,
+  EthereumSepolia = 11155111,
 }

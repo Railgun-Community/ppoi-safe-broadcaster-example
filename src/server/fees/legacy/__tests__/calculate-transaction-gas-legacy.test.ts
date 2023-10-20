@@ -28,9 +28,9 @@ import {
 import { initTokens } from '../../../tokens/network-tokens';
 import { testChainEthereum } from '../../../../test/setup.test';
 import {
-  BaseTokenWrappedAddress,
   EVMGasType,
   getEVMGasTypeForTransaction,
+  NETWORK_CONFIG,
   NetworkName,
   TransactionGasDetails,
 } from '@railgun-community/shared-models';
@@ -39,7 +39,8 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const MOCK_CHAIN = testChainEthereum();
-const MOCK_GAS_TOKEN = BaseTokenWrappedAddress.EthereumWETH;
+const MOCK_WRAPPED_GAS_TOKEN =
+  NETWORK_CONFIG[NetworkName.Ethereum].baseToken.wrappedAddress;
 const MOCK_TOKEN_ADDRESS = '0x001';
 
 // 0.10 estimate (est * price), 0.12 ETH total (gas limit).
@@ -68,7 +69,7 @@ describe('calculate-transaction-gas-legacy', () => {
     cacheTokenPriceForNetwork(
       TokenPriceSource.CoinGecko,
       MOCK_CHAIN,
-      MOCK_GAS_TOKEN,
+      MOCK_WRAPPED_GAS_TOKEN,
       { price: 3250.0, updatedAt: Date.now() },
     );
     cacheTokenPriceForNetwork(

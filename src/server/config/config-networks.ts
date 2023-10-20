@@ -6,14 +6,13 @@ import fallbackProvidersArbitrum from './fallback-providers/42161-arbitrum';
 import fallbackProvidersPolygonMumbai from './fallback-providers/80001-polygon-mumbai';
 import fallbackProvidersHardhat from './fallback-providers/31337-hardhat';
 import fallbackProvidersArbitrumGoerli from './fallback-providers/421613-arbitrum-goerli';
+import fallbackProvidersEthereumSepolia from './fallback-providers/11155111-ethereum-sepolia';
 import { feeConfigL1, feeConfigL2 } from './config-fees';
 import { CoingeckoNetworkID } from '../../models/api-constants';
 import {
-  BaseTokenWrappedAddress,
-  RailgunProxyContract,
-  RelayAdaptContract,
-  RailgunProxyDeploymentBlock,
   ChainType,
+  NETWORK_CONFIG,
+  NetworkName,
 } from '@railgun-community/shared-models';
 import { NetworkChainID } from './config-chains';
 import { NetworksConfig } from '../../models/config-models';
@@ -54,14 +53,16 @@ const networksConfig: NetworksConfig = {
       name: 'Ethereum',
       gasToken: {
         symbol: 'ETH',
-        wrappedAddress: BaseTokenWrappedAddress.EthereumWETH,
+        wrappedAddress:
+          NETWORK_CONFIG[NetworkName.Ethereum].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.25),
-      proxyContract: RailgunProxyContract.Ethereum,
-      relayAdaptContract: RelayAdaptContract.Ethereum,
-      deploymentBlock: RailgunProxyDeploymentBlock.Ethereum,
+      proxyContract: NETWORK_CONFIG[NetworkName.Ethereum].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.Ethereum].relayAdaptContract,
+      deploymentBlock: NETWORK_CONFIG[NetworkName.Ethereum].deploymentBlock,
       coingeckoNetworkId: CoingeckoNetworkID.Ethereum,
       fallbackProviderConfig: fallbackProvidersEthereum,
       priceTTLInMS: defaultTokenPriceTTL,
@@ -79,14 +80,17 @@ const networksConfig: NetworksConfig = {
       name: 'Görli Testnet',
       gasToken: {
         symbol: 'ETH',
-        wrappedAddress: BaseTokenWrappedAddress.EthereumGoerliWETH,
+        wrappedAddress:
+          NETWORK_CONFIG[NetworkName.EthereumGoerli].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.25),
-      proxyContract: RailgunProxyContract.EthereumGoerli,
-      relayAdaptContract: RelayAdaptContract.EthereumGoerli,
-      deploymentBlock: RailgunProxyDeploymentBlock.EthereumGoerli,
+      proxyContract: NETWORK_CONFIG[NetworkName.EthereumGoerli].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.EthereumGoerli].relayAdaptContract,
+      deploymentBlock:
+        NETWORK_CONFIG[NetworkName.EthereumGoerli].deploymentBlock,
       fallbackProviderConfig: fallbackProvidersEthereumGoerli,
       priceTTLInMS: defaultTokenPriceTTL,
       topUp: {
@@ -105,14 +109,16 @@ const networksConfig: NetworksConfig = {
       name: 'BNB Chain',
       gasToken: {
         symbol: 'BNB',
-        wrappedAddress: BaseTokenWrappedAddress.BinanceWBNB,
+        wrappedAddress:
+          NETWORK_CONFIG[NetworkName.BNBChain].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.2),
-      proxyContract: RailgunProxyContract.BNBChain,
-      relayAdaptContract: RelayAdaptContract.BNBChain,
-      deploymentBlock: RailgunProxyDeploymentBlock.BNBChain,
+      proxyContract: NETWORK_CONFIG[NetworkName.BNBChain].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.BNBChain].relayAdaptContract,
+      deploymentBlock: NETWORK_CONFIG[NetworkName.BNBChain].deploymentBlock,
       coingeckoNetworkId: CoingeckoNetworkID.BNBChain,
       fallbackProviderConfig: fallbackProvidersBNBChain,
       priceTTLInMS: defaultTokenPriceTTL,
@@ -130,15 +136,17 @@ const networksConfig: NetworksConfig = {
       name: 'Polygon PoS',
       gasToken: {
         symbol: 'MATIC',
-        wrappedAddress: BaseTokenWrappedAddress.PolygonWMATIC,
+        wrappedAddress:
+          NETWORK_CONFIG[NetworkName.Polygon].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.15),
-      proxyContract: RailgunProxyContract.PolygonPOS,
-      relayAdaptContract: RelayAdaptContract.PolygonPOS,
+      proxyContract: NETWORK_CONFIG[NetworkName.Polygon].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract,
+      deploymentBlock: NETWORK_CONFIG[NetworkName.Polygon].deploymentBlock,
       coingeckoNetworkId: CoingeckoNetworkID.PolygonPOS,
-      deploymentBlock: RailgunProxyDeploymentBlock.PolygonPOS,
       fallbackProviderConfig: fallbackProvidersPolygon,
       priceTTLInMS: defaultTokenPriceTTL,
       topUp: {
@@ -155,15 +163,17 @@ const networksConfig: NetworksConfig = {
       name: 'Arbitrum',
       gasToken: {
         symbol: 'ETH',
-        wrappedAddress: BaseTokenWrappedAddress.ArbitrumWETH,
+        wrappedAddress:
+          NETWORK_CONFIG[NetworkName.Arbitrum].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
       fees: feeConfigL2(1.5),
-      proxyContract: RailgunProxyContract.Arbitrum,
-      relayAdaptContract: RelayAdaptContract.Arbitrum,
+      proxyContract: NETWORK_CONFIG[NetworkName.Arbitrum].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.Arbitrum].relayAdaptContract,
+      deploymentBlock: NETWORK_CONFIG[NetworkName.Arbitrum].deploymentBlock,
       coingeckoNetworkId: CoingeckoNetworkID.Arbitrum,
-      deploymentBlock: RailgunProxyDeploymentBlock.Arbitrum,
       fallbackProviderConfig: fallbackProvidersArbitrum,
       priceTTLInMS: defaultTokenPriceTTL,
       topUp: {
@@ -180,14 +190,17 @@ const networksConfig: NetworksConfig = {
       name: 'Mumbai Testnet',
       gasToken: {
         symbol: 'MATIC',
-        wrappedAddress: BaseTokenWrappedAddress.PolygonMumbaiWMATIC,
+        wrappedAddress:
+          NETWORK_CONFIG[NetworkName.PolygonMumbai].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.15),
-      proxyContract: RailgunProxyContract.PolygonMumbai,
-      relayAdaptContract: RelayAdaptContract.PolygonMumbai,
-      deploymentBlock: RailgunProxyDeploymentBlock.PolygonMumbai,
+      proxyContract: NETWORK_CONFIG[NetworkName.PolygonMumbai].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.PolygonMumbai].relayAdaptContract,
+      deploymentBlock:
+        NETWORK_CONFIG[NetworkName.PolygonMumbai].deploymentBlock,
       fallbackProviderConfig: fallbackProvidersPolygonMumbai,
       priceTTLInMS: defaultTokenPriceTTL,
       topUp: {
@@ -206,14 +219,17 @@ const networksConfig: NetworksConfig = {
       name: 'Arbitrum Görli Testnet',
       gasToken: {
         symbol: 'ETH',
-        wrappedAddress: BaseTokenWrappedAddress.ArbitrumGoerliWETH,
+        wrappedAddress:
+          NETWORK_CONFIG[NetworkName.ArbitrumGoerli].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
       fees: feeConfigL2(1.5),
-      proxyContract: RailgunProxyContract.ArbitrumGoerli,
-      relayAdaptContract: RelayAdaptContract.ArbitrumGoerli,
-      deploymentBlock: RailgunProxyDeploymentBlock.ArbitrumGoerli,
+      proxyContract: NETWORK_CONFIG[NetworkName.ArbitrumGoerli].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.ArbitrumGoerli].relayAdaptContract,
+      deploymentBlock:
+        NETWORK_CONFIG[NetworkName.ArbitrumGoerli].deploymentBlock,
       fallbackProviderConfig: fallbackProvidersArbitrumGoerli,
       priceTTLInMS: defaultTokenPriceTTL,
       topUp: {
@@ -236,9 +252,10 @@ const networksConfig: NetworksConfig = {
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.25),
-      proxyContract: RailgunProxyContract.Hardhat,
-      relayAdaptContract: RelayAdaptContract.Hardhat,
-      deploymentBlock: RailgunProxyDeploymentBlock.Hardhat,
+      proxyContract: NETWORK_CONFIG[NetworkName.Hardhat].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.Hardhat].relayAdaptContract,
+      deploymentBlock: NETWORK_CONFIG[NetworkName.Hardhat].deploymentBlock,
       fallbackProviderConfig: fallbackProvidersHardhat,
       priceTTLInMS: defaultTokenPriceTTL,
       topUp: {
@@ -252,6 +269,34 @@ const networksConfig: NetworksConfig = {
       retryGasBuffer: parseUnits('0.1', 'gwei'),
       isTestNetwork: true,
       skipQuickScan: true,
+    },
+    [NetworkChainID.EthereumSepolia]: {
+      name: 'Sepolia Testnet',
+      gasToken: {
+        symbol: 'ETH',
+        wrappedAddress:
+          NETWORK_CONFIG[NetworkName.EthereumSepolia].baseToken.wrappedAddress,
+        decimals: 18n,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
+      },
+      fees: feeConfigL1(1.25),
+      proxyContract: NETWORK_CONFIG[NetworkName.EthereumSepolia].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.EthereumSepolia].relayAdaptContract,
+      deploymentBlock:
+        NETWORK_CONFIG[NetworkName.EthereumSepolia].deploymentBlock,
+      fallbackProviderConfig: fallbackProvidersEthereumSepolia,
+      priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.05,
+        swapThresholdIntoGasToken: ONE_AND_HALF,
+        minimumGasBalanceForTopup: HALF_TOKEN,
+      },
+      retryGasBuffer: parseUnits('0.1', 'gwei'),
+      isTestNetwork: true,
     },
   },
 };
