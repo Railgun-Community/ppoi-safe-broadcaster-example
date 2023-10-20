@@ -1,14 +1,26 @@
 [![Unit Tests](https://github.com/Railgun-Community/poi-safe-relayer-example/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/poi-safe-relayer-example/actions)
 
-# Example code for POI-Safe RAILGUN transactions
+# Example code and tests for POI-Safe RAILGUN transactions
 
-Example code to relay transactions that guarantee a Proof Of Innocence of all users.
+Example code to forward RAILGUN transactions to the blockchain. Uses the Waku messaging protocol, while guaranteeing a Proof Of Innocence for all transactions.
 
-This network runs on [Waku](https://wakunetwork.com/), a secure and decentralized messaging protocol.
+`poi-safe-relayer-example` is a node.js application that receives encrypted transactions from RAILGUN wallets equipped with Proof Of Innocence. The Relayer example verifies, signs and forwards the transactions to the blockchain. It will broadcast fees on the tokens you configure to accept at the rates defined in the config.
 
-`relayer-example` is a node application which relays transactions for RAILGUN users so that their transactions are signed and forwarded by your address to the blockchain. The relayer will broadcast fees on the tokens you configure it to accept at the rates you define. Messages are sent over the waku peer to peer network.
+## Proof Of Innocence
 
-## Prerequisites
+Proof Of Innocence is validated on every transaction for the safety of users and wallets.
+
+Proof of Innocence is verified through a Proof Of Spendability, which verifies a merkle proof guaranteeing that the UTXOs that are spent are part of the Proof Of Innocence inclusion set for each list.
+
+This means that every fee that is gathered is guaranteed to be spendable by your wallet - and RAILGUN wallets without Proof Of Innocence will not be able to use the relayer to forward any transactions.
+
+## Waku Messaging
+
+This network runs on [Waku](https://wakunetwork.com/), a secure and decentralized messaging protocol. Encrypted messages are sent over the private waku peer-to-peer network.
+
+# Setup
+
+## Requirements
 
 - node 16+
 - docker, if using docker
@@ -34,15 +46,13 @@ The fields to configure are described below. Note that you may leave the domain 
 - `TZ` - timezone code; eg 'EST'
 - `EMAIL` - letsencrypt will generate an SSL certificate for your domain; an email address must be entered. Whether you enter a real email address or a fake one is up to you
 
-### relayer
+### Init
 
-#### Init
-
-Customize your relayer by running `npm run copy-my-config`, which copies `src/MY-CONFIG.ts.example` to `src/MY-CONFIG.ts`.
+Customize your node by running `npm run copy-my-config`, which copies `src/MY-CONFIG.ts.example` to `src/MY-CONFIG.ts`.
 
 #### Configuration
 
-The standard relayer configurations are set in config files in `src/server/config/`. All of these can be overridden in `src/MY-CONFIG.ts`. The following are the most common fields that you might want to edit.
+The standard configurations are set in config files in `src/server/config/`. All of these can be overridden in `src/MY-CONFIG.ts`. The following are the most common fields that you might want to edit.
 
 - configDefaults.networks.active
 
@@ -75,7 +85,7 @@ configDefaults.waku.rpcURLBackup = 'http://nwaku2:8547';
 
 - configDefaults.wallet.mnemonic
 
-Set the mnemonic used to fund the relayer
+Set the mnemonic used for the wallets
 
 ```ts
 //...
@@ -113,7 +123,7 @@ configNetworks[ChainType.EVM][
 
 - configTokens
 
-Set the tokens you want to accept for each network.
+Set the tokens you want to accept as fees on each network.
 
 ```ts
 //...
@@ -121,12 +131,6 @@ configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
   symbol: 'TOKEN1',
 };
 ```
-
-## Run relayer-example
-
-- `yarn copy-my-config`, run in root
-- Make config changes to src/MY-CONFIG.ts
-- `yarn install`
 
 ## Running Options:
 
@@ -202,7 +206,7 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 ## Regular :
 
-### setup & start docker nwaku
+### 1. setup & start docker nwaku
 
 - copy `docker/.env.empty` to `docker/.env` and fill in `EXTIP`, `NODEKEY`, `LISTENIP` (see above)
 
@@ -225,11 +229,6 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 - verify that nwaku is connected to other nwaku nodes:
 
 `scripts/nwaku/peers.sh`
-
-### start relayer
-
-- `yarn start` or
-- `yarn debug` (DEBUG mode, with logs)
 
 ## Diagnostics
 
@@ -285,7 +284,7 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 4e76b7e1cd3d   ghcr.io/linuxserver/swag:latest   "/init"                  5 hours ago   Up 5 hours   80/tcp, 443/tcp                  relayer_swag.1.cmi0mo0r1fto3mbsz7iyfsms
 ```
 
-## Run tests
+## Run unit/integration tests
 
 - `yarn test`
 - `yarn test-coverage` (with code coverage visualizer)

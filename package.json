@@ -1,5 +1,5 @@
 {
-  "name": "@railgun-community/poi-compliant-relayer-example",
+  "name": "@railgun-community/poi-safe-relayer-example",
   "version": "4.2.0",
   "description": "",
   "main": "dist/main.js",
