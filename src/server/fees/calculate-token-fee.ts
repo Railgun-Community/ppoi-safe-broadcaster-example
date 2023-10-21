@@ -42,10 +42,6 @@ export const convertCachedTokenFee = (
 ) => {
   const decimalRatio = getTransactionTokenToGasDecimalRatio(token);
   const maximumGasConversion = (cachedUnitTokenFee * maximumGas) / decimalRatio;
-  console.log('maximumGas', maximumGas);
-  console.log('token', token);
-  console.log('decimalRatio', decimalRatio);
-  console.log('maximumTokenGasConversion', maximumGasConversion);
   return parseGasTokenFee(maximumGasConversion, token);
 };
 
