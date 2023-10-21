@@ -176,8 +176,7 @@ const getConsolidatedTokenAmounts = (
   // the current issue is if a check fails to allow one of the 'remaining' tokens but has enough to pass the native check
   // it will allow native to fall through to here.
   // inversely the same the other way I would assume.
-  // TODO: prevent completion if final amounts don't add up.
-  if (totalSwapValue < topUpThreshold) return [];
+  if (totalSwapValue <= (topUpThreshold * 95n) / 100n) return [];
 
   return consolidatedAmounts;
 };
@@ -194,7 +193,9 @@ export const getMultiTopUpTokenAmountsForChain = async (
   const topUpThreshold =
     configNetworks[chain.type][chain.id].topUp.swapThresholdIntoGasToken;
 
-  const tokenAmounts = [...tokenAmountsForChain];
+  const tokenAmounts = tokenAmountsForChain.map((amt) => {
+    return { erc20Amount: { ...amt.erc20Amount }, updatedAt: amt.updatedAt };
+  });
 
   const topUpTokenAmountsForChain: TokenTopUpCache[] = [];
   for (const shieldedTokenCache of tokenAmounts) {
@@ -215,7 +216,7 @@ export const getMultiTopUpTokenAmountsForChain = async (
       // figure out what the 2/3 max amount is. if amount is > set the 2/3 value as its availability.
       // compute topUpThreshold in tokenAmount as well.
       // if value is larger than topUpThreshold. just use the single token.
-      const usageThreshold = (topUpThreshold * 66n) / 100n;
+      const usageThreshold = (topUpThreshold * 33n) / 100n;
 
       const maxUsageThreshold = parseFloat(
         formatUnits(usageThreshold.toString(), gasToken.decimals),
@@ -288,7 +289,9 @@ export const getMultiTopUpTokenAmountsForChain = async (
   topUpTokenAmountsForChain.sort(decendingTokenSort);
   const nativeWrappedToken = getWrappedNativeTokenAddressForChain(chain);
 
-  let newSortedTopUpList = [...topUpTokenAmountsForChain];
+  let newSortedTopUpList = topUpTokenAmountsForChain.map((amt) => {
+    return { tokenAmount: { ...amt.tokenAmount }, swapValue: amt.swapValue };
+  });
 
   if (!setNativeLast) {
     const tempAmounts = [];
