@@ -20,7 +20,6 @@ services:
     restart: always
     volumes:
       - nwaku1:/data
-      - ./appdata/swag/etc/letsencrypt:/ssl
       - ../scripts/nwaku:/app/scripts
     healthcheck:
       test: curl --fail http://localhost:8546 || exit 1
@@ -43,7 +42,6 @@ services:
       - '8547:8547'
     volumes:
       - nwaku2:/data
-      - ./appdata/swag/etc/letsencrypt:/ssl
       - ../scripts/nwaku:/app/scripts
     healthcheck:
       test: curl --fail http://localhost:8547 || exit 1
@@ -66,6 +64,9 @@ services:
       LEPTON_DB: '/mnt/relayer.db'
       LOG_LEVEL: 'debug'
       DEBUG: 'relayer*,waku:jsonrpc-api'
+    secrets:
+      - MNEMONIC
+      - DB_ENCRYPTION_KEY
     depends_on:
       - nwaku1
     restart: always
