@@ -7,6 +7,7 @@ import { ERC20Amount } from '../../models/token-models';
 import { RelayerChain } from '../../models/chain-models';
 import {
   RailgunBalancesEvent,
+  RailgunWalletBalanceBucket,
   TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
@@ -52,7 +53,11 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
   chain,
   erc20Amounts,
   railgunWalletID: balanceRailgunWalletID,
+  balanceBucket,
 }: RailgunBalancesEvent) => {
+  if (balanceBucket !== RailgunWalletBalanceBucket.Spendable) {
+    return; // gate spendable balances.
+  }
   const railgunWalletID = getRailgunWalletID();
   if (railgunWalletID !== balanceRailgunWalletID) {
     return;
