@@ -168,7 +168,7 @@ const networksConfig: NetworksConfig = {
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
-      fees: feeConfigL2(1.5),
+      fees: feeConfigL2(1.2),
       proxyContract: NETWORK_CONFIG[NetworkName.Arbitrum].proxyContract,
       relayAdaptContract:
         NETWORK_CONFIG[NetworkName.Arbitrum].relayAdaptContract,
