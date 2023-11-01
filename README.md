@@ -177,7 +177,8 @@ docker secret create NODEKEY_2 - 0xc5af820e2fb37a65470a8a7c82ba415605c83009ffcbf
 - Run `docker/build.sh` to build the `relayer` and `nwaku` docker images from your `docker/.env` environment definition. This will compose a 'swag' version (`creates SSL certs for DOMAINS, only needed if you're using a domain`) and one that just uses the `$EXTIP` for its nwaku visibility.
 
 ```sh
-      ./docker/build.sh
+      ./docker/build.sh                 # builds the swag docker stack
+      ./docker/build.sh --no-swag       # builds swagless docker stack
 ```
 
 - Deploy stack with `./docker/run.sh`:
