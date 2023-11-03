@@ -1225,10 +1225,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@5.9.2":
-  version "5.9.2"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.9.2.tgz#5613c90fadb4ae1fc15372833a75ce8c71f57553"
-  integrity sha512-X1i3+8p90KM0DFklCp2NFv0TP2En5qj934tu386cUCPIu56X0ykKZeYZE+KhMB5M6WkOTzgHEFOby21CKnmgNg==
+"@railgun-community/engine@5.9.7":
+  version "5.9.7"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.9.7.tgz#8c202a4d62badabdd5dda1b5140af615b146f8c3"
+  integrity sha512-g04e1v7uPneme4bBQEb62EZVXu0N8Eh+t39zKWCQcNTjKz3HwUZ7fiaulBNNMvkmQF/XGGzy8vPVhRUHb9uUPw==
   dependencies:
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.0"
@@ -1252,10 +1252,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.8.5.tgz#cf9371b70e36411c4d2fb850d4d2a0721a45859e"
   integrity sha512-htKXxIQs4MxVYFd6tCm0UTL8vRptmZoirzs+MDZELgOLZUbwHLGlmKvgMrnr1j9avWiKPNaAE3Eq+1Vduplkjg==
 
-"@railgun-community/wallet@5.14.10":
-  version "5.14.10"
-  resolved "https://registry.yarnpkg.com/@railgun-community/wallet/-/wallet-5.14.10.tgz#90c6849dcd7b1c5c5b63a366d7168d7c91449e37"
-  integrity sha512-pEtLW1He0C3/k7hF2APsulhAJNMVnI17m5wzdv3Up6+Vs/CcP1IBR1DL+XQGbmT/tUVs+54oaynlGYFzLfs5+A==
+"@railgun-community/wallet@5.14.14":
+  version "5.14.14"
+  resolved "https://registry.yarnpkg.com/@railgun-community/wallet/-/wallet-5.14.14.tgz#ee2e17fb0badf7cc2dd5809f0742b6dced0a7604"
+  integrity sha512-p9ZGX+53VjPKK2Dtd94mLprlxtb1aA+AGRWkjCMnWuzLnjKCOW/huNP8EbcquG4PfPyjGvIhr3gjeHj1qgil7g==
   dependencies:
     "@graphql-mesh/cache-localforage" "^0.7.20"
     "@graphql-mesh/cross-helpers" "^0.3.4"
@@ -1267,7 +1267,7 @@
     "@graphql-mesh/types" "^0.91.14"
     "@graphql-mesh/utils" "^0.43.22"
     "@noble/ed25519" "^1.7.1"
-    "@railgun-community/engine" "5.9.2"
+    "@railgun-community/engine" "5.9.7"
     "@railgun-community/shared-models" "5.8.5"
     "@whatwg-node/fetch" "^0.8.4"
     assert "2.0.0"
