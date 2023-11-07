@@ -8,6 +8,7 @@ import {
   loadProvider,
   getProver,
   SnarkJSGroth16,
+  setLoggers,
 } from '@railgun-community/wallet';
 import fs from 'fs';
 import {
@@ -16,8 +17,10 @@ import {
 } from '@railgun-community/shared-models';
 import { DebugLevel } from '../../models/debug-models';
 import { groth16 } from 'snarkjs';
+import debug from 'debug';
 
 let engineStarted = false;
+const dbg = debug('relayer:sdks');
 
 const fileExists = (path: string): Promise<boolean> => {
   return new Promise((resolve) => {
@@ -45,6 +48,13 @@ export const startEngine = () => {
 
   const walletSource = 'relayer';
   const shouldDebug = configDefaults.debug.logLevel === DebugLevel.VerboseLogs;
+
+  if (shouldDebug) {
+    setLoggers(dbg, dbg);
+  } else {
+    setLoggers(() => {}, dbg); // Always log errors
+  }
+
   startRailgunEngine(
     walletSource,
     levelDB,
