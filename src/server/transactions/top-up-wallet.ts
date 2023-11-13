@@ -91,7 +91,7 @@ export const topUpWallet = async (
   const unwrappedTokensWaiting = await getPublicERC20AmountsBeforeUnwrap(
     topUpWallet,
     chain,
-    // true,
+    true, // force scan here to prevent unecessary additional unshielding.
   );
   // check to see if we have anything.
   const provider = getFirstJsonRpcProviderForNetwork(chain, true);
