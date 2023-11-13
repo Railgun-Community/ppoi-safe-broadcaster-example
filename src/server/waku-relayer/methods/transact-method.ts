@@ -316,6 +316,9 @@ const replaceErrorMessageNonDev = (
     case ErrorMessage.NOTE_ALREADY_SPENT:
     case ErrorMessage.UNKNOWN_ERROR:
     case ErrorMessage.POI_INVALID:
+    case ErrorMessage.NONCE_ALREADY_USED:
+    case ErrorMessage.BAD_RESPONSE:
+    case ErrorMessage.MISSING_RESPONSE:
       return errMsg;
   }
   return ErrorMessage.UNKNOWN_ERROR;
