@@ -1,4 +1,7 @@
 import { sanitizeError } from '@railgun-community/shared-models';
+import { RelayerErrorConstructor, RelayerError } from '../models/error-models';
+
+declare const RelayerError: RelayerErrorConstructor;
 
 export enum ErrorMessage {
   BAD_TOKEN_FEE = 'Bad token fee.',
@@ -32,4 +35,14 @@ const sanitizeEthersError = (errMessage: string) => {
 export const sanitizeRelayerError = (error: Error): Error => {
   const sanitized = sanitizeError(error);
   return new Error(sanitizeEthersError(sanitized.message));
+};
+
+export const customRelayerError = (message: string, errorSeen: Error) => {
+  return new RelayerError(`CMsg_${message}`, { cause: errorSeen.message });
+};
+
+export const sanitizeCustomRelayerError = (error: Error): Error => {
+  const newErrorString = error.message.slice(5);
+  // const suggestedFee = sanitizeSuggestedFee(newErrorString);
+  return new Error(newErrorString);
 };
