@@ -6,7 +6,11 @@ import {
   isDefined,
 } from '@railgun-community/shared-models';
 import { RelayerChain } from '../../models/chain-models';
-import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
+import {
+  ErrorMessage,
+  customRelayerError,
+  sanitizeRelayerError,
+} from '../../util/errors';
 import { logger } from '../../util/logger';
 import { throwErr, delay, promiseTimeout } from '../../util/promise-utils';
 import { NetworkChainID } from '../config/config-chains';
@@ -145,8 +149,14 @@ export const getEstimateGasDetailsRelayed = async (
       const formattedBaseFeeGas = parseFloat(
         formatUnits(ethersError.baseFeePerGas, 'gwei'),
       ).toFixed(8);
-      const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
-      throw new Error(newErrorMessage);
+
+      const newCustomError = customRelayerError(
+        `ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`,
+        err,
+      );
+      throw newCustomError;
+      // const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
+      // throw new Error(newErrorMessage);
     }
 
     if (
@@ -163,9 +173,15 @@ export const getEstimateGasDetailsRelayed = async (
 
       if (retryCount >= failedRetryAttempts) {
         if (err.message.indexOf('Timed out') !== -1) {
-          throw new Error(
-            `CMsg_ERROR: Relayer timed out attempting gas estimation. Please try again.`,
+          const newCustomError = customRelayerError(
+            `ERROR: Relayer timed out attempting gas estimation. Please try again.`,
+            err,
           );
+          throw newCustomError;
+
+          // throw new Error(
+          //   `CMsg_ERROR: Relayer timed out attempting gas estimation. Please try again.`,
+          // );
         }
         const formattedProvidedGas = parseFloat(
           formatUnits(minGasPrice, 'gwei'),
@@ -184,8 +200,13 @@ export const getEstimateGasDetailsRelayed = async (
               const formattedBaseFeeGas = parseFloat(
                 formatUnits(gasPrice, 'gwei'),
               ).toFixed(2);
-              const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
-              throw new Error(newErrorMessage);
+              const newCustomError = customRelayerError(
+                `ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`,
+                err,
+              );
+              throw newCustomError;
+              // const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
+              // throw new Error(newErrorMessage);
               // console.log('GasPrice Error', newErrorMessage);
             }
           }
@@ -201,9 +222,15 @@ export const getEstimateGasDetailsRelayed = async (
               const formattedBaseFeeGas = parseFloat(
                 formatUnits(baseFeePerGas, 'gwei'),
               ).toFixed(2);
-              const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
+
               // console.log('latestBlockError', newErrorMessage);
-              throw new Error(newErrorMessage);
+              const newCustomError = customRelayerError(
+                `ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`,
+                err,
+              );
+              throw newCustomError;
+              // const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
+              // throw new Error(newErrorMessage);
             }
           }
         } catch (error) {
@@ -216,8 +243,15 @@ export const getEstimateGasDetailsRelayed = async (
           }
           // console.log('ERROR', newErr);
         }
-        const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
-        throw new Error(newErrorMessage);
+
+        const newCustomError = customRelayerError(
+          `ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`,
+          err,
+        );
+        throw newCustomError;
+
+        // const newErrorMessage = `CMsg_ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`;
+        // throw new Error(newErrorMessage);
 
         // const feeData = await provider.getFeeData();
 
