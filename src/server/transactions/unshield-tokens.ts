@@ -119,8 +119,8 @@ export const generateUnshieldTransaction = async (
     undefined, // relayerFeeERC20AmountRecipient
     sendWithPublicWallet,
     undefined, // overallBatchMinGasPrice
-    (progress: number) => {
-      dbg(`Unshield Proof Progress:  ${progress.toFixed(2)}%`);
+    (progress: number, status: string) => {
+      dbg(`Unshield Proof Progress:  ${progress.toFixed(2)}%   | ${status}`);
     }, // progressCallback
   );
 
