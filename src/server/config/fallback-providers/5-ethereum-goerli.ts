@@ -12,7 +12,7 @@ const config: FallbackProviderJsonConfig = {
     },
     {
       provider: 'https://endpoints.omniatech.io/v1/eth/goerli/public',
-      priority: 2,
+      priority: 3,
       weight: 1,
     },
     {

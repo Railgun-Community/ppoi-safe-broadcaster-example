@@ -12,8 +12,8 @@ const config: FallbackProviderJsonConfig = {
     },
     {
       provider: 'https://arbitrum.blockpi.network/v1/rpc/public',
-      priority: 2,
-      weight: 2,
+      priority: 3,
+      weight: 1,
     },
   ],
 };
