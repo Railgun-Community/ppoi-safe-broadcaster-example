@@ -10,11 +10,11 @@ const config: FallbackProviderJsonConfig = {
       maxLogsPerBatch: 1, // Supports up to 10, but at 1 ethers handles getLogs differently, and this seems to be more stable.
       stallTimeout: 2500,
     },
-    {
-      provider: 'https://endpoints.omniatech.io/v1/eth/goerli/public',
-      priority: 3,
-      weight: 1,
-    },
+    // {
+    //   provider: 'https://endpoints.omniatech.io/v1/eth/goerli/public',
+    //   priority: 3,
+    //   weight: 1,
+    // },
     {
       provider: 'https://ethereum-goerli.publicnode.com',
       priority: 3,
