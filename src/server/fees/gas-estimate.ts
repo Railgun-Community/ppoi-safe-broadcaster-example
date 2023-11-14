@@ -38,14 +38,18 @@ export const getEstimateGasDetailsPublic = async (
 ): Promise<TransactionGasDetails> => {
   try {
     dbg('Getting Public Gas Details');
-    const gasDetails = await promiseTimeout(
+    const provider = getProviderForNetwork(chain);
+    const [gasEstimate, gasDetails] = await Promise.all([
+      provider.estimateGas(transaction).catch(throwErr),
       getStandardGasDetails(evmGasType, chain),
-      30 * 1000,
-    );
-
-    const gasEstimate = await raceGasEstimate(chain, transaction).catch(
-      throwErr,
-    );
+    ]);
+    // const gasDetails = await promiseTimeout(
+    //   getStandardGasDetails(evmGasType, chain),
+    //   30 * 1000,
+    // );
+    // const gasEstimate = await raceGasEstimate(chain, transaction).catch(
+    //   throwErr,
+    // );
 
     return { gasEstimate, ...gasDetails };
   } catch (err) {

@@ -83,10 +83,10 @@ export const getFirstJsonRpcProviderForNetwork = (
   const fallbackProvider = getProviderForNetwork(chain);
   // first provider in this list, is used as pollingprovider in the wallet,
   // we shouldnt double up its usage.
-  if (fallbackProvider.provider.providerConfigs.length > 1 && useSecondary) {
-    return fallbackProvider.provider.providerConfigs[1]
-      .provider as JsonRpcProvider;
-  }
+  // if (fallbackProvider.provider.providerConfigs.length > 1 && useSecondary) {
+  //   return fallbackProvider.provider.providerConfigs[1]
+  //     .provider as JsonRpcProvider;
+  // }
   return fallbackProvider.provider.providerConfigs[0]
     .provider as JsonRpcProvider;
 };
