@@ -32,7 +32,7 @@
     "@0x/contract-addresses": "^8.0.0",
     "@noble/ed25519": "^1.7.1",
     "@railgun-community/shared-models": "6.1.1",
-    "@railgun-community/wallet": "6.1.6",
+    "@railgun-community/wallet": "6.1.7",
     "@walletconnect/jsonrpc-types": "^1.0.2",
     "@walletconnect/jsonrpc-utils": "^1.0.4",
     "axios": "1.2.3",
