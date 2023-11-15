@@ -208,7 +208,10 @@ export class POIAssurance {
     chain: Chain,
     validatedPOI: StoredValidatedPOI,
   ) {
-    if (!configDefaults.poi.nodeURL) {
+    if (
+      !isDefined(configDefaults.poi.nodeURL) ||
+      configDefaults.poi.nodeURL === ''
+    ) {
       throw new Error('No poi nodeURL configured');
     }
 

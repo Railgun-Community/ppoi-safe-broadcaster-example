@@ -1,7 +1,7 @@
 import {
   ByteLength,
   POIRequired,
-  POIValidation,
+  POIValidator,
   nToHex,
 } from '@railgun-community/wallet';
 import { RelayerChain } from '../../models/chain-models';
@@ -49,7 +49,7 @@ export const validatePOI = async (
     const railgunWalletID = getRailgunWalletID();
 
     const { isValid, error, extractedRailgunTransactionData } =
-      await POIValidation.isValidSpendableTransaction(
+      await POIValidator.isValidSpendableTransaction(
         railgunWalletID,
         txidVersion,
         chain,
@@ -90,6 +90,7 @@ export const validatePOI = async (
     };
     return validatedPOIData;
   } catch (err) {
+    console.log(err);
     dbg(`Could not validate POI for transaction - ${err.message}`);
     throw new Error(ErrorMessage.POI_INVALID);
   }

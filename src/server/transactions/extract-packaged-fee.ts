@@ -3,7 +3,7 @@ import {
   extractFirstNoteERC20AmountMapFromTransactionRequest,
   parseRailgunTokenAddress,
 } from '@railgun-community/wallet';
-import { networkForChain } from '@railgun-community/shared-models';
+import { TXIDVersion, networkForChain } from '@railgun-community/shared-models';
 import { getRailgunWalletID } from '../wallets/active-wallets';
 import { ErrorMessage } from '../../util/errors';
 import { ContractTransaction } from 'ethers';
@@ -15,6 +15,7 @@ type PackagedFee = {
 };
 
 export const extractPackagedFeeFromTransaction = async (
+  txidVersion: TXIDVersion,
   chain: RelayerChain,
   transaction: ContractTransaction,
   useRelayAdapt: boolean,
@@ -31,6 +32,7 @@ export const extractPackagedFeeFromTransaction = async (
     firstNoteERC20Map = await promiseTimeout(
       extractFirstNoteERC20AmountMapFromTransactionRequest(
         railgunWalletID,
+        txidVersion,
         network,
         transaction,
         useRelayAdapt,

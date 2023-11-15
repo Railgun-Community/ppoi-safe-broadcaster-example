@@ -76,7 +76,12 @@ export const processTransaction = async (
   dbg('Maximum gas:', maximumGas);
 
   const { tokenAddress, packagedFeeAmount } =
-    await extractPackagedFeeFromTransaction(chain, transaction, useRelayAdapt);
+    await extractPackagedFeeFromTransaction(
+      txidVersion,
+      chain,
+      transaction,
+      useRelayAdapt,
+    );
   validateFee(chain, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
   dbg('Fee validated:', packagedFeeAmount, tokenAddress);
   dbg('Transaction gas details:', transactionGasDetails);
