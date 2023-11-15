@@ -1,12 +1,12 @@
-export interface RelayerError {
+export interface RelayerError extends Error {
   name: string;
-  message: string;
-  stack?: string;
+  cause?: string;
 }
-type RelayerErrorCause = {
-  cause?: string | undefined;
-};
+
 export interface RelayerErrorConstructor {
-  new (message?: string, seenError?: RelayerErrorCause): RelayerError;
-  (message?: string, seenError?: RelayerErrorCause): RelayerError;
+  new (message?: string, cause?: string): RelayerError;
+  (message?: string, cause?: string): RelayerError;
 }
+
+// eslint-disable-next-line vars-on-top, no-var, import/no-mutable-exports
+export var RelayerError: RelayerErrorConstructor;

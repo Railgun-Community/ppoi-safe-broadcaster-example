@@ -1,7 +1,5 @@
 import { sanitizeError } from '@railgun-community/shared-models';
-import { RelayerErrorConstructor, RelayerError } from '../models/error-models';
-
-declare const RelayerError: RelayerErrorConstructor;
+import { RelayerError } from '../models/error-models';
 
 export enum ErrorMessage {
   BAD_TOKEN_FEE = 'Bad token fee.',
@@ -38,11 +36,10 @@ export const sanitizeRelayerError = (error: Error): Error => {
 };
 
 export const customRelayerError = (message: string, errorSeen: Error) => {
-  return new RelayerError(`CMsg_${message}`, { cause: errorSeen.message });
+  return new RelayerError(`CMsg_${message}`, errorSeen.message);
 };
-
+// will strip the message back to its original desired string.
 export const sanitizeCustomRelayerError = (error: Error): Error => {
   const newErrorString = error.message.slice(5);
-  // const suggestedFee = sanitizeSuggestedFee(newErrorString);
   return new Error(newErrorString);
 };
