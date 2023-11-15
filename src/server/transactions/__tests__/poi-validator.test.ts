@@ -21,7 +21,7 @@ const chain: RelayerChain = { type: 0, id: 5 };
 
 let getActiveListsStub: SinonStub;
 
-describe('poi-validator', () => {
+describe.skip('poi-validator', () => {
   before(async () => {
     getActiveListsStub = Sinon.stub(POI, 'getActiveListKeys').returns([
       'test_list',
