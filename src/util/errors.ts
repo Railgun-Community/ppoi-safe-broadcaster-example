@@ -35,11 +35,12 @@ export const sanitizeRelayerError = (error: Error): Error => {
   return new Error(sanitizeEthersError(sanitized.message));
 };
 
-export const customRelayerError = (message: string, errorSeen: Error) => {
-  return new RelayerError(`CMsg_${message}`, errorSeen.message);
+export const customRelayerError = (message: string, errorSeen?: Error) => {
+  return new Error(`CMsg_${message}`);
+  // return new RelayerError(`CMsg_${message}`, errorSeen.message);
 };
 // will strip the message back to its original desired string.
-export const sanitizeCustomRelayerError = (error: Error): Error => {
+export const sanitizeCustomRelayerError = (error: RelayerError): string => {
   const newErrorString = error.message.slice(5);
-  return new Error(newErrorString);
+  return newErrorString;
 };

@@ -145,6 +145,15 @@ export const getEstimateGasDetailsRelayed = async (
     dbg('Error Info', err.info);
     const ethersError = sanitizeEthersError(err);
 
+    if (err?.info?.error?.message.includes('execution reverted') === true) {
+      dbg('EXECUTION REVERTED.');
+
+      const executionRevertedError = customRelayerError(
+        'Tranaction is unable to be processed, RPC is saying Execution Reverted. Possible causes are volatile gas prices, Please re-generate your transaction and try again.',
+      );
+      throw executionRevertedError;
+    }
+
     if (isDefined(ethersError)) {
       dbg('Found Ethers Error.');
       const formattedProvidedGas = parseFloat(

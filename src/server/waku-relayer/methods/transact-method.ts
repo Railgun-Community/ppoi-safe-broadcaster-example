@@ -16,7 +16,7 @@ import {
 } from '../../wallets/active-wallets';
 import { contentTopics } from '../topics';
 import { WakuMethodResponse } from '../waku-response';
-import { ErrorMessage } from '../../../util/errors';
+import { ErrorMessage, sanitizeCustomRelayerError } from '../../../util/errors';
 import configDefaults from '../../config/config-defaults';
 import { recognizesFeeCacheID } from '../../fees/transaction-fee-cache';
 import { RelayerChain } from '../../../models/chain-models';
@@ -31,6 +31,7 @@ import {
 import { getRelayerVersion } from '../../../util/relayer-version';
 import { TransactionResponse, formatUnits, parseUnits } from 'ethers';
 import { createValidTransaction } from '../../transactions/transaction-validator';
+import { RelayerError } from '../../../models/error-models';
 
 const handledClientPubKeys: string[] = [];
 
@@ -201,6 +202,8 @@ export const transactMethod = async (
     // custom error message
     if (err.message.indexOf('CMsg_') !== -1) {
       // strip the custom message. CM
+      const errReceived = sanitizeCustomRelayerError(err);
+      dbg(errReceived);
       const newErrorString = err.message.slice(5);
       const suggestedFee = sanitizeSuggestedFee(newErrorString);
       dbg('Suggested Fee', suggestedFee);

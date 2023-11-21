@@ -16,7 +16,10 @@ import {
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
-import { createRailgunWallet } from '@railgun-community/wallet';
+import {
+  createRailgunWallet,
+  rescanFullUTXOMerkletreesAndWallets,
+} from '@railgun-community/wallet';
 import { isDefined } from '@railgun-community/shared-models';
 import { delay } from '../../util/promise-utils';
 
@@ -79,6 +82,16 @@ export const initWallets = async (railgunWalletDerivationIndex = 0) => {
   await initRailgunWallet(mnemonic, railgunWalletDerivationIndex);
   printDebugWalletData();
 };
+
+export const fullUTXOResyncRelayerWallets = async () => {
+  const chains = configuredNetworkChains();
+  for (const chain of chains) {
+    dbg(`Starting Full Rescan of ${chain.type}:${chain.id}`);
+    // eslint-disable-next-line no-await-in-loop
+    await rescanFullUTXOMerkletreesAndWallets(chain);
+  }
+};
+
 
 const printDebugWalletData = () => {
   dbg(
