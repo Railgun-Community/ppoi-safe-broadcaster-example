@@ -11,7 +11,7 @@ export const getGasTokenBalance = async (
     const provider = getProviderForNetwork(chain);
     const balance = await promiseTimeout(
       provider.getBalance(walletAddress),
-      25 * 1000,
+      5 * 1000,
     ).catch(throwErr);
     return balance;
   } catch (err) {

@@ -229,30 +229,44 @@ export const executeTransaction = async (
       throw new Error(ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR);
     }
 
-    if (
-      isDefined(errMsg) &&
-      (errMsg.includes('Nonce already used') ||
-        errMsg.includes('server response 512') ||
-        errMsg.includes('nonce has already been used') ||
-        errMsg.includes('missing response for request'))
-    ) {
-      dbg('WEIRD BAD RETURN?... ');
-      throw new Error(ErrorMessage.TRANSACTION_SEND_RPC_ERROR);
-      // Try again with increased nonce.
-      // return executeTransaction(
-      //   chain,
-      //   transaction,
-      //   gasDetails,
-      //   activeWallet,
-      //   nonce + 1,
-      //   setAvailability,
-      // );
-    }
+    if (isDefined(errMsg)) {
+      if (errMsg.includes('missing response for request')) {
+        //
+        dbg(errMsg);
+        throw new Error(ErrorMessage.MISSING_RESPONSE);
+      }
+      if (errMsg.includes('server response 512')) {
+        //
+        dbg(errMsg);
+        throw new Error(ErrorMessage.BAD_RESPONSE);
+      }
+      if (
+        errMsg.includes('Nonce already used') ||
+        errMsg.includes('nonce has already been used')
+      ) {
+        dbg('WEIRD BAD RETURN?... ');
+        dbg(errMsg);
 
-    if (isDefined(errMsg) && errMsg.includes('transaction underpriced')) {
-      dbg('Underpriced Error');
-      throw new Error(ErrorMessage.TRANSACTION_UNDERPRICED);
+        throw new Error(ErrorMessage.NONCE_ALREADY_USED);
+
+        // throw new Error(ErrorMessage.TRANSACTION_SEND_RPC_ERROR);
+        // Try again with increased nonce.
+        // return executeTransaction(
+        //   chain,
+        //   transaction,
+        //   gasDetails,
+        //   activeWallet,
+        //   nonce + 1,
+        //   setAvailability,
+        // );
+      }
+
+      if (errMsg.includes('transaction underpriced')) {
+        dbg('Underpriced Error');
+        throw new Error(ErrorMessage.TRANSACTION_UNDERPRICED);
+      }
     }
+    // nonce errors
 
     throw sanitizeRelayerError(err);
   }

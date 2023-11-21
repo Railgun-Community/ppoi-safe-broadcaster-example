@@ -1,4 +1,5 @@
 import { sanitizeError } from '@railgun-community/shared-models';
+import { RelayerError } from '../models/error-models';
 
 export enum ErrorMessage {
   BAD_TOKEN_FEE = 'Bad token fee.',
@@ -19,6 +20,9 @@ export enum ErrorMessage {
   NOTE_ALREADY_SPENT = 'ALREADY SPENT: One of the notes contained in this transaction have already been spent!',
   TRANSACTION_UNDERPRICED = 'RPC Rejected Transction: Gas fee too low. Please select a higher gas price and resubmit.',
   POI_INVALID = 'Could not validate Proof of Innocence - Relayer cannot process this transaction.',
+  NONCE_ALREADY_USED = 'WARNING: Relayer recieved an error from the RPC: Nonce already used. There is no way to tell if the transaction made it. We did not recieve a tx hash. Please check the chain, if nothing happens within 15 minutes. It is safe to try again.',
+  MISSING_RESPONSE = 'RPC response is missing.',
+  BAD_RESPONSE = 'Server responded 512. ',
 }
 
 const sanitizeEthersError = (errMessage: string) => {
@@ -29,4 +33,14 @@ const sanitizeEthersError = (errMessage: string) => {
 export const sanitizeRelayerError = (error: Error): Error => {
   const sanitized = sanitizeError(error);
   return new Error(sanitizeEthersError(sanitized.message));
+};
+
+export const customRelayerError = (message: string, errorSeen?: Error) => {
+  return new Error(`CMsg_${message}`);
+  // return new RelayerError(`CMsg_${message}`, errorSeen.message);
+};
+// will strip the message back to its original desired string.
+export const sanitizeCustomRelayerError = (error: RelayerError): string => {
+  const newErrorString = error.message.slice(5);
+  return newErrorString;
 };
