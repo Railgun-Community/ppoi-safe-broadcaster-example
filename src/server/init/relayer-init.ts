@@ -1,5 +1,8 @@
 import { startEngine, stopEngine } from '../engine/engine-init';
-import { initWallets } from '../wallets/active-wallets';
+import {
+  fullUTXOResyncRelayerWallets,
+  initWallets,
+} from '../wallets/active-wallets';
 import { initNetworkProviders } from '../providers/active-network-providers';
 import {
   initPricePoller,
@@ -29,6 +32,7 @@ export const initRelayerModules = async (forTest = false) => {
   await initWallets();
   await initTokens();
   setOnBalanceUpdateCallback(onBalanceUpdateCallback);
+  // await fullUTXOResyncRelayerWallets();
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   initPricePoller();
   // eslint-disable-next-line @typescript-eslint/no-floating-promises

@@ -1,5 +1,8 @@
 import { logger } from '../../util/logger';
-import { getProviderForNetwork } from '../providers/active-network-providers';
+import {
+  getProviderForNetwork,
+  getFirstJsonRpcProviderForNetwork,
+} from '../providers/active-network-providers';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
 import { RelayerChain } from '../../models/chain-models';
 
@@ -11,11 +14,15 @@ export const getGasTokenBalance = async (
     const provider = getProviderForNetwork(chain);
     const balance = await promiseTimeout(
       provider.getBalance(walletAddress),
-      5 * 1000,
+      3 * 1000,
     ).catch(throwErr);
     return balance;
   } catch (err) {
-    logger.error(new Error(`Could not get gas token balance: ${err.message}`));
+    logger.error(
+      new Error(
+        `Could not get GAS token balance: ${err.message} on chain ${chain.type}:${chain.id} for ${walletAddress}`,
+      ),
+    );
     return undefined;
   }
 };

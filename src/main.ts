@@ -51,6 +51,9 @@ process.on('SIGINT', async () => {
 });
 
 process.on('unhandledRejection', (err: Error | string) => {
+  if (err.toString().includes('could not coalesce error')) {
+    return;
+  }
   dbg('unhandledRejection', err);
 });
 process.on('uncaughtException', (err: Error | string) => {

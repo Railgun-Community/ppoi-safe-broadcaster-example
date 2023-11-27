@@ -17,7 +17,7 @@ import { promiseTimeout, TXIDVersion } from '@railgun-community/shared-models';
 
 const dbg = debug('relayer:topup-util');
 
-let initialRun = true;
+const initialRun: NumMapType<NumMapType<boolean>> = {};
 
 const getShieldedTokenAmountsForChain = async (
   txidVersion: TXIDVersion,
@@ -25,8 +25,12 @@ const getShieldedTokenAmountsForChain = async (
 ): Promise<ShieldedCachedBalance[]> => {
   const shieldedBalancesForChain = getPrivateTokenBalanceCache(chain);
 
-  let forceRefresh = initialRun;
-  initialRun = false;
+  initialRun[chain.type] ??= {};
+  initialRun[chain.type][chain.id] ??= true;
+
+  const isInitialRun = initialRun[chain.type][chain.id];
+  let forceRefresh = isInitialRun;
+  initialRun[chain.type][chain.id] = false;
 
   if (forceRefresh === false) {
     forceRefresh = shieldedBalancesForChain.length === 0;

@@ -154,15 +154,17 @@ export const getActiveWalletsForChain = (
 export const numAvailableWallets = async (
   chain: RelayerChain,
 ): Promise<number> => {
-  const walletPromises: Promise<boolean>[] = [];
-
+  // const walletPromises: Promise<boolean>[] = [];
+  const walletsAvailability: boolean[] = [];
   for (const wallet of getActiveWallets()) {
-    walletPromises.push(isWalletAvailableWithEnoughFunds(wallet, chain));
     // eslint-disable-next-line no-await-in-loop
-    await delay(100);
+    const available = await isWalletAvailableWithEnoughFunds(wallet, chain);
+    walletsAvailability.push(available);
+    // eslint-disable-next-line no-await-in-loop
+    await delay(250);
   }
 
-  const walletAvailability = await Promise.all(walletPromises);
+  // const walletAvailability = await Promise.all(walletPromises);
 
-  return walletAvailability.filter((available) => available).length;
+  return walletsAvailability.filter((available) => available).length;
 };

@@ -1,5 +1,5 @@
 import configDefaults from '../config/config-defaults';
-import { resetMapObject } from '../../util/utils';
+import { removeUndefineds, resetMapObject } from '../../util/utils';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { getGasTokenBalance } from './gas-token-balance';
 import { ActiveWallet } from '../../models/wallet-models';
@@ -46,13 +46,21 @@ export const updateAllActiveWalletsGasTokenBalances = async (
 ) => {
   const balanceUpdatePromises: Promise<void>[] = [];
 
-  configuredNetworkChains().forEach((chainID) => {
-    activeWallets.forEach(({ address }) => {
+  const currentChains = configuredNetworkChains();
+  for (const chainID of currentChains) {
+    for (const { address } of activeWallets) {
       balanceUpdatePromises.push(updateCachedGasTokenBalance(chainID, address));
-    });
-  });
+      // eslint-disable-next-line no-await-in-loop
+      await delay(1000);
+    }
+  }
+  // configuredNetworkChains().forEach((chainID) => {
+  //   activeWallets.forEach(({ address }) => {
+  //     balanceUpdatePromises.push(updateCachedGasTokenBalance(chainID, address));
+  //   });
+  // });
 
-  await Promise.all(balanceUpdatePromises);
+  await Promise.allSettled(balanceUpdatePromises);
 };
 
 export const shouldUpdateCachedGasTokenBalance = (
@@ -106,10 +114,22 @@ export const getActiveWalletGasTokenBalanceMapForChain = async (
       }),
     );
     // eslint-disable-next-line no-await-in-loop
-    await delay(100);
+    await delay(250);
   }
 
-  const balanceResults = await Promise.all(balancePromises);
+  const balanceResultsUndefineds = (
+    await Promise.allSettled(balancePromises)
+  ).map((r) => {
+    if (r.status === 'fulfilled') {
+      return r.value;
+    }
+    if (r.status === 'rejected') {
+      logger.error(r.reason);
+    }
+    return undefined;
+  });
+
+  const balanceResults = removeUndefineds(balanceResultsUndefineds);
 
   const balanceMap: MapType<bigint> = {};
   activeWallets.forEach(async (activeWallet, index) => {

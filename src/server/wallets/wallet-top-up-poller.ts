@@ -81,8 +81,8 @@ export const initTopUpPoller = async () => {
     stopTopUpPolling();
     return;
   }
-
-  await delay(2 * 60 * 1000);
+  // prevent this from starting for 10 mins
+  await delay(10 * 60 * 1000);
 
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   pollTopUp();
