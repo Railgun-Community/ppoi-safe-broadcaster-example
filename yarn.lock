@@ -3768,18 +3768,6 @@ ethereumjs-util@^7.1.1, ethereumjs-util@^7.1.2, ethereumjs-util@^7.1.5:
     tslib "2.4.0"
     ws "8.5.0"
 
-"ethers@github:Railgun-Community/ethers.js#v6.7.9":
-  version "6.7.9"
-  resolved "https://codeload.github.com/Railgun-Community/ethers.js/tar.gz/ec97460de74ba2864a8389b053f20bee5c71d449"
-  dependencies:
-    "@adraffy/ens-normalize" "1.9.2"
-    "@noble/hashes" "1.1.2"
-    "@noble/secp256k1" "1.7.1"
-    "@types/node" "18.15.13"
-    aes-js "4.0.0-beta.5"
-    tslib "2.4.0"
-    ws "8.5.0"
-
 ethjs-unit@0.1.6:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/ethjs-unit/-/ethjs-unit-0.1.6.tgz#c665921e476e87bce2a9d588a6fe0405b2c41699"
