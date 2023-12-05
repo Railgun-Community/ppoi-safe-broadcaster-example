@@ -103,7 +103,7 @@ export const generateUnshieldTransaction = async (
     dbg('Unshield Gas Error:', err.message);
     if (err.message.includes('Invalid Merkle Root') === true) {
       dbg('SYNC ERROR: Invalid Merkle Root');
-      await rescanFullUTXOMerkletreesAndWallets(chain);
+      await rescanFullUTXOMerkletreesAndWallets(chain, undefined);
       dbg('Merkle Rescan Complete.');
     }
     return { gasEstimate: undefined };

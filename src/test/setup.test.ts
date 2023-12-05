@@ -26,7 +26,7 @@ const setupTests = () => {
   configDefaults.engine.dbDir = LEPTON_TEST_DB;
   configDefaults.settings.dbDir = SETTINGS_TEST_DB;
   savedConfigDefaults = JSON.parse(JSON.stringify(configDefaults));
-  configDefaults.poi.nodeURL = 'test';
+  configDefaults.poi.nodeURL = ['test'];
   resetMapObject(configTokens);
 };
 

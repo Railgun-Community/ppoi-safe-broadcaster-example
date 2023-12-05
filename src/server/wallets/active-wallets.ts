@@ -88,10 +88,9 @@ export const fullUTXOResyncRelayerWallets = async () => {
   for (const chain of chains) {
     dbg(`Starting Full Rescan of ${chain.type}:${chain.id}`);
     // eslint-disable-next-line no-await-in-loop
-    await rescanFullUTXOMerkletreesAndWallets(chain);
+    await rescanFullUTXOMerkletreesAndWallets(chain, undefined);
   }
 };
-
 
 const printDebugWalletData = () => {
   dbg(
