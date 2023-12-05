@@ -4,6 +4,8 @@ import {
   EVMGasType,
   TransactionGasDetails,
   isDefined,
+  TransactionGasDetailsType2,
+  TransactionGasDetailsType1,
 } from '@railgun-community/shared-models';
 import { RelayerChain } from '../../models/chain-models';
 import {
@@ -27,9 +29,11 @@ import {
   formatUnits,
 } from 'ethers';
 import debug from 'debug';
+import { GasDetails } from '../../models/gas-models';
 
 const dbg = debug('relayer:gas-estimate');
 
+// this function is purely for relayer usage.
 export const getEstimateGasDetailsPublic = async (
   chain: RelayerChain,
   evmGasType: EVMGasType,
@@ -50,7 +54,6 @@ export const getEstimateGasDetailsPublic = async (
     // const gasEstimate = await raceGasEstimate(chain, transaction).catch(
     //   throwErr,
     // );
-
     return { gasEstimate, ...gasDetails };
   } catch (err) {
     logger.error(err);

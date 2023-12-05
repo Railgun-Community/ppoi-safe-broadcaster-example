@@ -23,7 +23,9 @@ export const getERC20TokenBalance = async (
 
     return balance;
   } catch (err) {
-    logger.warn(`Could not get gas token balance: ${err.message}`);
+    logger.warn(
+      `Could not get token balance: ${err.message} on chain ${chain.type}:${chain.id}`,
+    );
     return 0n;
   }
 };
