@@ -210,7 +210,7 @@ export class POIAssurance {
   ) {
     if (
       !isDefined(configDefaults.poi.nodeURL) ||
-      configDefaults.poi.nodeURL === ''
+      configDefaults.poi.nodeURL[0] === ''
     ) {
       throw new Error('No poi nodeURL configured');
     }

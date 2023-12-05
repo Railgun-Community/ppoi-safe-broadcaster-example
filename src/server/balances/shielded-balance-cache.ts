@@ -1,6 +1,6 @@
 import {
   BalancesUpdatedCallback,
-  refreshRailgunBalances,
+  refreshBalances,
 } from '@railgun-community/wallet';
 import { resetMapObject } from '../../util/utils';
 import { ERC20Amount } from '../../models/token-models';
@@ -44,7 +44,7 @@ export const updateShieldedBalances = async (
     balancePromiseResolve = resolve;
   });
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  refreshRailgunBalances(txidVersion, chain, railgunWalletID, fullRescan);
+  refreshBalances(chain, [railgunWalletID]);
   return balancePromise;
 };
 
