@@ -1,18 +1,19 @@
 import {
+  FeeHistoryPercentile,
   FeeHistoryResult,
-  GasHistoryPercentile,
 } from '../../models/gas-models';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { RelayerChain } from '../../models/chain-models';
 import { JsonRpcProvider } from 'ethers';
 import { isDefined } from '@railgun-community/shared-models';
+import { NetworkChainID } from '../config/config-chains';
 
-const HISTORICAL_BLOCK_COUNT = 5;
+const HISTORICAL_BLOCK_COUNT = 10;
 const REWARD_PERCENTILES: number[] = [
-  GasHistoryPercentile.Low,
-  GasHistoryPercentile.Medium,
-  GasHistoryPercentile.High,
-  GasHistoryPercentile.VeryHigh,
+  FeeHistoryPercentile.Low,
+  FeeHistoryPercentile.Medium,
+  FeeHistoryPercentile.High,
+  FeeHistoryPercentile.VeryHigh,
 ];
 
 const findHeadBlockInMessage = (message: string): Optional<number> => {
@@ -30,6 +31,24 @@ const findHeadBlockInMessage = (message: string): Optional<number> => {
   }
 };
 
+export const getHistoricalBlockCountForChain = (
+  chain: RelayerChain,
+): number => {
+  const { id } = chain;
+  switch (id) {
+    case NetworkChainID.Ethereum: {
+
+      return 20;
+    }
+    case NetworkChainID.PolygonPOS: {
+      return 40;
+    }
+    default: {
+      return HISTORICAL_BLOCK_COUNT;
+    }
+  }
+};
+
 export const getFeeHistory = async (
   chain: RelayerChain,
   recentBlock?: number,
@@ -41,7 +60,7 @@ export const getFeeHistory = async (
       .provider as JsonRpcProvider;
 
     return await firstJsonRpcProvider.send('eth_feeHistory', [
-      HISTORICAL_BLOCK_COUNT,
+      getHistoricalBlockCountForChain(chain),
       recentBlock ?? 'latest',
       REWARD_PERCENTILES,
     ]);
@@ -60,8 +79,14 @@ export const getFeeHistory = async (
         return getFeeHistory(chain, headBlock, retryCount + 1);
       }
 
-      // eslint-disable-next-line no-param-reassign
-      recentBlock = recentBlock ?? (await provider.getBlockNumber()) - 1;
+      if (!isDefined(recentBlock)) {
+        const latestBlock = await provider.getBlock('latest');
+        if (!isDefined(latestBlock)) {
+          throw new Error("Could not get latest block");
+        }
+        // eslint-disable-next-line no-param-reassign
+        recentBlock = latestBlock.number - 1;
+      }
       return getFeeHistory(chain, recentBlock - 1, retryCount + 1);
     }
     throw err;

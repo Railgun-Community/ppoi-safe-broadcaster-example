@@ -39,9 +39,12 @@ export const validateMinGasPrice = async (
       // Valid gas price.
       return;
     }
+    dbg('=====Gas Price Validation Failed=====')
+    dbg(`slowGasPrice: ${slowGasPrice}`);
+    dbg(`minGasPrice: ${minGasPrice}`);
+    dbg(`minimumAcceptableGasPrice: ${minimumAcceptableGasPrice}`);
   } catch (err) {
     dbg(`error getting current gas price: ${err.message}`);
   }
-
   throw new Error(ErrorMessage.GAS_PRICE_TOO_LOW);
 };

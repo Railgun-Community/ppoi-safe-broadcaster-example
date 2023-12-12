@@ -31,11 +31,6 @@ import {
   GasDetailsBySpeed,
   GasDetails,
 } from '../../models/gas-models';
-import { maxBigInt, minBigInt } from '../../util/utils';
-import {
-  getGasDetailsBySpeedBlockNative,
-  supportsBlockNativeGasEstimates,
-} from '../api/block-native/gas-by-speed-block-native';
 import { NetworkChainID } from '../config/config-chains';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 import { getFeeHistory } from './gas-fee-history';
@@ -87,24 +82,24 @@ type SuggestedGasDetails = {
 // WARNING: TRANSACTIONS RISK BEING REVERTED IF YOU MODIFY THIS.
 const SETTINGS_BY_PRIORITY_LEVEL = {
   [GasHistoryPercentile.Low]: {
-    baseFeePercentageMultiplier: BigInt(125),
+    baseFeePercentageMultiplier: 105n,
     priorityFeePercentageMultiplier: 100n,
     minSuggestedMaxPriorityFeePerGas: BigInt(1_500_000_000),
   },
   [GasHistoryPercentile.Medium]: {
-    baseFeePercentageMultiplier: BigInt(180),
-    priorityFeePercentageMultiplier: BigInt(110),
+    baseFeePercentageMultiplier: 110n,
+    priorityFeePercentageMultiplier: 100n,
     minSuggestedMaxPriorityFeePerGas: BigInt(2_500_000_000),
   },
   [GasHistoryPercentile.High]: {
-    baseFeePercentageMultiplier: BigInt(250),
-    priorityFeePercentageMultiplier: BigInt(125),
+    baseFeePercentageMultiplier: 115n,
+    priorityFeePercentageMultiplier: 100n,
     minSuggestedMaxPriorityFeePerGas: BigInt(3_000_000_000),
   },
   [GasHistoryPercentile.VeryHigh]: {
-    baseFeePercentageMultiplier: 1000n,
-    priorityFeePercentageMultiplier: BigInt(200),
-    minSuggestedMaxPriorityFeePerGas: BigInt(4000000000), // 4_000_000_000
+    baseFeePercentageMultiplier: 125n,
+    priorityFeePercentageMultiplier: 100n,
+    minSuggestedMaxPriorityFeePerGas: BigInt(4_000_000_000), // 4_000_000_000
   },
 };
 
@@ -152,15 +147,6 @@ export const getGasDetailsForSpeed = async (
   chain: RelayerChain,
   percentile: GasHistoryPercentile,
 ): Promise<GasDetails> => {
-  if (supportsBlockNativeGasEstimates(chain)) {
-    const gasDetailsBySpeedBlockNative = await getGasDetailsBySpeedBlockNative(
-      evmGasType,
-      chain,
-    );
-    if (gasDetailsBySpeedBlockNative) {
-      return gasDetailsBySpeedBlockNative[percentile];
-    }
-  }
 
   switch (evmGasType) {
     case EVMGasType.Type0:
@@ -241,9 +227,7 @@ const estimateGasMaxFeesBySpeedUsingHeuristic = async (
 ): Promise<GasDetailsBySpeed> => {
   const feeHistory = await getFeeHistory(chain);
 
-  const baseFees: bigint[] = feeHistory.baseFeePerGas.map((feeHex) =>
-    BigInt(feeHex),
-  );
+  const mostRecentBaseFeePerGas = BigInt(feeHistory.baseFeePerGas[feeHistory.baseFeePerGas.length - 1]);
   const priorityFeePercentile: {
     [percentile in GasHistoryPercentile]: bigint[];
   } = {
@@ -257,11 +241,10 @@ const estimateGasMaxFeesBySpeedUsingHeuristic = async (
       BigInt(feePriorityGroup[2]),
     ),
     [GasHistoryPercentile.VeryHigh]: feeHistory.reward.map(
-      (feePriorityGroup) => BigInt(feePriorityGroup[2]), // Note: same as High
+      (feePriorityGroup) => BigInt(feePriorityGroup[3]),
     ),
   };
 
-  const baseFeesMedian: bigint = getMedianBigNumber(baseFees);
   const priorityFeePercentileMedians: {
     [percentile in GasHistoryPercentile]: bigint;
   } = {
@@ -283,22 +266,22 @@ const estimateGasMaxFeesBySpeedUsingHeuristic = async (
     [percentile in GasHistoryPercentile]: SuggestedGasDetails;
   } = {
     [GasHistoryPercentile.Low]: getSuggestedGasDetails(
-      baseFeesMedian,
+      mostRecentBaseFeePerGas,
       priorityFeePercentileMedians,
       GasHistoryPercentile.Low,
     ),
     [GasHistoryPercentile.Medium]: getSuggestedGasDetails(
-      baseFeesMedian,
+      mostRecentBaseFeePerGas,
       priorityFeePercentileMedians,
       GasHistoryPercentile.Medium,
     ),
     [GasHistoryPercentile.High]: getSuggestedGasDetails(
-      baseFeesMedian,
+      mostRecentBaseFeePerGas,
       priorityFeePercentileMedians,
       GasHistoryPercentile.High,
     ),
     [GasHistoryPercentile.VeryHigh]: getSuggestedGasDetails(
-      baseFeesMedian,
+      mostRecentBaseFeePerGas,
       priorityFeePercentileMedians,
       GasHistoryPercentile.VeryHigh,
     ),
@@ -331,20 +314,8 @@ const getSuggestedGasDetails = (
   },
   percentile: GasHistoryPercentile,
 ): SuggestedGasDetails => {
-  const settings = SETTINGS_BY_PRIORITY_LEVEL[percentile];
-  const maxBaseFeePerGas =
-    (baseFeesMedian * settings.baseFeePercentageMultiplier) / 100n;
-
-  // Ensure no lower than min suggested priority fee.
-  const priorityFee = maxBigInt(
-    (priorityFeePercentileMedians[percentile] *
-      settings.priorityFeePercentageMultiplier) /
-      100n,
-    settings.minSuggestedMaxPriorityFeePerGas,
-  );
-
-  // Ensure no higher than maxFeePerGas.
-  const maxPriorityFeePerGas = minBigInt(priorityFee, maxBaseFeePerGas);
+  const maxBaseFeePerGas = baseFeesMedian;
+  const maxPriorityFeePerGas = priorityFeePercentileMedians[percentile];
 
   return {
     maxPriorityFeePerGas,
