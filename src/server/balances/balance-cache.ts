@@ -41,6 +41,7 @@ export const updateCachedGasTokenBalance = async (
   };
 };
 
+// only used for tests?
 export const updateAllActiveWalletsGasTokenBalances = async (
   activeWallets: ActiveWallet[],
 ) => {
@@ -105,31 +106,19 @@ export const getActiveWalletGasTokenBalanceMapForChain = async (
   chain: RelayerChain,
   activeWallets: ActiveWallet[],
 ): Promise<MapType<bigint>> => {
-  const balancePromises: Promise<bigint | undefined>[] = [];
+  const balancePromises: (bigint | undefined)[] = [];
   for (const { address } of activeWallets) {
-    balancePromises.push(
-      getCachedGasTokenBalance(chain, address).catch((err) => {
-        logger.error(err);
-        return undefined;
-      }),
-    );
+    // eslint-disable-next-line no-await-in-loop
+    const cachedGasBalance = await getCachedGasTokenBalance(chain, address).catch((err) => {
+      logger.error(err);
+      return undefined;
+    });
+    balancePromises.push(cachedGasBalance);
     // eslint-disable-next-line no-await-in-loop
     await delay(250);
   }
 
-  const balanceResultsUndefineds = (
-    await Promise.allSettled(balancePromises)
-  ).map((r) => {
-    if (r.status === 'fulfilled') {
-      return r.value;
-    }
-    if (r.status === 'rejected') {
-      logger.error(r.reason);
-    }
-    return undefined;
-  });
-
-  const balanceResults = removeUndefineds(balanceResultsUndefineds);
+  const balanceResults = removeUndefineds(balancePromises);
 
   const balanceMap: MapType<bigint> = {};
   activeWallets.forEach(async (activeWallet, index) => {
