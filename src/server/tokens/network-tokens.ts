@@ -16,7 +16,6 @@ export const initTokens = async (testChain?: RelayerChain) => {
   for (const chain of configuredNetworkChains()) {
     if (isDefined(testChain)) {
       if (testChain.id !== chain.id) {
-        console.log('SKIPPING UNTESTED CHAINS');
         continue;
       }
     }
