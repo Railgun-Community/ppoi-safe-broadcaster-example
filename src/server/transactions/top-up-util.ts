@@ -37,9 +37,8 @@ const getShieldedTokenAmountsForChain = async (
   }
 
   if (forceRefresh) {
-    const fullRescan = false;
     await promiseTimeout(
-      updateShieldedBalances(txidVersion, chain, fullRescan),
+      updateShieldedBalances(txidVersion, chain),
       5 * 60 * 1000,
     ).catch((err: Error) => {
       dbg(err.message);
@@ -326,9 +325,9 @@ export const getMultiTopUpTokenAmountsForChain = async (
   const consolidatedTokenAmountsForChain = getConsolidatedTokenAmounts(
     setNativeLast
       ? orderNativeTokenLast(
-          topUpTokenAmountsForChain,
-          getWrappedNativeTokenAddressForChain(chain),
-        )
+        topUpTokenAmountsForChain,
+        getWrappedNativeTokenAddressForChain(chain),
+      )
       : newSortedTopUpList,
     chain,
   );

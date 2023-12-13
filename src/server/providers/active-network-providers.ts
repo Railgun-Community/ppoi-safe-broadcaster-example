@@ -18,17 +18,16 @@ const activeNetworkProviders: NumMapType<NumMapType<FallbackProvider>> = {};
 // eslint-disable-next-line require-await
 export const initNetworkProviders = async (chains?: RelayerChain[]) => {
   const initChains = chains ?? configuredNetworkChains();
-  await Promise.all(
-    initChains.map(async (chain) => {
-      try {
-        await initNetworkProvider(chain);
-      } catch (err) {
-        throw new Error(
-          `Could not initialize network provider for chain: ${chain.type}:${chain.id} - ${err.message}`,
-        );
-      }
-    }),
-  );
+  for (const chain of initChains) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await initNetworkProvider(chain);
+    } catch (err) {
+      throw new Error(
+        `Could not initialize network provider for chain: ${chain.type}:${chain.id} - ${err.message}`,
+      );
+    }
+  }
 };
 
 /**

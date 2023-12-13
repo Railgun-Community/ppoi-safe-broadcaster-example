@@ -5,6 +5,7 @@ import { GasHistoryPercentile } from '../../../models/gas-models';
 import { getGasDetailsForSpeed } from '../gas-by-speed';
 import { NetworkChainID } from '../../config/config-chains';
 import { RelayerChain } from '../../../models/chain-models';
+import { initNetworkProviders } from '../../providers/active-network-providers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -15,7 +16,12 @@ const chain: RelayerChain = {
 };
 
 describe('gas-by-speed', () => {
-  it('Should get gas speeds from live BlockNative API - Type0', async () => {
+
+  before(async () => {
+    await initNetworkProviders([chain]);
+  })
+
+  it('Should calculate gas speeds from RPC - Type0', async () => {
     await Promise.all(
       Object.values(GasHistoryPercentile)
         .filter((v) => !Number.isNaN(Number(v)))
@@ -34,7 +40,7 @@ describe('gas-by-speed', () => {
     );
   });
 
-  it('Should get gas speeds from live BlockNative API - Type2', async () => {
+  it('Should calculate gas speeds from RPC - Type2', async () => {
     await Promise.all(
       Object.values(GasHistoryPercentile)
         .filter((v) => !Number.isNaN(Number(v)))

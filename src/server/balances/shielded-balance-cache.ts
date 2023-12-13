@@ -35,7 +35,6 @@ let balancePromiseResolve: Optional<() => void>;
 export const updateShieldedBalances = async (
   txidVersion: TXIDVersion,
   chain: RelayerChain,
-  fullRescan: boolean,
 ) => {
   balancePromiseResolve = undefined;
 
@@ -68,10 +67,10 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
 
   erc20Amounts.forEach((erc20Amount) => {
     shieldedTokenBalanceCache[chain.type][chain.id][erc20Amount.tokenAddress] =
-      {
-        erc20Amount,
-        updatedAt: Date.now(),
-      };
+    {
+      erc20Amount,
+      updatedAt: Date.now(),
+    };
   });
 
   if (isDefined(balancePromiseResolve)) {
