@@ -3,9 +3,8 @@ import {
   calculateGasPrice,
   EVMGasType,
   TransactionGasDetails,
+  type TransactionGasDetailsType2,
   isDefined,
-  TransactionGasDetailsType2,
-  TransactionGasDetailsType1,
 } from '@railgun-community/shared-models';
 import { RelayerChain } from '../../models/chain-models';
 import {
@@ -350,12 +349,24 @@ export const calculateMaximumGasRelayer = (
 export const calculateMaximumGasPublic = (
   transactionGasDetails: TransactionGasDetails,
 ): bigint => {
+  // Average gas usage is around 83% of the max estimate.
   const gasPrice = calculateGasPrice(transactionGasDetails);
   const { gasEstimate } = transactionGasDetails;
   const publicGasEstimate = gasEstimate * gasPrice;
-  // Average gas usage is around 83% of the max estimate.
-  logger.warn(
-    `Gas Price Estimated at: ${formatEther(
+
+  const checkForType2 = transactionGasDetails as TransactionGasDetailsType2;
+  if (isDefined(checkForType2.maxPriorityFeePerGas)) {
+    const { maxFeePerGas, maxPriorityFeePerGas } = checkForType2;
+    const newPublicGasEstimate = (maxFeePerGas * gasEstimate) + maxPriorityFeePerGas;
+    dbg(
+      `TYPE 2 Gas Price Estimated at: ${formatEther(
+        parseUnits(maxFeePerGas.toString(), 'gwei'),
+      )}`,
+    );
+    return (newPublicGasEstimate * 8350n) / 10000n;
+  }
+  dbg(
+    `TYPE 1 Gas Price Estimated at: ${formatEther(
       parseUnits(gasPrice.toString(), 'gwei'),
     )}`,
   );

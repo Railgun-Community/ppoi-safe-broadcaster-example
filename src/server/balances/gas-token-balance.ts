@@ -1,6 +1,6 @@
 import { logger } from '../../util/logger';
 import {
-  getProviderForNetwork,
+  // getProviderForNetwork,
   getFirstJsonRpcProviderForNetwork,
 } from '../providers/active-network-providers';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
@@ -11,7 +11,7 @@ export const getGasTokenBalance = async (
   walletAddress: string,
 ): Promise<Optional<bigint>> => {
   try {
-    const provider = getProviderForNetwork(chain);
+    const provider = getFirstJsonRpcProviderForNetwork(chain);
     const balance = await promiseTimeout(
       provider.getBalance(walletAddress),
       3 * 1000,

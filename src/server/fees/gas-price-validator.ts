@@ -6,6 +6,7 @@ import { getGasDetailsForSpeed } from './gas-by-speed';
 import { GasHistoryPercentile } from '../../models/gas-models';
 import { promiseTimeout } from '../../util/promise-utils';
 import debug from 'debug';
+import { NetworkChainID } from '../config/config-chains';
 
 const dbg = debug('relayer:gas-price:validate');
 export const validateMinGasPrice = async (
@@ -17,6 +18,11 @@ export const validateMinGasPrice = async (
     `validateMinGasPrice: minGasPrice ${minGasPrice} (chain ${chain.type}:${chain.id})`,
   );
 
+  if (chain.id === NetworkChainID.Arbitrum) {
+    if (minGasPrice >= 100000000n) {
+      return true;
+    }
+  }
   try {
     // Low speed is 95th percentile to include in the next block.
     // Block gas submissions that are 50% below this level.

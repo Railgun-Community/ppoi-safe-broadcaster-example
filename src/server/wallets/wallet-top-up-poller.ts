@@ -35,17 +35,16 @@ const pollTopUp = async () => {
       if (walletToTopUp) {
         walletFound = true;
         logger.warn('We have a wallet to top up!');
-        for (const txidVersion of Object.values(TXIDVersion)) {
-          // eslint-disable-next-line no-await-in-loop
-          await topUpWallet(walletToTopUp, txidVersion, chain).catch((err) => {
-            logger.warn(
-              `Failed to top up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${txidVersion}`,
-            );
-            if (err.message.indexOf('Top Up too costly, skipping!') === -1) {
-              logger.error(err);
-            }
-          });
-        }
+        const currentTXIDVersion = TXIDVersion.V2_PoseidonMerkle; // Switch this to V3 when balances migrated after release.
+        // eslint-disable-next-line no-await-in-loop
+        await topUpWallet(walletToTopUp, currentTXIDVersion, chain).catch((err) => {
+          logger.warn(
+            `Failed to top up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${currentTXIDVersion}`,
+          );
+          if (err.message.indexOf('Top Up too costly, skipping!') === -1) {
+            logger.error(err);
+          }
+        });
       }
     }
   } catch (err) {
