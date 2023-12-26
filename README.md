@@ -1,18 +1,18 @@
 [![Unit Tests](https://github.com/Railgun-Community/poi-safe-relayer-example/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/poi-safe-relayer-example/actions)
 
-# Example code and tests for POI-Safe RAILGUN transactions
+# Example code and tests for PPOI-Safe RAILGUN transactions
 
-Example code to forward RAILGUN transactions to the blockchain. Uses the Waku messaging protocol, while guaranteeing a Proof Of Innocence for all transactions.
+Example code to forward RAILGUN transactions to the blockchain. Uses the Waku messaging protocol, while guaranteeing a Private Proof Of Innocence for all transactions.
 
-`poi-safe-relayer-example` is a node.js application that receives encrypted transactions from RAILGUN wallets equipped with Proof Of Innocence. The Relayer example verifies, signs and forwards the transactions to the blockchain. It will broadcast fees on the tokens you configure to accept at the rates defined in the config.
+`poi-safe-relayer-example` is a node.js application that receives encrypted transactions from RAILGUN wallets equipped with Private Proof Of Innocence. The Relayer example verifies, signs and forwards the transactions to the blockchain. It will broadcast fees on the tokens you configure to accept at the rates defined in the config.
 
-## Proof Of Innocence
+## Private Proof Of Innocence
 
-Proof Of Innocence is validated on every transaction for the safety of users and wallets.
+Private Proof Of Innocence is validated on every transaction for the safety of users and wallets.
 
-Proof of Innocence is verified through a Proof Of Spendability, which verifies a merkle proof guaranteeing that the UTXOs that are spent are part of the Proof Of Innocence inclusion set for each list.
+Private Proof of Innocence is verified through a Proof Of Spendability, which verifies a merkle proof guaranteeing that the UTXOs that are spent are part of the Private Proof Of Innocence inclusion set for each list.
 
-This means that every fee that is gathered is guaranteed to be spendable by your wallet - and RAILGUN wallets without Proof Of Innocence will not be able to use the relayer to forward any transactions.
+This means that every fee that is gathered is guaranteed to be spendable by your wallet - and RAILGUN wallets without Private Proof Of Innocence will not be able to use the relayer to forward any transactions.
 
 ## Waku Messaging
 
