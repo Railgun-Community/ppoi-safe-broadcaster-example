@@ -12,7 +12,6 @@ import {
   waitForTx,
   waitForTxs,
 } from './execute-transaction';
-import { approveZeroX } from './approve-spender';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import debug from 'debug';
@@ -38,6 +37,8 @@ import {
 import { NetworkChainID } from '../config/config-chains';
 import { ChainType, TXIDVersion } from '@railgun-community/shared-models';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
+import { swapUniswap } from './uniswap-swap';
+import { approveZeroX } from './approve-spender';
 
 const dbg = debug('relayer:topup-util');
 
@@ -57,10 +58,10 @@ const getTopUpTokens = async (
   const topUpTokens =
     allowMultiTokenTopUp === true
       ? await getMultiTopUpTokenAmountsForChain(
-          txidVersion,
-          chain,
-          accumulateNativeToken,
-        )
+        txidVersion,
+        chain,
+        accumulateNativeToken,
+      )
       : await getTopUpTokenAmountsForChain(txidVersion, chain);
   if (topUpTokens.length > 0) {
     // only cache if we get a result. don't store empty array.
@@ -276,35 +277,50 @@ const handlePublicTokens = async (
   }
 
   if (filteredPublicTokens.length > 0) {
-    // perform approvals
-    const approvalTxResponses = await approveZeroX(
-      topUpWallet,
-      filteredPublicTokens,
-      chain,
-    );
-    await waitForTxs(
-      topUpWallet,
-      ethersWallet,
-      chain,
-      approvalTxResponses,
-      false,
-    );
-    dbg('Approvals complete');
 
-    // perform swaps
-    const swapTxResponses = await swapZeroX(
-      topUpWallet,
-      filteredPublicTokens,
-      chain,
-    );
-    await waitForTxs(topUpWallet, ethersWallet, chain, swapTxResponses, false);
+    const shouldUseZeroX = configNetworks[chain.type][chain.id].topUp.useZeroXForSwap;
+    const hasZeroXAPIKey = configDefaults.api.zeroXApiKey !== '';
+    if (shouldUseZeroX && hasZeroXAPIKey) {
+      dbg("Top-Up Swapping with 0x")
+
+      const approvalTxResponses = await approveZeroX(
+        topUpWallet,
+        filteredPublicTokens,
+        chain,
+      );
+      await waitForTxs(
+        topUpWallet,
+        ethersWallet,
+        chain,
+        approvalTxResponses,
+        false,
+      );
+      dbg('0x Approvals complete');
+
+      const swapZeroXTxResponses = await swapZeroX(
+        topUpWallet,
+        filteredPublicTokens,
+        chain,
+      )
+      await waitForTxs(topUpWallet, ethersWallet, chain, swapZeroXTxResponses, false);
+
+    } else {
+      dbg("Top-Up Swapping with Uniswap")
+      // perform swaps and approvals combined
+      const swapTxResponses = await swapUniswap(
+        topUpWallet,
+        filteredPublicTokens,
+        chain,
+      );
+      await waitForTxs(topUpWallet, ethersWallet, chain, swapTxResponses, false);
+    }
+
   }
 };
+
 function clearTopUpCaches(chain: RelayerChain, topUpWallet: ActiveWallet) {
   dbg('Clearing Topup Cache');
   clearCachedBalances(chain, topUpWallet.address);
-
-  // change these two to be soley chain based.
   clearCachedTokens(chain);
   clearCachedTransaction(chain);
 }

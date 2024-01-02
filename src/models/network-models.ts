@@ -26,4 +26,5 @@ type TopUpConfig = {
   maxSpendPercentage: number;
   swapThresholdIntoGasToken: bigint;
   minimumGasBalanceForTopup: bigint;
+  useZeroXForSwap: boolean;
 };

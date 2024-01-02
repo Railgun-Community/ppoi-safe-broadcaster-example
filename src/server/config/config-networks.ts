@@ -74,6 +74,7 @@ const networksConfig: NetworksConfig = {
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: ONE_AND_HALF,
         minimumGasBalanceForTopup: HALF_TOKEN,
+        useZeroXForSwap: false,
       },
     },
     [NetworkChainID.EthereumGoerli]: {
@@ -100,6 +101,7 @@ const networksConfig: NetworksConfig = {
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: ONE_AND_HALF,
         minimumGasBalanceForTopup: HALF_TOKEN,
+        useZeroXForSwap: false,
       },
       retryGasBuffer: parseUnits('0.1', 'gwei'),
 
@@ -129,6 +131,7 @@ const networksConfig: NetworksConfig = {
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: HALF_TOKEN,
         minimumGasBalanceForTopup: HALF_TOKEN,
+        useZeroXForSwap: false,
       },
       retryGasBuffer: parseUnits('0.1', 'gwei'),
     },
@@ -156,6 +159,7 @@ const networksConfig: NetworksConfig = {
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: TEN_TOKENS,
         minimumGasBalanceForTopup: FIVE_TOKENS,
+        useZeroXForSwap: false,
       },
       retryGasBuffer: parseUnits('1', 'gwei'),
     },
@@ -183,6 +187,7 @@ const networksConfig: NetworksConfig = {
         maxSpendPercentage: 0.15,
         swapThresholdIntoGasToken: QUARTER_TOKEN / 2n,
         minimumGasBalanceForTopup: ONE_TOKEN / 20n, // 1/20th = 0.05
+        useZeroXForSwap: false,
       },
       retryGasBuffer: parseUnits('0.1', 'gwei'),
     },
@@ -210,6 +215,7 @@ const networksConfig: NetworksConfig = {
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: TEN_TOKENS,
         minimumGasBalanceForTopup: FIVE_TOKENS,
+        useZeroXForSwap: false,
       },
       retryGasBuffer: parseUnits('1', 'gwei'),
 
@@ -239,6 +245,7 @@ const networksConfig: NetworksConfig = {
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: QUARTER_TOKEN / 2n,
         minimumGasBalanceForTopup: ONE_TOKEN / 20n, // 1/20th = 0.05
+        useZeroXForSwap: false,
       },
       retryGasBuffer: parseUnits('0.1', 'gwei'),
       isTestNetwork: true,
@@ -265,6 +272,7 @@ const networksConfig: NetworksConfig = {
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: ONE_AND_HALF,
         minimumGasBalanceForTopup: HALF_TOKEN,
+        useZeroXForSwap: false,
       },
       retryGasBuffer: parseUnits('0.1', 'gwei'),
       isTestNetwork: true,
@@ -294,6 +302,7 @@ const networksConfig: NetworksConfig = {
         maxSpendPercentage: 0.05,
         swapThresholdIntoGasToken: ONE_AND_HALF,
         minimumGasBalanceForTopup: HALF_TOKEN,
+        useZeroXForSwap: false,
       },
       retryGasBuffer: parseUnits('0.1', 'gwei'),
       isTestNetwork: true,

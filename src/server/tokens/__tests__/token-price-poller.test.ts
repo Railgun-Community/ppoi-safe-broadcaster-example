@@ -67,6 +67,7 @@ const mockTokenPriceRefresherCoingecko = (
   };
 
   return {
+    enabled: true,
     refreshDelayInMS,
     refresher,
   };

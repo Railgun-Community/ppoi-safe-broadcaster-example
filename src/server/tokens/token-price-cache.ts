@@ -10,6 +10,7 @@ import { NetworkChainID } from '../config/config-chains';
 export enum TokenPriceSource {
   CoinGecko = 'CoinGecko',
   ZeroX = '0x',
+  Uniswap = 'Uniswap',
 }
 
 export type TokenPrice = {
@@ -43,8 +44,7 @@ export const cacheTokenPriceForNetwork = (
     updatedAt: tokenPrice.updatedAt,
   };
   logger.log(
-    `${source} [${chain.type}:${chain.id}]: Cache price $${
-      tokenPrice.price
+    `${source} [${chain.type}:${chain.id}]: Cache price $${tokenPrice.price
     } for token ${tokenAddress.toLowerCase()}`,
   );
 };
@@ -63,9 +63,8 @@ const logTokenLookupError = (
   tokenAddress: string,
 ) => {
   const tokenSymbol = tokenForAddress(chain, tokenAddress).symbol;
-  const tokenDetails = `${tokenSymbol} on ${
-    configNetworks[chain.type][chain.id].name
-  } (${tokenAddress})`;
+  const tokenDetails = `${tokenSymbol} on ${configNetworks[chain.type][chain.id].name
+    } (${tokenAddress})`;
   logger.warn(`${errorMsg}: ${tokenDetails}`);
 };
 

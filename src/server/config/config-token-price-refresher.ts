@@ -1,6 +1,7 @@
 import { RelayerChain } from '../../models/chain-models';
 import { zeroXUpdatePricesByAddresses } from '../api/0x/0x-price';
 import { coingeckoUpdatePricesByAddresses } from '../api/coingecko/coingecko-price';
+import { uniswapUpdatePricesByAddresses } from '../api/uniswap/uniswap-price';
 import { allTokenAddressesForNetwork } from '../tokens/network-tokens';
 import {
   cacheTokenPriceForNetwork,
@@ -11,6 +12,7 @@ import {
 import configNetworks from './config-networks';
 
 export type TokenPriceRefresher = {
+  enabled: boolean;
   refreshDelayInMS: number;
   refresher: (chain: RelayerChain, tokenAddresses: string[]) => Promise<void>;
 };
@@ -89,6 +91,32 @@ const tokenPriceRefresherZeroX = (
   return zeroXUpdatePricesByAddresses(chain, tokenAddresses, updater);
 };
 
+const tokenPriceRefresherUniswap = (
+  chain: RelayerChain,
+  tokenAddresses: string[],
+): Promise<void> => {
+  const updater: TokenPriceUpdater = (
+    tokenAddress: string,
+    tokenPrice: TokenPrice,
+  ) =>
+    cacheTokenPriceForNetwork(
+      TokenPriceSource.Uniswap,
+      chain,
+      tokenAddress,
+      tokenPrice,
+    );
+
+  const network = configNetworks[chain.type][chain.id];
+  if (network.isTestNetwork ?? false) {
+    return Promise.resolve();
+  }
+  return uniswapUpdatePricesByAddresses(
+    chain,
+    tokenAddresses,
+    updater,
+  );
+}
+
 export default {
   tokenPriceRefreshers: {
     [TokenPriceSource.CoinGecko]: {
@@ -96,6 +124,7 @@ export default {
        * Refresh token prices through CoinGecko every 30 seconds.
        * Note that free Coingecko API tier only allows 50 requests per minute.
        */
+      enabled: true,
       refreshDelayInMS: 30 * 1000,
       refresher: tokenPriceRefresherCoingecko,
     },
@@ -108,8 +137,18 @@ export default {
        * Requests must be processed serially because of the 0x API rate limit.
        * If a refresh is ongoing, we will skip the next request for a refresh.
        */
+      enabled: false, // requires 0x API key | disabled by default
       refreshDelayInMS: 60 * 1000,
       refresher: tokenPriceRefresherZeroX,
+    },
+    [TokenPriceSource.Uniswap]: {
+      /**
+       * Refresh token prices from Uniswap every 30 seconds.
+       * Please note not all tokens may be available on all networks.
+       */
+      enabled: true,
+      refreshDelayInMS: 30 * 1000,
+      refresher: tokenPriceRefresherUniswap,
     },
   },
 } as { tokenPriceRefreshers: MapType<TokenPriceRefresher> };
