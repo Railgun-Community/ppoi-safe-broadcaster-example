@@ -25,6 +25,8 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
     }
     // eslint-disable-next-line no-await-in-loop
     await tokenPriceRefresher.refresher(chain, tokenAddresses);
+    // eslint-disable-next-line no-await-in-loop
+    await delay(1000)
   }
 };
 
