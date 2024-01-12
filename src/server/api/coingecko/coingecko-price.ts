@@ -1,4 +1,4 @@
-import { isDefined } from '@railgun-community/shared-models';
+import { delay, isDefined } from '@railgun-community/shared-models';
 import { CoingeckoNetworkID } from '../../../models/api-constants';
 import { TokenPrice, TokenPriceUpdater } from '../../tokens/token-price-cache';
 import { CoingeckoApiEndpoint, getCoingeckoData } from './coingecko-fetch';
@@ -71,8 +71,12 @@ export const coingeckoUpdatePricesByAddresses = async (
       coingeckoNetworkId,
       batch,
     );
+    // eslint-disable-next-line no-await-in-loop
+    await delay(1000);
     batchTokenAddressPrices.forEach(({ tokenAddress, tokenPrice }) =>
       updater(tokenAddress, tokenPrice),
     );
   }
+  await delay(1000);
+
 };

@@ -52,6 +52,7 @@ export const getMockNetwork = (): Network => {
       maxSpendPercentage: 0.05,
       swapThresholdIntoGasToken: parseUnits('1', 18),
       minimumGasBalanceForTopup: parseUnits('0.5', 18),
+      useZeroXForSwap: false,
     },
   };
 };
@@ -85,6 +86,7 @@ export const getMockGoerliNetwork = (): Network => {
       maxSpendPercentage: 0.05,
       swapThresholdIntoGasToken: parseUnits('1', 18),
       minimumGasBalanceForTopup: parseUnits('0.5', 18),
+      useZeroXForSwap: false,
     },
   };
 };

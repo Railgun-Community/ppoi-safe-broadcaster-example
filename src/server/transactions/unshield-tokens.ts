@@ -224,6 +224,9 @@ export const unshieldTokens = async (
     undefined, // txidVersion
     undefined, // validatedPOIData
     unshieldWallet,
+    undefined, // overrideNonce
+    false,
+    false
   );
 
   return batchResponse;

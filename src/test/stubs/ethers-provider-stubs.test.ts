@@ -2,7 +2,7 @@ import { EVMGasType } from '@railgun-community/shared-models';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
 import * as GasHistoryModule from '../../server/fees/gas-by-speed';
-import { FallbackProvider } from 'ethers';
+import { FallbackProvider, JsonRpcProvider } from 'ethers';
 
 let estimateGasStub: SinonStub;
 let getHistoricalDataStub: SinonStub;
@@ -32,7 +32,7 @@ export const restoreGasEstimateStubs = () => {
 
 export const createGasBalanceStub = (balance: bigint) => {
   gasBalanceStub = sinon
-    .stub(FallbackProvider.prototype, 'getBalance')
+    .stub(JsonRpcProvider.prototype, 'getBalance')
     .resolves(balance);
   gasBalanceStub.calledOnceWithExactly;
 };

@@ -25,13 +25,20 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
     }
     // eslint-disable-next-line no-await-in-loop
     await tokenPriceRefresher.refresher(chain, tokenAddresses);
+    // eslint-disable-next-line no-await-in-loop
+    await delay(2000)
   }
 };
 
 const pollPrices = async (source: TokenPriceSource) => {
   const tokenPriceRefresher =
     configTokenPriceRefresher.tokenPriceRefreshers[source];
+  if (tokenPriceRefresher.enabled === false) {
+    dbg(`Price Poller for ${source} is disabled.`);
+    return;
+  }
   try {
+
     await pullAndCacheCurrentPricesForAllNetworks(tokenPriceRefresher);
   } catch (err) {
     dbg('pollPrices error');

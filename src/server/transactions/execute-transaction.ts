@@ -184,19 +184,22 @@ export const executeTransaction = async (
     dbg('Submitted transaction:', txResponse.hash);
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    waitForTx(
-      activeWallet,
-      ethersWallet,
-      chain,
-      txResponse,
-      nonce,
-      setAvailability,
-    ).finally(() => {
-      if (hashGlobal !== '') {
-        removeSubmittedTx(chain, hashGlobal);
-      }
-    });
 
+    if (setTxCached) {
+
+      waitForTx(
+        activeWallet,
+        ethersWallet,
+        chain,
+        txResponse,
+        nonce,
+        setAvailability,
+      ).finally(() => {
+        if (hashGlobal !== '') {
+          removeSubmittedTx(chain, hashGlobal);
+        }
+      });
+    }
     if (validatedPOIData) {
       if (!isDefined(txidVersion)) {
         dbg('WARNING: No txidVersion - cannot queue validated poi');
