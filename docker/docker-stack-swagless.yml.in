@@ -31,30 +31,7 @@ services:
       wakunode2 --config-file=/app/config.toml
       --nat="extip:${EXTIP}"
       --nodekey=${NODEKEY_1}
-
-  nwaku2:
-    image: nwaku:latest
-    hostname: 'nwaku2'
-    ports:
-      - '60001:60001' # p2p
-      - '9001:9001' # ENR
-      - '8001:8001' # wss
-      - '8547:8547'
-    volumes:
-      - nwaku2:/data
-      - ../scripts/nwaku:/app/scripts
-    healthcheck:
-      test: curl --fail http://localhost:8547 || exit 1
-      interval: 30s
-      retries: 4
-      start_period: 10s
-      timeout: 5s
-    entrypoint: >
-      wakunode2
-        --config-file=/app/config.toml
-        --nat="extip:${EXTIP}"
-        --nodekey=${NODEKEY_2}
-        --ports-shift=1
+      --websocket-support=true
 
   relayer:
     image: relayer:latest

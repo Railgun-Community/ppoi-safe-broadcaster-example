@@ -11,6 +11,7 @@ rpc-private=true
 rpc-address='0.0.0.0'
 rpc-port=8546
 relay-peer-exchange=true
+peer-exchange=true
 peer-exchange-node='/dns4/teelf.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAkygexqAtchrhYVqLFBTXFEEZPtz8C8ZnSP6iYy1s22mfW'
 keep-alive=false
 #listen-address='0.0.0.0'

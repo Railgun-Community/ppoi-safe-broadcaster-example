@@ -100,7 +100,7 @@ describe('waku-relayer', () => {
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
 
-    client = new WakuApiClient({ url: '', urlBackup: '' });
+    client = new WakuApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
     wakuRelayer = await WakuRelayer.init(client, {
       topic: configDefaults.waku.pubSubTopic,
