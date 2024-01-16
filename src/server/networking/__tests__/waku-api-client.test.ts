@@ -37,7 +37,7 @@ describe('waku-api-client', () => {
     };
     await initTokens(MOCK_CHAIN);
 
-    client = new WakuApiClient({ url: '', urlBackup: '' });
+    client = new WakuApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post');
   });
 

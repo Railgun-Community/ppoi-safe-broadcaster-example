@@ -56,6 +56,7 @@ import {
   RelayerFeeMessageData,
   RelayerRawParamsTransact,
   TXIDVersion,
+  delay,
 } from '@railgun-community/shared-models';
 import { getRelayerVersion } from '../../../util/relayer-version';
 import {
@@ -100,7 +101,7 @@ describe('waku-relayer', () => {
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
 
-    client = new WakuApiClient({ url: '', urlBackup: '' });
+    client = new WakuApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
     wakuRelayer = await WakuRelayer.init(client, {
       topic: configDefaults.waku.pubSubTopic,
@@ -285,8 +286,9 @@ describe('waku-relayer', () => {
     };
     await wakuRelayer?.handleMessage(relayMessage);
 
+    await delay(20000)
     // After transact-response sent.
-    expect(clientHTTPStub.calledOnce).to.be.true;
+    expect(clientHTTPStub.callCount).to.equal(20);
     const postCall = clientHTTPStub.getCall(0);
     expect(postCall.args[0]).to.equal('');
     const rpcArgs = postCall.args[1];
@@ -330,5 +332,5 @@ describe('waku-relayer', () => {
       sharedKey,
     );
     expect(resultData).to.deep.equal(expectedResultData);
-  }).timeout(5000);
-}).timeout(31000);
+  }).timeout(60000);
+}).timeout(61000);
