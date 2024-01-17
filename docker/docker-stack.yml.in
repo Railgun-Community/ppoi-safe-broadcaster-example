@@ -34,7 +34,7 @@ services:
       wakunode2 --config-file=/app/config.toml
       --nat="extip:${EXTIP}"
       --dns4-domain-name=${SUBDOMAIN}.${BASEDOMAIN}
-      --nodekey=${NODEKEY_1}
+      --nodekey=${NODEKEY}
       --websocket-support=true
       --websocket-secure-support=true
       --websocket-secure-key-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/privkey.pem"

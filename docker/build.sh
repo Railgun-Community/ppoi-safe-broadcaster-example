@@ -17,6 +17,18 @@ if [ ! -f custom.yml ]; then
 fi
 
 if [ -f .env ]; then
+  if [ -f $SETUP_STACK ]; then
+    read -p "Do you want to rebuild the relayer docker stack? (y/n) " answer
+    case ${answer:0:1} in
+      y|Y )
+        echo "Rebuilding relayer docker stack"
+        rm $SETUP_STACK
+        ;;
+      * )
+        echo "Using old relayer docker stack"
+        ;;
+    esac
+  fi
   if [ ! -f $SETUP_STACK ]; then
     export $(cat .env | xargs)
     envsubst < $SETUP_STACK.in > $SETUP_STACK
