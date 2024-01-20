@@ -5,8 +5,94 @@
 import { DebugLevel } from './models/debug-models';
 import { NetworkChainID } from './server/config/config-chains';
 import configDefaults from './server/config/config-defaults';
+import configNetworks from './server/config/config-networks';
+import { GAS_TOKEN_DECIMALS } from './models/token-models';
 import configTokens from './server/config/config-tokens';
 import { ChainType } from '@railgun-community/shared-models';
+import { parseUnits } from 'ethers';
+
+// MAKE CHANGES IN myConfigOverrides() BELOW
+// MAKE CHANGES IN myConfigOverrides() BELOW
+// MAKE CHANGES IN myConfigOverrides() BELOW
+
+// HELPER FUNCTIONS
+/**
+ * Converts a number value to a token value.
+ * @param value The number value to convert.
+ * @returns The token value.
+ */
+const tokenValue = (value: number) => {
+  return parseUnits(String(value), GAS_TOKEN_DECIMALS);
+};
+
+/**
+ * Sets the maximum spend percentage for a specific network. This is the maximum percentage of the
+ * expected gas token balance recieved that will be spent on a single transaction.
+ * @param chainId - The chain ID of the network.
+ * @param value - The maximum spend percentage value to set.
+ */
+const setMaxSpendPercentageForNetwork = (
+  chainId: NetworkChainID,
+  value: number,
+) => {
+  configNetworks[ChainType.EVM][chainId].topUp.maxSpendPercentage = value;
+}
+
+/**
+ * Sets the amount to unshield for top-up on a specific network.
+ *
+ * @param chainId - The chain ID of the network.
+ * @param value - The value to set as the top-up unshield amount.
+ */
+const setTopUpUnshieldAmountForNetwork = (
+  chainId: NetworkChainID,
+  value: number,
+) => {
+  configNetworks[ChainType.EVM][chainId].topUp.swapThresholdIntoGasToken = tokenValue(value);
+}
+
+/**
+ * Sets the threshold to begin attempting top-up for a specific network.
+ *
+ * @param chainId - The chain ID of the network.
+ * @param value - The value to set as the top-up begin threshold.
+ */
+const setTopUpBeginThresholdForNetwork = (
+  chainId: NetworkChainID,
+  value: number
+) => {
+  configNetworks[ChainType.EVM][chainId].topUp.minimumGasBalanceForTopup = tokenValue(value);
+}
+
+/**
+ * Sets the minimum availability balance for a specific network.
+ *
+ * @param chainId - The chain ID of the network.
+ * @param value - The value to set as the minimum availability balance.
+ */
+const setMinAvailabilityBalanceForNetwork = (
+  chainId: NetworkChainID,
+  value: number,
+) => {
+  configNetworks[ChainType.EVM][chainId].gasToken.minBalanceForAvailability = value;
+}
+
+/**
+ * Enables or disables native token accumulation for a specific network.
+ * @param chainId - The chain ID of the network.
+ * @param value - The value indicating whether native token accumulation should be enabled or disabled.
+ */
+const enableNativeTokenAccumulationForNetwork = (
+  chainId: NetworkChainID,
+  value: boolean,
+) => {
+  configNetworks[ChainType.EVM][chainId].topUp.accumulateNativeToken = value;
+}
+
+// MAKE CHANGES IN myConfigOverrides() BELOW
+// MAKE CHANGES IN myConfigOverrides() BELOW
+// MAKE CHANGES IN myConfigOverrides() BELOW
+// MAKE CHANGES IN myConfigOverrides() BELOW
 
 export const myConfigOverrides = () => {
   // Use these indices to configure HD wallets from the same mnemonic.
@@ -22,17 +108,20 @@ export const myConfigOverrides = () => {
   //
   configDefaults.debug.logLevel = DebugLevel.WarningsErrors;
   //
+
   configDefaults.networks.EVM = [
-    NetworkChainID.Ethereum,
-    NetworkChainID.EthereumGoerli,
+    // NetworkChainID.Ethereum,          // requires poi-node configured
+    // NetworkChainID.EthereumGoerli,    // requires poi-node configured
     NetworkChainID.BNBChain,
     NetworkChainID.PolygonPOS,
     NetworkChainID.PolygonMumbai,
+    NetworkChainID.Arbitrum,
   ];
 
-  configTokens[ChainType.EVM][NetworkChainID.Ethereum] = {
-    '0x_token_address': {
-      symbol: 'TOKEN1',
-    },
-  };
+  // Manually Set tokens for network, for example:
+  // configTokens[ChainType.EVM][NetworkChainID.Ethereum] = {
+  //   '0x_token_address': {
+  //     symbol: 'TOKEN1',
+  //   },
+  // };
 };
