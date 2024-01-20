@@ -8,7 +8,7 @@ import { uniswapGetSwapQuote } from "../api/uniswap/uniswap-quote";
 import { UniswapQuoteData } from "../api/uniswap/uniswap-models";
 import { ActiveWallet } from "../../models/wallet-models";
 import { getEstimateGasDetailsPublic } from "../fees/gas-estimate";
-import { executeTransaction } from "./execute-transaction";
+import { executeTransaction, waitTx } from "./execute-transaction";
 import { populateUniswapApprovalTransactions } from "./uniswap-approve";
 import { getProviderForNetwork } from "../providers/active-network-providers";
 
@@ -133,6 +133,8 @@ export const swapUniswap = async (
       false, // setAvailability
       false, // setTxCached
     );
+    // eslint-disable-next-line no-await-in-loop
+    await waitTx(txResponse);
     TransactionResponses.push(txResponse);
   }
 

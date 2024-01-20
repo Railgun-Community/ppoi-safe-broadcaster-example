@@ -307,12 +307,11 @@ const handlePublicTokens = async (
     } else {
       dbg("Top-Up Swapping with Uniswap")
       // perform swaps and approvals combined
-      const swapTxResponses = await swapUniswap(
+      await swapUniswap(
         topUpWallet,
         filteredPublicTokens,
         chain,
       );
-      await waitForTxs(topUpWallet, ethersWallet, chain, swapTxResponses, false);
     }
 
   }

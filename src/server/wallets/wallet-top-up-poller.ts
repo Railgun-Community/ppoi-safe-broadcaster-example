@@ -11,7 +11,7 @@ import { RelayerChain } from '../../models/chain-models';
 import { removeUndefineds } from '../../util/utils';
 import debug from 'debug';
 import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
-import { TXIDVersion } from '@railgun-community/shared-models';
+import { TXIDVersion, isDefined } from '@railgun-community/shared-models';
 
 const dbg = debug('relayer:top-up-poller');
 
@@ -32,9 +32,11 @@ const pollTopUp = async () => {
     for (const chain of chains) {
       // eslint-disable-next-line no-await-in-loop
       const walletToTopUp = await getTopUpWallet(chain);
-      if (walletToTopUp) {
+      if (isDefined(walletToTopUp)) {
         walletFound = true;
-        logger.warn('We have a wallet to top up!');
+        logger.warn(
+          `We have a wallet to top up | address: ${walletToTopUp.address} on chain:${chain.id}`,
+        );
         const currentTXIDVersion = TXIDVersion.V2_PoseidonMerkle; // Switch this to V3 when balances migrated after release.
         // eslint-disable-next-line no-await-in-loop
         await topUpWallet(walletToTopUp, currentTXIDVersion, chain).catch((err) => {
