@@ -111,21 +111,18 @@ export const getTopUpWallet = async (
     );
     if (unwrappedTokensWaiting.length > 0) {
       let totalTokenValue = 0;
-      let tokenAmountValueThreshold: Optional<number>;
+      const { gasToken } = configNetworks[chain.type][chain.id];
+      const gasTokenPrice = lookUpCachedTokenPrice(chain, gasToken.wrappedAddress);
+      const { swapThresholdIntoGasToken } = configNetworks[chain.type][chain.id].topUp;
+      const gasTokenAmountReadable = formatUnits(swapThresholdIntoGasToken, gasToken.decimals);
+      const swapThresholdIntoGasTokenValue = parseFloat(gasTokenAmountReadable) * gasTokenPrice;
+      const tokenAmountValueThreshold = swapThresholdIntoGasTokenValue / 3;
       for (const unshieldToken of unwrappedTokensWaiting) {
         const tokenPrice = lookUpCachedTokenPrice(chain, unshieldToken.tokenAddress);
         const token = tokenForAddress(chain, unshieldToken.tokenAddress);
         const tokenAmountReadable = formatUnits(unshieldToken.amount, token.decimals);
         const tokenAmountValue = parseFloat(tokenAmountReadable) * tokenPrice;
         totalTokenValue += tokenAmountValue;
-        if (!isDefined(tokenAmountValueThreshold)) {
-          const { gasToken } = configNetworks[chain.type][chain.id];
-          const gasTokenPrice = lookUpCachedTokenPrice(chain, gasToken.wrappedAddress);
-          const { swapThresholdIntoGasToken } = configNetworks[chain.type][chain.id].topUp;
-          const gasTokenAmountReadable = formatUnits(swapThresholdIntoGasToken, gasToken.decimals);
-          const swapThresholdIntoGasTokenValue = parseFloat(gasTokenAmountReadable) * gasTokenPrice;
-          tokenAmountValueThreshold = swapThresholdIntoGasTokenValue / 3;
-        }
 
         logger.warn(`Token ${unshieldToken.tokenAddress} on ${activeWallet.address} on chain ${chain.type}:${chain.id}.`)
         logger.warn(`Token Price: ${tokenPrice}`);
