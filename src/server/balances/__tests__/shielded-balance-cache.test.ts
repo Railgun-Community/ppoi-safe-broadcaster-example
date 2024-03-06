@@ -23,7 +23,7 @@ const MOCK_TOKEN_AMOUNT = BigInt('1000000000000000000000');
 
 describe('shielded-balance-cache', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     await setupSingleTestWallet();
   });
 

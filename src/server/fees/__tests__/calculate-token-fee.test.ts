@@ -92,7 +92,7 @@ const setupMocks = (
 
 describe('calculate-token-fee', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     network = setupTestNetwork();
     configNetworks[chain.type][chain.id] = network;
     await initNetworkProviders([chain]);

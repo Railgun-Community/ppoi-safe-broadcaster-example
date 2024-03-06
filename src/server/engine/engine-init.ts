@@ -40,7 +40,7 @@ const testArtifactStore = new ArtifactStore(
   fileExists,
 );
 
-export const startEngine = () => {
+export const startEngine = async () => {
   if (engineStarted) {
     return;
   }
@@ -55,7 +55,7 @@ export const startEngine = () => {
     setLoggers(() => {}, dbg); // Always log errors
   }
 
-  startRailgunEngine(
+  await startRailgunEngine(
     walletSource,
     levelDB,
     shouldDebug,

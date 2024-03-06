@@ -67,7 +67,7 @@ const MOCK_UINT_ALLOWANCE = 1000n;
 
 describe('approve-spender', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     initSettingsDB();
     await clearSettingsDB();
     await setupSingleTestWallet();

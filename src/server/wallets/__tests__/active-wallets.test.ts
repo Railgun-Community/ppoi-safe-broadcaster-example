@@ -15,7 +15,7 @@ const { expect } = chai;
 
 describe('active-wallets', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     await setupSingleTestWallet();
   });
 

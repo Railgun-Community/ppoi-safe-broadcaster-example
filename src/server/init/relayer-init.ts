@@ -27,7 +27,7 @@ export const initRelayerModules = async (forTest = false) => {
     isDefined(myConfigOverrides) && myConfigOverrides();
   }
   initSettingsDB();
-  startEngine();
+  await startEngine();
   await initNetworkProviders();
   await initWallets();
   await initTokens();

@@ -26,7 +26,7 @@ const chain = testChainEthereum();
 
 describe('available-wallets', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     await setupSingleTestWallet();
     await initNetworkProviders([chain]);
     await delay(500);

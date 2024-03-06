@@ -30,7 +30,7 @@ const MOCK_CHAIN = testChainEthereum();
 describe('waku-api-client', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
-    startEngine();
+    await startEngine();
     await setupSingleTestWallet();
     configTokens[MOCK_CHAIN.type][MOCK_CHAIN.id][MOCK_TOKEN_ADDRESS] = {
       symbol: 'MOCK1',

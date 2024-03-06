@@ -22,7 +22,7 @@ const MOCK_CHAIN = testChainGoerli();
 
 describe('config-token-price-refresher', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = testNetwork;
     await initNetworkProviders([MOCK_CHAIN]);
     // @ts-expect-error

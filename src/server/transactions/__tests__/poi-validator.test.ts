@@ -27,7 +27,7 @@ describe.skip('poi-validator', () => {
       'test_list',
     ]);
 
-    startEngine();
+    await startEngine();
 
     await initNetworkProviders([chain]);
 

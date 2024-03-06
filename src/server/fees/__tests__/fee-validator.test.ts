@@ -47,7 +47,7 @@ describe('fee-validator', function test() {
   this.timeout(31000);
 
   before(async () => {
-    startEngine();
+    await startEngine();
     const network = getMockNetwork();
     configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = network;
     gasTokenAddress = network.gasToken.wrappedAddress;

@@ -35,7 +35,7 @@ describe('wallet-top-up-poller', () => {
     configDefaults.topUps.shouldTopUp = true;
     resetGasTokenBalanceCache();
     resetAvailableWallets(MOCK_CHAIN);
-    startEngine();
+    await startEngine();
     await setupSingleTestWallet();
   });
 

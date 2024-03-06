@@ -71,7 +71,7 @@ const validatePriceRefresherOutput = (
 
 describe('coingecko-price', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
 
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
     configNetworks[chainGoerli.type][chainGoerli.id] = goerliNetwork;

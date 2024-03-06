@@ -61,7 +61,7 @@ const MOCK_CHAIN = testChainGoerli();
 
 describe('execute-transaction', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     initSettingsDB();
     await clearSettingsDB();
     await setupSingleTestWallet();

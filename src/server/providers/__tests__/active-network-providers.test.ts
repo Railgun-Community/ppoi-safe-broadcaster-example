@@ -14,7 +14,7 @@ const MOCK_CHAIN = testChainEthereum();
 
 describe('active-network-providers', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     await initNetworkProviders();
   });
 

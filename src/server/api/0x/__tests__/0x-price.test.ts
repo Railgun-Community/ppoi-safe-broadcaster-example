@@ -69,7 +69,7 @@ const validatePriceRefresherOutput = (chain: RelayerChain) => {
 
 describe('0x-price', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
 
     configDefaults.api.zeroXApiKey = testConfig.zeroXApiKey;
 

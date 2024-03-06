@@ -66,7 +66,7 @@ const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 describe('unshield-tokens', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     initSettingsDB();
     await clearSettingsDB();
     await setupSingleTestWallet();

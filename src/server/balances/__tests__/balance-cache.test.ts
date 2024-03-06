@@ -33,7 +33,7 @@ const shouldUpdateEthWalletBalance = (address: string) => {
 
 describe('balance-cache', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     await initWallets();
     await initNetworkProviders([MOCK_CHAIN]);
     resetGasTokenBalanceCache();

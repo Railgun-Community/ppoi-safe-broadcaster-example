@@ -15,7 +15,7 @@ const chain: RelayerChain = { type: 0, id: 5 };
 
 describe('poi-assurance', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
 
     await initNetworkProviders([chain]);
 

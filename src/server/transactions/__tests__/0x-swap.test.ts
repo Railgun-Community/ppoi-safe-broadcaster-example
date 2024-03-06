@@ -60,7 +60,7 @@ const MOCK_CHAIN = testChainEthereum();
 
 describe('0x-swap', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     initSettingsDB();
     await clearSettingsDB();
     await setupSingleTestWallet();

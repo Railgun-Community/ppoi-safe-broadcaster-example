@@ -41,7 +41,7 @@ const addressForIndex = (index: number): string => {
 
 describe('best-match-wallet', () => {
   before(async () => {
-    startEngine();
+    await startEngine();
     getCachedGasTokenBalanceStub = sinon
       .stub(BalanceCacheModule, 'getCachedGasTokenBalance')
       .resolves(10n ** 18n);

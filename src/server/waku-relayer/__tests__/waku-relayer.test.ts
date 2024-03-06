@@ -90,7 +90,7 @@ const handleHTTPPost = async (url: string, data?: unknown) => {
 describe('waku-relayer', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
-    startEngine();
+    await startEngine();
     await setupSingleTestWallet();
     network = setupTestNetwork();
     configNetworks[chain.type][chain.id] = getMockNetwork();
@@ -286,7 +286,7 @@ describe('waku-relayer', () => {
     };
     await wakuRelayer?.handleMessage(relayMessage);
 
-    await delay(20000)
+    await delay(20000);
     // After transact-response sent.
     expect(clientHTTPStub.callCount).to.equal(20);
     const postCall = clientHTTPStub.getCall(0);
