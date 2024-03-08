@@ -1,21 +1,22 @@
+import { TXIDVersion, isDefined } from '@railgun-community/shared-models';
+import debug from 'debug';
+import { formatUnits } from 'ethers';
+import { RelayerChain } from '../../models/chain-models';
+import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { delay } from '../../util/promise-utils';
+import { removeUndefineds } from '../../util/utils';
+import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
+import { getPublicERC20AmountsBeforeUnwrap } from '../balances/top-up-balance';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
-import { topUpWallet } from '../transactions/top-up-wallet';
-import { isWalletUnavailable } from './available-wallets';
-import { getActiveWallets, getActiveWalletsForChain } from './active-wallets';
-import { ActiveWallet } from '../../models/wallet-models';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
-import { RelayerChain } from '../../models/chain-models';
-import { removeUndefineds } from '../../util/utils';
-import debug from 'debug';
-import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
-import { isDefined, TXIDVersion } from '@railgun-community/shared-models';
-import { getPublicERC20AmountsBeforeUnwrap } from '../balances/top-up-balance';
-import { lookUpCachedTokenPrice } from '../tokens/token-price-cache';
 import { tokenForAddress } from '../tokens/network-tokens';
-import { formatUnits, parseUnits } from 'ethers';
+import { lookUpCachedTokenPrice } from '../tokens/token-price-cache';
+import { pollRefreshBalances } from '../transactions/top-up-util';
+import { topUpWallet } from '../transactions/top-up-wallet';
+import { getActiveWallets, getActiveWalletsForChain } from './active-wallets';
+import { isWalletUnavailable } from './available-wallets';
 
 const dbg = debug('relayer:top-up-poller');
 
@@ -43,14 +44,16 @@ const pollTopUp = async () => {
         );
         const currentTXIDVersion = TXIDVersion.V2_PoseidonMerkle; // Switch this to V3 when balances migrated after release.
         // eslint-disable-next-line no-await-in-loop
-        await topUpWallet(walletToTopUp, currentTXIDVersion, chain).catch((err) => {
-          logger.warn(
-            `Failed to top up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${currentTXIDVersion}`,
-          );
-          if (err.message.indexOf('Top Up too costly, skipping!') === -1) {
-            logger.error(err);
-          }
-        });
+        await topUpWallet(walletToTopUp, currentTXIDVersion, chain).catch(
+          (err) => {
+            logger.warn(
+              `Failed to top up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${currentTXIDVersion}`,
+            );
+            if (err.message.indexOf('Top Up too costly, skipping!') === -1) {
+              logger.error(err);
+            }
+          },
+        );
       }
     }
   } catch (err) {
@@ -87,7 +90,9 @@ export const initTopUpPoller = async () => {
     return;
   }
   // prevent this from starting for 10 mins
-  await delay(2 * 60 * 1000);
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  pollRefreshBalances();
+  await delay(10 * 60 * 1000);
 
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   pollTopUp();
@@ -112,19 +117,35 @@ export const getTopUpWallet = async (
     if (unwrappedTokensWaiting.length > 0) {
       let totalTokenValue = 0;
       const { gasToken } = configNetworks[chain.type][chain.id];
-      const gasTokenPrice = lookUpCachedTokenPrice(chain, gasToken.wrappedAddress);
-      const { swapThresholdIntoGasToken } = configNetworks[chain.type][chain.id].topUp;
-      const gasTokenAmountReadable = formatUnits(swapThresholdIntoGasToken, gasToken.decimals);
-      const swapThresholdIntoGasTokenValue = parseFloat(gasTokenAmountReadable) * gasTokenPrice;
-      const tokenAmountValueThreshold = swapThresholdIntoGasTokenValue / 3;
+      const gasTokenPrice = lookUpCachedTokenPrice(
+        chain,
+        gasToken.wrappedAddress,
+      );
+      const { swapThresholdIntoGasToken } =
+        configNetworks[chain.type][chain.id].topUp;
+      const gasTokenAmountReadable = formatUnits(
+        swapThresholdIntoGasToken,
+        gasToken.decimals,
+      );
+      const swapThresholdIntoGasTokenValue =
+        parseFloat(gasTokenAmountReadable) * gasTokenPrice;
+      const tokenAmountValueThreshold = swapThresholdIntoGasTokenValue / 4;
       for (const unshieldToken of unwrappedTokensWaiting) {
-        const tokenPrice = lookUpCachedTokenPrice(chain, unshieldToken.tokenAddress);
+        const tokenPrice = lookUpCachedTokenPrice(
+          chain,
+          unshieldToken.tokenAddress,
+        );
         const token = tokenForAddress(chain, unshieldToken.tokenAddress);
-        const tokenAmountReadable = formatUnits(unshieldToken.amount, token.decimals);
+        const tokenAmountReadable = formatUnits(
+          unshieldToken.amount,
+          token.decimals,
+        );
         const tokenAmountValue = parseFloat(tokenAmountReadable) * tokenPrice;
         totalTokenValue += tokenAmountValue;
 
-        logger.warn(`Token ${unshieldToken.tokenAddress} on ${activeWallet.address} on chain ${chain.type}:${chain.id}.`)
+        logger.warn(
+          `Token ${unshieldToken.tokenAddress} on ${activeWallet.address} on chain ${chain.type}:${chain.id}.`,
+        );
         logger.warn(`Token Price: ${tokenPrice}`);
         logger.warn(`Token Amount Readable: ${tokenAmountReadable}`);
         logger.warn(`Token Amount Value: ${tokenAmountValue}`);
@@ -132,12 +153,16 @@ export const getTopUpWallet = async (
       }
       if (isDefined(tokenAmountValueThreshold)) {
         if (totalTokenValue > tokenAmountValueThreshold) {
-          logger.warn(`Tokens awaiting ${unwrappedTokensWaiting.length} | ${activeWallet.address} on chain ${chain.type}:${chain.id}.`);
-          return activeWallet
+          logger.warn(
+            `Tokens awaiting ${unwrappedTokensWaiting.length} | ${activeWallet.address} on chain ${chain.type}:${chain.id}.`,
+          );
+          return activeWallet;
         }
       }
     }
-    logger.warn(`We have ${unwrappedTokensWaiting.length} tokens awaiting on ${activeWallet.address} on chain ${chain.type}:${chain.id}.`)
+    logger.warn(
+      `We have ${unwrappedTokensWaiting.length} tokens awaiting on ${activeWallet.address} on chain ${chain.type}:${chain.id}.`,
+    );
   }
   // asending sort
   const topUpWallets: Optional<ActiveWallet>[] = activeWallets
