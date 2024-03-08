@@ -1,34 +1,34 @@
-import debug from 'debug';
 import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
+import debug from 'debug';
 
-import {
-  POIRequired,
-  fromUTF8String,
-  signWithWalletViewingKey,
-} from '@railgun-community/wallet';
-import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
-import { transactMethod } from './methods/transact-method';
-import { configuredNetworkChains } from '../chains/network-chain-ids';
-import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
-import { delay, promiseTimeout } from '../../util/promise-utils';
-import { contentTopics } from './topics';
-import {
-  getRailgunWalletAddress,
-  getRailgunWalletID,
-  numAvailableWallets,
-} from '../wallets/active-wallets';
-import { WakuMessage } from './waku-message';
-import { WakuMethodResponse } from './waku-response';
-import configNetworks from '../config/config-networks';
-import { RelayerChain } from '../../models/chain-models';
 import {
   RelayerFeeMessage,
   RelayerFeeMessageData,
   isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
+import {
+  POIRequired,
+  fromUTF8String,
+  signWithWalletViewingKey,
+} from '@railgun-community/wallet';
+import { RelayerChain } from '../../models/chain-models';
+import { delay, promiseTimeout } from '../../util/promise-utils';
 import { getRelayerVersion } from '../../util/relayer-version';
+import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configDefaults from '../config/config-defaults';
+import configNetworks from '../config/config-networks';
+import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
+import { WakuApiClient, WakuRelayMessage } from '../networking/waku-api-client';
+import {
+  getRailgunWalletAddress,
+  getRailgunWalletID,
+  numAvailableWallets,
+} from '../wallets/active-wallets';
+import { transactMethod } from './methods/transact-method';
+import { contentTopics } from './topics';
+import { WakuMessage } from './waku-message';
+import { WakuMethodResponse } from './waku-response';
 
 type JsonRPCMessageHandler = (
   params: any,
@@ -119,11 +119,13 @@ export class WakuRelayer {
       this.dbg('Publishing tx response on', contentTopic);
       // publish message 10x over 10 seconds async
 
-      this.ensureTxResponse(msg).catch((e) => {
-        this.dbg('Error publishing Tx Response message', e.message);
-      }).finally(() => {
-        this.dbg('Finished broadcasting Tx Response message');
-      });
+      this.ensureTxResponse(msg)
+        .catch((e) => {
+          this.dbg('Error publishing Tx Response message', e.message);
+        })
+        .finally(() => {
+          this.dbg('Finished broadcasting Tx Response message');
+        });
       return;
     }
 
@@ -133,7 +135,7 @@ export class WakuRelayer {
   }
 
   private async ensureTxResponse(msg: WakuMessage) {
-    for (let i = 0; i < 20; i += 1) {
+    for (let i = 0; i < 5; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       await delay(500);
       this.client.publish(msg, this.options.topic).catch((e) => {
@@ -207,7 +209,8 @@ export class WakuRelayer {
       message,
     );
     this.dbg(
-      `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${Object.keys(fees).length
+      `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${
+        Object.keys(fees).length
       }, Available Wallets ${availableWallets}`,
     );
     return {
