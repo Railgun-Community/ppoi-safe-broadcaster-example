@@ -1,23 +1,42 @@
+import { delay, TXIDVersion } from '@railgun-community/shared-models';
+import debug from 'debug';
+import { formatEther, formatUnits, parseUnits } from 'ethers';
+import { RelayerChain } from '../../models/chain-models';
 import { ERC20Amount } from '../../models/token-models';
-import { getTransactionTokens } from '../tokens/network-tokens';
-import configDefaults from '../config/config-defaults';
-import configNetworks from '../config/config-networks';
+import { removeUndefineds } from '../../util/utils';
 import {
   getPrivateTokenBalanceCache,
   ShieldedCachedBalance,
   updateShieldedBalances,
 } from '../balances/shielded-balance-cache';
-import { removeUndefineds } from '../../util/utils';
-import { RelayerChain } from '../../models/chain-models';
-import debug from 'debug';
-import { getTokenPricesFromCachedPrices } from '../fees/calculate-token-fee';
-import { formatEther, formatUnits, parseUnits } from 'ethers';
 import { getWrappedNativeTokenAddressForChain } from '../balances/top-up-balance';
-import { promiseTimeout, TXIDVersion } from '@railgun-community/shared-models';
+import { configuredNetworkChains } from '../chains/network-chain-ids';
+import configDefaults from '../config/config-defaults';
+import configNetworks from '../config/config-networks';
+import { getTokenPricesFromCachedPrices } from '../fees/calculate-token-fee';
+import { getTransactionTokens } from '../tokens/network-tokens';
 
 const dbg = debug('relayer:topup-util');
 
 const initialRun: NumMapType<NumMapType<boolean>> = {};
+
+export const pollRefreshBalances = async () => {
+  const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+  dbg('Polling refresh balances');
+  const chains = configuredNetworkChains();
+  for (const chain of chains) {
+    // eslint-disable-next-line no-await-in-loop
+    await updateShieldedBalances(txidVersion, chain).catch((err: Error) => {
+      dbg('UPDATE SHIELD ERROR');
+      dbg(err.message);
+    });
+    // eslint-disable-next-line no-await-in-loop
+    await delay(1000);
+  }
+  await delay(5 * 60 * 1000);
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  pollRefreshBalances();
+};
 
 const getShieldedTokenAmountsForChain = async (
   txidVersion: TXIDVersion,
@@ -37,12 +56,12 @@ const getShieldedTokenAmountsForChain = async (
   }
 
   if (forceRefresh) {
-    await promiseTimeout(
-      updateShieldedBalances(txidVersion, chain),
-      5 * 60 * 1000,
-    ).catch((err: Error) => {
-      dbg(err.message);
-    });
+    // await promiseTimeout(
+    //   updateShieldedBalances(txidVersion, chain),
+    //   5 * 60 * 1000,
+    // ).catch((err: Error) => {
+    //   dbg(err.message);
+    // });
     const updatedBalances = getPrivateTokenBalanceCache(chain);
     return updatedBalances;
   }
@@ -325,9 +344,9 @@ export const getMultiTopUpTokenAmountsForChain = async (
   const consolidatedTokenAmountsForChain = getConsolidatedTokenAmounts(
     setNativeLast
       ? orderNativeTokenLast(
-        topUpTokenAmountsForChain,
-        getWrappedNativeTokenAddressForChain(chain),
-      )
+          topUpTokenAmountsForChain,
+          getWrappedNativeTokenAddressForChain(chain),
+        )
       : newSortedTopUpList,
     chain,
   );
