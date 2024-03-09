@@ -135,13 +135,13 @@ export class WakuRelayer {
   }
 
   private async ensureTxResponse(msg: WakuMessage) {
-    for (let i = 0; i < 5; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      await delay(500);
-      this.client.publish(msg, this.options.topic).catch((e) => {
-        this.dbg('Error publishing message', e.message);
-      });
-    }
+    // for (let i = 0; i < 1; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    // await delay(500);
+    this.client.publish(msg, this.options.topic).catch((e) => {
+      this.dbg('Error publishing message', e.message);
+    });
+    // }
   }
 
   static decode(payload: Uint8Array): string {
@@ -209,8 +209,7 @@ export class WakuRelayer {
       message,
     );
     this.dbg(
-      `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${
-        Object.keys(fees).length
+      `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${Object.keys(fees).length
       }, Available Wallets ${availableWallets}`,
     );
     return {
