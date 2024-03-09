@@ -14,6 +14,7 @@ export type WakuRelayMessage = {
 
 export type WakuApiClientOptions = {
   url: string;
+  urlBackup: string;
 };
 
 export enum WakuRequestMethods {
@@ -33,9 +34,12 @@ export class WakuApiClient {
 
   mainNwaku: string;
 
+  backupNwaku: string;
+
   constructor(options: WakuApiClientOptions) {
     this.dbg = debug('waku:jsonrpc-api');
     this.mainNwaku = options.url;
+    this.backupNwaku = options.urlBackup;
     const httpConfig = {
       timeout: 60000,
       headers: { 'Content-Type': 'application/json' },
@@ -47,7 +51,7 @@ export class WakuApiClient {
   async request(method: string, params: any, retry = 0): Promise<any> {
     const req = formatJsonRpcRequest(method, params);
     try {
-      const postURL = this.mainNwaku;
+      const postURL = retry === 0 ? this.mainNwaku : this.backupNwaku;
       const response = await promiseTimeout(
         this.http.post(postURL, req),
         10 * 1000,
