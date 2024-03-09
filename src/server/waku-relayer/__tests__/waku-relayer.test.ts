@@ -288,7 +288,7 @@ describe('waku-relayer', () => {
 
     await delay(20000);
     // After transact-response sent.
-    expect(clientHTTPStub.callCount).to.equal(20);
+    expect(clientHTTPStub.callCount).to.equal(1);
     const postCall = clientHTTPStub.getCall(0);
     expect(postCall.args[0]).to.equal('');
     const rpcArgs = postCall.args[1];
