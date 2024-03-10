@@ -223,7 +223,7 @@ export class WakuRelayer {
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chain);
     const feeBroadcastData = await promiseTimeout(
       this.createFeeBroadcastData(fees, feeCacheID, chain),
-      1 * 1000,
+      3 * 1000,
     )
       .then((result: RelayerFeeMessage) => {
         return result;
@@ -268,6 +268,7 @@ export class WakuRelayer {
 
   async poll(frequency: number): Promise<void> {
     if (this.stopping) return;
+    this.dbg('Polling for messages')
     const messages = await this.client
       .getMessages(this.options.topic, this.subscribedContentTopics)
       .catch(async (e) => {
@@ -279,20 +280,18 @@ export class WakuRelayer {
         }
         return [];
       });
-    const messagePromises = [];
-    for (const message of messages) {
-      messagePromises.push(
-        this.handleMessage(message).catch((err) => {
-          this.dbg(err);
-          return undefined;
-        }),
-      );
-      // eslint-disable-next-line no-await-in-loop
-      await delay(100);
+    if (messages.length > 0) {
+      this.dbg('Received messages:', messages.length);
     }
-    await Promise.allSettled(messagePromises);
+    for (const message of messages) {
+      // eslint-disable-next-line no-await-in-loop
+      this.handleMessage(message).catch((err) => {
+        this.dbg(err);
+      })
+      // eslint-disable-next-line no-await-in-loop
+      await delay(250);
+    }
     await delay(frequency);
-
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.poll(frequency);
   }
