@@ -9,7 +9,7 @@ import {
 } from 'server/waku-relayer/waku-relayer';
 import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
-import { WakuApiClient } from 'server/networking/waku-api-client';
+import { WakuApiClient } from 'server/networking/waku-rest-api-client';
 
 const dbg = debug('relayer:main');
 
