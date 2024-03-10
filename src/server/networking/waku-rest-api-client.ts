@@ -72,8 +72,9 @@ export class WakuApiClient {
   }
 
   formatRESTRequest(method: string, topic: any) {
-    this.dbg('formatting REST request', method, topic);
-    return `${method}${topic}`;
+    const formattedURL = `${method}${topic}`;
+    this.dbg('formatting REST request', method, topic, 'as URL', formattedURL);
+    return formattedURL;
   }
 
   determineRequestType(method: string) {
@@ -111,19 +112,19 @@ export class WakuApiClient {
           {
             const response = await promiseTimeout(this.post(formattedURL, params), 10 * 1000);
             this.dbg(response)
-            return response;
+            return response.data;
           }
         case 'DELETE':
           {
             const response = await promiseTimeout(this.delete(formattedURL, params), 10 * 1000);
             this.dbg(response)
-            return response;
+            return response.data;
           }
         default:
           {
             const response = await promiseTimeout(this.get(formattedURL), 10 * 1000);
             this.dbg(response)
-            return response;
+            return response.data;
           }
       }
     } catch (err) {
@@ -138,13 +139,10 @@ export class WakuApiClient {
 
   async getDebug(): Promise<string[]> {
     const data = await this.request(WakuRequestMethods.DebugInfo, '', []);
-    const { result, error } = data;
-    if (isDefined(result)) {
-      return result.listenAddresses;
+    if (isDefined(data)) {
+      return data.listenAddresses;
     }
-    if (isDefined(error)) {
-      this.dbg(error.message);
-    }
+    this.dbg('There was an error gathering addresses from debug info. Returning empty array.');
     return [];
   }
 
@@ -153,8 +151,8 @@ export class WakuApiClient {
     const data = await this.request(WakuRequestMethods.DeleteSubscriptions, '', [
       topics,
     ]);
-    const { result } = data;
-    return result;
+    return data;
+
   }
 
   async subscribe(topics: string[]) {
@@ -162,9 +160,7 @@ export class WakuApiClient {
     const data = await this.request(WakuRequestMethods.PublishSubscription, '', [
       topics,
     ]);
-
-    const { result } = data;
-    return result;
+    return data;
   }
 
   /**
@@ -187,13 +183,13 @@ export class WakuApiClient {
         [{ payload, timestamp, contentTopic }],
         MAX_RETRIES,
       );
-      return data.result;
+      return data;
     }
 
     const data = await this.request(WakuRequestMethods.PublishMessage, topic, [
       { payload, timestamp, contentTopic },
     ]);
-    return data.result;
+    return data;
   }
 
   static fromJSON(obj: any): WakuRelayMessage {
@@ -221,7 +217,7 @@ export class WakuApiClient {
     if (isDefined(data.error)) {
       throw data.error;
     }
-    const messages: WakuRelayMessage[] = data.result.map(
+    const messages: WakuRelayMessage[] = data.map(
       WakuApiClient.fromJSON,
     );
 
