@@ -26,6 +26,15 @@ export enum WakuRequestMethods {
 
 const MAX_RETRIES = 4;
 
+const checkResponseStatus = (response: any, dbg: any) => {
+  if (response.status === 200) {
+    return;
+  }
+  dbg('Error Response Status: ', response);
+  throw new Error(`Error Response Status: ${response.statusText}`);
+}
+
+
 export class WakuApiClient {
   dbg: debug.Debugger;
 
@@ -52,6 +61,7 @@ export class WakuApiClient {
       this.http.post(path, data),
       10 * 1000,
     );
+    checkResponseStatus(response, this.dbg);
     return response.data;
   }
 
@@ -60,6 +70,7 @@ export class WakuApiClient {
       this.http.get(path),
       10 * 1000,
     );
+    checkResponseStatus(response, this.dbg);
     return response.data;
   }
 
@@ -68,6 +79,7 @@ export class WakuApiClient {
       this.http.delete(path, { data }),
       10 * 1000,
     );
+    checkResponseStatus(response, this.dbg);
     return response.data;
   }
 
