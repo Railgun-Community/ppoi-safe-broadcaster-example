@@ -1,1 +1,3 @@
-curl -d '{ "jsonrpc":"2.0", "method":"get_waku_v2_debug_v1_version", "params":[], "id":1 }' -H 'Content-Type: application/json' -X POST localhost:8546/ -s | jq .result
+#!/bin/sh
+curl -X GET "http://localhost:8645/debug/v1/version" -H "accept: text/plain"
+

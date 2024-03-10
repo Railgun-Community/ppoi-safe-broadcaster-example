@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-import { rpcRequest } from './rpcRequest.js';
+import { restPOSTRequest } from './restRequest.js';
 
+const { log } = console;
 const args = process.argv.slice(2);
-const { result, error } = await rpcRequest('post_waku_v2_admin_v1_peers', [args]);
-console.log({ result, error });
+const result = await restPOSTRequest('/admin/v1/peers', [args]);
+log({ result });
