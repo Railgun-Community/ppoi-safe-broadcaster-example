@@ -104,27 +104,27 @@ export class WakuApiClient {
       switch (requestType) {
         case 'GET':
           {
-            const response = await promiseTimeout(this.get(formattedURL), 10 * 1000);
+            const response = await this.get(formattedURL);
             this.dbg(response)
-            return response.data;
+            return response;
           }
         case 'POST':
           {
-            const response = await promiseTimeout(this.post(formattedURL, params), 10 * 1000);
+            const response = await this.post(formattedURL, params);
             this.dbg(response)
-            return response.data;
+            return response;
           }
         case 'DELETE':
           {
-            const response = await promiseTimeout(this.delete(formattedURL, params), 10 * 1000);
+            const response = await this.delete(formattedURL, params);
             this.dbg(response)
-            return response.data;
+            return response;
           }
         default:
           {
-            const response = await promiseTimeout(this.get(formattedURL), 10 * 1000);
+            const response = await this.get(formattedURL);
             this.dbg(response)
-            return response.data;
+            return response;
           }
       }
     } catch (err) {
