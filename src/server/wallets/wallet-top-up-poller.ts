@@ -4,9 +4,9 @@ import { formatUnits } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
-import { delay } from '../../util/promise-utils';
+import { delay, promiseTimeout } from '../../util/promise-utils';
 import { removeUndefineds } from '../../util/utils';
-import { getActiveWalletGasTokenBalanceMapForChain } from '../balances/balance-cache';
+import { getActiveWalletGasTokenBalanceMapForChain, updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { getPublicERC20AmountsBeforeUnwrap } from '../balances/top-up-balance';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configDefaults from '../config/config-defaults';
@@ -44,7 +44,15 @@ const pollTopUp = async () => {
         );
         const currentTXIDVersion = TXIDVersion.V2_PoseidonMerkle; // Switch this to V3 when balances migrated after release.
         // eslint-disable-next-line no-await-in-loop
-        await topUpWallet(walletToTopUp, currentTXIDVersion, chain).catch(
+        await topUpWallet(walletToTopUp, currentTXIDVersion, chain).then(async () => {
+          logger.warn(
+            `Successfully topped up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${currentTXIDVersion}`,
+          );
+          await promiseTimeout(
+            updateCachedGasTokenBalance(chain, walletToTopUp.address),
+            10 * 1000
+          );
+        }).catch(
           (err) => {
             logger.warn(
               `Failed to top up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${currentTXIDVersion}`,
