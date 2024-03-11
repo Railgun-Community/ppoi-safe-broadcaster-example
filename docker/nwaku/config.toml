@@ -18,10 +18,10 @@ rest-admin=true
 rest-private=true
 rest-relay-cache-capacity=300
 staticnode=[
-  #'/dns4/teelf.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAkygexqAtchrhYVqLFBTXFEEZPtz8C8ZnSP6iYy1s22mfW'
+  '/dns4/teelf.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAkygexqAtchrhYVqLFBTXFEEZPtz8C8ZnSP6iYy1s22mfW'
 ]
 dns-discovery=false
-discv5-discovery=true
+discv5-discovery=false
 discv5-bootstrap-node=[
   # fleet
   'enr:-Ni4QPZ55N8GN4HwH_7Nli9Bgd23JJtKvaGC0fXeiwE_A8aePE7YGseYgskHgyxNmezLfSMBKuDn34urDqVfKBRCbmABgmlkgnY0gmlwhNiAsSuKbXVsdGlhZGRyc7hAAB02GHRlZWxmLndlY2FtZWZyb21hcGVzLmNvbQbqYAAfNhh0ZWVsZi53ZWNhbWVmcm9tYXBlcy5jb20GH0DeA4lzZWNwMjU2azGhAj9FT3UXw5hx9aGLFGvVprvCsidIq_vbClDzoljGeJRhg3RjcILqYIV3YWt1MgE'
