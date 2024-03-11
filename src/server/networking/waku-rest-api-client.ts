@@ -19,8 +19,8 @@ export type WakuApiClientOptions = {
 export enum WakuRequestMethods {
   DebugInfo = '/debug/v1/info', // GET
   PublishSubscription = '/relay/v1/subscriptions', // POST
-  PublishMessage = '/relay/v1/messages/', // POST - requires pubsub topic
-  GetMessages = '/relay/v1/messages/',  // GET - requires pubsub topic
+  PublishMessage = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-relayer', // POST - requires pubsub topic
+  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-relayer',  // GET - requires pubsub topic
   DeleteSubscriptions = '/relay/v1/subscriptions', // DELETE
 }
 
@@ -33,9 +33,7 @@ const checkResponseStatus = (response: any, dbg: any) => {
   dbg('Error Response Status: ', response);
   throw new Error(`Error Response Status: ${response.statusText}`);
 }
-
-
-export class WakuApiClient {
+export class WakuRestApiClient {
   dbg: debug.Debugger;
 
   http: AxiosInstance;
@@ -45,7 +43,7 @@ export class WakuApiClient {
   backupNwaku: string;
 
   constructor(options: WakuApiClientOptions) {
-    this.dbg = debug('waku:REST-api');
+    this.dbg = debug('relayer:waku:REST-api');
     this.mainNwaku = options.url;
     this.backupNwaku = options.urlBackup;
     const httpConfig = {
@@ -83,74 +81,62 @@ export class WakuApiClient {
     return response.data;
   }
 
-  formatRESTRequest(method: string, topic: any) {
-    const formattedURL = `${method}${topic}`;
-    this.dbg('formatting REST request', method, topic, 'as URL', formattedURL);
-    return formattedURL;
-  }
-
-  determineRequestType(method: string) {
-    this.dbg('determining request type', method);
+  static determineRequestType(method: string) {
     switch (method) {
       case WakuRequestMethods.DebugInfo:
       case WakuRequestMethods.GetMessages:
-        return 'GET';
+        { return 'GET'; }
       case WakuRequestMethods.PublishSubscription:
       case WakuRequestMethods.PublishMessage:
-        return 'POST';
+        { return 'POST'; }
       case WakuRequestMethods.DeleteSubscriptions:
-        return 'DELETE';
+        { return 'DELETE'; }
       default:
-        return 'GET';
+        {
+          return 'GET';
+        }
     }
   }
 
-  async request(method: string, topic: string, params: any, retry = 0): Promise<any> {
-    const req = this.formatRESTRequest(method, topic);
+  async request(method: string, requestType: string, params: any, retry = 0): Promise<any> {
+    const baseURL = retry === 0 ? this.mainNwaku : this.backupNwaku;
+    const formattedURL = `${baseURL}${method}`;
     try {
-      const baseURL = retry === 0 ? this.mainNwaku : this.backupNwaku;
-      const formattedURL = `${baseURL}${req}`;
-
-      const requestType = this.determineRequestType(method);
 
       switch (requestType) {
         case 'GET':
           {
             const response = await this.get(formattedURL);
-            this.dbg(response)
             return response;
           }
         case 'POST':
           {
             const response = await this.post(formattedURL, params);
-            this.dbg(response)
             return response;
           }
         case 'DELETE':
           {
             const response = await this.delete(formattedURL, params);
-            this.dbg(response)
             return response;
           }
         default:
           {
             const response = await this.get(formattedURL);
-            this.dbg(response)
             return response;
           }
       }
     } catch (err) {
       if (retry < MAX_RETRIES) {
-        this.dbg('Error posting to relay-api. Retrying.', req, err.message);
-        return this.request(method, params, retry + 1);
+        this.dbg('Error posting to relay-api. Retrying.', formattedURL, err.message);
+        return this.request(method, requestType, params, retry + 1);
       }
-      this.dbg('Error posting to relay-api', req, err.message);
+      this.dbg('Error posting to relay-api', formattedURL, err.message);
       throw Error(err.message);
     }
   }
 
   async getDebug(): Promise<string[]> {
-    const data = await this.request(WakuRequestMethods.DebugInfo, '', []);
+    const data = await this.request(WakuRequestMethods.DebugInfo, 'GET', []);
     if (isDefined(data)) {
       return data.listenAddresses;
     }
@@ -159,8 +145,7 @@ export class WakuApiClient {
   }
 
   async unsubscribe(topics: string[]) {
-    this.dbg('unsubscribing from topics', topics);
-    const data = await this.request(WakuRequestMethods.DeleteSubscriptions, '', [
+    const data = await this.request(WakuRequestMethods.DeleteSubscriptions, 'DELETE', [
       topics,
     ]);
     return data;
@@ -168,10 +153,8 @@ export class WakuApiClient {
   }
 
   async subscribe(topics: string[]) {
-    this.dbg('subscribing to topics', topics);
-    const data = await this.request(WakuRequestMethods.PublishSubscription, '', [
-      topics,
-    ]);
+    const data = await this.request(WakuRequestMethods.PublishSubscription, 'POST', topics);
+    await this.request(WakuRequestMethods.PublishSubscription, 'POST', topics, 1); // publish on nwaku2 as well
     return data;
   }
 
@@ -187,19 +170,18 @@ export class WakuApiClient {
     const { timestamp } = message;
     const payload = Buffer.from(message.payload).toString('base64');
     const { contentTopic } = message;
-
     if (contentTopic?.includes('fees') === true) {
       // we have fee message.. dont try to resend.
       const data = await this.request(
-        WakuRequestMethods.PublishMessage, topic,
-        [{ payload, timestamp, contentTopic }],
+        WakuRequestMethods.PublishMessage, 'POST',
+        { payload, timestamp, version: 0, contentTopic },
         MAX_RETRIES,
       );
       return data;
     }
 
-    const data = await this.request(WakuRequestMethods.PublishMessage, topic, [
-      { payload, timestamp, contentTopic },
+    const data = await this.request(WakuRequestMethods.PublishMessage, 'POST', [
+      { payload, timestamp, version: 0, contentTopic },
     ]);
     return data;
   }
@@ -224,13 +206,13 @@ export class WakuApiClient {
     topic: string,
     contentTopics: string[] = [],
   ): Promise<WakuRelayMessage[]> {
-    const data = await this.request(WakuRequestMethods.GetMessages, topic, []);
+    const data = await this.request(WakuRequestMethods.GetMessages, 'GET', []);
 
     if (isDefined(data.error)) {
       throw data.error;
     }
     const messages: WakuRelayMessage[] = data.map(
-      WakuApiClient.fromJSON,
+      WakuRestApiClient.fromJSON,
     );
 
     if (!isDefined(messages)) {

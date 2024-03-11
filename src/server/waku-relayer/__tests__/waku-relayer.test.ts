@@ -16,10 +16,10 @@ import {
 } from '@railgun-community/wallet';
 import { WakuMethodNames, WakuRelayer } from '../waku-relayer';
 import {
-  WakuApiClient,
+  WakuRestApiClient,
   WakuRelayMessage,
   WakuRequestMethods,
-} from '../../networking/waku-api-client';
+} from '../../networking/waku-rest-api-client';
 import {
   encryptResponseData,
   tryDecryptData,
@@ -69,7 +69,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 let wakuRelayer: Optional<WakuRelayer>;
-let client: WakuApiClient;
+let client: WakuRestApiClient;
 
 let clientHTTPStub: SinonStub;
 let processTransactionStub: SinonStub;
@@ -101,7 +101,7 @@ describe('waku-relayer', () => {
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
 
-    client = new WakuApiClient({ url: '', urlBackup: '' });
+    client = new WakuRestApiClient({ url: '', urlBackup: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
     wakuRelayer = await WakuRelayer.init(client, {
       topic: configDefaults.waku.pubSubTopic,

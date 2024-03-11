@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
-import { WakuApiClient, WakuRelayMessage } from '../waku-rest-api-client';
+import { WakuRestApiClient, WakuRelayMessage } from '../waku-rest-api-client';
 import {
   setupSingleTestWallet,
   testChainEthereum,
@@ -16,7 +16,7 @@ import { initTokens } from '../../tokens/network-tokens';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-let client: WakuApiClient;
+let client: WakuRestApiClient;
 
 let clientHTTPStub: SinonStub;
 
@@ -33,7 +33,7 @@ describe('waku-rest-api-client', () => {
     };
     await initTokens(MOCK_CHAIN);
 
-    client = new WakuApiClient({ url: '', urlBackup: '' });
+    client = new WakuRestApiClient({ url: '', urlBackup: '' });
     clientHTTPStub = sinon.stub(client.http, 'post');
   });
 
