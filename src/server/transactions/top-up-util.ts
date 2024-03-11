@@ -1,4 +1,4 @@
-import { delay, TXIDVersion } from '@railgun-community/shared-models';
+import { delay, TXIDVersion, promiseTimeout } from '@railgun-community/shared-models';
 import debug from 'debug';
 import { formatEther, formatUnits, parseUnits } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
@@ -26,8 +26,12 @@ export const pollRefreshBalances = async () => {
   const chains = configuredNetworkChains();
   for (const chain of chains) {
     // eslint-disable-next-line no-await-in-loop
-    await updateShieldedBalances(txidVersion, chain).catch((err: Error) => {
+    await promiseTimeout(
+      updateShieldedBalances(txidVersion, chain),
+      5 * 60 * 1000,
+    ).catch((err: Error) => {
       dbg('UPDATE SHIELD ERROR');
+
       dbg(err.message);
     });
     // eslint-disable-next-line no-await-in-loop
@@ -56,12 +60,7 @@ const getShieldedTokenAmountsForChain = async (
   }
 
   if (forceRefresh) {
-    // await promiseTimeout(
-    //   updateShieldedBalances(txidVersion, chain),
-    //   5 * 60 * 1000,
-    // ).catch((err: Error) => {
-    //   dbg(err.message);
-    // });
+
     const updatedBalances = getPrivateTokenBalanceCache(chain);
     return updatedBalances;
   }
@@ -344,9 +343,9 @@ export const getMultiTopUpTokenAmountsForChain = async (
   const consolidatedTokenAmountsForChain = getConsolidatedTokenAmounts(
     setNativeLast
       ? orderNativeTokenLast(
-          topUpTokenAmountsForChain,
-          getWrappedNativeTokenAddressForChain(chain),
-        )
+        topUpTokenAmountsForChain,
+        getWrappedNativeTokenAddressForChain(chain),
+      )
       : newSortedTopUpList,
     chain,
   );
