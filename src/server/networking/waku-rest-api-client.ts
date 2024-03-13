@@ -180,9 +180,11 @@ export class WakuRestApiClient {
       return data;
     }
 
-    const data = await this.request(WakuRequestMethods.PublishMessage, 'POST', [
+    const data = await this.request(
+      WakuRequestMethods.PublishMessage,
+      'POST',
       { payload, timestamp, version: 0, contentTopic },
-    ]);
+    );
     return data;
   }
 
