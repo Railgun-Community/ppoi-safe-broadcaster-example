@@ -58,10 +58,15 @@ const calculateMessageTime = (params: any, id: number): Promise<Optional<WakuMet
   return Promise.resolve({
     rpcResult: {
       jsonrpc: '2.0',
-      result: diffSeconds.toString(),
-      id,
+      result: {
+        diffSeconds,
+        diffMs: diff,
+        timestamp: newTimestamp,
+        now,
+      },
+      id
     },
-    contentTopic: '/railgun/v2/0/137/transact/json',
+    contentTopic: '/railgun/v2/0/137/transact-response/json',
 
   });
 }
@@ -157,6 +162,7 @@ export class WakuRelayer {
       if (method in this.methods) {
         this.dbg(`Received message on ${contentTopic}`);
         const response = await this.methods[method](params, id);
+        // && method !== WakuMethodNames.MessageTimestamp
         if (response) {
           await this.publish(response.rpcResult, response.contentTopic);
         }
