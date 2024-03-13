@@ -37,12 +37,34 @@ type JsonRPCMessageHandler = (
 
 export enum WakuMethodNames {
   Transact = 'transact',
+  MessageTimestamp = 'messageTimestamp'
 }
 
 export type WakuRelayerOptions = {
   topic: string;
   feeExpiration: number;
 };
+
+const calculateMessageTime = (params: any, id: number): Promise<Optional<WakuMethodResponse>> => {
+  const { timestamp } = params;
+  console.log("Timestamp: ", timestamp, ' id: ', id)
+  const now = Date.now();
+  const newTimestamp = parseInt(timestamp, 10);
+  console.log("New Timestamp: ", newTimestamp)
+  const diff = now - newTimestamp
+  const diffSeconds = diff / 1000;
+  console.log("Diff in seconds: ", diffSeconds);
+  // return undefined;
+  return Promise.resolve({
+    rpcResult: {
+      jsonrpc: '2.0',
+      result: diffSeconds.toString(),
+      id,
+    },
+    contentTopic: '/railgun/v2/0/137/transact/json',
+
+  });
+}
 
 export class WakuRelayer {
   client: WakuRestApiClient;
@@ -63,6 +85,7 @@ export class WakuRelayer {
 
   methods: MapType<JsonRPCMessageHandler> = {
     [WakuMethodNames.Transact]: transactMethod,
+    [WakuMethodNames.MessageTimestamp]: calculateMessageTime
   };
 
   stopping = false;
