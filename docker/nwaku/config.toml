@@ -18,7 +18,7 @@ rest-admin=true
 rest-private=true
 rest-relay-cache-capacity=300
 staticnode=[
-  # '/dns4/teelf.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAkygexqAtchrhYVqLFBTXFEEZPtz8C8ZnSP6iYy1s22mfW'
+  '/dns4/teelf.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAkygexqAtchrhYVqLFBTXFEEZPtz8C8ZnSP6iYy1s22mfW'
 ]
 dns-discovery=false
 discv5-discovery=true
