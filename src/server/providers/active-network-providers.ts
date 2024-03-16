@@ -23,9 +23,26 @@ export const initNetworkProviders = async (chains?: RelayerChain[]) => {
       // eslint-disable-next-line no-await-in-loop
       await initNetworkProvider(chain);
     } catch (err) {
+
+
+      const error = err as Error;
+      const { message } = error;
+      if (message.includes('Failed to get block number')) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          await initNetworkProvider(chain);
+          continue;
+        } catch (secondErr) {
+          dbg(
+            `Could not initialize network provider for chain: ${chain.type}:${chain.id} - ${secondErr.message}`,
+          );
+
+        }
+      }
       throw new Error(
         `Could not initialize network provider for chain: ${chain.type}:${chain.id} - ${err.message}`,
       );
+
     }
   }
 };
