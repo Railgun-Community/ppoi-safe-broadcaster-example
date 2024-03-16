@@ -10,6 +10,7 @@ import {
 import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
 import { WakuRestApiClient } from 'server/networking/waku-rest-api-client';
+import { waitForWaku } from './server/networking/waku-poller';
 
 const dbg = debug('relayer:main');
 
@@ -21,6 +22,7 @@ const main = async (): Promise<void> => {
   await initRelayerModules();
 
   // Note that this default can be overridden in initRelayerModules().
+  await waitForWaku(config.waku.rpcURL);
   dbg(`Connecting to ${config.waku.rpcURL}`);
 
   const client = new WakuRestApiClient({
