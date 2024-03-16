@@ -24,12 +24,6 @@ services:
       - ../scripts/nwaku:/app/scripts
     depends_on:
       - swag
-    healthcheck:
-      test: curl --fail http://localhost:8546 || exit 1
-      interval: 30s
-      retries: 4
-      start_period: 10s
-      timeout: 5s
     entrypoint: >
       wakunode2 --config-file=/app/config.toml
       --nat="extip:${EXTIP}"
@@ -54,12 +48,6 @@ services:
       - ../scripts/nwaku:/app/scripts
     depends_on:
       - swag
-    healthcheck:
-      test: curl --fail http://localhost:8547 || exit 1
-      interval: 30s
-      retries: 4
-      start_period: 10s
-      timeout: 5s
     entrypoint: >
       wakunode2
         --config-file=/app/config.toml
@@ -89,7 +77,7 @@ services:
     tty: true
     volumes:
       - relayer:/mnt
-    command: sh -c './scripts/wait-for nwaku1:8546 -t 30 -- npm start'
+    command: sh -c 'npm start'
 
   swag:
     image: ghcr.io/linuxserver/swag
