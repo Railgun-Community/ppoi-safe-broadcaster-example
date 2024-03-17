@@ -106,6 +106,7 @@ export class WakuRelayer {
   async publish(
     payload: Optional<JsonRpcPayload<string>> | object,
     contentTopic: string,
+    isTxResponse = false,
   ): Promise<void> {
     if (!payload) {
       return;
@@ -115,9 +116,36 @@ export class WakuRelayer {
       contentTopic,
     );
 
+    if (isTxResponse) {
+      this.dbg('Publishing tx response on', contentTopic);
+      // publish message 10x over 10 seconds async
+
+      await this.ensureTxResponse(msg)
+        .catch((e) => {
+          this.dbg('Error publishing Tx Response message', e.message);
+        })
+        .finally(() => {
+          this.dbg('Finished broadcasting Tx Response message');
+        });
+      return;
+    }
+
     return this.client.publish(msg, this.options.topic).catch((e) => {
       this.dbg('Error publishing message', e.message);
     });
+  }
+
+  private async ensureTxResponse(msg: WakuMessage) {
+    for (let i = 0; i < 20; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      await this.client.publish(msg, this.options.topic).then(
+        () => this.dbg('Published TX RESPONSE')
+      ).catch((e) => {
+        this.dbg('Error publishing message', e.message);
+      });
+      // eslint-disable-next-line no-await-in-loop
+      await delay(1000);
+    }
   }
 
   static decode(payload: Uint8Array): string {
@@ -136,7 +164,7 @@ export class WakuRelayer {
         this.dbg(`Received message on ${contentTopic}`);
         const response = await this.methods[method](params, id);
         if (response) {
-          await this.publish(response.rpcResult, response.contentTopic);
+          await this.publish(response.rpcResult, response.contentTopic, true);
         }
       }
     } catch (e) {
