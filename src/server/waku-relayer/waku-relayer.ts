@@ -106,7 +106,6 @@ export class WakuRelayer {
   async publish(
     payload: Optional<JsonRpcPayload<string>> | object,
     contentTopic: string,
-    isTxResponse = false,
   ): Promise<void> {
     if (!payload) {
       return;
@@ -150,7 +149,7 @@ export class WakuRelayer {
         this.dbg(`Received message on ${contentTopic}`);
         const response = await this.methods[method](params, id);
         if (response) {
-          await this.publish(response.rpcResult, response.contentTopic, true);
+          await this.publish(response.rpcResult, response.contentTopic);
         }
       }
     } catch (e) {
