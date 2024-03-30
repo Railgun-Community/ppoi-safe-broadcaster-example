@@ -116,20 +116,6 @@ export class WakuRelayer {
       contentTopic,
     );
 
-    if (isTxResponse) {
-      this.dbg('Publishing tx response on', contentTopic);
-      // publish message 10x over 10 seconds async
-
-      await this.ensureTxResponse(msg)
-        .catch((e) => {
-          this.dbg('Error publishing Tx Response message', e.message);
-        })
-        .finally(() => {
-          this.dbg('Finished broadcasting Tx Response message');
-        });
-      return;
-    }
-
     return this.client.publish(msg, this.options.topic).catch((e) => {
       this.dbg('Error publishing message', e.message);
     });

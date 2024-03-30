@@ -5,11 +5,6 @@ store=true
 filter=true
 lightpush=true
 rln-relay=false
-rpc=false
-rpc-admin=false
-rpc-private=false
-rpc-address='0.0.0.0'
-rpc-port=8546
 relay-peer-exchange=true
 rest=true
 rest-address='0.0.0.0'
@@ -33,5 +28,4 @@ discv5-bootstrap-node=[
 pubsub-topic=[
   '/waku/2/railgun-relayer',
 ]
-metrics-server=false
 max-connections=300

@@ -1,4 +1,4 @@
-FROM wakuorg/nwaku:v0.25.0
+FROM wakuorg/nwaku:v0.26.0
 
 RUN apk add curl jq websocat
 COPY ./config.toml /app
