@@ -43,6 +43,7 @@ services:
         --config-file=/app/config.toml
         --nat="extip:${EXTIP}"
         --nodekey=${NODEKEY_2}
+        --websocket-support=true
         --ports-shift=1
 
   relayer:
