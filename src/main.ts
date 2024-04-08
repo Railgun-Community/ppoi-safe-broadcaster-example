@@ -9,7 +9,8 @@ import {
 } from 'server/waku-relayer/waku-relayer';
 import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
-import { WakuApiClient } from 'server/networking/waku-api-client';
+import { WakuRestApiClient } from 'server/networking/waku-rest-api-client';
+import { waitForWaku } from './server/networking/waku-poller';
 
 const dbg = debug('relayer:main');
 
@@ -21,9 +22,10 @@ const main = async (): Promise<void> => {
   await initRelayerModules();
 
   // Note that this default can be overridden in initRelayerModules().
+  await waitForWaku(config.waku.rpcURL);
   dbg(`Connecting to ${config.waku.rpcURL}`);
 
-  const client = new WakuApiClient({
+  const client = new WakuRestApiClient({
     url: config.waku.rpcURL,
     urlBackup: config.waku.rpcURLBackup,
   });
@@ -32,12 +34,10 @@ const main = async (): Promise<void> => {
     feeExpiration: config.transactionFees.feeExpirationInMS,
   };
   relayer = await WakuRelayer.init(client, options);
-
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   relayer.poll(config.waku.pollFrequencyInMS);
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   relayer.broadcastFeesOnInterval(config.waku.broadcastFeesDelayInMS);
-
   // print multiaddress of nim-waku instance
   dbg(await relayer.client.getDebug());
 };

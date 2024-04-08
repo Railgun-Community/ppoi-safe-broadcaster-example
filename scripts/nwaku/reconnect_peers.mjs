@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-import { rpcRequest } from './rpcRequest.js';
+import { restGETRequest, restPOSTRequest } from './restRequest.js';
 
 const { log } = console;
 
 const reconnect = async (peer) => {
-  const res = await rpcRequest('post_waku_v2_admin_v1_peers', [
-    [peer * tiaddr],
-  ]);
-  log(peer * tiaddr, res);
+  const res = await restPOSTRequest('/admin/v1/peers', [[peer]]);
+  log(peer, res);
 };
 
-const { result, error } = await rpcRequest('get_waku_v2_admin_v1_peers', []);
+const result = await restGETRequest('/admin/v1/peers');
 
-result.filter((peer) => !peer.connected).forEach((peer) => reconnect(peer));
+result
+  .filter((peer) => peer.connected === false)
+  .forEach((peer) => reconnect(peer));

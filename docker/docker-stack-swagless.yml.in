@@ -21,12 +21,6 @@ services:
     volumes:
       - nwaku1:/data
       - ../scripts/nwaku:/app/scripts
-    healthcheck:
-      test: curl --fail http://localhost:8546 || exit 1
-      interval: 30s
-      retries: 4
-      start_period: 10s
-      timeout: 5s
     entrypoint: >
       wakunode2 --config-file=/app/config.toml
       --nat="extip:${EXTIP}"
@@ -44,17 +38,12 @@ services:
     volumes:
       - nwaku2:/data
       - ../scripts/nwaku:/app/scripts
-    healthcheck:
-      test: curl --fail http://localhost:8547 || exit 1
-      interval: 30s
-      retries: 4
-      start_period: 10s
-      timeout: 5s
     entrypoint: >
       wakunode2
         --config-file=/app/config.toml
         --nat="extip:${EXTIP}"
         --nodekey=${NODEKEY_2}
+        --websocket-support=true
         --ports-shift=1
 
   relayer:
@@ -74,7 +63,7 @@ services:
     tty: true
     volumes:
       - relayer:/mnt
-    command: sh -c './scripts/wait-for nwaku1:8546 -t 30 -- npm start'
+    command: sh -c 'npm start'
 
 secrets:
   MNEMONIC:

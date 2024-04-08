@@ -171,7 +171,9 @@ export const executeTransaction = async (
       }
     }
 
-    setWalletAvailability(activeWallet, chain, false);
+    if (setAvailability === true) {
+      setWalletAvailability(activeWallet, chain, false);
+    }
     updatePendingTransactions(activeWallet, chain, true); // set it before, incase we encounter error and dont get hash, it should still properly poll.
 
     const txResponse: TransactionResponse = await promiseTimeout(
@@ -302,7 +304,9 @@ export const waitForTx = async (
     dbg(`Transaction ${txResponse.hash} error: ${err.message}`);
   } finally {
     await updateCachedGasTokenBalance(chain, activeWallet.address);
-    if (setAvailability) setWalletAvailability(activeWallet, chain, true);
+    if (setAvailability === true) {
+      setWalletAvailability(activeWallet, chain, true);
+    }
   }
 };
 

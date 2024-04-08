@@ -16,7 +16,7 @@ import { lookUpCachedTokenPrice } from '../tokens/token-price-cache';
 import { pollRefreshBalances } from '../transactions/top-up-util';
 import { topUpWallet } from '../transactions/top-up-wallet';
 import { getActiveWallets, getActiveWalletsForChain } from './active-wallets';
-import { isWalletUnavailable } from './available-wallets';
+import { isWalletUnavailable, setWalletAvailability } from './available-wallets';
 
 const dbg = debug('relayer:top-up-poller');
 
@@ -52,6 +52,8 @@ const pollTopUp = async () => {
             updateCachedGasTokenBalance(chain, walletToTopUp.address),
             10 * 1000
           );
+          setWalletAvailability(walletToTopUp, chain, true);
+
         }).catch(
           (err) => {
             logger.warn(

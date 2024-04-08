@@ -4,7 +4,7 @@
 
 Example code to forward RAILGUN transactions to the blockchain. Uses the Waku messaging protocol, while guaranteeing a Private Proof Of Innocence for all transactions.
 
-`poi-safe-relayer-example` is a node.js application that receives encrypted transactions from RAILGUN wallets equipped with Private Proof Of Innocence. The Relayer example verifies, signs and forwards the transactions to the blockchain. It will broadcast fees on the tokens you configure to accept at the rates defined in the config.
+`ppoi-safe-relayer-example` is a node.js application that receives encrypted transactions from RAILGUN wallets equipped with Private Proof Of Innocence. The Relayer example verifies, signs and forwards the transactions to the blockchain. It will broadcast fees on the tokens you configure to accept at the rates defined in the config.
 
 ## Private Proof Of Innocence
 
@@ -22,13 +22,67 @@ This network runs on [Waku](https://wakunetwork.com/), a secure and decentralize
 
 ## Requirements
 
-- node 16+
+- node 18+
 - docker, if using docker
 - jq (cli utility for parsing json)
+- At least 1GB of RAM, at least 20GB of disk space
 
-## Configuration
+## Configuration Options
 
-### nwaku
+# 1. Quick Installer
+
+This is intended as a setup-wizard for running in docker.
+
+Only things required for setup are a capable system and a mnemonic to configure the relayer.
+
+```sh
+# clone repo
+git clone https://github.com/Railgun-Community/ppoi-safe-relayer-example.git
+
+# change to repo directory
+cd ppoi-safe-relayer-example
+
+# May have to do this on a VPS
+docker swarm init --advertise-addr PUT.IP.ADDR.HERE
+
+# launch SETUP script
+./docker/setup
+
+# or If your server requires root privelages to run docker, ie: (aws, azure...)
+# Prerequisites:
+# 1. Generate a password, this is used to encrypt the railgun-databases
+# 2. Mnemonic - best to copy/paste it. input will not show on screen. (protected input)
+sudo ./docker/setup
+```
+
+This will setup 2 naku nodes & 1 relayer node.
+Configure its base defaults, and launch.
+
+## Useful Commands
+
+- `./docker/stop.sh` - will kill the running docker-stack
+- `./docker/run.sh` - will start up the swag instance (requires fully qualified domain name)
+- `./docker/runswagless.sh` - will start up the swagless instance.
+- `./docker/build.sh --no-swag` - will compile/rebuild the swagless docker-container after making any changes to code/config.
+- `./docker/build.sh`- will compile/rebuild the swag docker-container after making any changes to code/config.
+
+## Checking Docker Logs
+
+##### these commands may need to be run with sudo
+
+- `docker service logs relayer_relayer -f --raw` - displays running relayer logs
+- `docker service logs relayer_nwaku1 -f --raw` - displays running nwaku node 1 logs
+- `docker service logs relayer_nwaku2 -f --raw` - displays running nwaku node 2 logs
+
+<hr>
+<br>
+<br>
+<br>
+<br>
+
+# 2. Manual Installation & Setup
+
+### [NWAKU]
 
 Create and edit docker/.env to define your environment. Start by copying docker/.env.empty to docker/.env, as this includes the needed fields.
 
@@ -46,7 +100,7 @@ The fields to configure are described below. Note that you may leave the domain 
 - `TZ` - timezone code; eg 'EST'
 - `EMAIL` - letsencrypt will generate an SSL certificate for your domain; an email address must be entered. Whether you enter a real email address or a fake one is up to you
 
-### Init
+### [RELAYER]
 
 Customize your node by running `npm run copy-my-config`, which copies `src/MY-CONFIG.ts.example` to `src/MY-CONFIG.ts`.
 
@@ -132,12 +186,12 @@ configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
 };
 ```
 
-## Running Options:
+## Manual Running Options:
 
 ### Docker stack
 
 - Prereqs: Install docker
-- Create a secret key (`NODEKEY_1 & NODEKEY_2`) for your node. This is not currently used for encryption, but does establish your node's identity: running `scripts/nodekey.sh` will generate these. (see below.)
+- Create the secret keys (`NODEKEY_1` & `NODEKEY_2`) for your node. This is not currently used for encryption, but does establish your node's identity: running `scripts/nodekey.sh` will generate these. (see below.)
 - Know your external IP (`EXTIP`) and verify that ports 60000 and 8000 are exposed to the outside world (see https://www.canyouseeme.org/ or similar).
 - If you have a stable ip and domain and would like to join the community fleet of bootstrap nodes, be sure to enter your `BASEDOMAIN` and optionally `SUBDOMAIN`. The `swag` service will automatically generate an SSL certificate for you through letsencrypt.
 
@@ -149,12 +203,12 @@ configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
 
       echo "sw0rdf1sh" -n | sha256sum | awk '{print $1}' | docker secret create DB_ENCRYPTION_KEY -
 
-- Generate `NODEKEY` docker secret:
+- Generate `NODEKEY_1` & `NODEKEY_2` docker secrets:
 
 ```sh
       # step 1:
             ./scripts/nodekey.sh
-      # this will generate NODEKEY_1 & NODEKEY_2
+      # this will generate NODEKEY
       # and fill them into .env if they're not already present.
 
       # Step 2:
@@ -165,9 +219,9 @@ configTokens[ChainType.EVM][NetworkChainID.Ethereum]['0x_token_address'] = {
 ##### Manual Completion Example
 
 ```sh
-docker secret create NODEKEY_1 - 0xaf46f851e0d9c2f520c89ad95d67b5d098f1d79fae2fef3f562102eca9310a66
-docker secret create NODEKEY_2 - 0xc5af820e2fb37a65470a8a7c82ba415605c83009ffcbf87916707183942bbb68
-# do not use these for your NODEKEYs
+echo "0xaf46f851e0d9c2f520c89ad95d67b5d098f1d79fae2fef3f562102eca9310a66" | docker secret create NODEKEY_1 -
+echo "0x98f1d79fae2fef3f562102eca9310a66af46f851e0d9c2f520c89ad95d67b5d0" | docker secret create NODEKEY_2 -
+# DO NOT USE this hash for your NODEKEY
 ```
 
 - Register `MNEMONIC` docker secret. This is an example. Your actual mnemonic is not 'my mnemonic words...'
@@ -217,11 +271,11 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 - run image interactively (useful for first setup): replace `$EXTIP` with your external IP.
 
-      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -it nwaku --config-file=/app/config.toml --nat="extip:$EXTIP"
+      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -it nwaku --config-file=./docker/nwaku/config.toml --nat="extip:$EXTIP" --nodekey=$NODEKEY  --websocket-support=true
 
 - run image in background/detached: replace `$EXTIP` with your external IP.
 
-      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -d nwaku --config-file=/app/config.toml --nat="extip:$EXTIP"
+      docker run -p 8546:8546 -p 60000:60000 -p 8000:8000 -d nwaku --config-file=./docker/nwaku/config.toml --nat="extip:$EXTIP"  --nodekey=$NODEKEY  --websocket-support=true
 
 - verify that you can communicate with your nwaku instance over json-rpc:
 

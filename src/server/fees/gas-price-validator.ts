@@ -19,7 +19,7 @@ export const validateMinGasPrice = async (
   );
 
   if (chain.id === NetworkChainID.Arbitrum) {
-    if (minGasPrice >= 100000000n) {
+    if (minGasPrice >= 10000000n) {
       return true;
     }
   }
