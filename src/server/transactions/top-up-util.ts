@@ -135,7 +135,7 @@ const getConsolidatedTokenAmounts = (
         const readableCost = readableRemains * gasTokenPrice;
         const convertedAmount = readableCost / tokenPrice;
         // convert back into evm
-        const decimalLimit = convertedAmount > 1 ? 2 : 8;
+        const decimalLimit = convertedAmount > 1 ? 2 : 6;
         const overSpentAmount = parseUnits(
           convertedAmount.toFixed(decimalLimit),
           token.decimals,
@@ -168,7 +168,7 @@ const getConsolidatedTokenAmounts = (
 
         const publicTokenConverted = priceConvertedValue / tokenPrice;
         // convert this back to the other token.
-        const decimalLimit = publicTokenConverted > 1 ? 2 : 8;
+        const decimalLimit = publicTokenConverted > 1 ? 2 : 6;
 
         // convert this into the decimal amount.
         const convertedThreshold = parseUnits(
