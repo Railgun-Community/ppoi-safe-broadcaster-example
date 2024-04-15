@@ -18,7 +18,7 @@ describe('network-tokens', () => {
         symbol: 'WETH',
       },
     };
-    await initTokens();
+    await initTokens(MOCK_CHAIN);
   });
 
   it('Should have correct number of tokens', () => {

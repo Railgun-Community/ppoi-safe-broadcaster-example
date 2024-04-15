@@ -9,9 +9,14 @@ import {
 } from 'ethers';
 import sinon, { SinonStub } from 'sinon';
 import { getActiveWallets } from '../../wallets/active-wallets';
-import { getMockGoerliNetwork, getMockToken } from '../../../test/mocks.test';
+import {
+  getMockGoerliNetwork,
+  getMockNetwork,
+  getMockToken,
+} from '../../../test/mocks.test';
 import {
   setupSingleTestWallet,
+  testChainEthereum,
   testChainGoerli,
 } from '../../../test/setup.test';
 import { startEngine } from '../../engine/engine-init';
@@ -62,7 +67,7 @@ const MOCK_TOKEN_AMOUNT_2 = {
 };
 const TO_APPROVE = [MOCK_TOKEN_AMOUNT_1, MOCK_TOKEN_AMOUNT_2];
 
-const MOCK_CHAIN = testChainGoerli();
+const MOCK_CHAIN = testChainEthereum();
 const MOCK_UINT_ALLOWANCE = 1000n;
 
 describe('approve-spender', () => {
@@ -72,7 +77,7 @@ describe('approve-spender', () => {
     await clearSettingsDB();
     await setupSingleTestWallet();
     [activeWallet] = getActiveWallets();
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockGoerliNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getNonce')

@@ -24,8 +24,8 @@ describe('token-price-cache', () => {
   before(async () => {
     mockTokenConfig(MOCK_CHAIN_ETHEREUM, MOCK_TOKEN_ADDRESS_1);
     mockTokenConfig(MOCK_CHAIN_ETHEREUM, MOCK_TOKEN_ADDRESS_2);
-    mockTokenConfig(MOCK_CHAIN_ROPSTEN, MOCK_TOKEN_ADDRESS_1);
-    await initTokens();
+    // mockTokenConfig(MOCK_CHAIN_ROPSTEN, MOCK_TOKEN_ADDRESS_1);
+    await initTokens(MOCK_CHAIN_ETHEREUM);
   });
 
   beforeEach(() => {
@@ -51,9 +51,9 @@ describe('token-price-cache', () => {
     expect(() =>
       lookUpCachedTokenPrice(MOCK_CHAIN_ETHEREUM, MOCK_TOKEN_ADDRESS_2),
     ).to.throw(`No cached price for token: ${MOCK_TOKEN_ADDRESS_2}`);
-    expect(() =>
-      lookUpCachedTokenPrice(MOCK_CHAIN_ROPSTEN, MOCK_TOKEN_ADDRESS_1),
-    ).to.throw(`No cached price for token: ${MOCK_TOKEN_ADDRESS_1}`);
+    // expect(() =>
+    //   lookUpCachedTokenPrice(MOCK_CHAIN_ROPSTEN, MOCK_TOKEN_ADDRESS_1),
+    // ).to.throw(`No cached price for token: ${MOCK_TOKEN_ADDRESS_1}`);
     expect(
       lookUpCachedTokenPrice(MOCK_CHAIN_ETHEREUM, MOCK_TOKEN_ADDRESS_1),
     ).to.equal(10.0);

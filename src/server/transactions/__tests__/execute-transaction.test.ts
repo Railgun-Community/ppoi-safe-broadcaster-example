@@ -17,9 +17,11 @@ import {
   getMockContractTransaction,
   getMockProvider,
   getMockGoerliNetwork,
+  getMockNetwork,
 } from '../../../test/mocks.test';
 import {
   setupSingleTestWallet,
+  testChainEthereum,
   testChainGoerli,
 } from '../../../test/setup.test';
 import { startEngine } from '../../engine/engine-init';
@@ -57,7 +59,7 @@ let sendTransactionStub: SinonStub;
 let waitTxStub: SinonStub;
 let getBestMatchWalletForNetwork: SinonStub;
 
-const MOCK_CHAIN = testChainGoerli();
+const MOCK_CHAIN = testChainEthereum();
 
 describe('execute-transaction', () => {
   before(async () => {
@@ -66,9 +68,8 @@ describe('execute-transaction', () => {
     await clearSettingsDB();
     await setupSingleTestWallet();
     [activeWallet] = getActiveWallets();
-    configNetworks[testChainGoerli().type][testChainGoerli().id] =
-      getMockGoerliNetwork();
-    await initNetworkProviders([testChainGoerli()]);
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
+    await initNetworkProviders([MOCK_CHAIN]);
     ethersWallet = createEthersWallet(activeWallet, getMockProvider());
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getNonce')

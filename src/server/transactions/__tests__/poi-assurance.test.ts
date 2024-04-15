@@ -11,7 +11,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const txidVersion = TXIDVersion.V2_PoseidonMerkle;
-const chain: RelayerChain = { type: 0, id: 5 };
+const chain: RelayerChain = { type: 0, id: 1 };
 
 describe('poi-assurance', () => {
   before(async () => {

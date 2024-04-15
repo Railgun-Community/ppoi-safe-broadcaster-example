@@ -6,9 +6,14 @@ import {
   getActiveWallets,
   getRailgunWalletID,
 } from '../../wallets/active-wallets';
-import { getMockGoerliNetwork, getMockToken } from '../../../test/mocks.test';
+import {
+  getMockGoerliNetwork,
+  getMockNetwork,
+  getMockToken,
+} from '../../../test/mocks.test';
 import {
   setupSingleTestWallet,
+  testChainEthereum,
   testChainGoerli,
 } from '../../../test/setup.test';
 import { startEngine } from '../../engine/engine-init';
@@ -48,7 +53,7 @@ const MOCK_TOKEN_AMOUNT_2 = {
   amount: BigInt('200000000000000'),
 };
 
-const MOCK_CHAIN = testChainGoerli();
+const MOCK_CHAIN = testChainEthereum();
 
 const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
@@ -72,7 +77,7 @@ describe('unshield-tokens', () => {
     await setupSingleTestWallet();
     railgunWalletID = getRailgunWalletID();
     [activeWallet] = getActiveWallets();
-    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockGoerliNetwork();
+    configNetworks[MOCK_CHAIN.type][MOCK_CHAIN.id] = getMockNetwork();
     await initNetworkProviders([MOCK_CHAIN]);
     walletGetTransactionCountStub = sinon
       .stub(EthersWallet.prototype, 'getNonce')
