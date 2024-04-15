@@ -15,7 +15,7 @@ const MOCK_CHAIN = testChainEthereum();
 describe('active-network-providers', () => {
   before(async () => {
     await startEngine();
-    await initNetworkProviders();
+    await initNetworkProviders([MOCK_CHAIN]);
   });
 
   it('Should init viable fallback providers', async () => {
