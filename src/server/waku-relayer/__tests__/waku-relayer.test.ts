@@ -74,7 +74,11 @@ let client: WakuRestApiClient;
 let clientHTTPStub: SinonStub;
 let processTransactionStub: SinonStub;
 
-let requestData: Optional<JsonRpcRequest>;
+type WakuMessageInTransport = WakuMessage & {
+  payload: string;
+};
+
+let requestData: Optional<WakuMessageInTransport>;
 
 const MOCK_TOKEN_ADDRESS = '0x12345';
 let network: Network;
@@ -82,9 +86,8 @@ const chain = testChainEthereum();
 
 // eslint-disable-next-line require-await
 const handleHTTPPost = async (url: string, data?: unknown) => {
-  expect(url).to.equal('');
-  requestData = data as JsonRpcRequest;
-  return { data: { result: {} } } as unknown as JsonRpcResult;
+  requestData = data as unknown as WakuMessageInTransport;
+  return { data: {}, status: 200 };
 };
 
 describe('waku-relayer', () => {
@@ -96,7 +99,7 @@ describe('waku-relayer', () => {
     configNetworks[chain.type][chain.id] = getMockNetwork();
     await initNetworkProviders([chain]);
     mockTokenConfig(chain, MOCK_TOKEN_ADDRESS);
-    await initTokens();
+    await initTokens(chain);
     processTransactionStub = sinon
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
@@ -156,17 +159,13 @@ describe('waku-relayer', () => {
     expect(contentTopic).to.equal(contentTopics.fees(chain));
 
     await wakuRelayer?.broadcastFeesForChain(chain);
-    expect(requestData?.id).to.be.a('number');
-    expect(requestData?.method).to.equal(WakuRequestMethods.PublishMessage);
-    expect(requestData?.params).to.be.an('array');
-    expect(requestData?.params[0]).to.equal(configDefaults.waku.pubSubTopic);
-    expect(requestData?.params[1]).to.be.an('object');
-    const requestParams = requestData?.params[1];
-    expect(requestParams?.contentTopic).to.equal(contentTopic);
-    expect(requestParams?.timestamp).to.be.a('number');
-    expect(requestParams?.payload).to.be.a('string');
-
-    const utf8 = Buffer.from(requestParams.payload, 'base64').toString('utf8');
+    expect(requestData?.contentTopic).to.equal(contentTopic);
+    expect(requestData?.timestamp).to.be.a('number');
+    expect(requestData?.payload).to.be.a('string');
+    if (!requestData?.payload) {
+      return;
+    }
+    const utf8 = Buffer.from(requestData.payload, 'base64').toString('utf8');
     const message = JSON.parse(utf8) as RelayerFeeMessage;
     const data = JSON.parse(
       toUTF8String(message.data),
@@ -234,10 +233,9 @@ describe('waku-relayer', () => {
   });
 
   it('Should test transact method - transfer', async () => {
-    const handleHTTPPost = () => {
-      return { result: {} };
-    };
-    clientHTTPStub.callsFake(handleHTTPPost);
+    clientHTTPStub.callsFake(() => {
+      return { data: {}, status: 200 };
+    });
 
     const contentTopic = contentTopics.transact(chain);
 
@@ -290,12 +288,14 @@ describe('waku-relayer', () => {
     // After transact-response sent.
     expect(clientHTTPStub.callCount).to.equal(1);
     const postCall = clientHTTPStub.getCall(0);
-    expect(postCall.args[0]).to.equal('');
+    expect(postCall.args[0]).to.equal(WakuRequestMethods.PublishMessage);
     const rpcArgs = postCall.args[1];
-    expect(rpcArgs.id).to.be.a('number');
-    expect(rpcArgs.method).to.equal(WakuRequestMethods.PublishMessage);
-    expect(rpcArgs.params).to.be.an('array');
-    expect(rpcArgs.params[0]).to.equal(configDefaults.waku.pubSubTopic);
+    expect(rpcArgs.version).to.be.a('number');
+    expect(rpcArgs.contentTopic).to.equal(
+      contentTopics.transactResponse(chain),
+    );
+    expect(rpcArgs.timestamp).to.be.an('number');
+    expect(rpcArgs.payload).to.be.an('string');
 
     const encryptedResponse = encryptResponseData(
       {
@@ -313,12 +313,9 @@ describe('waku-relayer', () => {
       // { timestamp: relayMessage.timestamp },
     );
     expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
-    expect(rpcArgs.params[1].contentTopic).to.equal(
-      contentTopics.transactResponse(chain),
-    );
 
     const decoded = JSON.parse(
-      WakuRelayer.decode(Buffer.from(rpcArgs.params[1].payload, 'base64')),
+      WakuRelayer.decode(Buffer.from(rpcArgs.payload, 'base64')),
     );
     const decodedExpected = JSON.parse(
       WakuRelayer.decode(expectedWakuMessage.payload as Uint8Array),

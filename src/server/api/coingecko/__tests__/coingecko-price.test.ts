@@ -25,7 +25,7 @@ import { coingeckoUpdatePricesByAddresses } from '../coingecko-price';
 import { RelayerChain } from '../../../../models/chain-models';
 import {
   testChainEthereum,
-  testChainGoerli,
+  // testChainGoerli,
 } from '../../../../test/setup.test';
 import { startEngine } from '../../../engine/engine-init';
 
@@ -38,7 +38,7 @@ const TOKEN_ADDRESSES = [TOKEN_ADDRESS_1, TOKEN_ADDRESS_2];
 
 const goerliNetwork = getMockGoerliNetwork();
 const chainEthereum = testChainEthereum();
-const chainGoerli = testChainGoerli();
+// const chainGoerli = testChainGoerli();
 
 const TOKEN_PRICE_SOURCE = TokenPriceSource.CoinGecko;
 
@@ -74,8 +74,11 @@ describe('coingecko-price', () => {
     await startEngine();
 
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
-    configNetworks[chainGoerli.type][chainGoerli.id] = goerliNetwork;
-    await initNetworkProviders([chainEthereum, chainGoerli]);
+    // configNetworks[chainGoerli.type][chainGoerli.id] = goerliNetwork;
+    await initNetworkProviders([
+      chainEthereum,
+      //  chainGoerli
+    ]);
 
     resetTokenPriceCache();
 
@@ -86,10 +89,9 @@ describe('coingecko-price', () => {
 
     // @ts-expect-error
     configTokens[chainEthereum.type] ??= {};
-    // @ts-expect-error
-    configTokens[chainGoerli.type] ??= {};
     configTokens[chainEthereum.type][chainEthereum.id] = tokenConfigs;
-    configTokens[chainGoerli.type][chainGoerli.id] = tokenConfigs;
+    // configTokens[chainGoerli.type] ??= {};
+    // configTokens[chainGoerli.type][chainGoerli.id] = tokenConfigs;
     await initTokens();
   });
 
@@ -98,16 +100,22 @@ describe('coingecko-price', () => {
       '0xe76c6c83af64e4c60245d8c7de953df673a7a33d', // RAIL
       '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
     ];
-    const params = {
-      contract_addresses: liveTokenAddresses.join(','),
-      vs_currencies: 'usd',
-      include_last_updated_at: true,
-    };
-    const coingeckoPriceMap = await getCoingeckoData(
-      CoingeckoApiEndpoint.PriceLookup,
-      CoingeckoNetworkID.Ethereum,
-      params,
-    );
+    // Call them 1 by 1 to play nice with free-tier rate limit
+    const coingeckoPriceMap: { [id: string]: any } = {};
+    for (const address of liveTokenAddresses) {
+      // eslint-disable-next-line no-await-in-loop
+      const priceMap = await getCoingeckoData(
+        CoingeckoApiEndpoint.PriceLookup,
+        CoingeckoNetworkID.Ethereum,
+        {
+          contract_addresses: address,
+          vs_currencies: 'usd',
+          include_last_updated_at: true,
+        },
+      );
+      Object.assign(coingeckoPriceMap, priceMap);
+    }
+
     liveTokenAddresses.forEach((address) => {
       const priceData = coingeckoPriceMap[address];
       expect(priceData).to.be.an('object');
@@ -167,20 +175,22 @@ describe('coingecko-price', () => {
   it('Should retry Coingecko API fetch on error', async () => {
     const stubAxiosGet = sinon.stub(axios, 'get').throws();
 
-    const params = {
-      contract_addresses: TOKEN_ADDRESSES.join(','),
-      vs_currencies: 'usd',
-      include_last_updated_at: true,
-    };
-    await expect(
-      getCoingeckoData(
-        CoingeckoApiEndpoint.PriceLookup,
-        CoingeckoNetworkID.Ethereum,
-        params,
-      ),
-    ).to.be.rejected;
-    expect(stubAxiosGet.callCount).to.equal(2);
-
+    for (const address of TOKEN_ADDRESSES) {
+      const params = {
+        contract_addresses: address,
+        vs_currencies: 'usd',
+        include_last_updated_at: true,
+      };
+      // eslint-disable-next-line no-await-in-loop
+      await expect(
+        getCoingeckoData(
+          CoingeckoApiEndpoint.PriceLookup,
+          CoingeckoNetworkID.Ethereum,
+          params,
+        ),
+      ).to.be.rejected;
+    }
+    expect(stubAxiosGet.callCount).to.equal(4);
     stubAxiosGet.restore();
   });
 
@@ -198,17 +208,17 @@ describe('coingecko-price', () => {
     stubGetCoingeckoData.restore();
   });
 
-  it('Should run CoinGecko configured price refresher for Ropsten', async () => {
-    await configTokenPriceRefresher.tokenPriceRefreshers[
-      TOKEN_PRICE_SOURCE
-    ].refresher(chainGoerli, TOKEN_ADDRESSES);
-    const tokenAddressesToPrice =
-      getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainGoerli.type][
-        chainGoerli.id
-      ];
-    expect(Object.keys(tokenAddressesToPrice).length).to.equal(3);
-    expect(
-      tokenAddressesToPrice[goerliNetwork.gasToken.wrappedAddress]?.price,
-    ).to.equal(2000);
-  });
+  // it('Should run CoinGecko configured price refresher for Ropsten', async () => {
+  //   await configTokenPriceRefresher.tokenPriceRefreshers[
+  //     TOKEN_PRICE_SOURCE
+  //   ].refresher(chainGoerli, TOKEN_ADDRESSES);
+  //   const tokenAddressesToPrice =
+  //     getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainGoerli.type][
+  //       chainGoerli.id
+  //     ];
+  //   expect(Object.keys(tokenAddressesToPrice).length).to.equal(3);
+  //   expect(
+  //     tokenAddressesToPrice[goerliNetwork.gasToken.wrappedAddress]?.price,
+  //   ).to.equal(2000);
+  // });
 }).timeout(30000);

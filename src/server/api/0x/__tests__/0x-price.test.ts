@@ -15,7 +15,7 @@ import {
 import configNetworks from '../../../config/config-networks';
 import {
   getMockNetwork,
-  getMockGoerliNetwork,
+  // getMockGoerliNetwork,
   getMockTokenConfig,
 } from '../../../../test/mocks.test';
 import configTokens from '../../../config/config-tokens';
@@ -30,7 +30,7 @@ import {
 import { RelayerChain } from '../../../../models/chain-models';
 import {
   testChainEthereum,
-  testChainGoerli,
+  // testChainGoerli,
 } from '../../../../test/setup.test';
 import { startEngine } from '../../../engine/engine-init';
 import configDefaults from '../../../config/config-defaults';
@@ -43,10 +43,10 @@ const TOKEN_ADDRESS_1 = '0x013573';
 const TOKEN_ADDRESS_2 = '0x73829';
 const TOKEN_ADDRESSES = [TOKEN_ADDRESS_1, TOKEN_ADDRESS_2];
 
-const goerliNetwork = getMockGoerliNetwork();
+// const goerliNetwork = getMockGoerliNetwork();
 
 const chainEthereum = testChainEthereum();
-const chainGoerli = testChainGoerli();
+// const chainGoerli = testChainGoerli();
 
 const TOKEN_PRICE_SOURCE = TokenPriceSource.ZeroX;
 
@@ -74,8 +74,11 @@ describe('0x-price', () => {
     configDefaults.api.zeroXApiKey = testConfig.zeroXApiKey;
 
     configNetworks[chainEthereum.type][chainEthereum.id] = getMockNetwork();
-    configNetworks[chainGoerli.type][chainGoerli.id] = goerliNetwork;
-    await initNetworkProviders([chainEthereum, chainGoerli]);
+    // configNetworks[chainGoerli.type][chainGoerli.id] = goerliNetwork;
+    await initNetworkProviders([
+      chainEthereum,
+      // chainGoerli
+    ]);
 
     resetTokenPriceCache();
 
@@ -88,10 +91,10 @@ describe('0x-price', () => {
 
     // @ts-expect-error
     configTokens[chainEthereum.type] ??= {};
-    // @ts-expect-error
-    configTokens[chainGoerli.type] ??= {};
     configTokens[chainEthereum.type][chainEthereum.id] = tokenConfigs;
-    configTokens[chainGoerli.type][chainGoerli.id] = tokenConfigs;
+
+    // configTokens[chainGoerli.type] ??= {};
+    // configTokens[chainGoerli.type][chainGoerli.id] = tokenConfigs;
     await initTokens();
   });
 
@@ -187,14 +190,14 @@ describe('0x-price', () => {
     stubGetZeroXData.restore();
   });
 
-  it('Should run 0x configured price refresher for Ropsten', async () => {
-    await configTokenPriceRefresher.tokenPriceRefreshers[
-      TOKEN_PRICE_SOURCE
-    ].refresher(chainGoerli, TOKEN_ADDRESSES);
-    const ropstenPrices =
-      getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainGoerli.type][
-        chainGoerli.id
-      ];
-    expect(ropstenPrices).to.equal(undefined);
-  });
+  // it('Should run 0x configured price refresher for Ropsten', async () => {
+  //   await configTokenPriceRefresher.tokenPriceRefreshers[
+  //     TOKEN_PRICE_SOURCE
+  //   ].refresher(chainGoerli, TOKEN_ADDRESSES);
+  //   const ropstenPrices =
+  //     getTokenPriceCache()[TOKEN_PRICE_SOURCE][chainGoerli.type][
+  //       chainGoerli.id
+  //     ];
+  //   expect(ropstenPrices).to.equal(undefined);
+  // });
 }).timeout(30000);

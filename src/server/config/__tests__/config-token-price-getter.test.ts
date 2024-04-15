@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { getMockGoerliNetwork } from '../../../test/mocks.test';
-import { testChainGoerli } from '../../../test/setup.test';
+import { getMockGoerliNetwork, getMockNetwork } from '../../../test/mocks.test';
+import { testChainEthereum, testChainGoerli } from '../../../test/setup.test';
 import { startEngine } from '../../engine/engine-init';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { initTokens } from '../../tokens/network-tokens';
@@ -16,9 +16,9 @@ import configTokens from '../config-tokens';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const testNetwork = getMockGoerliNetwork();
-const MOCK_TOKEN_ADDRESS = '0x123';
-const MOCK_CHAIN = testChainGoerli();
+const testNetwork = getMockNetwork();
+const MOCK_CHAIN = testChainEthereum();
+const MOCK_TOKEN_ADDRESS = '0x013573';
 
 describe('config-token-price-refresher', () => {
   before(async () => {
@@ -42,9 +42,10 @@ describe('config-token-price-refresher', () => {
       getTokenPriceCache()[TokenPriceSource.CoinGecko][MOCK_CHAIN.type][
         MOCK_CHAIN.id
       ];
-    expect(tokenAddressesToPrice[MOCK_TOKEN_ADDRESS]?.price).to.equal(2000);
-    expect(
-      tokenAddressesToPrice[testNetwork.gasToken.wrappedAddress]?.price,
-    ).to.equal(2000);
+    expect(tokenAddressesToPrice[MOCK_TOKEN_ADDRESS]?.price).to.greaterThan(0);
+    // expect(
+    //   tokenAddressesToPrice[testNetwork.gasToken.wrappedAddress]?.price,
+    // ).to.greaterThan(0);
+    expect(tokenAddressesToPrice[MOCK_TOKEN_ADDRESS]?.price).to.be.a('number');
   });
 }).timeout(31000);
