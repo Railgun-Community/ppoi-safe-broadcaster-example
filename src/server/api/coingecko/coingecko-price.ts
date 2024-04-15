@@ -40,16 +40,24 @@ const coingeckoPriceLookup = async (
   tokenAddresses: string[],
 ): Promise<TokenAddressPrice[]> => {
   const currency = 'usd';
-  const params = {
-    contract_addresses: tokenAddresses.join(','),
-    vs_currencies: currency,
-    include_last_updated_at: true,
-  };
-  const coingeckoPriceMap: CoingeckoPriceMap = await getCoingeckoData(
-    CoingeckoApiEndpoint.PriceLookup,
-    coingeckoNetworkId,
-    params,
-  );
+
+  const paramArr = tokenAddresses.map((address) => {
+    return {
+      contract_addresses: address,
+      vs_currencies: currency,
+      include_last_updated_at: true,
+    };
+  });
+  let coingeckoPriceMap: CoingeckoPriceMap = {};
+  for (const params of paramArr) {
+    // eslint-disable-next-line no-await-in-loop
+    const geckoPriceMap: CoingeckoPriceMap = await getCoingeckoData(
+      CoingeckoApiEndpoint.PriceLookup,
+      coingeckoNetworkId,
+      params,
+    );
+    coingeckoPriceMap = { ...coingeckoPriceMap, ...geckoPriceMap };
+  }
 
   const tokenPrices = tokenPriceArrayFromCoingeckoPriceMap(
     coingeckoPriceMap,
@@ -78,5 +86,4 @@ export const coingeckoUpdatePricesByAddresses = async (
     );
   }
   await delay(1000);
-
 };
