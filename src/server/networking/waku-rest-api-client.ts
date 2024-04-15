@@ -20,7 +20,7 @@ export enum WakuRequestMethods {
   DebugInfo = '/debug/v1/info', // GET
   PublishSubscription = '/relay/v1/subscriptions', // POST
   PublishMessage = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-relayer', // POST - requires pubsub topic
-  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-relayer',  // GET - requires pubsub topic
+  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-relayer', // GET - requires pubsub topic
   DeleteSubscriptions = '/relay/v1/subscriptions', // DELETE
 }
 
@@ -32,7 +32,7 @@ const checkResponseStatus = (response: any, dbg: any) => {
   }
   dbg('Error Response Status: ', response);
   throw new Error(`Error Response Status: ${response.statusText}`);
-}
+};
 export class WakuRestApiClient {
   dbg: debug.Debugger;
 
@@ -64,10 +64,7 @@ export class WakuRestApiClient {
   }
 
   async get(path: string) {
-    const response = await promiseTimeout(
-      this.http.get(path),
-      10 * 1000,
-    );
+    const response = await promiseTimeout(this.http.get(path), 10 * 1000);
     checkResponseStatus(response, this.dbg);
     return response.data;
   }
@@ -84,50 +81,56 @@ export class WakuRestApiClient {
   static determineRequestType(method: string) {
     switch (method) {
       case WakuRequestMethods.DebugInfo:
-      case WakuRequestMethods.GetMessages:
-        { return 'GET'; }
+      case WakuRequestMethods.GetMessages: {
+        return 'GET';
+      }
       case WakuRequestMethods.PublishSubscription:
-      case WakuRequestMethods.PublishMessage:
-        { return 'POST'; }
-      case WakuRequestMethods.DeleteSubscriptions:
-        { return 'DELETE'; }
-      default:
-        {
-          return 'GET';
-        }
+      case WakuRequestMethods.PublishMessage: {
+        return 'POST';
+      }
+      case WakuRequestMethods.DeleteSubscriptions: {
+        return 'DELETE';
+      }
+      default: {
+        return 'GET';
+      }
     }
   }
 
-  async request(method: string, requestType: string, params: any, retry = 0): Promise<any> {
+  async request(
+    method: string,
+    requestType: string,
+    params: any,
+    retry = 0,
+  ): Promise<any> {
     const baseURL = retry === 0 ? this.mainNwaku : this.backupNwaku;
     const formattedURL = `${baseURL}${method}`;
     try {
-
       switch (requestType) {
-        case 'GET':
-          {
-            const response = await this.get(formattedURL);
-            return response;
-          }
-        case 'POST':
-          {
-            const response = await this.post(formattedURL, params);
-            return response;
-          }
-        case 'DELETE':
-          {
-            const response = await this.delete(formattedURL, params);
-            return response;
-          }
-        default:
-          {
-            const response = await this.get(formattedURL);
-            return response;
-          }
+        case 'GET': {
+          const response = await this.get(formattedURL);
+          return response;
+        }
+        case 'POST': {
+          const response = await this.post(formattedURL, params);
+          return response;
+        }
+        case 'DELETE': {
+          const response = await this.delete(formattedURL, params);
+          return response;
+        }
+        default: {
+          const response = await this.get(formattedURL);
+          return response;
+        }
       }
     } catch (err) {
       if (retry < MAX_RETRIES) {
-        this.dbg('Error posting to relay-api. Retrying.', formattedURL, err.message);
+        this.dbg(
+          'Error posting to relay-api. Retrying.',
+          formattedURL,
+          err.message,
+        );
         return this.request(method, requestType, params, retry + 1);
       }
       this.dbg('Error posting to relay-api', formattedURL, err.message);
@@ -140,21 +143,33 @@ export class WakuRestApiClient {
     if (isDefined(data)) {
       return data.listenAddresses;
     }
-    this.dbg('There was an error gathering addresses from debug info. Returning empty array.');
+    this.dbg(
+      'There was an error gathering addresses from debug info. Returning empty array.',
+    );
     return [];
   }
 
   async unsubscribe(topics: string[]) {
-    const data = await this.request(WakuRequestMethods.DeleteSubscriptions, 'DELETE', [
-      topics,
-    ]);
+    const data = await this.request(
+      WakuRequestMethods.DeleteSubscriptions,
+      'DELETE',
+      [topics],
+    );
     return data;
-
   }
 
   async subscribe(topics: string[]) {
-    const data = await this.request(WakuRequestMethods.PublishSubscription, 'POST', topics);
-    await this.request(WakuRequestMethods.PublishSubscription, 'POST', topics, 1); // publish on nwaku2 as well
+    const data = await this.request(
+      WakuRequestMethods.PublishSubscription,
+      'POST',
+      topics,
+    );
+    await this.request(
+      WakuRequestMethods.PublishSubscription,
+      'POST',
+      topics,
+      1,
+    ); // publish on nwaku2 as well
     return data;
   }
 
@@ -173,18 +188,20 @@ export class WakuRestApiClient {
     if (contentTopic?.includes('fees') === true) {
       // we have fee message.. dont try to resend.
       const data = await this.request(
-        WakuRequestMethods.PublishMessage, 'POST',
+        WakuRequestMethods.PublishMessage,
+        'POST',
         { payload, timestamp, version: 0, contentTopic },
         MAX_RETRIES,
       );
       return data;
     }
 
-    const data = await this.request(
-      WakuRequestMethods.PublishMessage,
-      'POST',
-      { payload, timestamp, version: 0, contentTopic },
-    );
+    const data = await this.request(WakuRequestMethods.PublishMessage, 'POST', {
+      payload,
+      timestamp,
+      version: 0,
+      contentTopic,
+    });
     return data;
   }
 
@@ -213,9 +230,7 @@ export class WakuRestApiClient {
     if (isDefined(data.error)) {
       throw data.error;
     }
-    const messages: WakuRelayMessage[] = data.map(
-      WakuRestApiClient.fromJSON,
-    );
+    const messages: WakuRelayMessage[] = data.map(WakuRestApiClient.fromJSON);
 
     if (!isDefined(messages)) {
       this.dbg('No messages, got data:', data);
