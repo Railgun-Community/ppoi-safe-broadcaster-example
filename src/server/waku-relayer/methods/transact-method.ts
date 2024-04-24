@@ -55,6 +55,7 @@ export const transactMethod = async (
 ): Promise<Optional<WakuMethodResponse>> => {
   dbg('got transact');
   dbg(params);
+  const preDecryptionTime = performance.now();
 
   const { pubkey: clientPubKey, encryptedData } = params;
 
@@ -78,6 +79,9 @@ export const transactMethod = async (
     dbg('Cannot decrypt - Not intended receiver');
     return undefined;
   }
+  const postDecryptionTime = performance.now();
+  const decryptionDuration = (postDecryptionTime - preDecryptionTime).toFixed(0);
+  dbg(`Decrypted in ${decryptionDuration}ms`);
 
   const {
     chainType,
@@ -103,7 +107,7 @@ export const transactMethod = async (
   };
 
   try {
-    dbg('Decrypted - attempting to transact');
+    dbg('Attempting to transact');
 
     if (!minVersion || !maxVersion) {
       dbg(`Cannot process tx - Requires params minVersion, maxVersion`);

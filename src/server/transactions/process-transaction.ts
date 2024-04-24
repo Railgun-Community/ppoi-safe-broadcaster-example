@@ -33,6 +33,7 @@ export const processTransaction = async (
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList,
   devLog?: boolean,
 ): Promise<TransactionResponse> => {
+  const preGasTimestamp = performance.now();
   // Minimum gas for gas estimate wallet: 0.15 (or 0.01 L2).
   const minimumGasNeeded = minimumGasBalanceForAvailability(chain);
 
@@ -88,6 +89,11 @@ export const processTransaction = async (
 
   await validateMinGasPrice(chain, minGasPrice, evmGasType);
 
+  const postGasTimestamp = performance.now();
+  const gasDuration = (postGasTimestamp - preGasTimestamp).toFixed(0);
+  dbg(`Gas calculations done in ${gasDuration}ms`);
+
+  const prePOITimestamp = performance.now();
   // DO NOT MODIFY.
   // WARNING: If you modify POI validation, you risk fees that aren't spendable, as they won't have valid POIs.
   const validatedPOIData: Optional<ValidatedPOIData> = await validatePOI(
@@ -98,12 +104,20 @@ export const processTransaction = async (
     preTransactionPOIsPerTxidLeafPerList,
   );
   // DO NOT MODIFY.
+  const postPOITimestamp = performance.now();
+  const poiDuration = (postPOITimestamp - prePOITimestamp).toFixed(0);
+  dbg(`POI validation done in ${poiDuration}ms`);
 
-  return executeTransaction(
+  const preTxTimestamp = performance.now();
+  const transactionResponse = await executeTransaction(
     chain,
     transaction,
     transactionGasDetails,
     txidVersion,
     validatedPOIData,
   );
+  const postTxTimestamp = performance.now();
+  const txDuration = (postTxTimestamp - preTxTimestamp).toFixed(0);
+  dbg(`Transaction executed in ${txDuration}ms`);
+  return transactionResponse;
 };
