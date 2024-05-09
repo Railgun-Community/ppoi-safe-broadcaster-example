@@ -27,6 +27,20 @@ This network runs on [Waku](https://wakunetwork.com/), a secure and decentralize
 - jq (cli utility for parsing json)
 - At least 1GB of RAM, at least 20GB of disk space
 
+## Updating
+
+This will: (**_docker only_**)
+
+- fetch the & update your local version of the repo.
+- stop your current dockers.
+- build new docker images.
+- start restart the docker stack.
+
+```sh
+./update #run from base directory
+./update --no-swag #for updating swagless docker instances
+```
+
 ## Configuration Options
 
 # 1. Quick Installer
