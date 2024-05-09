@@ -82,16 +82,16 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'ETH',
         wrappedAddress:
-          NETWORK_CONFIG[NetworkName.EthereumGoerli].baseToken.wrappedAddress,
+          NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.25),
-      proxyContract: NETWORK_CONFIG[NetworkName.EthereumGoerli].proxyContract,
+      proxyContract: NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].proxyContract,
       relayAdaptContract:
-        NETWORK_CONFIG[NetworkName.EthereumGoerli].relayAdaptContract,
+        NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].relayAdaptContract,
       deploymentBlock:
-        NETWORK_CONFIG[NetworkName.EthereumGoerli].deploymentBlock,
+        NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].deploymentBlock,
       fallbackProviderConfig: fallbackProvidersEthereumGoerli,
       priceTTLInMS: defaultTokenPriceTTL,
       topUp: {
@@ -196,16 +196,46 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'MATIC',
         wrappedAddress:
-          NETWORK_CONFIG[NetworkName.PolygonMumbai].baseToken.wrappedAddress,
+          NETWORK_CONFIG[NetworkName.PolygonMumbai_DEPRECATED].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
       },
       fees: feeConfigL1(1.2),
-      proxyContract: NETWORK_CONFIG[NetworkName.PolygonMumbai].proxyContract,
+      proxyContract: NETWORK_CONFIG[NetworkName.PolygonMumbai_DEPRECATED].proxyContract,
       relayAdaptContract:
-        NETWORK_CONFIG[NetworkName.PolygonMumbai].relayAdaptContract,
+        NETWORK_CONFIG[NetworkName.PolygonMumbai_DEPRECATED].relayAdaptContract,
       deploymentBlock:
-        NETWORK_CONFIG[NetworkName.PolygonMumbai].deploymentBlock,
+        NETWORK_CONFIG[NetworkName.PolygonMumbai_DEPRECATED].deploymentBlock,
+      fallbackProviderConfig: fallbackProvidersPolygonMumbai,
+      priceTTLInMS: defaultTokenPriceTTL,
+      topUp: {
+        allowMultiTokenTopUp: true,
+        accumulateNativeToken: true,
+        toleratedSlippage: 0.01,
+        maxSpendPercentage: 0.05,
+        swapThresholdIntoGasToken: TEN_TOKENS,
+        minimumGasBalanceForTopup: FIVE_TOKENS,
+        useZeroXForSwap: false,
+      },
+      retryGasBuffer: parseUnits('1', 'gwei'),
+
+      isTestNetwork: true,
+    },
+    [NetworkChainID.PolygonAmoy]: {
+      name: "Amoy Testnet",
+      gasToken: {
+        symbol: 'MATIC',
+        wrappedAddress:
+          NETWORK_CONFIG[NetworkName.PolygonAmoy].baseToken.wrappedAddress,
+        decimals: 18n,
+        minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L1,
+      },
+      fees: feeConfigL1(1.2),
+      proxyContract: NETWORK_CONFIG[NetworkName.PolygonAmoy].proxyContract,
+      relayAdaptContract:
+        NETWORK_CONFIG[NetworkName.PolygonAmoy].relayAdaptContract,
+      deploymentBlock:
+        NETWORK_CONFIG[NetworkName.PolygonAmoy].deploymentBlock,
       fallbackProviderConfig: fallbackProvidersPolygonMumbai,
       priceTTLInMS: defaultTokenPriceTTL,
       topUp: {
@@ -226,16 +256,16 @@ const networksConfig: NetworksConfig = {
       gasToken: {
         symbol: 'ETH',
         wrappedAddress:
-          NETWORK_CONFIG[NetworkName.ArbitrumGoerli].baseToken.wrappedAddress,
+          NETWORK_CONFIG[NetworkName.ArbitrumGoerli_DEPRECATED].baseToken.wrappedAddress,
         decimals: 18n,
         minBalanceForAvailability: MINIMUM_BALANCE_FOR_AVAILABILITY_L2,
       },
       fees: feeConfigL2(1.2),
-      proxyContract: NETWORK_CONFIG[NetworkName.ArbitrumGoerli].proxyContract,
+      proxyContract: NETWORK_CONFIG[NetworkName.ArbitrumGoerli_DEPRECATED].proxyContract,
       relayAdaptContract:
-        NETWORK_CONFIG[NetworkName.ArbitrumGoerli].relayAdaptContract,
+        NETWORK_CONFIG[NetworkName.ArbitrumGoerli_DEPRECATED].relayAdaptContract,
       deploymentBlock:
-        NETWORK_CONFIG[NetworkName.ArbitrumGoerli].deploymentBlock,
+        NETWORK_CONFIG[NetworkName.ArbitrumGoerli_DEPRECATED].deploymentBlock,
       fallbackProviderConfig: fallbackProvidersArbitrumGoerli,
       priceTTLInMS: defaultTokenPriceTTL,
       topUp: {

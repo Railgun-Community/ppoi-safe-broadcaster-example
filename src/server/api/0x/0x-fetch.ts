@@ -29,6 +29,7 @@ export const getStablecoinReferenceSymbol = (chain: RelayerChain): string => {
         case NetworkChainID.ArbitrumGoerli:
           return 'USDT';
         case NetworkChainID.Hardhat:
+        case NetworkChainID.PolygonAmoy:
           throw error;
       }
     }
@@ -54,6 +55,7 @@ const zeroXApiUrl = (chain: RelayerChain): string => {
           return 'https://mumbai.api.0x.org/';
         case NetworkChainID.ArbitrumGoerli:
         case NetworkChainID.EthereumSepolia:
+        case NetworkChainID.PolygonAmoy:
         case NetworkChainID.Hardhat:
           throw new Error(`No 0x API URL for chain ${chain.type}:${chain.id}`);
       }

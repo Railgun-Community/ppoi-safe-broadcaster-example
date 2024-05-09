@@ -71,10 +71,10 @@ export const getMockGoerliNetwork = (): Network => {
       gasEstimateLimitToActualRatio: 1.25,
       profit: 0.05,
     },
-    proxyContract: NETWORK_CONFIG[NetworkName.EthereumGoerli].proxyContract,
+    proxyContract: NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].proxyContract,
     relayAdaptContract:
-      NETWORK_CONFIG[NetworkName.EthereumGoerli].relayAdaptContract,
-    deploymentBlock: NETWORK_CONFIG[NetworkName.EthereumGoerli].deploymentBlock,
+      NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].relayAdaptContract,
+    deploymentBlock: NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].deploymentBlock,
     fallbackProviderConfig: fallbackProvidersEthereumGoerli,
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,
