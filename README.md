@@ -34,7 +34,7 @@ This will: (**_docker only_**)
 - fetch the & update your local version of the repo.
 - stop your current dockers.
 - build new docker images.
-- start restart the docker stack.
+- restart the docker stack.
 
 ```sh
 ./update #run from base directory
