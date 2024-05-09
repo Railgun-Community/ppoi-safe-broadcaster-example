@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+USE_SWAGLESS=false
+
+if [ "$1" = "--no-swag" ]; then
+  USE_SWAGLESS=true;
+fi
+
+git fetch && \
+git rebase origin/main && \
+yarn && \
+docker/stop.sh && \
+if [ "$USE_SWAGLESS" = "true" ]; then
+  docker/build.sh --no-swag && \
+else
+  docker/build.sh && \
+fi
+sleep 30 && \
+if [ "$USE_SWAGLESS" = "true" ]; then
+  docker/runswagless.sh;
+else
+  docker/run.sh;
+fi

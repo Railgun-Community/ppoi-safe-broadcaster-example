@@ -18,6 +18,7 @@ import configNetworks from '../config/config-networks';
 import { RelayerChain } from '../../models/chain-models';
 import {
   createRailgunWallet,
+  isBlockedAddress,
   rescanFullUTXOMerkletreesAndWallets,
 } from '@railgun-community/wallet';
 import { isDefined } from '@railgun-community/shared-models';
@@ -70,7 +71,7 @@ export const initWallets = async (railgunWalletDerivationIndex = 0) => {
       Mnemonic.fromPhrase(mnemonic),
       derivationPathForIndex(index),
     );
-    // TODO: determine whether wallet is currently busy, set available(false) if so.
+    if (isBlockedAddress(wallet.address)) return;
     activeWallets.push({
       address: wallet.address,
       pkey: wallet.privateKey,

@@ -135,6 +135,7 @@ const gasHistoryPercentileForChain = (
         case NetworkChainID.BNBChain:
         case NetworkChainID.PolygonPOS:
           return GasHistoryPercentile.High;
+        case NetworkChainID.PolygonAmoy:
         case NetworkChainID.PolygonMumbai:
           return GasHistoryPercentile.VeryHigh;
       }

@@ -329,6 +329,7 @@ export const calculateGasLimitRelayer = (
         case NetworkChainID.PolygonPOS:
         case NetworkChainID.Hardhat:
         case NetworkChainID.PolygonMumbai:
+        case NetworkChainID.PolygonAmoy:
         case NetworkChainID.Ethereum:
           // Add 20% to gasEstimate for L1s.
           return (gasEstimate * 12000n) / 10000n;

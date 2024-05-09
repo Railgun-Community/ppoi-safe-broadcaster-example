@@ -34,6 +34,7 @@ export const getStablecoinReferenceSymbols = (chain: RelayerChain): string[] => 
         case NetworkChainID.ArbitrumGoerli:
           return ['USDT'];
         case NetworkChainID.Hardhat:
+        case NetworkChainID.PolygonAmoy:
           throw error;
       }
     }
@@ -103,8 +104,8 @@ export const uniswapUpdatePricesByAddresses = async (
       uniswapPriceLookupByAddress(chain, tokenAddress),
       10 * 1000,
     )
-      .then((uniswapPriceData) => {
-        if (uniswapPriceData) {
+      .then((uniswapPriceData: any) => {
+        if (isDefined(uniswapPriceData)) {
           const tokenPrice: TokenPrice = {
             price: uniswapPriceData.price,
             updatedAt: Date.now(),
