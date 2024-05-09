@@ -38,7 +38,7 @@ This will: (**_docker only_**)
 
 ```sh
 ./update #run from base directory
-./update --no-swag #for updating swagless docker instances
+./update-swagless #for updating swagless docker instances
 ```
 
 ## Configuration Options
