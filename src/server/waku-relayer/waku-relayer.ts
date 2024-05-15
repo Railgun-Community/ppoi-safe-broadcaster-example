@@ -14,12 +14,15 @@ import {
 } from '@railgun-community/wallet';
 import { RelayerChain } from '../../models/chain-models';
 import { delay, promiseTimeout } from '../../util/promise-utils';
-import { getRelayerVersion } from '../../util/relayer-version';
+import { getRelayerVersion } from '../../util/broadcaster-version';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
-import { WakuRestApiClient, WakuRelayMessage } from '../networking/waku-rest-api-client';
+import {
+  WakuRestApiClient,
+  WakuRelayMessage,
+} from '../networking/waku-rest-api-client';
 import {
   getRailgunWalletAddress,
   getRailgunWalletID,
@@ -43,7 +46,6 @@ export type WakuRelayerOptions = {
   topic: string;
   feeExpiration: number;
 };
-
 
 export class WakuRelayer {
   client: WakuRestApiClient;
@@ -72,7 +74,7 @@ export class WakuRelayer {
     const chainIDs = configuredNetworkChains();
     this.client = client;
     this.options = options;
-    this.dbg = debug('relayer:waku:relayer');
+    this.dbg = debug('broadcaster:waku:broadcaster');
     this.subscribedContentTopics = [
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
@@ -85,9 +87,9 @@ export class WakuRelayer {
     client: WakuRestApiClient,
     options: WakuRelayerOptions,
   ): Promise<WakuRelayer> {
-    const relayer = new WakuRelayer(client, options);
-    await relayer.subscribe();
-    return relayer;
+    const broadcaster = new WakuRelayer(client, options);
+    await broadcaster.subscribe();
+    return broadcaster;
   }
 
   async stop() {
@@ -123,11 +125,12 @@ export class WakuRelayer {
   private async ensureTxResponse(msg: WakuMessage) {
     for (let i = 0; i < 20; i += 1) {
       // eslint-disable-next-line no-await-in-loop
-      await this.client.publish(msg, this.options.topic).then(
-        () => this.dbg('Published TX RESPONSE')
-      ).catch((e) => {
-        this.dbg('Error publishing message', e.message);
-      });
+      await this.client
+        .publish(msg, this.options.topic)
+        .then(() => this.dbg('Published TX RESPONSE'))
+        .catch((e) => {
+          this.dbg('Error publishing message', e.message);
+        });
       // eslint-disable-next-line no-await-in-loop
       await delay(1000);
     }
@@ -175,7 +178,7 @@ export class WakuRelayer {
     if (!network) {
       throw new Error('No network found');
     }
-    // DO NOT CHANGE : Required in order to make relayer fees spendable
+    // DO NOT CHANGE : Required in order to make broadcaster fees spendable
     const requiredPOIListKeys = await POIRequired.getRequiredListKeys(
       network.name,
     );
@@ -190,7 +193,7 @@ export class WakuRelayer {
       availableWallets,
       version: getRelayerVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
-      requiredPOIListKeys, // DO NOT CHANGE : Required in order to make relayer fees spendable
+      requiredPOIListKeys, // DO NOT CHANGE : Required in order to make broadcaster fees spendable
     };
     const message = fromUTF8String(JSON.stringify(data));
     const signature = await signWithWalletViewingKey(
@@ -198,7 +201,8 @@ export class WakuRelayer {
       message,
     );
     this.dbg(
-      `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${Object.keys(fees).length
+      `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${
+        Object.keys(fees).length
       }, Available Wallets ${availableWallets}`,
     );
     return {
@@ -257,10 +261,10 @@ export class WakuRelayer {
 
   async poll(frequency: number): Promise<void> {
     if (this.stopping) {
-      this.dbg('Sopping polling')
+      this.dbg('Sopping polling');
       return;
     }
-    this.dbg('Polling for messages')
+    this.dbg('Polling for messages');
     const messages = await this.client
       .getMessages(this.options.topic, this.subscribedContentTopics)
       .catch(async (e) => {
@@ -279,7 +283,7 @@ export class WakuRelayer {
       // eslint-disable-next-line no-await-in-loop
       this.handleMessage(message).catch((err) => {
         this.dbg(err);
-      })
+      });
       // eslint-disable-next-line no-await-in-loop
       await delay(250);
     }

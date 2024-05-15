@@ -14,7 +14,7 @@ import {
   getRandomBytes,
   getRailgunWalletAddressData,
 } from '@railgun-community/wallet';
-import { WakuMethodNames, WakuRelayer } from '../waku-relayer';
+import { WakuMethodNames, WakuRelayer } from '../waku-broadcaster';
 import {
   WakuRestApiClient,
   WakuRelayMessage,
@@ -58,7 +58,7 @@ import {
   TXIDVersion,
   delay,
 } from '@railgun-community/shared-models';
-import { getRelayerVersion } from '../../../util/relayer-version';
+import { getRelayerVersion } from '../../../util/broadcaster-version';
 import {
   getRailgunWalletAddress,
   getRailgunWalletID,
@@ -90,7 +90,7 @@ const handleHTTPPost = async (url: string, data?: unknown) => {
   return { data: {}, status: 200 };
 };
 
-describe('waku-relayer', () => {
+describe('waku-broadcaster', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
     await startEngine();

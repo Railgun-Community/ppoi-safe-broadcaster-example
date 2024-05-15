@@ -21,7 +21,7 @@ import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
 import { ContractTransaction, TransactionResponse } from 'ethers';
 import { ValidatedPOIData, validatePOI } from './poi-validator';
 
-const dbg = debug('relayer:transact:validate');
+const dbg = debug('broadcaster:transact:validate');
 
 export const processTransaction = async (
   txidVersion: TXIDVersion,

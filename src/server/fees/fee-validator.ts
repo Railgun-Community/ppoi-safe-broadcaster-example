@@ -7,7 +7,7 @@ import { isDefined } from '@railgun-community/shared-models';
 import { tokenForAddress } from '../tokens/network-tokens';
 import debug from 'debug';
 
-const dbg = debug('relayer:fee:validator:');
+const dbg = debug('broadcaster:fee:validator:');
 
 const comparePackagedFeeToCalculated = (
   chain: RelayerChain,

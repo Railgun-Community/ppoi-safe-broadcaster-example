@@ -19,7 +19,7 @@ import {
 } from '@railgun-community/shared-models';
 import { ContractTransaction, TransactionResponse } from 'ethers';
 
-const dbg = debug('relayer:swaps');
+const dbg = debug('broadcaster:swaps');
 
 export const generateSwapTransactions = async (
   erc20Amounts: ERC20Amount[],

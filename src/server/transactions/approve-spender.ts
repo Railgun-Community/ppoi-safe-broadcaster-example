@@ -14,7 +14,7 @@ import {
   networkForChain,
 } from '@railgun-community/shared-models';
 
-const dbg = debug('relayer:approvals');
+const dbg = debug('broadcaster:approvals');
 
 export const MAX_UINT_ALLOWANCE = 2n ** 256n - 1n;
 

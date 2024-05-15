@@ -20,7 +20,7 @@ import { groth16 } from 'snarkjs';
 import debug from 'debug';
 
 let engineStarted = false;
-const dbg = debug('relayer:sdks');
+const dbg = debug('broadcaster:sdks');
 
 const fileExists = (path: string): Promise<boolean> => {
   return new Promise((resolve) => {
@@ -46,7 +46,7 @@ export const startEngine = async () => {
   }
   const levelDB = new LevelDOWN(configDefaults.engine.dbDir);
 
-  const walletSource = 'relayer';
+  const walletSource = 'broadcaster';
   const shouldDebug = configDefaults.debug.logLevel === DebugLevel.VerboseLogs;
 
   if (shouldDebug) {

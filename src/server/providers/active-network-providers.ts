@@ -11,7 +11,7 @@ import {
 import debug from 'debug';
 import { FallbackProvider, JsonRpcProvider } from 'ethers';
 
-const dbg = debug('relayer:networks');
+const dbg = debug('broadcaster:networks');
 
 const activeNetworkProviders: NumMapType<NumMapType<FallbackProvider>> = {};
 
@@ -23,8 +23,6 @@ export const initNetworkProviders = async (chains?: RelayerChain[]) => {
       // eslint-disable-next-line no-await-in-loop
       await initNetworkProvider(chain);
     } catch (err) {
-
-
       const error = err as Error;
       const { message } = error;
       if (message.includes('Failed to get block number')) {
@@ -36,13 +34,11 @@ export const initNetworkProviders = async (chains?: RelayerChain[]) => {
           dbg(
             `Could not initialize network provider for chain: ${chain.type}:${chain.id} - ${secondErr.message}`,
           );
-
         }
       }
       throw new Error(
         `Could not initialize network provider for chain: ${chain.type}:${chain.id} - ${err.message}`,
       );
-
     }
   }
 };

@@ -30,9 +30,9 @@ import {
 import debug from 'debug';
 import { GasDetails } from '../../models/gas-models';
 
-const dbg = debug('relayer:gas-estimate');
+const dbg = debug('broadcaster:gas-estimate');
 
-// this function is purely for relayer usage.
+// this function is purely for broadcaster usage.
 export const getEstimateGasDetailsPublic = async (
   chain: RelayerChain,
   evmGasType: EVMGasType,
@@ -358,7 +358,8 @@ export const calculateMaximumGasPublic = (
   const checkForType2 = transactionGasDetails as TransactionGasDetailsType2;
   if (isDefined(checkForType2.maxPriorityFeePerGas)) {
     const { maxFeePerGas, maxPriorityFeePerGas } = checkForType2;
-    const newPublicGasEstimate = (maxFeePerGas * gasEstimate) + maxPriorityFeePerGas;
+    const newPublicGasEstimate =
+      maxFeePerGas * gasEstimate + maxPriorityFeePerGas;
     dbg(
       `TYPE 2 Gas Price Estimated at: ${formatEther(
         parseUnits(maxFeePerGas.toString(), 'gwei'),

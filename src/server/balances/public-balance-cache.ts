@@ -1,7 +1,7 @@
 import debug from 'debug';
 import { RelayerChain } from '../../models/chain-models';
 
-const dbg = debug('relayer:public-balance-cache');
+const dbg = debug('broadcaster:public-balance-cache');
 type PublicBalanceCache = {
   timestamp: number;
   balance: bigint;

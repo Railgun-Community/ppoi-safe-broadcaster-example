@@ -34,7 +34,7 @@ import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import { TransactionResponse, ContractTransaction, formatUnits } from 'ethers';
 import debug from 'debug';
 
-const dbg = debug('relayer:top-up-unshield');
+const dbg = debug('broadcaster:top-up-unshield');
 
 export const generateUnshieldTransaction = async (
   txidVersion: TXIDVersion,
@@ -226,7 +226,7 @@ export const unshieldTokens = async (
     unshieldWallet,
     undefined, // overrideNonce
     false,
-    false
+    false,
   );
 
   return batchResponse;

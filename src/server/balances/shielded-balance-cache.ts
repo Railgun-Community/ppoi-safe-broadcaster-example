@@ -14,7 +14,7 @@ import {
 import { getRailgunWalletID } from '../wallets/active-wallets';
 import debug from 'debug';
 
-const dbg = debug('relayer:balances:shielded');
+const dbg = debug('broadcaster:balances:shielded');
 
 export type ShieldedCachedBalance = {
   erc20Amount: ERC20Amount;
@@ -67,10 +67,10 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
 
   erc20Amounts.forEach((erc20Amount) => {
     shieldedTokenBalanceCache[chain.type][chain.id][erc20Amount.tokenAddress] =
-    {
-      erc20Amount,
-      updatedAt: Date.now(),
-    };
+      {
+        erc20Amount,
+        updatedAt: Date.now(),
+      };
   });
 
   if (isDefined(balancePromiseResolve)) {

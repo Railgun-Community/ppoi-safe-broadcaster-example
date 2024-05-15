@@ -24,7 +24,7 @@ import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configDefaults from '../config/config-defaults';
 import leveldown from 'leveldown';
 
-const dbg = debug('relayer:poi-assurance');
+const dbg = debug('broadcaster:poi-assurance');
 
 const POI_ASSURANCE_NAMESPACE = 'poi-assurance';
 

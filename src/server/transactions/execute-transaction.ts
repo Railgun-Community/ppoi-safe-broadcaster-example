@@ -37,7 +37,7 @@ import {
 import { ValidatedPOIData } from './poi-validator';
 import { POIAssurance } from './poi-assurance';
 
-const dbg = debug('relayer:transact:execute');
+const dbg = debug('broadcaster:transact:execute');
 
 const LAST_NONCE_KEY = 'last_nonce_key';
 
@@ -188,7 +188,6 @@ export const executeTransaction = async (
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
 
     if (setTxCached) {
-
       waitForTx(
         activeWallet,
         ethersWallet,

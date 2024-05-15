@@ -26,6 +26,6 @@ discv5-bootstrap-node=[
   'enr:-Ni4QLf1GqgX04PfPiU3XonC30G0igOGyqiJs2ke0_T0m8boPQLZ7_Agh3BlbOSTJD5yvr9acyYQiXo3KpRPTaxC4EYBgmlkgnY0gmlwhC0gpwuKbXVsdGlhZGRyc7hAAB02GGZsZWV0LndlY2FtZWZyb21hcGVzLmNvbQbqYQAfNhhmbGVldC53ZWNhbWVmcm9tYXBlcy5jb20GH0HeA4lzZWNwMjU2azGhA9gCbHe9obcRB0Eyxn8uu6K3LoZb2xhLnl_Tc28bl2gbg3RjcILqYYV3YWt1MgE'
 ]
 pubsub-topic=[
-  '/waku/2/railgun-relayer',
+  '/waku/2/railgun-broadcaster',
 ]
 max-connections=300

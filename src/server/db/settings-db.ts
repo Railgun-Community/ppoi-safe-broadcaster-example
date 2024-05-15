@@ -3,7 +3,7 @@ import leveldown from 'leveldown';
 import { logger } from '../../util/logger';
 import configDefaults from '../config/config-defaults';
 
-const SETTINGS_DB_NAMESPACE = 'relayer:settings';
+const SETTINGS_DB_NAMESPACE = 'broadcaster:settings';
 
 let db: Optional<Database>;
 

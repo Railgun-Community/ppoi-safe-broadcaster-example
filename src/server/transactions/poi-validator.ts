@@ -16,7 +16,7 @@ import { ErrorMessage } from '../../util/errors';
 import { ContractTransaction } from 'ethers';
 import { getRailgunWalletID } from '../wallets/active-wallets';
 
-const dbg = debug('relayer:poi-validator');
+const dbg = debug('broadcaster:poi-validator');
 
 export type ValidatedPOIData = {
   railgunTxid: string;

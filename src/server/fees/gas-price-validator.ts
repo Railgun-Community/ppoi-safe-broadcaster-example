@@ -8,7 +8,7 @@ import { promiseTimeout } from '../../util/promise-utils';
 import debug from 'debug';
 import { NetworkChainID } from '../config/config-chains';
 
-const dbg = debug('relayer:gas-price:validate');
+const dbg = debug('broadcaster:gas-price:validate');
 export const validateMinGasPrice = async (
   chain: RelayerChain,
   minGasPrice: bigint,
@@ -45,7 +45,7 @@ export const validateMinGasPrice = async (
       // Valid gas price.
       return;
     }
-    dbg('=====Gas Price Validation Failed=====')
+    dbg('=====Gas Price Validation Failed=====');
     dbg(`slowGasPrice: ${slowGasPrice}`);
     dbg(`minGasPrice: ${minGasPrice}`);
     dbg(`minimumAcceptableGasPrice: ${minimumAcceptableGasPrice}`);

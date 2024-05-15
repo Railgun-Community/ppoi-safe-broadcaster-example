@@ -1,18 +1,24 @@
-import { delay, getEVMGasTypeForTransaction, isDefined, networkForChain, removeUndefineds } from "@railgun-community/shared-models";
-import configNetworks from "../config/config-networks";
-import { ContractTransaction, TransactionResponse } from "ethers";
-import { RelayerChain } from "../../models/chain-models";
-import { ERC20Amount } from "../../models/token-models";
-import debug from "debug";
-import { uniswapGetSwapQuote } from "../api/uniswap/uniswap-quote";
-import { UniswapQuoteData } from "../api/uniswap/uniswap-models";
-import { ActiveWallet } from "../../models/wallet-models";
-import { getEstimateGasDetailsPublic } from "../fees/gas-estimate";
-import { executeTransaction, waitTx } from "./execute-transaction";
-import { populateUniswapApprovalTransactions } from "./uniswap-approve";
-import { getProviderForNetwork } from "../providers/active-network-providers";
+import {
+  delay,
+  getEVMGasTypeForTransaction,
+  isDefined,
+  networkForChain,
+  removeUndefineds,
+} from '@railgun-community/shared-models';
+import configNetworks from '../config/config-networks';
+import { ContractTransaction, TransactionResponse } from 'ethers';
+import { RelayerChain } from '../../models/chain-models';
+import { ERC20Amount } from '../../models/token-models';
+import debug from 'debug';
+import { uniswapGetSwapQuote } from '../api/uniswap/uniswap-quote';
+import { UniswapQuoteData } from '../api/uniswap/uniswap-models';
+import { ActiveWallet } from '../../models/wallet-models';
+import { getEstimateGasDetailsPublic } from '../fees/gas-estimate';
+import { executeTransaction, waitTx } from './execute-transaction';
+import { populateUniswapApprovalTransactions } from './uniswap-approve';
+import { getProviderForNetwork } from '../providers/active-network-providers';
 
-const dbg = debug('relayer:uni-swaps');
+const dbg = debug('broadcaster:uni-swaps');
 
 const quoteToContractTransaction = (
   chain: RelayerChain,
@@ -66,7 +72,7 @@ export const generateUniSwapTransactions = async (
         provider,
         chain,
         walletAddress,
-        spender
+        spender,
       );
 
       populatedTransactions.push(...populatedApprovals);
@@ -90,7 +96,6 @@ export const generateUniSwapTransactions = async (
 
   return removeUndefineds(populatedTransactions);
 };
-
 
 export const swapUniswap = async (
   activeWallet: ActiveWallet,

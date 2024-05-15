@@ -1,16 +1,19 @@
-import { RelayerChain } from "../../../models/chain-models";
-import { ERC20Amount } from "../../../models/token-models";
-import { NetworkChainID } from "../../config/config-chains";
-import { fetchUniswapQuote, getUniswapQuoteParams } from "./uniswap-fetch";
-import { UniswapQuoteData, UniswapQuoteInputs, UniswapQuoteResponse } from "./uniswap-models";
-import { AxiosError } from "axios";
+import { RelayerChain } from '../../../models/chain-models';
+import { ERC20Amount } from '../../../models/token-models';
+import { NetworkChainID } from '../../config/config-chains';
+import { fetchUniswapQuote, getUniswapQuoteParams } from './uniswap-fetch';
+import {
+  UniswapQuoteData,
+  UniswapQuoteInputs,
+  UniswapQuoteResponse,
+} from './uniswap-models';
+import { AxiosError } from 'axios';
 
 import debug from 'debug';
 
-const dbg = debug('relayer:Uniswap-quote');
+const dbg = debug('broadcaster:Uniswap-quote');
 
 export const uniswapPermit2ContractAddress = (chain: RelayerChain) => {
-
   switch (chain.id) {
     case NetworkChainID.Ethereum:
     case NetworkChainID.BNBChain:
@@ -19,7 +22,9 @@ export const uniswapPermit2ContractAddress = (chain: RelayerChain) => {
       return '0x000000000022d473030f116ddee9f6b43ac78ba3';
     }
     default: {
-      throw new Error(`No Universal Router Contract address for chain ${chain.type}:${chain.id}`);
+      throw new Error(
+        `No Universal Router Contract address for chain ${chain.type}:${chain.id}`,
+      );
     }
   }
 };
@@ -52,16 +57,9 @@ export const uniswapGetSwapQuote = async (
       slippage: slippagePercentage,
     };
 
-    const quoteParams = getUniswapQuoteParams(
-      chain,
-      walletAddress,
-      params,
-    );
+    const quoteParams = getUniswapQuoteParams(chain, walletAddress, params);
 
-    const {
-      routing,
-      quote
-    } = await fetchUniswapQuote<UniswapQuoteResponse>(
+    const { routing, quote } = await fetchUniswapQuote<UniswapQuoteResponse>(
       quoteParams,
     );
 
@@ -71,7 +69,7 @@ export const uniswapGetSwapQuote = async (
     // implement security check here.
 
     return {
-      quote
+      quote,
     };
   } catch (err) {
     const msg = formatApiError(err);

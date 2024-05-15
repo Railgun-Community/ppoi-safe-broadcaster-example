@@ -29,8 +29,8 @@ if [ "$1" = "" ]; then
   mkdir -p appdata/swag
 fi
 
-# build relayer and exit 1 if it failed
-docker build -t relayer:latest -f relayer/Dockerfile ..
+# build broadcaster and exit 1 if it failed
+docker build -t broadcaster:latest -f broadcaster/Dockerfile ..
 if [ $? != 0 ]; then
   echo "FAILED TO BUILD RELAYER IMAGE"
   exit 1
@@ -43,4 +43,4 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
-echo "SUCCESS building relayer and nwaku images"
+echo "SUCCESS building broadcaster and nwaku images"

@@ -14,7 +14,7 @@ const firstHDWalletDefault: {
 
 export default {
   /*
-   * String to identify this relayer instance.
+   * String to identify this broadcaster instance.
    * Required if running multiple Relayer instances with the same RAILGUN wallet / balance.
    */
   instanceIdentifier: '',
@@ -226,7 +226,7 @@ export default {
     /**
      * libp2p pubSubTopic to subscribe to.
      */
-    pubSubTopic: '/waku/2/railgun-relayer',
+    pubSubTopic: '/waku/2/railgun-broadcaster',
   },
 
   api: {

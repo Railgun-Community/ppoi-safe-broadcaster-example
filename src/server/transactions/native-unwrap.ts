@@ -13,7 +13,7 @@ import {
 } from '@railgun-community/shared-models';
 import { getProviderForNetwork } from '../providers/active-network-providers';
 
-const dbg = debug('relayer:native-unwrap');
+const dbg = debug('broadcaster:native-unwrap');
 
 export const generateUnwrapTransactions = async (
   erc20Amounts: ERC20Amount[],

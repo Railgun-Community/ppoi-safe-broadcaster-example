@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import debug from 'debug';
 
-const dbg = debug('relayer:waku:poller');
+const dbg = debug('broadcaster:waku:poller');
 
 export const waitForWaku = async (url: string) => {
   let retries = 0;
@@ -12,7 +12,7 @@ export const waitForWaku = async (url: string) => {
     headers: { 'Content-Type': 'application/json' },
   };
   const http = axios.create(httpConfig);
-  dbg("Polling for Waku Connection...")
+  dbg('Polling for Waku Connection...');
   while (retries < 30) {
     try {
       // eslint-disable-next-line no-await-in-loop
@@ -23,12 +23,12 @@ export const waitForWaku = async (url: string) => {
       }
       dbg('Error Response Status: ', response);
     } catch (e) {
-      dbg("Waku Polling Error")
+      dbg('Waku Polling Error');
       dbg(e);
     }
     retries += 1;
     // eslint-disable-next-line no-await-in-loop
-    await delay(1000)
+    await delay(1000);
   }
   throw new Error('Could not connect to Waku');
-}
+};

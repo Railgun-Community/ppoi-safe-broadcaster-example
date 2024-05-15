@@ -4,9 +4,9 @@ import { DebugLevel } from '../models/debug-models';
 import DebugWrapper from './debug-wrapper';
 
 // Wrapped for testing purposes.
-const dbgLog = new DebugWrapper('relayer:log');
-const dbgWarn = new DebugWrapper('relayer:warn');
-const dbgError = new DebugWrapper('relayer:error');
+const dbgLog = new DebugWrapper('broadcaster:log');
+const dbgWarn = new DebugWrapper('broadcaster:warn');
+const dbgError = new DebugWrapper('broadcaster:error');
 
 export const getDbgInstances = () => {
   return {

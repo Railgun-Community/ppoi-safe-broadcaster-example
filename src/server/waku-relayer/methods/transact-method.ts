@@ -28,14 +28,14 @@ import {
   isDefined,
   versionCompare,
 } from '@railgun-community/shared-models';
-import { getRelayerVersion } from '../../../util/relayer-version';
+import { getRelayerVersion } from '../../../util/broadcaster-version';
 import { TransactionResponse, formatUnits, parseUnits } from 'ethers';
 import { createValidTransaction } from '../../transactions/transaction-validator';
 import { RelayerError } from '../../../models/error-models';
 
 const handledClientPubKeys: string[] = [];
 
-const dbg = debug('relayer:transact');
+const dbg = debug('broadcaster:transact');
 
 const sanitizeSuggestedFee = (errorString: string) => {
   const pattern = /Suggested Gas Price was (\d+\.\d+)/;

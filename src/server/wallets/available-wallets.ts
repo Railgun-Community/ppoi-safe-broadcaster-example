@@ -10,7 +10,7 @@ import { hasPendingTransactions } from './pending-wallet';
 
 const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
-export const dbg = debug('relayer:wallets:availability');
+export const dbg = debug('broadcaster:wallets:availability');
 
 const lastUsedWalletAddressMap: NumMapType<NumMapType<string>> = {};
 
@@ -138,6 +138,3 @@ export const resetAvailableWallets = (chain: RelayerChain) => {
   unavailableWalletMap[chain.type] ??= {};
   resetMapObject(unavailableWalletMap[chain.type][chain.id]);
 };
-
-
-

@@ -6,7 +6,10 @@ import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { delay, promiseTimeout } from '../../util/promise-utils';
 import { removeUndefineds } from '../../util/utils';
-import { getActiveWalletGasTokenBalanceMapForChain, updateCachedGasTokenBalance } from '../balances/balance-cache';
+import {
+  getActiveWalletGasTokenBalanceMapForChain,
+  updateCachedGasTokenBalance,
+} from '../balances/balance-cache';
 import { getPublicERC20AmountsBeforeUnwrap } from '../balances/top-up-balance';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configDefaults from '../config/config-defaults';
@@ -16,9 +19,12 @@ import { lookUpCachedTokenPrice } from '../tokens/token-price-cache';
 import { pollRefreshBalances } from '../transactions/top-up-util';
 import { topUpWallet } from '../transactions/top-up-wallet';
 import { getActiveWallets, getActiveWalletsForChain } from './active-wallets';
-import { isWalletUnavailable, setWalletAvailability } from './available-wallets';
+import {
+  isWalletUnavailable,
+  setWalletAvailability,
+} from './available-wallets';
 
-const dbg = debug('relayer:top-up-poller');
+const dbg = debug('broadcaster:top-up-poller');
 
 // eslint-disable-next-line import/no-mutable-exports
 export let shouldPollTopUp = true;
@@ -44,26 +50,25 @@ const pollTopUp = async () => {
         );
         const currentTXIDVersion = TXIDVersion.V2_PoseidonMerkle; // Switch this to V3 when balances migrated after release.
         // eslint-disable-next-line no-await-in-loop
-        await topUpWallet(walletToTopUp, currentTXIDVersion, chain).then(async () => {
-          logger.warn(
-            `Successfully topped up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${currentTXIDVersion}`,
-          );
-          await promiseTimeout(
-            updateCachedGasTokenBalance(chain, walletToTopUp.address),
-            10 * 1000
-          );
-          setWalletAvailability(walletToTopUp, chain, true);
-
-        }).catch(
-          (err) => {
+        await topUpWallet(walletToTopUp, currentTXIDVersion, chain)
+          .then(async () => {
+            logger.warn(
+              `Successfully topped up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${currentTXIDVersion}`,
+            );
+            await promiseTimeout(
+              updateCachedGasTokenBalance(chain, walletToTopUp.address),
+              10 * 1000,
+            );
+            setWalletAvailability(walletToTopUp, chain, true);
+          })
+          .catch((err) => {
             logger.warn(
               `Failed to top up wallet ${walletToTopUp.address} chain:${chain.id}, txidVersion:${currentTXIDVersion}`,
             );
             if (err.message.indexOf('Top Up too costly, skipping!') === -1) {
               logger.error(err);
             }
-          },
-        );
+          });
       }
     }
   } catch (err) {

@@ -40,7 +40,7 @@ import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { swapUniswap } from './uniswap-swap';
 import { approveZeroX } from './approve-spender';
 
-const dbg = debug('relayer:topup-util');
+const dbg = debug('broadcaster:topup-util');
 
 const getTopUpTokens = async (
   txidVersion: TXIDVersion,
@@ -58,10 +58,10 @@ const getTopUpTokens = async (
   const topUpTokens =
     allowMultiTokenTopUp === true
       ? await getMultiTopUpTokenAmountsForChain(
-        txidVersion,
-        chain,
-        accumulateNativeToken,
-      )
+          txidVersion,
+          chain,
+          accumulateNativeToken,
+        )
       : await getTopUpTokenAmountsForChain(txidVersion, chain);
   if (topUpTokens.length > 0) {
     // only cache if we get a result. don't store empty array.
@@ -277,11 +277,11 @@ const handlePublicTokens = async (
   }
 
   if (filteredPublicTokens.length > 0) {
-
-    const shouldUseZeroX = configNetworks[chain.type][chain.id].topUp.useZeroXForSwap;
+    const shouldUseZeroX =
+      configNetworks[chain.type][chain.id].topUp.useZeroXForSwap;
     const hasZeroXAPIKey = configDefaults.api.zeroXApiKey !== '';
     if (shouldUseZeroX && hasZeroXAPIKey) {
-      dbg("Top-Up Swapping with 0x")
+      dbg('Top-Up Swapping with 0x');
 
       const approvalTxResponses = await approveZeroX(
         topUpWallet,
@@ -301,19 +301,19 @@ const handlePublicTokens = async (
         topUpWallet,
         filteredPublicTokens,
         chain,
-      )
-      await waitForTxs(topUpWallet, ethersWallet, chain, swapZeroXTxResponses, false);
-
-    } else {
-      dbg("Top-Up Swapping with Uniswap")
-      // perform swaps and approvals combined
-      await swapUniswap(
-        topUpWallet,
-        filteredPublicTokens,
-        chain,
       );
+      await waitForTxs(
+        topUpWallet,
+        ethersWallet,
+        chain,
+        swapZeroXTxResponses,
+        false,
+      );
+    } else {
+      dbg('Top-Up Swapping with Uniswap');
+      // perform swaps and approvals combined
+      await swapUniswap(topUpWallet, filteredPublicTokens, chain);
     }
-
   }
 };
 

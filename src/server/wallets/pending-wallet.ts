@@ -8,7 +8,7 @@ import debug from 'debug';
 import { NetworkChainID } from '../config/config-chains';
 import configDefaults from '../config/config-defaults';
 
-const dbg = debug('relayer:pending-transaction');
+const dbg = debug('broadcaster:pending-transaction');
 
 const pendingTransactionCache: NumMapType<NumMapType<MapType<boolean>>> = {};
 const initPendingTransactionCache = (chain: RelayerChain) => {
@@ -207,7 +207,7 @@ export const hasPendingTransactions = (
     }
     return cached;
   }
-  // upon initial start of the relayer, no accounts should have pending transactions.
+  // upon initial start of the broadcaster, no accounts should have pending transactions.
   // or any subsequent restarts. please make sure to clear them out then restart if they become an issue.
   pendingTransactionCache[chain.type][chain.id][wallet.address] = false;
   return false;

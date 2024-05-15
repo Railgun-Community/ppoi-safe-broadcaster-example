@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { formatJsonRpcRequest } from '@walletconnect/jsonrpc-utils';
 import debug from 'debug';
-import { WakuMessage } from '../waku-relayer/waku-message';
+import { WakuMessage } from '../waku-broadcaster/waku-message';
 import { isDefined } from '@railgun-community/shared-models';
 import { promiseTimeout } from '../../util/promise-utils';
 

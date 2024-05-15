@@ -29,7 +29,7 @@ const activeWallets: ActiveWallet[] = [];
 let railgunWalletAddress: string;
 let railgunWalletID: string;
 
-const dbg = debug('relayer:wallets');
+const dbg = debug('broadcaster:wallets');
 
 export const resetWallets = () => {
   resetArray(activeWallets);

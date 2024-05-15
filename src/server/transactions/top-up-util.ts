@@ -1,4 +1,8 @@
-import { delay, TXIDVersion, promiseTimeout } from '@railgun-community/shared-models';
+import {
+  delay,
+  TXIDVersion,
+  promiseTimeout,
+} from '@railgun-community/shared-models';
 import debug from 'debug';
 import { formatEther, formatUnits, parseUnits } from 'ethers';
 import { RelayerChain } from '../../models/chain-models';
@@ -16,7 +20,7 @@ import configNetworks from '../config/config-networks';
 import { getTokenPricesFromCachedPrices } from '../fees/calculate-token-fee';
 import { getTransactionTokens } from '../tokens/network-tokens';
 
-const dbg = debug('relayer:topup-util');
+const dbg = debug('broadcaster:topup-util');
 
 const initialRun: NumMapType<NumMapType<boolean>> = {};
 
@@ -60,7 +64,6 @@ const getShieldedTokenAmountsForChain = async (
   }
 
   if (forceRefresh) {
-
     const updatedBalances = getPrivateTokenBalanceCache(chain);
     return updatedBalances;
   }
@@ -343,9 +346,9 @@ export const getMultiTopUpTokenAmountsForChain = async (
   const consolidatedTokenAmountsForChain = getConsolidatedTokenAmounts(
     setNativeLast
       ? orderNativeTokenLast(
-        topUpTokenAmountsForChain,
-        getWrappedNativeTokenAddressForChain(chain),
-      )
+          topUpTokenAmountsForChain,
+          getWrappedNativeTokenAddressForChain(chain),
+        )
       : newSortedTopUpList,
     chain,
   );

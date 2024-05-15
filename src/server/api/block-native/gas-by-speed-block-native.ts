@@ -10,7 +10,7 @@ import {
 } from '../../../models/gas-models';
 import { parseUnits } from 'ethers';
 
-const dbg = debug('relayer:api:block-native');
+const dbg = debug('broadcaster:api:block-native');
 
 /**
  * See full param list:

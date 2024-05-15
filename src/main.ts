@@ -2,19 +2,19 @@ import debug from 'debug';
 import {
   initRelayerModules,
   uninitRelayerModules,
-} from 'server/init/relayer-init';
+} from 'server/init/broadcaster-init';
 import {
   WakuRelayer,
   WakuRelayerOptions,
-} from 'server/waku-relayer/waku-relayer';
+} from 'server/waku-broadcaster/waku-broadcaster';
 import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
 import { WakuRestApiClient } from 'server/networking/waku-rest-api-client';
 import { waitForWaku } from './server/networking/waku-poller';
 
-const dbg = debug('relayer:main');
+const dbg = debug('broadcaster:main');
 
-let relayer: WakuRelayer;
+let broadcaster: WakuRelayer;
 
 const main = async (): Promise<void> => {
   dbg('Warming up Relayer');
@@ -33,19 +33,19 @@ const main = async (): Promise<void> => {
     topic: config.waku.pubSubTopic,
     feeExpiration: config.transactionFees.feeExpirationInMS,
   };
-  relayer = await WakuRelayer.init(client, options);
+  broadcaster = await WakuRelayer.init(client, options);
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  relayer.poll(config.waku.pollFrequencyInMS);
+  broadcaster.poll(config.waku.pollFrequencyInMS);
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  relayer.broadcastFeesOnInterval(config.waku.broadcastFeesDelayInMS);
+  broadcaster.broadcastFeesOnInterval(config.waku.broadcastFeesDelayInMS);
   // print multiaddress of nim-waku instance
-  dbg(await relayer.client.getDebug());
+  dbg(await broadcaster.client.getDebug());
 };
 
 process.on('SIGINT', async () => {
   dbg('shutting down');
   await uninitRelayerModules();
-  await relayer.stop();
+  await broadcaster.stop();
   await delay(2000);
   process.exit(0);
 });
