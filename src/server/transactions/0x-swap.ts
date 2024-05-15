@@ -10,7 +10,7 @@ import { ActiveWallet } from '../../models/wallet-models';
 import configNetworks from '../config/config-networks';
 import debug from 'debug';
 import { removeUndefineds } from '../../util/utils';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   delay,
   getEVMGasTypeForTransaction,
@@ -23,7 +23,7 @@ const dbg = debug('broadcaster:swaps');
 
 export const generateSwapTransactions = async (
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
 ): Promise<ContractTransaction[]> => {
   const populatedTransactions: Optional<ContractTransaction>[] = [];
@@ -64,7 +64,7 @@ export const generateSwapTransactions = async (
 };
 
 const quoteToContractTransaction = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   quote: ZeroXFormattedQuoteData,
   walletAddress: string,
 ): ContractTransaction => {
@@ -80,7 +80,7 @@ const quoteToContractTransaction = (
 export const swapZeroX = async (
   activeWallet: ActiveWallet,
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<TransactionResponse[]> => {
   const populatedSwapTXs = await generateSwapTransactions(
     erc20Amounts,

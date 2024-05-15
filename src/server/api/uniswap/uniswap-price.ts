@@ -4,7 +4,7 @@ import {
   isDefined,
   promiseTimeout,
 } from '@railgun-community/shared-models';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { NetworkChainID } from '../../config/config-chains';
 import { tokenForAddress } from '../../tokens/network-tokens';
 import { UniswapQuoteInputs, UniswapQuoteResponse } from './uniswap-models';
@@ -20,7 +20,7 @@ type UniswapFormattedPriceData = {
 const refreshLocks: NumMapType<NumMapType<boolean>> = {};
 
 export const getStablecoinReferenceSymbols = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): string[] => {
   const error = new Error(
     `Chain ${chain.type}:${chain.id} has no reference symbol, Unable to get price quotes.`,
@@ -48,7 +48,7 @@ export const getStablecoinReferenceSymbols = (
 };
 
 export const uniswapPriceLookupByAddress = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ): Promise<Optional<UniswapFormattedPriceData>> => {
   try {
@@ -93,7 +93,7 @@ export const uniswapPriceLookupByAddress = async (
 };
 
 export const uniswapUpdatePricesByAddresses = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddresses: string[],
   updater: TokenPriceUpdater,
 ): Promise<void> => {

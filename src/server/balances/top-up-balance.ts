@@ -3,7 +3,7 @@ import { ActiveWallet } from '../../models/wallet-models';
 import { getERC20TokenBalance } from './erc20-token-balance';
 import { networkTokens } from '../tokens/network-tokens';
 import { removeUndefineds } from '../../util/utils';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import configNetworks from '../config/config-networks';
 import { delay } from '../../util/promise-utils';
 
@@ -16,14 +16,14 @@ import debug from 'debug';
 const dbg = debug('balance-getter');
 
 export const getWrappedNativeTokenAddressForChain = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): string => {
   return configNetworks[chain.type][chain.id].gasToken.wrappedAddress;
 };
 
 const getPublicBalances = async (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddresses: string[],
   forceScan = false,
 ) => {
@@ -58,7 +58,7 @@ const getPublicBalances = async (
 
 export const getPublicERC20AmountsBeforeUnwrap = async (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   forceScan = false,
 ): Promise<ERC20Amount[]> => {
   const tokensForChain = networkTokens[chain.type][chain.id];
@@ -73,7 +73,7 @@ export const getPublicERC20AmountsBeforeUnwrap = async (
 };
 export const getPublicERC20AmountsAfterUnwrap = async (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokens: ERC20Amount[],
 ): Promise<ERC20Amount[]> => {
   const tokenAddresses = tokens.map((token) => token.tokenAddress);

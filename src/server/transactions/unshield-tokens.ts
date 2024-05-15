@@ -13,7 +13,7 @@ import {
   TransactionGasDetails,
   TXIDVersion,
 } from '@railgun-community/shared-models';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ERC20Amount } from '../../models/token-models';
 import { getStandardGasDetails } from '../fees/gas-by-speed';
 import {
@@ -42,7 +42,7 @@ export const generateUnshieldTransaction = async (
   dbEncryptionKey: string,
   toWalletAddress: string,
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<ContractTransaction> => {
   const network = networkForChain(chain);
   if (!network) {
@@ -153,7 +153,7 @@ export const unshieldTokens = async (
   dbEncryptionKey: string,
   toWalletAddress: string,
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<TransactionResponse> => {
   const network = networkForChain(chain);
   if (!network) {
@@ -232,13 +232,13 @@ export const unshieldTokens = async (
   return batchResponse;
 };
 
-const getMaxSpendPercentageForChain = (chain: RelayerChain): number => {
+const getMaxSpendPercentageForChain = (chain: BroadcasterChain): number => {
   return configNetworks[chain.type][chain.id].topUp.maxSpendPercentage;
 };
 
 const checkGasEstimate = async (
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   maxGasCost: bigint,
 ) => {
   logger.warn('TOP UP GASTIMATOR');

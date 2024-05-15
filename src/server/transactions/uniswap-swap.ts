@@ -7,7 +7,7 @@ import {
 } from '@railgun-community/shared-models';
 import configNetworks from '../config/config-networks';
 import { ContractTransaction, TransactionResponse } from 'ethers';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ERC20Amount } from '../../models/token-models';
 import debug from 'debug';
 import { uniswapGetSwapQuote } from '../api/uniswap/uniswap-quote';
@@ -21,7 +21,7 @@ import { getProviderForNetwork } from '../providers/active-network-providers';
 const dbg = debug('broadcaster:uni-swaps');
 
 const quoteToContractTransaction = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   quote: UniswapQuoteData,
   walletAddress: string,
 ): ContractTransaction => {
@@ -37,7 +37,7 @@ const quoteToContractTransaction = (
 
 export const generateUniSwapTransactions = async (
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
 ): Promise<ContractTransaction[]> => {
   const populatedTransactions: Optional<ContractTransaction>[] = [];
@@ -100,7 +100,7 @@ export const generateUniSwapTransactions = async (
 export const swapUniswap = async (
   activeWallet: ActiveWallet,
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<TransactionResponse[]> => {
   const populatedSwapTXs = await generateUniSwapTransactions(
     erc20Amounts,

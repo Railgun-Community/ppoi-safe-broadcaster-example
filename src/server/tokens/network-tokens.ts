@@ -7,12 +7,12 @@ import { getProviderForNetwork } from '../providers/active-network-providers';
 import { removeUndefineds } from '../../util/utils';
 import { logger } from '../../util/logger';
 import { ABI_ERC20 } from '../abi/abi';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { isDefined } from '@railgun-community/shared-models';
 
 export const networkTokens: NumMapType<NumMapType<Token[]>> = {};
 
-export const initTokens = async (testChain?: RelayerChain) => {
+export const initTokens = async (testChain?: BroadcasterChain) => {
   for (const chain of configuredNetworkChains()) {
     if (isDefined(testChain)) {
       if (testChain.id !== chain.id) {
@@ -50,7 +50,7 @@ export const getERC20Decimals = (
 const erc20TokenDetailsForAddress = async (
   tokenAddress: string,
   provider: FallbackProvider,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<Optional<Token>> => {
   const { symbol } = configTokens[chain.type][chain.id][tokenAddress];
   try {
@@ -68,14 +68,16 @@ const erc20TokenDetailsForAddress = async (
   }
 };
 
-export const allTokenAddressesForNetwork = (chain: RelayerChain): string[] => {
+export const allTokenAddressesForNetwork = (
+  chain: BroadcasterChain,
+): string[] => {
   return networkTokens[chain.type][chain.id].map((token) =>
     token.address.toLowerCase(),
   );
 };
 
 export const tokenForAddress = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   address: string,
 ): Token => {
   const lowercaseAddress = address.toLowerCase();
@@ -91,7 +93,7 @@ export const tokenForAddress = (
 };
 
 export const getTransactionTokens = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ): { token: Token; gasToken: GasTokenConfig } => {
   const token = tokenForAddress(chain, tokenAddress);

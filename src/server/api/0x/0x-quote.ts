@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { ZeroXApiEndpoint, getZeroXData } from './0x-fetch';
 import { ERC20Amount } from '../../../models/token-models';
 import { logger } from '../../../util/logger';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { getContractAddressesForChainOrThrow } from '@0x/contract-addresses';
 import { parseUnits } from 'ethers';
 import { isDefined } from '@railgun-community/shared-models';
@@ -41,7 +41,7 @@ export type ZeroXFormattedQuoteData = {
   sellTokenValue: string;
 };
 
-export const zeroXExchangeProxyContractAddress = (chain: RelayerChain) => {
+export const zeroXExchangeProxyContractAddress = (chain: BroadcasterChain) => {
   const addresses = getContractAddressesForChainOrThrow(Number(chain.id));
   return addresses.exchangeProxy;
 };
@@ -72,7 +72,7 @@ export const zeroXExchangeProxyContractAddress = (chain: RelayerChain) => {
 // };
 
 const getZeroXQuoteInvalidError = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   to: string,
   data: string,
   value: string,
@@ -116,7 +116,7 @@ const getZeroXQuoteInvalidError = (
 };
 
 export const zeroXGetSwapQuote = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   sellERC20Amount: ERC20Amount,
   buyTokenAddress: string,
   slippagePercentage: number,

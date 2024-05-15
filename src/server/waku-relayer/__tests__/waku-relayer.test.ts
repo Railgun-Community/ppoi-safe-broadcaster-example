@@ -6,7 +6,7 @@ import sinon, { SinonStub } from 'sinon';
 import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import {
-  verifyRelayerSignature,
+  verifyBroadcasterSignature,
   hexlify,
   toUTF8String,
   tryDecryptJSONDataWithSharedKey,
@@ -14,7 +14,7 @@ import {
   getRandomBytes,
   getRailgunWalletAddressData,
 } from '@railgun-community/wallet';
-import { WakuMethodNames, WakuRelayer } from '../waku-broadcaster';
+import { WakuMethodNames, WakuBroadcaster } from '../waku-broadcaster';
 import {
   WakuRestApiClient,
   WakuRelayMessage,
@@ -51,14 +51,14 @@ import {
 } from '../../../test/stubs/ethers-provider-stubs.test';
 import { resetGasTokenBalanceCache } from '../../balances/balance-cache';
 import {
-  RelayerEncryptedMethodParams,
-  RelayerFeeMessage,
-  RelayerFeeMessageData,
-  RelayerRawParamsTransact,
+  BroadcasterEncryptedMethodParams,
+  BroadcasterFeeMessage,
+  BroadcasterFeeMessageData,
+  BroadcasterRawParamsTransact,
   TXIDVersion,
   delay,
 } from '@railgun-community/shared-models';
-import { getRelayerVersion } from '../../../util/broadcaster-version';
+import { getBroadcasterVersion } from '../../../util/broadcaster-version';
 import {
   getRailgunWalletAddress,
   getRailgunWalletID,
@@ -68,7 +68,7 @@ import { TransactionResponse } from 'ethers';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-let wakuRelayer: Optional<WakuRelayer>;
+let wakuBroadcaster: Optional<WakuBroadcaster>;
 let client: WakuRestApiClient;
 
 let clientHTTPStub: SinonStub;
@@ -106,7 +106,7 @@ describe('waku-broadcaster', () => {
 
     client = new WakuRestApiClient({ url: '', urlBackup: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
-    wakuRelayer = await WakuRelayer.init(client, {
+    wakuBroadcaster = await WakuBroadcaster.init(client, {
       topic: configDefaults.waku.pubSubTopic,
       feeExpiration: configDefaults.transactionFees.feeExpirationInMS,
     });
@@ -128,7 +128,7 @@ describe('waku-broadcaster', () => {
     processTransactionStub.restore();
     resetTokenPriceCache();
     resetTransactionFeeCache();
-    wakuRelayer = undefined;
+    wakuBroadcaster = undefined;
     resetGasTokenBalanceCache();
     restoreGasBalanceStub();
   });
@@ -158,7 +158,7 @@ describe('waku-broadcaster', () => {
     const contentTopic = '/railgun/v2/0/1/fees/json';
     expect(contentTopic).to.equal(contentTopics.fees(chain));
 
-    await wakuRelayer?.broadcastFeesForChain(chain);
+    await wakuBroadcaster?.broadcastFeesForChain(chain);
     expect(requestData?.contentTopic).to.equal(contentTopic);
     expect(requestData?.timestamp).to.be.a('number');
     expect(requestData?.payload).to.be.a('string');
@@ -166,10 +166,10 @@ describe('waku-broadcaster', () => {
       return;
     }
     const utf8 = Buffer.from(requestData.payload, 'base64').toString('utf8');
-    const message = JSON.parse(utf8) as RelayerFeeMessage;
+    const message = JSON.parse(utf8) as BroadcasterFeeMessage;
     const data = JSON.parse(
       toUTF8String(message.data),
-    ) as RelayerFeeMessageData;
+    ) as BroadcasterFeeMessageData;
     const { signature } = message;
     expect(data).to.be.an('object');
     expect(data.fees[MOCK_TOKEN_ADDRESS]).to.be.a(
@@ -186,7 +186,7 @@ describe('waku-broadcaster', () => {
     const decodedRailgunAddress = getRailgunWalletAddressData(
       data.railgunAddress,
     );
-    const isValid = await verifyRelayerSignature(
+    const isValid = await verifyBroadcasterSignature(
       signature,
       message.data,
       decodedRailgunAddress.viewingPublicKey,
@@ -203,7 +203,7 @@ describe('waku-broadcaster', () => {
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
 
-    const data: RelayerRawParamsTransact = {
+    const data: BroadcasterRawParamsTransact = {
       txidVersion: TXIDVersion.V2_PoseidonMerkle,
       chainID: chain.id,
       chainType: chain.type,
@@ -214,8 +214,8 @@ describe('waku-broadcaster', () => {
       broadcasterViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
       devLog: true,
-      minVersion: getRelayerVersion(),
-      maxVersion: getRelayerVersion(),
+      minVersion: getBroadcasterVersion(),
+      maxVersion: getBroadcasterVersion(),
       preTransactionPOIsPerTxidLeafPerList: {},
     };
     const randomPrivKey = getRandomBytes(32);
@@ -250,7 +250,7 @@ describe('waku-broadcaster', () => {
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
 
-    const data: RelayerRawParamsTransact = {
+    const data: BroadcasterRawParamsTransact = {
       txidVersion: TXIDVersion.V2_PoseidonMerkle,
       chainID: chain.id,
       chainType: chain.type,
@@ -261,8 +261,8 @@ describe('waku-broadcaster', () => {
       broadcasterViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
       devLog: true,
-      minVersion: getRelayerVersion(),
-      maxVersion: getRelayerVersion(),
+      minVersion: getBroadcasterVersion(),
+      maxVersion: getBroadcasterVersion(),
       preTransactionPOIsPerTxidLeafPerList: {},
     };
     const randomPrivKey = getRandomBytes(32);
@@ -273,7 +273,7 @@ describe('waku-broadcaster', () => {
       broadcasterPublicKey,
     );
     const encryptedData = encryptResponseData(data, sharedKey);
-    const params: RelayerEncryptedMethodParams = {
+    const params: BroadcasterEncryptedMethodParams = {
       encryptedData,
       pubkey: clientPubKey,
     };
@@ -288,7 +288,7 @@ describe('waku-broadcaster', () => {
       payload: Buffer.from(JSON.stringify(payload)),
       timestamp: Date.now(),
     };
-    await wakuRelayer?.handleMessage(relayMessage);
+    await wakuBroadcaster?.handleMessage(relayMessage);
 
     await delay(20000);
     // After transact-response sent.
@@ -321,10 +321,10 @@ describe('waku-broadcaster', () => {
     expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
 
     const decoded = JSON.parse(
-      WakuRelayer.decode(Buffer.from(rpcArgs.payload, 'base64')),
+      WakuBroadcaster.decode(Buffer.from(rpcArgs.payload, 'base64')),
     );
     const decodedExpected = JSON.parse(
-      WakuRelayer.decode(expectedWakuMessage.payload as Uint8Array),
+      WakuBroadcaster.decode(expectedWakuMessage.payload as Uint8Array),
     );
     const resultData = await tryDecryptJSONDataWithSharedKey(
       decoded.result,

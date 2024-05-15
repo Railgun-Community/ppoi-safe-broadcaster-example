@@ -1,4 +1,4 @@
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { ERC20Amount } from '../../../models/token-models';
 import { NetworkChainID } from '../../config/config-chains';
 import { fetchUniswapQuote, getUniswapQuoteParams } from './uniswap-fetch';
@@ -13,7 +13,7 @@ import debug from 'debug';
 
 const dbg = debug('broadcaster:Uniswap-quote');
 
-export const uniswapPermit2ContractAddress = (chain: RelayerChain) => {
+export const uniswapPermit2ContractAddress = (chain: BroadcasterChain) => {
   switch (chain.id) {
     case NetworkChainID.Ethereum:
     case NetworkChainID.BNBChain:
@@ -35,7 +35,7 @@ const formatApiError = (err: AxiosError<any>): string => {
 };
 
 export const uniswapGetSwapQuote = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
   sellERC20Amount: ERC20Amount,
   buyTokenAddress: string,

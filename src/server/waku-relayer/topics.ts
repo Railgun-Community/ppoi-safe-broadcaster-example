@@ -1,11 +1,11 @@
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 
 export const contentTopics = {
   default: () => '/railgun/v2/default/json',
-  fees: (chain: RelayerChain) =>
+  fees: (chain: BroadcasterChain) =>
     `/railgun/v2/${chain.type}/${chain.id}/fees/json`,
-  transact: (chain: RelayerChain) =>
+  transact: (chain: BroadcasterChain) =>
     `/railgun/v2/${chain.type}/${chain.id}/transact/json`,
-  transactResponse: (chain: RelayerChain) =>
+  transactResponse: (chain: BroadcasterChain) =>
     `/railgun/v2/${chain.type}/${chain.id}/transact-response/json`,
 };

@@ -8,7 +8,7 @@ import {
   removeUndefineds,
 } from '@railgun-community/shared-models';
 import { ValidatedPOIData } from './poi-validator';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import debug from 'debug';
 import {
   ByteLength,
@@ -78,7 +78,7 @@ export class POIAssurance {
 
   static async queueValidatedPOI(
     txidVersion: TXIDVersion,
-    chain: RelayerChain,
+    chain: BroadcasterChain,
     txid: string,
     validatedPOIData: ValidatedPOIData,
   ): Promise<void> {
@@ -101,7 +101,7 @@ export class POIAssurance {
 
   private static getNamespace(
     txidVersion: TXIDVersion,
-    chain: RelayerChain,
+    chain: BroadcasterChain,
     txid?: string,
   ): string[] {
     const namespace = [
@@ -118,7 +118,7 @@ export class POIAssurance {
 
   static async getValidatedPOIs(
     txidVersion: TXIDVersion,
-    chain: RelayerChain,
+    chain: BroadcasterChain,
   ): Promise<StoredValidatedPOI[]> {
     try {
       // poi-assurance:txidVersion:chainType:chainId:DATA
@@ -144,7 +144,7 @@ export class POIAssurance {
 
   static async deleteValidatedPOI(
     txidVersion: TXIDVersion,
-    chain: RelayerChain,
+    chain: BroadcasterChain,
     txid: string,
   ) {
     try {

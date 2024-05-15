@@ -1,6 +1,6 @@
 import LevelDOWN from 'leveldown';
 import configDefaults from '../config/config-defaults';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   startRailgunEngine,
   stopRailgunEngine,
@@ -80,7 +80,7 @@ export const stopEngine = async () => {
  * so it will run the slow scan in the background.
  */
 export const loadEngineProvider = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   providerJsonConfig: FallbackProviderJsonConfig,
 ) => {
   if (!engineStarted) {

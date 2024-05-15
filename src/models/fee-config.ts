@@ -4,7 +4,7 @@ export type FeeConfig = {
   gasEstimateVarianceBuffer: number;
 
   // Variance as a percentage, calculated by average gas limit / actual gas used.
-  // Relayers send fees to clients based on a gas limit (gas estimate + 20%),
+  // Broadcasters send fees to clients based on a gas limit (gas estimate + 20%),
   // however the actual gas is typically 20-30% lower than the limit on L1s.
   // This buffer adjusts the fees so that the expected profit margin is more accurate.
   gasEstimateLimitToActualRatio: number;

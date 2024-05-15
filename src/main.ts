@@ -1,11 +1,11 @@
 import debug from 'debug';
 import {
-  initRelayerModules,
-  uninitRelayerModules,
+  initBroadcasterModules,
+  uninitBroadcasterModules,
 } from 'server/init/broadcaster-init';
 import {
-  WakuRelayer,
-  WakuRelayerOptions,
+  WakuBroadcaster,
+  WakuBroadcasterOptions,
 } from 'server/waku-broadcaster/waku-broadcaster';
 import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
@@ -14,14 +14,14 @@ import { waitForWaku } from './server/networking/waku-poller';
 
 const dbg = debug('broadcaster:main');
 
-let broadcaster: WakuRelayer;
+let broadcaster: WakuBroadcaster;
 
 const main = async (): Promise<void> => {
   dbg('Warming up Broadcaster');
 
-  await initRelayerModules();
+  await initBroadcasterModules();
 
-  // Note that this default can be overridden in initRelayerModules().
+  // Note that this default can be overridden in initBroadcasterModules().
   await waitForWaku(config.waku.rpcURL);
   dbg(`Connecting to ${config.waku.rpcURL}`);
 
@@ -29,11 +29,11 @@ const main = async (): Promise<void> => {
     url: config.waku.rpcURL,
     urlBackup: config.waku.rpcURLBackup,
   });
-  const options: WakuRelayerOptions = {
+  const options: WakuBroadcasterOptions = {
     topic: config.waku.pubSubTopic,
     feeExpiration: config.transactionFees.feeExpirationInMS,
   };
-  broadcaster = await WakuRelayer.init(client, options);
+  broadcaster = await WakuBroadcaster.init(client, options);
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   broadcaster.poll(config.waku.pollFrequencyInMS);
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -44,7 +44,7 @@ const main = async (): Promise<void> => {
 
 process.on('SIGINT', async () => {
   dbg('shutting down');
-  await uninitRelayerModules();
+  await uninitBroadcasterModules();
   await broadcaster.stop();
   await delay(2000);
   process.exit(0);

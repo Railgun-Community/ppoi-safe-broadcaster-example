@@ -1,13 +1,13 @@
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ContractTransaction } from 'ethers';
 
 const cachedGasPrice: NumMapType<NumMapType<MapType<CachedGasPrice>>> = {};
-const initGasPriceCache = (chain: RelayerChain) => {
+const initGasPriceCache = (chain: BroadcasterChain) => {
   cachedGasPrice[chain.type] ??= {};
   cachedGasPrice[chain.type][chain.id] ??= {};
 };
 export const getCachedGasPrice = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
 ) => {
   initGasPriceCache(chain);
@@ -24,7 +24,7 @@ type CachedGasPrice = {
   cacheTime: number;
 };
 export const cacheGasPrice = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
   gasPrice: bigint,
 ) => {
@@ -37,7 +37,7 @@ export const cacheGasPrice = (
 };
 
 export const clearCachedGasPrice = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
 ) => {
   initGasPriceCache(chain);
@@ -54,12 +54,12 @@ type SubmittedTxCache = {
   completed: boolean;
 };
 const cachedSubmittedTxs: NumMapType<NumMapType<SubmittedTxCache[]>> = {};
-const initSubmittedTxCache = (chain: RelayerChain) => {
+const initSubmittedTxCache = (chain: BroadcasterChain) => {
   cachedSubmittedTxs[chain.type] ??= {};
   cachedSubmittedTxs[chain.type][chain.id] ??= [];
 };
 
-export const cacheSubmittedTx = (chain: RelayerChain, hash: string) => {
+export const cacheSubmittedTx = (chain: BroadcasterChain, hash: string) => {
   initSubmittedTxCache(chain);
   cachedSubmittedTxs[chain.type][chain.id].push({
     hash,
@@ -68,7 +68,7 @@ export const cacheSubmittedTx = (chain: RelayerChain, hash: string) => {
   });
 };
 
-export const txWasAlreadySent = (chain: RelayerChain, hash: string) => {
+export const txWasAlreadySent = (chain: BroadcasterChain, hash: string) => {
   initSubmittedTxCache(chain);
   for (const tx of cachedSubmittedTxs[chain.type][chain.id]) {
     if (tx.hash === hash) {
@@ -78,7 +78,7 @@ export const txWasAlreadySent = (chain: RelayerChain, hash: string) => {
   return false;
 };
 
-export const removeSubmittedTx = (chain: RelayerChain, hash: string) => {
+export const removeSubmittedTx = (chain: BroadcasterChain, hash: string) => {
   initSubmittedTxCache(chain);
   const newArray: SubmittedTxCache[] = cachedSubmittedTxs[chain.type][
     chain.id
@@ -88,7 +88,7 @@ export const removeSubmittedTx = (chain: RelayerChain, hash: string) => {
   cachedSubmittedTxs[chain.type][chain.id] = newArray;
 };
 
-export const cleanupSubmittedTxs = (chain: RelayerChain) => {
+export const cleanupSubmittedTxs = (chain: BroadcasterChain) => {
   initSubmittedTxCache(chain);
   const newArray: SubmittedTxCache[] = cachedSubmittedTxs[chain.type][
     chain.id
@@ -111,12 +111,12 @@ export type TopUpTransaction = {
 
 const topUpTransactionCache: NumMapType<NumMapType<TopUpTransaction>> = {};
 
-const initTopUpCache = (chain: RelayerChain) => {
+const initTopUpCache = (chain: BroadcasterChain) => {
   topUpTransactionCache[chain.type] ??= {};
   // topUpTransactionCache[chain.type][chain.id] ??= {};
 };
 
-export const getCachedTransaction = (chain: RelayerChain) => {
+export const getCachedTransaction = (chain: BroadcasterChain) => {
   initTopUpCache(chain);
   if (typeof topUpTransactionCache[chain.type][chain.id] !== 'undefined') {
     topUpTransactionCache[chain.type][chain.id].attempts += 1;
@@ -129,7 +129,7 @@ export const getCachedTransaction = (chain: RelayerChain) => {
  * generate the populatedTx, and again when its cleared after timeout refresh of it.
  */
 export const cacheTopUpTransaction = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   populatedTransaction: ContractTransaction,
 ) => {
   initTopUpCache(chain);
@@ -141,7 +141,7 @@ export const cacheTopUpTransaction = (
   };
 };
 
-export const clearCachedTransaction = (chain: RelayerChain) => {
+export const clearCachedTransaction = (chain: BroadcasterChain) => {
   initTopUpCache(chain);
   if (typeof topUpTransactionCache[chain.type][chain.id] !== 'undefined') {
     delete topUpTransactionCache[chain.type][chain.id];

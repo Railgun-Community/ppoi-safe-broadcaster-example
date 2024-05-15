@@ -3,7 +3,7 @@ import {
   FeeHistoryResult,
 } from '../../models/gas-models';
 import { getProviderForNetwork } from '../providers/active-network-providers';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { JsonRpcProvider } from 'ethers';
 import { isDefined } from '@railgun-community/shared-models';
 import { NetworkChainID } from '../config/config-chains';
@@ -32,12 +32,11 @@ const findHeadBlockInMessage = (message: string): Optional<number> => {
 };
 
 export const getHistoricalBlockCountForChain = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): number => {
   const { id } = chain;
   switch (id) {
     case NetworkChainID.Ethereum: {
-
       return 20;
     }
     case NetworkChainID.PolygonPOS: {
@@ -50,7 +49,7 @@ export const getHistoricalBlockCountForChain = (
 };
 
 export const getFeeHistory = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   recentBlock?: number,
   retryCount = 0,
 ): Promise<FeeHistoryResult> => {
@@ -82,7 +81,7 @@ export const getFeeHistory = async (
       if (!isDefined(recentBlock)) {
         const latestBlock = await provider.getBlock('latest');
         if (!isDefined(latestBlock)) {
-          throw new Error("Could not get latest block");
+          throw new Error('Could not get latest block');
         }
         // eslint-disable-next-line no-param-reassign
         recentBlock = latestBlock.number - 1;

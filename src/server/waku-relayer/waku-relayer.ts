@@ -2,8 +2,8 @@ import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
 import debug from 'debug';
 
 import {
-  RelayerFeeMessage,
-  RelayerFeeMessageData,
+  BroadcasterFeeMessage,
+  BroadcasterFeeMessageData,
   isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
@@ -12,9 +12,9 @@ import {
   fromUTF8String,
   signWithWalletViewingKey,
 } from '@railgun-community/wallet';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { delay, promiseTimeout } from '../../util/promise-utils';
-import { getRelayerVersion } from '../../util/broadcaster-version';
+import { getBroadcasterVersion } from '../../util/broadcaster-version';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
@@ -42,12 +42,12 @@ export enum WakuMethodNames {
   Transact = 'transact',
 }
 
-export type WakuRelayerOptions = {
+export type WakuBroadcasterOptions = {
   topic: string;
   feeExpiration: number;
 };
 
-export class WakuRelayer {
+export class WakuBroadcaster {
   client: WakuRestApiClient;
 
   dbg: debug.Debugger;
@@ -62,7 +62,7 @@ export class WakuRelayer {
     ? configDefaults.instanceIdentifier
     : undefined;
 
-  options: WakuRelayerOptions;
+  options: WakuBroadcasterOptions;
 
   methods: MapType<JsonRPCMessageHandler> = {
     [WakuMethodNames.Transact]: transactMethod,
@@ -70,7 +70,7 @@ export class WakuRelayer {
 
   stopping = false;
 
-  constructor(client: WakuRestApiClient, options: WakuRelayerOptions) {
+  constructor(client: WakuRestApiClient, options: WakuBroadcasterOptions) {
     const chainIDs = configuredNetworkChains();
     this.client = client;
     this.options = options;
@@ -85,9 +85,9 @@ export class WakuRelayer {
 
   static async init(
     client: WakuRestApiClient,
-    options: WakuRelayerOptions,
-  ): Promise<WakuRelayer> {
-    const broadcaster = new WakuRelayer(client, options);
+    options: WakuBroadcasterOptions,
+  ): Promise<WakuBroadcaster> {
+    const broadcaster = new WakuBroadcaster(client, options);
     await broadcaster.subscribe();
     return broadcaster;
   }
@@ -144,7 +144,7 @@ export class WakuRelayer {
     const { payload, contentTopic } = message;
 
     try {
-      const decoded = WakuRelayer.decode(payload);
+      const decoded = WakuBroadcaster.decode(payload);
       const request = JSON.parse(decoded);
       const { method, params, id } = request;
 
@@ -163,8 +163,8 @@ export class WakuRelayer {
   private createFeeBroadcastData = async (
     fees: MapType<bigint>,
     feeCacheID: string,
-    chain: RelayerChain,
-  ): Promise<RelayerFeeMessage> => {
+    chain: BroadcasterChain,
+  ): Promise<BroadcasterFeeMessage> => {
     const tokenAddresses = Object.keys(fees);
     const feesHex: MapType<string> = {};
     tokenAddresses.forEach((tokenAddress) => {
@@ -183,7 +183,7 @@ export class WakuRelayer {
       network.name,
     );
 
-    const data: RelayerFeeMessageData = {
+    const data: BroadcasterFeeMessageData = {
       fees: feesHex,
       // client can't rely on message timestamp to calculate expiration
       feeExpiration: Date.now() + this.options.feeExpiration,
@@ -191,7 +191,7 @@ export class WakuRelayer {
       railgunAddress: this.railgunWalletAddress,
       identifier: this.identifier,
       availableWallets,
-      version: getRelayerVersion(),
+      version: getBroadcasterVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
       requiredPOIListKeys, // DO NOT CHANGE : Required in order to make broadcaster fees spendable
     };
@@ -211,14 +211,14 @@ export class WakuRelayer {
     };
   };
 
-  async broadcastFeesForChain(chain: RelayerChain): Promise<void> {
+  async broadcastFeesForChain(chain: BroadcasterChain): Promise<void> {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chain);
     const feeBroadcastData = await promiseTimeout(
       this.createFeeBroadcastData(fees, feeCacheID, chain),
       3 * 1000,
     )
-      .then((result: RelayerFeeMessage) => {
+      .then((result: BroadcasterFeeMessage) => {
         return result;
       })
       .catch((err: Error) => {

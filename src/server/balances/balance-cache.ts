@@ -4,7 +4,7 @@ import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { getGasTokenBalance } from './gas-token-balance';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { formatUnits } from 'ethers';
 import { delay, isDefined } from '@railgun-community/shared-models';
 
@@ -21,7 +21,7 @@ export const resetGasTokenBalanceCache = () => {
 };
 
 export const updateCachedGasTokenBalance = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
   retryCount = 0,
 ): Promise<void> => {
@@ -65,7 +65,7 @@ export const updateAllActiveWalletsGasTokenBalances = async (
 };
 
 export const shouldUpdateCachedGasTokenBalance = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
 ) => {
   gasTokenBalanceCache[chain.type] ??= {};
@@ -82,7 +82,7 @@ export const shouldUpdateCachedGasTokenBalance = (
 };
 
 export const getCachedGasTokenBalance = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
 ): Promise<bigint> => {
   if (shouldUpdateCachedGasTokenBalance(chain, walletAddress)) {
@@ -103,13 +103,16 @@ export const getCachedGasTokenBalance = async (
 };
 
 export const getActiveWalletGasTokenBalanceMapForChain = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   activeWallets: ActiveWallet[],
 ): Promise<MapType<bigint>> => {
   const balancePromises: (bigint | undefined)[] = [];
   for (const { address } of activeWallets) {
     // eslint-disable-next-line no-await-in-loop
-    const cachedGasBalance = await getCachedGasTokenBalance(chain, address).catch((err) => {
+    const cachedGasBalance = await getCachedGasTokenBalance(
+      chain,
+      address,
+    ).catch((err) => {
       logger.error(err);
       return undefined;
     });

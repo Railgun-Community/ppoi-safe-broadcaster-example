@@ -1,5 +1,5 @@
 import debug from 'debug';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 
 const dbg = debug('broadcaster:public-balance-cache');
 type PublicBalanceCache = {
@@ -9,14 +9,14 @@ type PublicBalanceCache = {
 const cachedPublicTokenBalances: NumMapType<
   NumMapType<MapType<MapType<PublicBalanceCache>>>
 > = {};
-const initPublicCache = (chain: RelayerChain, walletAddress: string) => {
+const initPublicCache = (chain: BroadcasterChain, walletAddress: string) => {
   cachedPublicTokenBalances[chain.type] ??= {};
   cachedPublicTokenBalances[chain.type][chain.id] ??= {};
   cachedPublicTokenBalances[chain.type][chain.id][walletAddress] ??= {};
 };
 
 export const getCachedPublicBalance = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
   tokenAddress: string,
 ) => {
@@ -51,7 +51,7 @@ export const getCachedPublicBalance = (
 };
 
 export const cachePublicBalance = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
   tokenAddress: string,
   balance: bigint,
@@ -65,7 +65,7 @@ export const cachePublicBalance = (
 };
 
 export const clearCachedBalances = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
 ) => {
   initPublicCache(chain, walletAddress);

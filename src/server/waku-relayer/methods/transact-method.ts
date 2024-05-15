@@ -16,22 +16,25 @@ import {
 } from '../../wallets/active-wallets';
 import { contentTopics } from '../topics';
 import { WakuMethodResponse } from '../waku-response';
-import { ErrorMessage, sanitizeCustomRelayerError } from '../../../util/errors';
+import {
+  ErrorMessage,
+  sanitizeCustomBroadcasterError,
+} from '../../../util/errors';
 import configDefaults from '../../config/config-defaults';
 import { recognizesFeeCacheID } from '../../fees/transaction-fee-cache';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import configNetworks from '../../config/config-networks';
 import {
-  RelayerEncryptedMethodParams,
-  RelayerRawParamsTransact,
+  BroadcasterEncryptedMethodParams,
+  BroadcasterRawParamsTransact,
   TXIDVersion,
   isDefined,
   versionCompare,
 } from '@railgun-community/shared-models';
-import { getRelayerVersion } from '../../../util/broadcaster-version';
+import { getBroadcasterVersion } from '../../../util/broadcaster-version';
 import { TransactionResponse, formatUnits, parseUnits } from 'ethers';
 import { createValidTransaction } from '../../transactions/transaction-validator';
-import { RelayerError } from '../../../models/error-models';
+import { BroadcasterError } from '../../../models/error-models';
 
 const handledClientPubKeys: string[] = [];
 
@@ -50,7 +53,7 @@ const sanitizeSuggestedFee = (errorString: string) => {
 };
 
 export const transactMethod = async (
-  params: RelayerEncryptedMethodParams,
+  params: BroadcasterEncryptedMethodParams,
   id: number,
 ): Promise<Optional<WakuMethodResponse>> => {
   dbg('got transact');
@@ -72,7 +75,7 @@ export const transactMethod = async (
   const decrypted = (await tryDecryptData(
     encryptedData,
     sharedKey,
-  )) as RelayerRawParamsTransact;
+  )) as BroadcasterRawParamsTransact;
   if (decrypted == null) {
     // Incorrect key. Skipping transact message.
     dbg('Cannot decrypt - Not intended receiver');
@@ -97,7 +100,7 @@ export const transactMethod = async (
   const preTransactionPOIsPerTxidLeafPerList =
     decrypted.preTransactionPOIsPerTxidLeafPerList ?? {};
 
-  const chain: RelayerChain = {
+  const chain: BroadcasterChain = {
     type: chainType,
     id: chainID,
   };
@@ -110,7 +113,7 @@ export const transactMethod = async (
       // Do nothing. No error response.
       return;
     }
-    const broadcasterVersion = getRelayerVersion();
+    const broadcasterVersion = getBroadcasterVersion();
     if (
       versionCompare(broadcasterVersion, minVersion) < 0 ||
       versionCompare(broadcasterVersion, maxVersion) > 0
@@ -202,7 +205,7 @@ export const transactMethod = async (
     // custom error message
     if (err.message.indexOf('CMsg_') !== -1) {
       // strip the custom message. CM
-      const errReceived = sanitizeCustomRelayerError(err);
+      const errReceived = sanitizeCustomBroadcasterError(err);
       dbg(errReceived);
       const newErrorString = err.message.slice(5);
       const suggestedFee = sanitizeSuggestedFee(newErrorString);
@@ -284,7 +287,7 @@ export const transactMethod = async (
 
 const resultResponse = (
   id: number,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   sharedKey: Uint8Array,
   txResponse: TransactionResponse,
 ): WakuMethodResponse => {
@@ -329,7 +332,7 @@ const replaceErrorMessageNonDev = (
 
 const errorResponse = (
   id: number,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   sharedKey: Uint8Array,
   err: Error,
   devLog?: boolean,
@@ -343,7 +346,7 @@ const errorResponse = (
 const encryptedRPCResponse = (
   response: object,
   id: number,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   sharedKey: Uint8Array,
 ) => {
   dbg('Response:', response);

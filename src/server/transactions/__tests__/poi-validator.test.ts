@@ -7,7 +7,7 @@ import {
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { POI } from '@railgun-community/engine';
 import Sinon, { SinonStub } from 'sinon';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { startEngine } from '../../engine/engine-init';
 import { validatePOI } from '../poi-validator';
@@ -17,7 +17,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const txidVersion = TXIDVersion.V2_PoseidonMerkle;
-const chain: RelayerChain = { type: 0, id: 5 };
+const chain: BroadcasterChain = { type: 0, id: 5 };
 
 let getActiveListsStub: SinonStub;
 

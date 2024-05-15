@@ -1,5 +1,5 @@
 import { sanitizeError } from '@railgun-community/shared-models';
-import { RelayerError } from '../models/error-models';
+import { BroadcasterError } from '../models/error-models';
 
 export enum ErrorMessage {
   BAD_TOKEN_FEE = 'Bad token fee.',
@@ -30,17 +30,19 @@ const sanitizeEthersError = (errMessage: string) => {
   return errMessage.split('[ See:')[0];
 };
 
-export const sanitizeRelayerError = (error: Error): Error => {
+export const sanitizeBroadcasterError = (error: Error): Error => {
   const sanitized = sanitizeError(error);
   return new Error(sanitizeEthersError(sanitized.message));
 };
 
-export const customRelayerError = (message: string, errorSeen?: Error) => {
+export const customBroadcasterError = (message: string, errorSeen?: Error) => {
   return new Error(`CMsg_${message}`);
-  // return new RelayerError(`CMsg_${message}`, errorSeen.message);
+  // return new BroadcasterError(`CMsg_${message}`, errorSeen.message);
 };
 // will strip the message back to its original desired string.
-export const sanitizeCustomRelayerError = (error: RelayerError): string => {
+export const sanitizeCustomBroadcasterError = (
+  error: BroadcasterError,
+): string => {
   const newErrorString = error.message.slice(5);
   return newErrorString;
 };

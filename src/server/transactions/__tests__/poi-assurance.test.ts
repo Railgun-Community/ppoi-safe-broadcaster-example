@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { TXIDVersion } from '@railgun-community/shared-models';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 import { startEngine } from '../../engine/engine-init';
 import { ValidatedPOIData } from '../poi-validator';
@@ -11,7 +11,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const txidVersion = TXIDVersion.V2_PoseidonMerkle;
-const chain: RelayerChain = { type: 0, id: 1 };
+const chain: BroadcasterChain = { type: 0, id: 1 };
 
 describe('poi-assurance', () => {
   before(async () => {

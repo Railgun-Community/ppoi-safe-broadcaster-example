@@ -6,11 +6,11 @@ import {
   networkForChain,
 } from '@railgun-community/shared-models';
 import debug from 'debug';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ErrorMessage } from '../../util/errors';
 import { validateFee } from '../fees/fee-validator';
 import {
-  calculateMaximumGasRelayer,
+  calculateMaximumGasBroadcaster,
   getEstimateGasDetailsRelayed,
 } from '../fees/gas-estimate';
 import { validateMinGasPrice } from '../fees/gas-price-validator';
@@ -25,7 +25,7 @@ const dbg = debug('broadcaster:transact:validate');
 
 export const processTransaction = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   feeCacheID: string,
   minGasPrice: bigint,
   transaction: ContractTransaction,
@@ -72,7 +72,10 @@ export const processTransaction = async (
 
   dbg('transactionGasDetails:', transactionGasDetails);
 
-  const maximumGas = calculateMaximumGasRelayer(transactionGasDetails, chain);
+  const maximumGas = calculateMaximumGasBroadcaster(
+    transactionGasDetails,
+    chain,
+  );
   dbg('Maximum gas:', maximumGas);
 
   const { tokenAddress, packagedFeeAmount } =

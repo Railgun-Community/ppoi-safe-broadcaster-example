@@ -2,7 +2,7 @@ import { EVMGasType, ChainType } from '@railgun-community/shared-models';
 import axios from 'axios';
 import debug from 'debug';
 import configDefaults from '../../config/config-defaults';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { NetworkChainID } from '../../config/config-chains';
 import {
   GasDetailsBySpeed,
@@ -38,7 +38,7 @@ enum BlockNativeConfidenceLevel {
   Low = 80,
 }
 
-export const supportsBlockNativeGasEstimates = (chain: RelayerChain) => {
+export const supportsBlockNativeGasEstimates = (chain: BroadcasterChain) => {
   if (chain.type !== ChainType.EVM) {
     return false;
   }
@@ -117,7 +117,7 @@ const maxFeesForConfidenceLevel = (
 
 export const getGasDetailsBySpeedBlockNative = async (
   evmGasType: EVMGasType,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   retryCount = 0,
 ): Promise<Optional<GasDetailsBySpeed>> => {
   try {

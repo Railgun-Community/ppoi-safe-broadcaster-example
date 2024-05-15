@@ -1,5 +1,5 @@
 import { ErrorMessage } from '../../util/errors';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { EVMGasType, isDefined } from '@railgun-community/shared-models';
 
 import { getGasDetailsForSpeed } from './gas-by-speed';
@@ -10,7 +10,7 @@ import { NetworkChainID } from '../config/config-chains';
 
 const dbg = debug('broadcaster:gas-price:validate');
 export const validateMinGasPrice = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   minGasPrice: bigint,
   evmGasType: EVMGasType.Type0 | EVMGasType.Type1,
 ) => {

@@ -161,7 +161,7 @@ export default {
     /**
      * Indeces to configure HD wallets from the same mnemonic.
      * Each separate Broadcaster instance must have its own HD wallets.
-     * If you run multiple Relayers with the same mnemonic, set `transactionFees.requireMatchingFeeCacheID = true`
+     * If you run multiple Broadcasters with the same mnemonic, set `transactionFees.requireMatchingFeeCacheID = true`
      * Add optional chains to run per wallet index. Defaults to all active chains.
      */
     hdWallets: [firstHDWalletDefault],

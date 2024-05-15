@@ -1,7 +1,7 @@
 import { TXIDVersion, isDefined } from '@railgun-community/shared-models';
 import debug from 'debug';
 import { formatUnits } from 'ethers';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { delay, promiseTimeout } from '../../util/promise-utils';
@@ -114,7 +114,7 @@ export const initTopUpPoller = async () => {
 };
 
 export const getTopUpWallet = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<Optional<ActiveWallet>> => {
   const activeWallets = getActiveWalletsForChain(chain);
 

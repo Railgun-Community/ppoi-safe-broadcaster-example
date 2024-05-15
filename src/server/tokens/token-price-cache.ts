@@ -3,7 +3,7 @@ import { GasTokenConfig, Token } from '../../models/token-models';
 import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';
 import { tokenForAddress } from './network-tokens';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { isDefined } from '@railgun-community/shared-models';
 import { NetworkChainID } from '../config/config-chains';
 
@@ -32,7 +32,7 @@ const tokenPriceCache: MapType<NumMapType<NumMapType<TokenAddressesToPrice>>> =
 
 export const cacheTokenPriceForNetwork = (
   source: TokenPriceSource,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
   tokenPrice: TokenPrice,
 ) => {
@@ -44,7 +44,8 @@ export const cacheTokenPriceForNetwork = (
     updatedAt: tokenPrice.updatedAt,
   };
   logger.log(
-    `${source} [${chain.type}:${chain.id}]: Cache price $${tokenPrice.price
+    `${source} [${chain.type}:${chain.id}]: Cache price $${
+      tokenPrice.price
     } for token ${tokenAddress.toLowerCase()}`,
   );
 };
@@ -59,18 +60,19 @@ export const getTokenPriceCache = () => {
 
 const logTokenLookupError = (
   errorMsg: string,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ) => {
   const tokenSymbol = tokenForAddress(chain, tokenAddress).symbol;
-  const tokenDetails = `${tokenSymbol} on ${configNetworks[chain.type][chain.id].name
-    } (${tokenAddress})`;
+  const tokenDetails = `${tokenSymbol} on ${
+    configNetworks[chain.type][chain.id].name
+  } (${tokenAddress})`;
   logger.warn(`${errorMsg}: ${tokenDetails}`);
 };
 
 export const cachedTokenPriceForSource = (
   source: TokenPriceSource,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ): Optional<TokenPrice> => {
   const pricesForSource = tokenPriceCache[source];
@@ -114,7 +116,7 @@ export const cachedTokenPriceForSource = (
 };
 
 const getAverageCachedTokenPrice = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ): Optional<number> => {
   const tokenPrices: TokenPrice[] = [];
@@ -136,7 +138,7 @@ const getAverageCachedTokenPrice = (
 };
 
 export const lookUpCachedTokenPrice = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ): number => {
   const cachedPrice = getAverageCachedTokenPrice(
@@ -154,7 +156,7 @@ export const lookUpCachedTokenPrice = (
 };
 
 export const getTransactionTokenPrices = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   token: Token,
   gasToken: GasTokenConfig,
 ): { gasTokenPrice: number; tokenPrice: number } => {

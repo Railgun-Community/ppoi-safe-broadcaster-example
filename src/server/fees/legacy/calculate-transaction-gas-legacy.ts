@@ -2,7 +2,7 @@ import {
   TransactionGasDetails,
   EVMGasType,
 } from '@railgun-community/shared-models';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import configDefaults from '../../config/config-defaults';
 import configNetworks from '../../config/config-networks';
 import { getTransactionTokens } from '../../tokens/network-tokens';
@@ -11,20 +11,20 @@ import {
   getRoundedTokenToGasPriceRatio,
   getTransactionTokenToGasDecimalRatio,
 } from '../calculate-token-fee';
-import { calculateGasLimitRelayer } from '../gas-estimate';
+import { calculateGasLimitBroadcaster } from '../gas-estimate';
 
 /**
  * This is a legacy operation, now that we have minGasPrice in every Relayed transaction.
  * Retaining the code for posterity.
  */
 export const createTransactionGasDetailsLegacy = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   gasEstimateDetails: TransactionGasDetails,
   tokenAddress: string,
   tokenFee: bigint,
 ): TransactionGasDetails => {
   const { evmGasType, gasEstimate } = gasEstimateDetails;
-  const gasLimit = calculateGasLimitRelayer(gasEstimate, chain);
+  const gasLimit = calculateGasLimitBroadcaster(gasEstimate, chain);
   const { token, gasToken } = getTransactionTokens(chain, tokenAddress);
   const { tokenPrice, gasTokenPrice } = getTransactionTokenPrices(
     chain,

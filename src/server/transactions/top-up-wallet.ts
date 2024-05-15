@@ -16,7 +16,7 @@ import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import debug from 'debug';
 import { swapZeroX } from './0x-swap';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { Wallet } from 'ethers';
 import { nativeUnwrap } from './native-unwrap';
 import { delay } from '../../util/promise-utils';
@@ -44,7 +44,7 @@ const dbg = debug('broadcaster:topup-util');
 
 const getTopUpTokens = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<ERC20Amount[]> => {
   initTopUpTokenCache(chain);
   if (typeof cachedTopUpTokens[chain.type][chain.id] !== 'undefined') {
@@ -73,7 +73,7 @@ const getTopUpTokens = async (
 export const topUpWallet = async (
   topUpWallet: ActiveWallet,
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ) => {
   const topUpTokens = await getTopUpTokens(txidVersion, chain);
   // also cache the topUpTokens. this is to prevent it from halting if the balances increase to a point at which
@@ -245,7 +245,7 @@ export const topUpWallet = async (
 
 const handlePublicTokens = async (
   publicTokenAmounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   topUpWallet: ActiveWallet,
   ethersWallet: Wallet,
 ) => {
@@ -317,7 +317,7 @@ const handlePublicTokens = async (
   }
 };
 
-function clearTopUpCaches(chain: RelayerChain, topUpWallet: ActiveWallet) {
+function clearTopUpCaches(chain: BroadcasterChain, topUpWallet: ActiveWallet) {
   dbg('Clearing Topup Cache');
   clearCachedBalances(chain, topUpWallet.address);
   clearCachedTokens(chain);

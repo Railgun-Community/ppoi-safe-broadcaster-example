@@ -7,11 +7,11 @@ import {
 } from '../tokens/network-tokens';
 import { getTransactionTokenPrices } from '../tokens/token-price-cache';
 import { cacheUnitFeesForTokens } from './transaction-fee-cache';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { FeeConfig } from '../../models/fee-config';
 
 export const getAllUnitTokenFeesForChain = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): { fees: MapType<bigint>; feeCacheID: string } => {
   const tokenAddresses = allTokenAddressesForNetwork(chain);
   const tokenFeesForChain: MapType<bigint> = {};
@@ -46,7 +46,7 @@ export const convertCachedTokenFee = (
 };
 
 export const calculateTokenFeePerUnitGasToken = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ) => {
   const oneUnitGas = 10n ** BigInt(GAS_TOKEN_DECIMALS);
@@ -54,7 +54,7 @@ export const calculateTokenFeePerUnitGasToken = (
 };
 
 export const getTokenFee = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   maximumGas: bigint,
   tokenAddress: string,
 ) => {
@@ -69,7 +69,7 @@ export const getTokenFee = (
 };
 
 export const getTokenPricesFromCachedPrices = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ) => {
   const { token, gasToken } = getTransactionTokens(chain, tokenAddress);
@@ -86,7 +86,7 @@ export const getTokenPricesFromCachedPrices = (
 };
 
 const getTokenRatiosFromCachedPrices = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
   precision: number,
 ) => {

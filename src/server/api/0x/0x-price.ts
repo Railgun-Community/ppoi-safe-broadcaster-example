@@ -1,5 +1,5 @@
 import { isDefined } from '@railgun-community/shared-models';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { delay, promiseTimeout } from '../../../util/promise-utils';
 import { tokenForAddress } from '../../tokens/network-tokens';
 import { TokenPrice, TokenPriceUpdater } from '../../tokens/token-price-cache';
@@ -40,7 +40,7 @@ type ZeroXFormattedPriceData = {
 };
 
 const zeroXPriceLookupByAddress = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ): Promise<Optional<ZeroXFormattedPriceData>> => {
   try {
@@ -75,7 +75,7 @@ const zeroXPriceLookupByAddress = async (
 };
 
 export const zeroXUpdatePricesByAddresses = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddresses: string[],
   updater: TokenPriceUpdater,
 ): Promise<void> => {

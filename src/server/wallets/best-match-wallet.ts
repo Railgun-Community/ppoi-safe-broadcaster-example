@@ -6,13 +6,13 @@ import {
 } from './available-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import configDefaults from '../config/config-defaults';
 import { randomElement } from '../../util/utils';
 import { ErrorMessage } from '../../util/errors';
 
 export const getBestMatchWalletForNetwork = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   minimumGasNeeded: bigint,
 ): Promise<ActiveWallet> => {
   const activeWallets = getActiveWalletsForChain(chain);

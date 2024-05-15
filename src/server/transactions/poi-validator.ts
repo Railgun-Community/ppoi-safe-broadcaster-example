@@ -4,7 +4,7 @@ import {
   POIValidator,
   nToHex,
 } from '@railgun-community/wallet';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   PreTransactionPOIsPerTxidLeafPerList,
   TXIDVersion,
@@ -30,7 +30,7 @@ export type ValidatedPOIData = {
 // WARNING: If you modify POI validation, you risk fees that aren't spendable, as they won't have valid POIs.
 export const validatePOI = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   transactionRequest: ContractTransaction,
   useRelayAdapt: boolean,
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList,

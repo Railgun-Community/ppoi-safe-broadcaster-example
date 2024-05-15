@@ -22,7 +22,7 @@ import configTokens from '../../../config/config-tokens';
 import { initTokens } from '../../../tokens/network-tokens';
 import { initNetworkProviders } from '../../../providers/active-network-providers';
 import { coingeckoUpdatePricesByAddresses } from '../coingecko-price';
-import { RelayerChain } from '../../../../models/chain-models';
+import { BroadcasterChain } from '../../../../models/chain-models';
 import {
   testChainEthereum,
   // testChainGoerli,
@@ -56,7 +56,7 @@ const expectedCoingeckoPriceOutput = (nowTimestamp: number) => {
 };
 
 const validatePriceRefresherOutput = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   nowTimestamp: number,
 ) => {
   const tokenAddressesToPrice =

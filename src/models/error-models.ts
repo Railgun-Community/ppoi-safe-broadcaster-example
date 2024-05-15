@@ -1,12 +1,12 @@
-export interface RelayerError extends Error {
+export interface BroadcasterError extends Error {
   name: string;
   cause?: string;
 }
 
-export interface RelayerErrorConstructor {
-  new (message?: string, cause?: string): RelayerError;
-  (message?: string, cause?: string): RelayerError;
+export interface BroadcasterErrorConstructor {
+  new (message?: string, cause?: string): BroadcasterError;
+  (message?: string, cause?: string): BroadcasterError;
 }
 
 // eslint-disable-next-line vars-on-top, no-var, import/no-mutable-exports
-export var RelayerError: RelayerErrorConstructor;
+export var BroadcasterError: BroadcasterErrorConstructor;

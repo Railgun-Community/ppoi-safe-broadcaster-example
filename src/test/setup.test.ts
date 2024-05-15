@@ -11,7 +11,7 @@ import { getMockNetwork, MOCK_TOKEN_6_DECIMALS } from './mocks.test';
 import configTokens from '../server/config/config-tokens';
 import { resetMapObject } from '../util/utils';
 import * as NetworkTokensModule from '../server/tokens/network-tokens';
-import { RelayerChain } from '../models/chain-models';
+import { BroadcasterChain } from '../models/chain-models';
 import { ChainType } from '@railgun-community/shared-models';
 
 export const LEPTON_TEST_DB = 'engine.test.db';
@@ -74,27 +74,27 @@ export const resetConfigDefaults = () => {
   }
 };
 
-export const testChainGoerli = (): RelayerChain => {
+export const testChainGoerli = (): BroadcasterChain => {
   return {
     type: ChainType.EVM,
     id: NetworkChainID.EthereumGoerli,
   };
 };
-export const testChainHardhat = (): RelayerChain => {
+export const testChainHardhat = (): BroadcasterChain => {
   return {
     type: ChainType.EVM,
     id: NetworkChainID.Hardhat,
   };
 };
 
-export const testChainEthereum = (): RelayerChain => {
+export const testChainEthereum = (): BroadcasterChain => {
   return {
     type: ChainType.EVM,
     id: NetworkChainID.Ethereum,
   };
 };
 
-export const testChainPolygon = (): RelayerChain => {
+export const testChainPolygon = (): BroadcasterChain => {
   return {
     type: ChainType.EVM,
     id: NetworkChainID.PolygonPOS,

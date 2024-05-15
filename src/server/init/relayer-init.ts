@@ -1,6 +1,6 @@
 import { startEngine, stopEngine } from '../engine/engine-init';
 import {
-  fullUTXOResyncRelayerWallets,
+  fullUTXOResyncBroadcasterWallets,
   initWallets,
 } from '../wallets/active-wallets';
 import { initNetworkProviders } from '../providers/active-network-providers';
@@ -22,7 +22,7 @@ import { onBalanceUpdateCallback } from '../balances/shielded-balance-cache';
 import { isDefined } from '@railgun-community/shared-models';
 import { POIAssurance } from '../transactions/poi-assurance';
 
-export const initRelayerModules = async (forTest = false) => {
+export const initBroadcasterModules = async (forTest = false) => {
   if (!forTest) {
     isDefined(myConfigOverrides) && myConfigOverrides();
   }
@@ -32,7 +32,7 @@ export const initRelayerModules = async (forTest = false) => {
   await initWallets();
   await initTokens();
   setOnBalanceUpdateCallback(onBalanceUpdateCallback);
-  // await fullUTXOResyncRelayerWallets();
+  // await fullUTXOResyncBroadcasterWallets();
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   initPricePoller();
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -42,7 +42,7 @@ export const initRelayerModules = async (forTest = false) => {
   initTopUpPoller();
 };
 
-export const uninitRelayerModules = async () => {
+export const uninitBroadcasterModules = async () => {
   stopTokenPricePolling();
   logger.log('stopping token price polling');
   stopTopUpPolling();

@@ -21,7 +21,7 @@ import {
 import * as estimateGasModule from '../gas-estimate';
 import {
   getEstimateGasDetailsPublic,
-  calculateMaximumGasRelayer,
+  calculateMaximumGasBroadcaster,
 } from '../gas-estimate';
 import { initTokens } from '../../tokens/network-tokens';
 import { initNetworkProviders } from '../../providers/active-network-providers';
@@ -162,7 +162,10 @@ describe('calculate-token-fee', () => {
       evmGasType,
       MOCK_TRANSACTION,
     );
-    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails, chain);
+    const maximumGas = calculateMaximumGasBroadcaster(
+      gasEstimateDetails,
+      chain,
+    );
     const maximumGasFeeForToken = getTokenFee(
       chain,
       maximumGas,
@@ -196,7 +199,10 @@ describe('calculate-token-fee', () => {
       evmGasType,
       MOCK_TRANSACTION,
     );
-    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails, chain);
+    const maximumGas = calculateMaximumGasBroadcaster(
+      gasEstimateDetails,
+      chain,
+    );
     const maximumGasFeeForToken = getTokenFee(
       chain,
       maximumGas,
@@ -244,7 +250,10 @@ describe('calculate-token-fee', () => {
       evmGasType,
       MOCK_TRANSACTION,
     );
-    const maximumGas = calculateMaximumGasRelayer(gasEstimateDetails, chain);
+    const maximumGas = calculateMaximumGasBroadcaster(
+      gasEstimateDetails,
+      chain,
+    );
     expect(() => getTokenFee(chain, maximumGas, MOCK_TOKEN_ADDRESS)).to.throw(
       `Price ratio between token (400000000) and gas token (1234.56)
       is not precise enough to provide an accurate fee.`,

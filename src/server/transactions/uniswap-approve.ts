@@ -1,7 +1,7 @@
 import debug from 'debug';
 import { ABI_ERC20, ABI_PERMIT2 } from '../abi/abi';
 import { Contract, ContractTransaction, FallbackProvider } from 'ethers';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ERC20Amount } from '../../models/token-models';
 import { uniswapPermit2ContractAddress } from '../api/uniswap/uniswap-quote';
 
@@ -11,7 +11,7 @@ export const MAX_UINT_ALLOWANCE = 2n ** 256n - 1n;
 export async function populateUniswapApprovalTransactions(
   tokenAmount: ERC20Amount,
   provider: FallbackProvider,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   sender: string,
   spender: string,
 ): Promise<ContractTransaction[]> {

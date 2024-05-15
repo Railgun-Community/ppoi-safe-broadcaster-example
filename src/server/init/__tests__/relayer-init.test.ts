@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-import { initRelayerModules } from '../broadcaster-init';
+import { initBroadcasterModules } from '../broadcaster-init';
 import * as engineInitModule from '../../engine/engine-init';
 import * as activeWalletsModule from '../../wallets/active-wallets';
 import * as activeProvidersModule from '../../providers/active-network-providers';
@@ -35,7 +35,7 @@ describe('broadcaster-init', () => {
       .resolves();
 
     const forTest = true;
-    await initRelayerModules(forTest);
+    await initBroadcasterModules(forTest);
 
     expect(stubInitEngine.calledOnce).to.be.true;
     expect(stubInitWallets.calledOnce).to.be.true;

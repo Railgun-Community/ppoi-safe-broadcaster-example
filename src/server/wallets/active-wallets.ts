@@ -15,7 +15,7 @@ import {
 } from '../balances/balance-cache';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configNetworks from '../config/config-networks';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   createRailgunWallet,
   isBlockedAddress,
@@ -84,7 +84,7 @@ export const initWallets = async (railgunWalletDerivationIndex = 0) => {
   printDebugWalletData();
 };
 
-export const fullUTXOResyncRelayerWallets = async () => {
+export const fullUTXOResyncBroadcasterWallets = async () => {
   const chains = configuredNetworkChains();
   for (const chain of chains) {
     dbg(`Starting Full Rescan of ${chain.type}:${chain.id}`);
@@ -144,7 +144,7 @@ export const getActiveWallets = (): ActiveWallet[] => {
 };
 
 export const getActiveWalletsForChain = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): ActiveWallet[] => {
   return getActiveWallets().filter(
     (wallet) => !wallet.chains || wallet.chains.includes(chain.id),
@@ -152,7 +152,7 @@ export const getActiveWalletsForChain = (
 };
 
 export const numAvailableWallets = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<number> => {
   // const walletPromises: Promise<boolean>[] = [];
   const walletsAvailability: boolean[] = [];
