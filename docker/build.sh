@@ -32,14 +32,14 @@ fi
 # build broadcaster and exit 1 if it failed
 docker build -t broadcaster:latest -f broadcaster/Dockerfile ..
 if [ $? != 0 ]; then
-  echo "FAILED TO BUILD RELAYER IMAGE"
+  echo "FAILED TO BUILD BROADCASTER IMAGE"
   exit 1
 fi
 
 # build nwaku and exit 1 if it failed
 docker build --pull -t nwaku:latest -f nwaku/Dockerfile nwaku
 if [ $? != 0 ]; then
-  echo "FAILED TO BUILD RELAYER IMAGE"
+  echo "FAILED TO BUILD BROADCASTER IMAGE"
   exit 1
 fi
 

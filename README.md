@@ -114,7 +114,7 @@ The fields to configure are described below. Note that you may leave the domain 
 - `TZ` - timezone code; eg 'EST'
 - `EMAIL` - letsencrypt will generate an SSL certificate for your domain; an email address must be entered. Whether you enter a real email address or a fake one is up to you
 
-### [RELAYER]
+### [BROADCASTER]
 
 Customize your node by running `npm run copy-my-config`, which copies `src/MY-CONFIG.ts.example` to `src/MY-CONFIG.ts`.
 
