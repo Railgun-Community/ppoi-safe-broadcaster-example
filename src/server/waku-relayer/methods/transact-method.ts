@@ -86,7 +86,7 @@ export const transactMethod = async (
     feesID: feeCacheID,
     to,
     data,
-    relayerViewingKey,
+    broadcasterViewingKey,
     useRelayAdapt,
     devLog,
     minVersion,
@@ -110,20 +110,20 @@ export const transactMethod = async (
       // Do nothing. No error response.
       return;
     }
-    const relayerVersion = getRelayerVersion();
+    const broadcasterVersion = getRelayerVersion();
     if (
-      versionCompare(relayerVersion, minVersion) < 0 ||
-      versionCompare(relayerVersion, maxVersion) > 0
+      versionCompare(broadcasterVersion, minVersion) < 0 ||
+      versionCompare(broadcasterVersion, maxVersion) > 0
     ) {
       dbg(
-        `Cannot process tx - Broadcaster version ${relayerVersion} outside range ${minVersion}-${maxVersion}`,
+        `Cannot process tx - Broadcaster version ${broadcasterVersion} outside range ${minVersion}-${maxVersion}`,
       );
       // Do nothing. No error response.
       return;
     }
 
-    if (!relayerViewingKey) {
-      dbg(`Cannot process tx - Requires params relayerViewingKey`);
+    if (!broadcasterViewingKey) {
+      dbg(`Cannot process tx - Requires params broadcasterViewingKey`);
       // Do nothing. No error response.
       return;
     }
@@ -131,7 +131,7 @@ export const transactMethod = async (
     const railgunWalletAddress = getRailgunWalletAddress();
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
-    if (relayerViewingKey !== hexlify(viewingPublicKey)) {
+    if (broadcasterViewingKey !== hexlify(viewingPublicKey)) {
       return undefined;
     }
 
@@ -160,7 +160,7 @@ export const transactMethod = async (
       feeCacheID == null ||
       to == null ||
       data == null ||
-      relayerViewingKey == null ||
+      broadcasterViewingKey == null ||
       useRelayAdapt == null
     ) {
       return errorResponse(

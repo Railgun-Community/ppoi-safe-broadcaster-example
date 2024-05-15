@@ -196,9 +196,9 @@ describe('waku-broadcaster', () => {
 
   it('Should encrypt and decrypt data using shared keys', async () => {
     const railgunWalletID = getRailgunWalletID();
-    const relayerPrivateKey =
+    const broadcasterPrivateKey =
       getRailgunWalletPrivateViewingKey(railgunWalletID);
-    const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
+    const broadcasterPublicKey = await ed.getPublicKey(broadcasterPrivateKey);
     const railgunWalletAddress = getRailgunWalletAddress();
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
@@ -211,7 +211,7 @@ describe('waku-broadcaster', () => {
       minGasPrice: '0x1000',
       to: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
       data: '0x1234',
-      relayerViewingKey: hexlify(viewingPublicKey),
+      broadcasterViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
       devLog: true,
       minVersion: getRelayerVersion(),
@@ -220,11 +220,14 @@ describe('waku-broadcaster', () => {
     };
     const randomPrivKey = getRandomBytes(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
-    const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
+    const sharedKey = await ed.getSharedSecret(
+      randomPrivKey,
+      broadcasterPublicKey,
+    );
     const encryptedData = encryptResponseData(data, sharedKey);
 
     const sharedKeyAlternate = await ed.getSharedSecret(
-      relayerPrivateKey,
+      broadcasterPrivateKey,
       randomPubKeyUint8Array,
     );
     expect(sharedKeyAlternate).to.deep.equal(sharedKey);
@@ -240,9 +243,9 @@ describe('waku-broadcaster', () => {
     const contentTopic = contentTopics.transact(chain);
 
     const railgunWalletID = getRailgunWalletID();
-    const relayerPrivateKey =
+    const broadcasterPrivateKey =
       getRailgunWalletPrivateViewingKey(railgunWalletID);
-    const relayerPublicKey = await ed.getPublicKey(relayerPrivateKey);
+    const broadcasterPublicKey = await ed.getPublicKey(broadcasterPrivateKey);
     const railgunWalletAddress = getRailgunWalletAddress();
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
@@ -255,7 +258,7 @@ describe('waku-broadcaster', () => {
       minGasPrice: '0x1000',
       to: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
       data: '0x1234',
-      relayerViewingKey: hexlify(viewingPublicKey),
+      broadcasterViewingKey: hexlify(viewingPublicKey),
       useRelayAdapt: false,
       devLog: true,
       minVersion: getRelayerVersion(),
@@ -265,7 +268,10 @@ describe('waku-broadcaster', () => {
     const randomPrivKey = getRandomBytes(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
     const clientPubKey = hexlify(randomPubKeyUint8Array);
-    const sharedKey = await ed.getSharedSecret(randomPrivKey, relayerPublicKey);
+    const sharedKey = await ed.getSharedSecret(
+      randomPrivKey,
+      broadcasterPublicKey,
+    );
     const encryptedData = encryptResponseData(data, sharedKey);
     const params: RelayerEncryptedMethodParams = {
       encryptedData,

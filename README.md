@@ -84,9 +84,9 @@ Configure its base defaults, and launch.
 
 ##### these commands may need to be run with sudo
 
-- `docker service logs relayer_relayer -f --raw` - displays running broadcaster logs
-- `docker service logs relayer_nwaku1 -f --raw` - displays running nwaku node 1 logs
-- `docker service logs relayer_nwaku2 -f --raw` - displays running nwaku node 2 logs
+- `docker service logs broadcaster_broadcaster -f --raw` - displays running broadcaster logs
+- `docker service logs broadcaster_nwaku1 -f --raw` - displays running nwaku node 1 logs
+- `docker service logs broadcaster_nwaku2 -f --raw` - displays running nwaku node 2 logs
 
 <hr>
 <br>
@@ -254,12 +254,12 @@ echo "0x98f1d79fae2fef3f562102eca9310a66af46f851e0d9c2f520c89ad95d67b5d0" | dock
 
         $ ./docker/run.sh
 
-        Creating network relayer_relayer
-        Creating service relayer_relayer
-        Creating service relayer_swag
-        Creating service relayer_nwaku
+        Creating network broadcaster_broadcaster
+        Creating service broadcaster_broadcaster
+        Creating service broadcaster_swag
+        Creating service broadcaster_nwaku
 
-If you get an error about the `relayer_relayer` network not existing, just execute `docker/run.sh` again until it works. This is a known issue with docker, but you may need to do it 5 times. Just press up instead of typing it again.
+If you get an error about the `broadcaster_broadcaster` network not existing, just execute `docker/run.sh` again until it works. This is a known issue with docker, but you may need to do it 5 times. Just press up instead of typing it again.
 
 - Stop stack:
 
@@ -267,9 +267,9 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 - View logs. append with `-f` to follow
 
-      docker service logs relayer_relayer       # broadcaster logs
-      docker service logs relayer_nwaku         # nwaku network node
-      docker service logs relayer_swag          # letsencrypt generation
+      docker service logs broadcaster_broadcaster       # broadcaster logs
+      docker service logs broadcaster_nwaku         # nwaku network node
+      docker service logs broadcaster_swag          # letsencrypt generation
 
 <br>
 
@@ -337,9 +337,9 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 - Monitor logs with commands like
 
-  - `docker service logs relayer_nwaku`
-  - `docker service logs relayer_relayer`
-  - `docker service logs relayer_swag`
+  - `docker service logs broadcaster_nwaku`
+  - `docker service logs broadcaster_broadcaster`
+  - `docker service logs broadcaster_swag`
 
 - In the event that services were restarted, the logs shown by the above commands may not be the true logs. If in doubt, execute:
   - `docker container ps`
@@ -348,9 +348,9 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 ```
  CONTAINER ID   IMAGE                             COMMAND                  CREATED       STATUS       PORTS                            NAMES
-345265257f8f   broadcaster:latest                    "docker-entrypoint.s…"   5 hours ago   Up 5 hours                                    relayer_relayer.1.k8e9vk23lhzi79g3vcu02wtr9
-8fe5803a4314   nwaku:latest                      "wakunode2 --config-…"   5 hours ago   Up 5 hours   8545/tcp, 30303/tcp, 60000/tcp   relayer_nwaku.1.5kfe0bcahwbb95bdqxmqgx6ak
-4e76b7e1cd3d   ghcr.io/linuxserver/swag:latest   "/init"                  5 hours ago   Up 5 hours   80/tcp, 443/tcp                  relayer_swag.1.cmi0mo0r1fto3mbsz7iyfsms
+345265257f8f   broadcaster:latest                    "docker-entrypoint.s…"   5 hours ago   Up 5 hours                                    broadcaster_broadcaster.1.k8e9vk23lhzi79g3vcu02wtr9
+8fe5803a4314   nwaku:latest                      "wakunode2 --config-…"   5 hours ago   Up 5 hours   8545/tcp, 30303/tcp, 60000/tcp   broadcaster_nwaku.1.5kfe0bcahwbb95bdqxmqgx6ak
+4e76b7e1cd3d   ghcr.io/linuxserver/swag:latest   "/init"                  5 hours ago   Up 5 hours   80/tcp, 443/tcp                  broadcaster_swag.1.cmi0mo0r1fto3mbsz7iyfsms
 ```
 
 ## Run unit/integration tests

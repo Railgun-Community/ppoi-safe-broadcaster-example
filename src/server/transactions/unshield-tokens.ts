@@ -116,7 +116,7 @@ export const generateUnshieldTransaction = async (
     dbEncryptionKey,
     erc20AmountRecipients,
     [], // nftAmountRecipients
-    undefined, // relayerFeeERC20AmountRecipient
+    undefined, // broadcasterFeeERC20AmountRecipient
     sendWithPublicWallet,
     undefined, // overallBatchMinGasPrice
     (progress: number, status: string) => {
@@ -138,7 +138,7 @@ export const generateUnshieldTransaction = async (
     railgunWalletID,
     erc20AmountRecipients,
     [], // nftAmountRecipients
-    undefined, // relayerFeeERC20AmountRecipient
+    undefined, // broadcasterFeeERC20AmountRecipient
     true, // sendWithPublicWallet
     undefined, // overallBatchMinGasPrice
     finalGasDetails,
