@@ -6,7 +6,7 @@ import sinon, { SinonStub } from 'sinon';
 import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import {
-  verifyBroadcasterSignature,
+  verifyRelayerSignature,
   hexlify,
   toUTF8String,
   tryDecryptJSONDataWithSharedKey,
@@ -186,7 +186,8 @@ describe('waku-broadcaster', () => {
     const decodedRailgunAddress = getRailgunWalletAddressData(
       data.railgunAddress,
     );
-    const isValid = await verifyBroadcasterSignature(
+    //TODO: finish rename in wallet
+    const isValid = await verifyRelayerSignature(
       signature,
       message.data,
       decodedRailgunAddress.viewingPublicKey,
