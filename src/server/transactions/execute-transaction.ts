@@ -179,7 +179,7 @@ export const executeTransaction = async (
     const txResponse: TransactionResponse = await promiseTimeout(
       ethersWallet.sendTransaction(finalTransaction),
       // 45-second time-out. A shorter or longer timeout may cause issues with frontends.
-      // Frontends submit to relayers with their own timeout; the frontend timeout may lapse before the Relayer timeout.
+      // Frontends submit to relayers with their own timeout; the frontend timeout may lapse before the Broadcaster timeout.
       45000,
     );
 

@@ -17,7 +17,7 @@ const dbg = debug('broadcaster:main');
 let broadcaster: WakuRelayer;
 
 const main = async (): Promise<void> => {
-  dbg('Warming up Relayer');
+  dbg('Warming up Broadcaster');
 
   await initRelayerModules();
 

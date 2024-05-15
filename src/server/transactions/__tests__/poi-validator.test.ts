@@ -116,7 +116,7 @@ describe.skip('poi-validator', () => {
         pois,
       ),
     ).to.eventually.be.rejectedWith(
-      'Could not validate Proof of Innocence - Relayer cannot process this transaction.',
+      'Could not validate Proof of Innocence - Broadcaster cannot process this transaction.',
     );
   }).timeout(20000);
 

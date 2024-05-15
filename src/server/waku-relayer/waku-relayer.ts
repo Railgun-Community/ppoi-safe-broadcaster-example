@@ -171,7 +171,7 @@ export class WakuRelayer {
       feesHex[tokenAddress] = `0x${fees[tokenAddress].toString(16)}`;
     });
 
-    // Availability must be accurate or Relayer risks automatic blocking by clients.
+    // Availability must be accurate or Broadcaster risks automatic blocking by clients.
     const availableWallets = await numAvailableWallets(chain);
 
     const network = networkForChain(chain);

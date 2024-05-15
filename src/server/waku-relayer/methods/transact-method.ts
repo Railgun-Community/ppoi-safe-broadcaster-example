@@ -116,7 +116,7 @@ export const transactMethod = async (
       versionCompare(relayerVersion, maxVersion) > 0
     ) {
       dbg(
-        `Cannot process tx - Relayer version ${relayerVersion} outside range ${minVersion}-${maxVersion}`,
+        `Cannot process tx - Broadcaster version ${relayerVersion} outside range ${minVersion}-${maxVersion}`,
       );
       // Do nothing. No error response.
       return;
@@ -145,13 +145,13 @@ export const transactMethod = async (
       !recognizesFeeCacheID(chain, feeCacheID)
     ) {
       dbg(
-        'Fee cache ID unrecognized. Transaction sent to another Relayer with same Rail Address.',
+        'Fee cache ID unrecognized. Transaction sent to another Broadcaster with same Rail Address.',
       );
       // Do nothing. No error response.
       return undefined;
     }
 
-    // Relayer validated. Begin error responses.
+    // Broadcaster validated. Begin error responses.
 
     if (
       chainType == null ||

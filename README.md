@@ -4,7 +4,7 @@
 
 Example code to forward RAILGUN transactions to the blockchain. Uses the Waku messaging protocol, while guaranteeing a Private Proof Of Innocence for all transactions.
 
-`ppoi-safe-broadcaster-example` is a node.js application that receives encrypted transactions from RAILGUN wallets equipped with Private Proof Of Innocence. The Relayer example verifies, signs and forwards the transactions to the blockchain. It will broadcast fees on the tokens you configure to accept at the rates defined in the config.
+`ppoi-safe-broadcaster-example` is a node.js application that receives encrypted transactions from RAILGUN wallets equipped with Private Proof Of Innocence. The Broadcaster example verifies, signs and forwards the transactions to the blockchain. It will broadcast fees on the tokens you configure to accept at the rates defined in the config.
 
 ## Private Proof Of Innocence
 

@@ -122,7 +122,7 @@ export const getEstimateGasDetailsRelayed = async (
 ): Promise<TransactionGasDetails> => {
   if (evmGasType === EVMGasType.Type2) {
     // minGasPrice not allowed on EVMGasType 2
-    throw new Error('EVMGasType 2 not allowed for Relayer transactions.');
+    throw new Error('EVMGasType 2 not allowed for Broadcaster transactions.');
   }
   const gasPrice = minGasPrice;
   const transactionWithOptionalMinGas: ContractTransaction = {
@@ -189,13 +189,13 @@ export const getEstimateGasDetailsRelayed = async (
       if (retryCount >= failedRetryAttempts) {
         if (err.message.indexOf('Timed out') !== -1) {
           const newCustomError = customRelayerError(
-            `ERROR: Relayer timed out attempting gas estimation. Please try again.`,
+            `ERROR: Broadcaster timed out attempting gas estimation. Please try again.`,
             err,
           );
           throw newCustomError;
 
           // throw new Error(
-          //   `CMsg_ERROR: Relayer timed out attempting gas estimation. Please try again.`,
+          //   `CMsg_ERROR: Broadcaster timed out attempting gas estimation. Please try again.`,
           // );
         }
         const formattedProvidedGas = parseFloat(

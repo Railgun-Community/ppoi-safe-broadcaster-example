@@ -81,8 +81,8 @@ export const lookUpCachedUnitTokenFee = (
 /**
  * Checks if feeCacheID is in cache map. It's ok if it's expired.
  * The fee cache ID ensures that this exact server sent out the fees.
- * This enables a Relayer to run multiple servers with the same Rail Address (and different HD wallets).
- * We check whether the fee was dispatched by this Relayer in transact-method.ts.
+ * This enables a Broadcaster to run multiple servers with the same Rail Address (and different HD wallets).
+ * We check whether the fee was dispatched by this Broadcaster in transact-method.ts.
  */
 export const recognizesFeeCacheID = (
   chain: RelayerChain,

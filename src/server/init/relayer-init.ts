@@ -37,7 +37,7 @@ export const initRelayerModules = async (forTest = false) => {
   initPricePoller();
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   POIAssurance.init();
-  logger.log('Relayer ready.');
+  logger.log('Broadcaster ready.');
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   initTopUpPoller();
 };

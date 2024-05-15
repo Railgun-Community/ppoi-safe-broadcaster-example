@@ -1,6 +1,6 @@
 export type FeeConfig = {
   // This buffer is a percentage of the estimated gas fee.
-  // Add large buffer for L2s because gas estimates change commonly between Client -> Relayer by 20%+.
+  // Add large buffer for L2s because gas estimates change commonly between Client -> Broadcaster by 20%+.
   gasEstimateVarianceBuffer: number;
 
   // Variance as a percentage, calculated by average gas limit / actual gas used.

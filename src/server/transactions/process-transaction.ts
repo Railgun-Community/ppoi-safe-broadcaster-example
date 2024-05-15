@@ -52,7 +52,7 @@ export const processTransaction = async (
     sendWithPublicWallet,
   );
   if (evmGasType === EVMGasType.Type2) {
-    throw new Error('Invalid gas type for Relayer transaction.');
+    throw new Error('Invalid gas type for Broadcaster transaction.');
   }
 
   const transactionRequestForGasEstimate: ContractTransaction = {
