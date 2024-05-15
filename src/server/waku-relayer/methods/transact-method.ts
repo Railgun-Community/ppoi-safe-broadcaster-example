@@ -306,7 +306,7 @@ const replaceErrorMessageNonDev = (
   switch (knownError) {
     case ErrorMessage.TRANSACTION_UNDERPRICED:
     case ErrorMessage.BAD_TOKEN_FEE:
-    case ErrorMessage.NO_RELAYER_FEE:
+    case ErrorMessage.NO_BROADCASTER_FEE:
     case ErrorMessage.GAS_ESTIMATE_ERROR:
     case ErrorMessage.GAS_ESTIMATE_REVERT:
     case ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR:
@@ -318,7 +318,7 @@ const replaceErrorMessageNonDev = (
     case ErrorMessage.REJECTED_PACKAGED_FEE:
     case ErrorMessage.FAILED_TO_EXTRACT_PACKAGED_FEE:
     case ErrorMessage.REPEAT_TRANSACTION:
-    case ErrorMessage.RELAYER_OUT_OF_GAS:
+    case ErrorMessage.BROADCASTER_OUT_OF_GAS:
     case ErrorMessage.NOTE_ALREADY_SPENT:
     case ErrorMessage.UNKNOWN_ERROR:
     case ErrorMessage.POI_INVALID:

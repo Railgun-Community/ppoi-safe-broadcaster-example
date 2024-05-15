@@ -70,7 +70,7 @@ export const getBestMatchWalletForNetwork = async (
     logger.warn(
       `${availableWallets.length} wallets available. ${outofFundsWallets.length} wallets are out of gas funds. (Need gas: ${minimumGasNeeded})`,
     );
-    throw new Error(ErrorMessage.RELAYER_OUT_OF_GAS);
+    throw new Error(ErrorMessage.BROADCASTER_OUT_OF_GAS);
   }
 
   if (randomizeSelection) {
