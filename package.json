@@ -31,7 +31,7 @@
   "dependencies": {
     "@0x/contract-addresses": "^8.0.0",
     "@noble/ed25519": "^1.7.1",
-    "@railgun-community/shared-models": "^6.4.7",
+    "@railgun-community/shared-models": "7.0.x",
     "@railgun-community/wallet": "^7.5.0",
     "@walletconnect/jsonrpc-types": "^1.0.2",
     "@walletconnect/jsonrpc-utils": "^1.0.4",
