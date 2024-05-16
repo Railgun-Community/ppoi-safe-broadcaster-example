@@ -1,6 +1,6 @@
 import * as ed from '@noble/ed25519';
 import {
-  hexlify,
+  ByteUtils,
   encryptJSONDataWithSharedKey,
   tryDecryptJSONDataWithSharedKey,
   EncryptedData,
@@ -134,7 +134,7 @@ export const transactMethod = async (
     const railgunWalletAddress = getRailgunWalletAddress();
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
-    if (broadcasterViewingKey !== hexlify(viewingPublicKey)) {
+    if (broadcasterViewingKey !== ByteUtils.hexlify(viewingPublicKey)) {
       return undefined;
     }
 

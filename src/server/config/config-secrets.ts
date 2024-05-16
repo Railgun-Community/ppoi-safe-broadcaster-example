@@ -1,14 +1,14 @@
 import { Secrets } from 'models/config-models';
 import { getSecret } from 'docker-secret';
 import _prompt from 'prompt-sync';
-import { fromUTF8String, hexlify } from '@railgun-community/wallet';
+import { ByteUtils, fromUTF8String } from '@railgun-community/wallet';
 import { sha256 } from 'ethers';
 
 const prompt = _prompt({ sigint: true });
 const getEncryptionKey = (): string => {
   const input = prompt('Enter passphrase to encrypt database: ');
   // input was already 32 bytes; don't hash
-  if (hexlify(input).length === 64) {
+  if (ByteUtils.hexlify(input).length === 64) {
     return input;
   }
   // hash input to 32 bytes if it's > 6 characters long

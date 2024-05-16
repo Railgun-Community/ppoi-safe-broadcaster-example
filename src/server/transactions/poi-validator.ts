@@ -2,7 +2,7 @@ import {
   ByteLength,
   POIRequired,
   POIValidator,
-  nToHex,
+  ByteUtils,
 } from '@railgun-community/wallet';
 import { BroadcasterChain } from '../../models/chain-models';
 import {
@@ -80,7 +80,7 @@ export const validatePOI = async (
     const validatedPOIData: ValidatedPOIData = {
       railgunTxid: feeTransactionData.railgunTxid,
       utxoTreeIn: Number(feeTransactionData.utxoTreeIn),
-      notePublicKey: nToHex(
+      notePublicKey: ByteUtils.nToHex(
         feeTransactionData.firstCommitmentNotePublicKey as bigint,
         ByteLength.UINT_256,
         true,

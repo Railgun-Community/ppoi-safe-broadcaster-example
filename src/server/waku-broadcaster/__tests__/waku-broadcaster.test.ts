@@ -3,11 +3,10 @@ import * as ed from '@noble/ed25519';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon, { SinonStub } from 'sinon';
-import { JsonRpcRequest, JsonRpcResult } from '@walletconnect/jsonrpc-types';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
 import {
-  verifyRelayerSignature,
-  hexlify,
+  verifyBroadcasterSignature,
+  ByteUtils,
   toUTF8String,
   tryDecryptJSONDataWithSharedKey,
   getRailgunWalletPrivateViewingKey,
@@ -186,8 +185,7 @@ describe('waku-broadcaster', () => {
     const decodedRailgunAddress = getRailgunWalletAddressData(
       data.railgunAddress,
     );
-    //TODO: finish rename in wallet
-    const isValid = await verifyRelayerSignature(
+    const isValid = await verifyBroadcasterSignature(
       signature,
       message.data,
       decodedRailgunAddress.viewingPublicKey,
@@ -212,7 +210,7 @@ describe('waku-broadcaster', () => {
       minGasPrice: '0x1000',
       to: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
       data: '0x1234',
-      broadcasterViewingKey: hexlify(viewingPublicKey),
+      broadcasterViewingKey: ByteUtils.hexlify(viewingPublicKey),
       useRelayAdapt: false,
       devLog: true,
       minVersion: getBroadcasterVersion(),
@@ -259,7 +257,7 @@ describe('waku-broadcaster', () => {
       minGasPrice: '0x1000',
       to: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
       data: '0x1234',
-      broadcasterViewingKey: hexlify(viewingPublicKey),
+      broadcasterViewingKey: ByteUtils.hexlify(viewingPublicKey),
       useRelayAdapt: false,
       devLog: true,
       minVersion: getBroadcasterVersion(),
@@ -268,7 +266,7 @@ describe('waku-broadcaster', () => {
     };
     const randomPrivKey = getRandomBytes(32);
     const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
-    const clientPubKey = hexlify(randomPubKeyUint8Array);
+    const clientPubKey = ByteUtils.hexlify(randomPubKeyUint8Array);
     const sharedKey = await ed.getSharedSecret(
       randomPrivKey,
       broadcasterPublicKey,

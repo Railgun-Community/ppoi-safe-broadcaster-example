@@ -14,7 +14,7 @@ import {
   ByteLength,
   Database,
   POINodeRequest,
-  formatToByteLength,
+  ByteUtils,
   getRailgunTransactionsForTxid,
   refreshReceivePOIsForWallet,
   walletForID,
@@ -66,7 +66,7 @@ export class POIAssurance {
     namespace: string[],
     fieldCount: number,
   ): Promise<string[][]> {
-    if (!this.db) {
+    if (!isDefined(this.db)) {
       throw new Error('Call POIAssurance.init first to initialize DB');
     }
     const keys: string[] = await this.db.getNamespaceKeys(namespace);
@@ -83,7 +83,7 @@ export class POIAssurance {
     validatedPOIData: ValidatedPOIData,
   ): Promise<void> {
     try {
-      if (!this.db) {
+      if (!isDefined(this.db)) {
         throw new Error('Call POIAssurance.init first to initialize DB');
       }
 
@@ -128,7 +128,7 @@ export class POIAssurance {
       const validatedPOIs: StoredValidatedPOI[] = removeUndefineds(
         await Promise.all(
           keySplits.map(async (keySplit) => {
-            if (!this.db) {
+            if (!isDefined(this.db)) {
               throw new Error('Call POIAssurance.init first to initialize DB');
             }
             return (await this.db.get(keySplit, 'json')) as StoredValidatedPOI;
@@ -148,7 +148,7 @@ export class POIAssurance {
     txid: string,
   ) {
     try {
-      if (!this.db) {
+      if (!isDefined(this.db)) {
         throw new Error('Call POIAssurance.init first to initialize DB');
       }
 
@@ -179,10 +179,10 @@ export class POIAssurance {
       const wallet = walletForID(walletID);
       const spendableReceivedTxids = (
         await wallet.getSpendableReceivedChainTxids(txidVersion, chain)
-      ).map((txid) => formatToByteLength(txid, ByteLength.UINT_256));
+      ).map((txid) => ByteUtils.formatToByteLength(txid, ByteLength.UINT_256));
 
       for (const validatedPOI of validatedPOIs) {
-        const txidFormatted = formatToByteLength(
+        const txidFormatted = ByteUtils.formatToByteLength(
           validatedPOI.txid,
           ByteLength.UINT_256,
         );
