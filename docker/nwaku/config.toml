@@ -14,18 +14,16 @@ rest-private=true
 rest-relay-cache-capacity=3000
 keep-alive=true
 staticnode=[
-  '/dns4/teelf.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAkygexqAtchrhYVqLFBTXFEEZPtz8C8ZnSP6iYy1s22mfW',
-  '/dns4/fleet.wecamefromapes.com/tcp/60001/p2p/16Uiu2HAmTCCZFbQxDNF1TL9TKSPXtfF9QJtNWhCFE5M8UNzk7DQv',
-
+  "/dns4/horsey.horsewithsixlegs.xyz/tcp/60000/p2p/16Uiu2HAmLWDFk5nGXgLx2Mz2deiEMRya1HNcvWELMDodkAC891Sd",
 ]
 dns-discovery=false
 discv5-discovery=true
 discv5-bootstrap-node=[
   # fleet
-  'enr:-Ni4QPZ55N8GN4HwH_7Nli9Bgd23JJtKvaGC0fXeiwE_A8aePE7YGseYgskHgyxNmezLfSMBKuDn34urDqVfKBRCbmABgmlkgnY0gmlwhNiAsSuKbXVsdGlhZGRyc7hAAB02GHRlZWxmLndlY2FtZWZyb21hcGVzLmNvbQbqYAAfNhh0ZWVsZi53ZWNhbWVmcm9tYXBlcy5jb20GH0DeA4lzZWNwMjU2azGhAj9FT3UXw5hx9aGLFGvVprvCsidIq_vbClDzoljGeJRhg3RjcILqYIV3YWt1MgE',
-  'enr:-Ni4QLf1GqgX04PfPiU3XonC30G0igOGyqiJs2ke0_T0m8boPQLZ7_Agh3BlbOSTJD5yvr9acyYQiXo3KpRPTaxC4EYBgmlkgnY0gmlwhC0gpwuKbXVsdGlhZGRyc7hAAB02GGZsZWV0LndlY2FtZWZyb21hcGVzLmNvbQbqYQAfNhhmbGVldC53ZWNhbWVmcm9tYXBlcy5jb20GH0HeA4lzZWNwMjU2azGhA9gCbHe9obcRB0Eyxn8uu6K3LoZb2xhLnl_Tc28bl2gbg3RjcILqYYV3YWt1MgE'
+  'enr:-OW4QF2eXPNrvihLXdfgsvxuXOUAbr356G4j3C2FYTg6CgLNMiTEViAoOf6VpMuPN3LUoyGmKsJ8MdU5VP6jFSgTuEcBgmlkgnY0gmlwhJ9Bw0aKbXVsdGlhZGRyc7hGACA2G2hvcnNleS5ob3JzZXdpdGhzaXhsZWdzLnh5egbqYAAiNhtob3JzZXkuaG9yc2V3aXRoc2l4bGVncy54eXoGH0DeA4lzZWNwMjU2azGhA3Sd2_FnlrSEnDZZ-DEkKp-RJnuZmDABK6s6kKcBnUweg3RjcILqYIN1ZHCCIyiFd2FrdTIP'
 ]
 pubsub-topic=[
   '/waku/2/railgun-broadcaster',
 ]
 max-connections=300
+
