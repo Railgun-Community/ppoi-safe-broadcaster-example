@@ -29,6 +29,13 @@ This network runs on [Waku](https://wakunetwork.com/), a secure and decentralize
 
 ## Updating
 
+# NOTICE 5/20/2024
+
+- fetch the latest commmits from main branch
+- run `./docker/stop.sh` if you're running the docker stack
+- run `./broadcaster-update`
+- run the update script as below or manually complete the needed steps as defined in the script
+
 This will: (**_docker only_**)
 
 - fetch the & update your local version of the repo.
