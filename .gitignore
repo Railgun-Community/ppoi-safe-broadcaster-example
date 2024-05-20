@@ -41,5 +41,6 @@ docker/docker-stack.yml
 docker/docker-stack-swagless.yml
 docker/appdata
 docker/custom.yml
+docker/UPDATED
 
 *.bak

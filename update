@@ -2,6 +2,7 @@
 set -e
 git fetch && \
 git rebase origin/main && \
+./broadcaster-update && \
 yarn && \
 docker/stop.sh && \
 docker/build.sh && \
