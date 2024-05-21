@@ -43,7 +43,6 @@ export const incrementReliability = async (
   } else {
     await setReliability(key, 1);
   }
-  console.log('Incrementing reliability');
 };
 
 export const decrementReliability = async (
@@ -51,7 +50,6 @@ export const decrementReliability = async (
   metric: string,
 ) => {
   const key = getReliabilityKeyPath(chain, metric);
-  console.log('Decrementing reliability', key);
   const current = await getReliability(key);
   if (isDefined(current)) {
     const next = current - 1;
@@ -59,7 +57,6 @@ export const decrementReliability = async (
   } else {
     await setReliability(key, 0);
   }
-  console.log('Decrementing reliability');
 };
 
 export const getReliability = async (
@@ -79,10 +76,15 @@ export const setReliability = async (
 
 export const getReliabilityRatio = async (
   chain: BroadcasterChain,
-  metric: string,
 ): Promise<number> => {
-  const successKey = getReliabilityKeyPath(chain, metric);
-  const failureKey = getReliabilityKeyPath(chain, metric);
+  const successKey = getReliabilityKeyPath(
+    chain,
+    ReliabilityMetric.SEND_SUCCESS,
+  );
+  const failureKey = getReliabilityKeyPath(
+    chain,
+    ReliabilityMetric.SEND_FAILURE,
+  );
   const success = await getReliability(successKey);
   const failure = await getReliability(failureKey);
   if (isDefined(success) && isDefined(failure)) {
@@ -91,21 +93,16 @@ export const getReliabilityRatio = async (
   return 0;
 };
 
-export const getReliabilityRatios = async (
+export const initReliabilityMetricsForChain = async (
   chain: BroadcasterChain,
-): Promise<Record<string, number>> => {
-  const ratios: Record<string, number> = {
-    DECODE_SUCCESS: 0,
-    SEND_SUCCESS: 0,
-    SEND_FAILURE: 0,
-  };
-  for (const metric of Object.keys(MetricsStrings)) {
+): Promise<void> => {
+  for (const metric of MetricsStrings) {
+    const key = getReliabilityKeyPath(chain, metric);
     // eslint-disable-next-line no-await-in-loop
-    ratios[metric] = await getReliabilityRatio(
-      chain,
-      // @ts-ignore
-      metric,
-    );
+    const current = await getReliability(key);
+    if (!isDefined(current)) {
+      // eslint-disable-next-line no-await-in-loop
+      await setReliability(key, 0);
+    }
   }
-  return ratios;
 };

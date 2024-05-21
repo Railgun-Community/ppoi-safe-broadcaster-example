@@ -12,6 +12,9 @@ import {
   decrementReliability,
   ReliabilityMetric,
   getReliabilityKeyPath,
+  //   getReliabilityRatios,
+  getReliabilityRatio,
+  setReliability,
 } from '../reliability';
 
 chai.use(chaiAsPromised);
@@ -36,30 +39,49 @@ describe('reliability-settings', () => {
     await closeSettingsDB();
   });
 
-  it('Should test increment Decode-Success', async () => {
+  it('Should test increment Send-Success', async () => {
     const reliabilityKey = getReliabilityKeyPath(
       MOCK_CHAIN,
-      ReliabilityMetric.DECODE_SUCCESS,
+      ReliabilityMetric.SEND_SUCCESS,
     );
     const initialValue = await getReliability(reliabilityKey);
     expect(initialValue).to.be.undefined;
-    await incrementReliability(MOCK_CHAIN, ReliabilityMetric.DECODE_SUCCESS);
+    await incrementReliability(MOCK_CHAIN, ReliabilityMetric.SEND_SUCCESS);
     const incrementedValue = await getReliability(reliabilityKey);
     expect(incrementedValue).to.equal(1);
   });
 
-  it('Should test decrement Decode-Success', async () => {
+  it('Should test decrement Send-Success', async () => {
     const reliabilityKey = getReliabilityKeyPath(
       MOCK_CHAIN,
-      ReliabilityMetric.DECODE_SUCCESS,
+      ReliabilityMetric.SEND_SUCCESS,
     );
     const initialValue = await getReliability(reliabilityKey);
     expect(initialValue).to.equal(1);
-    await decrementReliability(MOCK_CHAIN, ReliabilityMetric.DECODE_SUCCESS);
+    await decrementReliability(MOCK_CHAIN, ReliabilityMetric.SEND_SUCCESS);
     const decrementedValue = await getReliability(reliabilityKey);
     expect(decrementedValue).to.equal(0);
   });
-  //   it('Should test settings db errors', async () => {
+  it('Should test reliability ratio', async () => {
+    const reliabilityKey = getReliabilityKeyPath(
+      MOCK_CHAIN,
+      ReliabilityMetric.SEND_SUCCESS,
+    );
+    const failureKey = getReliabilityKeyPath(
+      MOCK_CHAIN,
+      ReliabilityMetric.SEND_FAILURE,
+    );
+    const initialValue = await getReliability(reliabilityKey);
+    expect(initialValue).to.equal(0);
+    await incrementReliability(MOCK_CHAIN, ReliabilityMetric.SEND_SUCCESS);
+    const incrementedValue = await getReliability(reliabilityKey);
+    await setReliability(failureKey, 0);
+    const failureValue = await getReliability(failureKey);
+    expect(incrementedValue).to.equal(1);
+    expect(failureValue).to.equal(0);
+    await incrementReliability(MOCK_CHAIN, ReliabilityMetric.SEND_FAILURE);
 
-  //   });
+    const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
+    expect(reliabilityRatio).to.equal(0.5);
+  });
 });
