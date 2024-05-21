@@ -90,7 +90,9 @@ export const getReliabilityRatio = async (
   if (isDefined(success) && isDefined(failure)) {
     return success / (success + failure);
   }
-  return 0;
+  // return 1 for 'initial' report value;
+  // waku-broadcaster-client will sort based on reliability
+  return 1;
 };
 
 export const initReliabilityMetricsForChain = async (
