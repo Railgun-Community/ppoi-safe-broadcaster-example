@@ -32,6 +32,7 @@ import { transactMethod } from './methods/transact-method';
 import { contentTopics } from './topics';
 import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
+import { getReliabilityRatio } from '../../util/reliability';
 
 type JsonRPCMessageHandler = (
   params: any,
@@ -183,9 +184,12 @@ export class WakuBroadcaster {
       network.name,
     );
 
+    const reliabilityMetrics = await getReliabilityRatio(chain);
+
     const data: BroadcasterFeeMessageData = {
       fees: feesHex,
       // client can't rely on message timestamp to calculate expiration
+      // TODO: check if this is fixed
       feeExpiration: Date.now() + this.options.feeExpiration,
       feesID: feeCacheID,
       railgunAddress: this.railgunWalletAddress,
@@ -194,6 +198,7 @@ export class WakuBroadcaster {
       version: getBroadcasterVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
       requiredPOIListKeys, // DO NOT CHANGE : Required in order to make broadcaster fees spendable
+      reliability: reliabilityMetrics,
     };
     const message = fromUTF8String(JSON.stringify(data));
     const signature = await signWithWalletViewingKey(
