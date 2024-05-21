@@ -34,8 +34,13 @@ import {
 import { getBroadcasterVersion } from '../../../util/broadcaster-version';
 import { TransactionResponse, formatUnits, parseUnits } from 'ethers';
 import { createValidTransaction } from '../../transactions/transaction-validator';
-import { BroadcasterError } from '../../../models/error-models';
+import {
+  ReliabilityMetric,
+  incrementReliability,
+} from '../../../util/reliability';
 
+// TODO: check out error generation & responses in this file
+// import { BroadcasterError } from '../../../models/error-models';
 const handledClientPubKeys: string[] = [];
 
 const dbg = debug('broadcaster:transact');
@@ -66,6 +71,14 @@ export const transactMethod = async (
     dbg('Repeat message - already handled');
     return undefined;
   }
+  await incrementReliability(
+    {
+      // @ts-ignore; this is a dummy chain object since we don't have the chain info yet
+      id: 0,
+      type: 0,
+    },
+    ReliabilityMetric.TOTAL_SEEN,
+  );
   handledClientPubKeys.push(clientPubKey);
 
   const railgunWalletID = getRailgunWalletID();
@@ -81,6 +94,7 @@ export const transactMethod = async (
     dbg('Cannot decrypt - Not intended receiver');
     return undefined;
   }
+  // TODO: if we get here, start metrics tracking for the 'reliability' metric
 
   const {
     chainType,
@@ -105,12 +119,16 @@ export const transactMethod = async (
     id: chainID,
   };
 
+  await incrementReliability(chain, ReliabilityMetric.DECODE_SUCCESS);
+
   try {
     dbg('Decrypted - attempting to transact');
 
     if (!minVersion || !maxVersion) {
       dbg(`Cannot process tx - Requires params minVersion, maxVersion`);
       // Do nothing. No error response.
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return;
     }
     const broadcasterVersion = getBroadcasterVersion();
@@ -122,12 +140,16 @@ export const transactMethod = async (
         `Cannot process tx - Broadcaster version ${broadcasterVersion} outside range ${minVersion}-${maxVersion}`,
       );
       // Do nothing. No error response.
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return;
     }
 
     if (!broadcasterViewingKey) {
       dbg(`Cannot process tx - Requires params broadcasterViewingKey`);
       // Do nothing. No error response.
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return;
     }
 
@@ -135,12 +157,16 @@ export const transactMethod = async (
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
     if (broadcasterViewingKey !== ByteUtils.hexlify(viewingPublicKey)) {
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return undefined;
     }
 
     if (!feeCacheID) {
       dbg(`Cannot process tx - Requires params feeCacheID`);
       // Do nothing. No error response.
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return;
     }
     if (
@@ -151,6 +177,8 @@ export const transactMethod = async (
         'Fee cache ID unrecognized. Transaction sent to another Broadcaster with same Rail Address.',
       );
       // Do nothing. No error response.
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return undefined;
     }
 
@@ -166,6 +194,8 @@ export const transactMethod = async (
       broadcasterViewingKey == null ||
       useRelayAdapt == null
     ) {
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return errorResponse(
         id,
         chain,
@@ -179,6 +209,8 @@ export const transactMethod = async (
       !isDefined(configNetworks[chain.type]) ||
       !isDefined(configNetworks[chain.type][chain.id])
     ) {
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return errorResponse(
         id,
         chain,
@@ -200,6 +232,8 @@ export const transactMethod = async (
       preTransactionPOIsPerTxidLeafPerList,
       devLog,
     );
+    await incrementReliability(chain, ReliabilityMetric.SEND_SUCCESS);
+
     return resultResponse(id, chain, sharedKey, txResponse);
   } catch (err) {
     // custom error message
@@ -261,10 +295,14 @@ export const transactMethod = async (
               preTransactionPOIsPerTxidLeafPerList,
               devLog,
             );
+            await incrementReliability(chain, ReliabilityMetric.SEND_SUCCESS);
+
             return resultResponse(id, chain, sharedKey, txResponse);
           } catch (err) {
             // any error here. we just return original response instead.
             dbg('We Errored twice.', err);
+            await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
             return errorResponse(
               id,
               chain,
@@ -275,16 +313,19 @@ export const transactMethod = async (
           }
         }
       }
-      // check if this is a
-
       const newErr = new Error(newErrorString);
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return errorResponse(id, chain, sharedKey, newErr, true);
     }
     dbg(err);
+    await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
     return errorResponse(id, chain, sharedKey, err, devLog);
   }
 };
 
+// TODO: mark a successful tx for the 'reliability' metric
 const resultResponse = (
   id: number,
   chain: BroadcasterChain,
@@ -330,6 +371,7 @@ const replaceErrorMessageNonDev = (
   return ErrorMessage.UNKNOWN_ERROR;
 };
 
+// TODO: mark a failed tx for the 'reliability' metric
 const errorResponse = (
   id: number,
   chain: BroadcasterChain,

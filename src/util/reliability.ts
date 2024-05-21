@@ -8,18 +8,22 @@ import {
 } from '../server/db/settings-db';
 import { isDefined } from '@railgun-community/shared-models';
 
-// store successful decode count
-// store successful 'send' count
-// store failed 'send' count
-
-const dbg = debug('broadcaster:utils:reliablity');
+const dbg = debug('broadcaster:utils:reliability');
 
 const BROADCASTER_KEY = 'reliability_key';
 
-const MetricsStrings = ['decode_success', 'send_success', 'send_failure'];
+const MetricsStrings = [
+  'total_seen', // total number of messages seen
+  'decode_success',
+  'decode_failure', // this one will be seen_total - decode_success
+  'send_success',
+  'send_failure',
+];
 
 export const ReliabilityMetric = {
+  TOTAL_SEEN: 'total_seen',
   DECODE_SUCCESS: 'decode_success',
+  DECODE_FAILURE: 'decode_failure',
   SEND_SUCCESS: 'send_success',
   SEND_FAILURE: 'send_failure',
 };
@@ -62,14 +66,19 @@ export const decrementReliability = async (
 export const getReliability = async (
   key: string,
 ): Promise<Optional<number>> => {
-  return await getSettingsNumber(key);
+  return await getSettingsNumber(key).catch((e) => {
+    dbg(`Error getting reliability metric, ${key}: ${e}`);
+    return undefined;
+  });
 };
 
 export const setReliability = async (
   key: string,
   value: number,
 ): Promise<void> => {
-  return await storeSettingsNumber(key, value);
+  return await storeSettingsNumber(key, value).catch((e) => {
+    dbg(`Error setting reliability metric, ${key}: ${value}: ${e}`);
+  });
 };
 
 // calculate ratios
