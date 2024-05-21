@@ -4,7 +4,6 @@ docker/stop.sh && \
 git fetch && \
 git rebase origin/main && \
 ./broadcaster-update && \
-yarn && \
 docker/build.sh && \
 sleep 30 && \
 docker/run.sh;
