@@ -50,7 +50,7 @@ const handleNoDBError = () => {
   return Promise.resolve(undefined);
 };
 
-export const storeSettingsString = (
+export const storeSettingsString = async (
   key: string,
   value: string,
 ): Promise<void> => {
@@ -62,7 +62,7 @@ export const storeSettingsString = (
     .catch((err) => putDbErrorHandler(key, value, err));
 };
 
-export const storeSettingsBytes = (
+export const storeSettingsBytes = async (
   key: string,
   value: string,
 ): Promise<void> => {
@@ -74,7 +74,7 @@ export const storeSettingsBytes = (
     .catch((err) => putDbErrorHandler(key, value, err));
 };
 
-export const storeSettingsNumber = (
+export const storeSettingsNumber = async (
   key: string,
   value: number,
 ): Promise<void> => {
@@ -86,7 +86,9 @@ export const storeSettingsNumber = (
     .catch((err) => putDbErrorHandler(key, value, err));
 };
 
-export const getSettingsString = (key: string): Promise<Optional<string>> => {
+export const getSettingsString = async (
+  key: string,
+): Promise<Optional<string>> => {
   if (!db) {
     return handleNoDBError();
   }
@@ -95,7 +97,9 @@ export const getSettingsString = (key: string): Promise<Optional<string>> => {
     .catch((err) => getDbErrorHandler(key, err));
 };
 
-export const getSettingsBytes = (key: string): Promise<Optional<string>> => {
+export const getSettingsBytes = async (
+  key: string,
+): Promise<Optional<string>> => {
   if (!db) {
     return handleNoDBError();
   }
@@ -104,7 +108,9 @@ export const getSettingsBytes = (key: string): Promise<Optional<string>> => {
     .catch((err) => getDbErrorHandler(key, err));
 };
 
-export const getSettingsNumber = (key: string): Promise<Optional<number>> => {
+export const getSettingsNumber = async (
+  key: string,
+): Promise<Optional<number>> => {
   if (!db) {
     return handleNoDBError();
   }
