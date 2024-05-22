@@ -211,7 +211,7 @@ export default {
      * URL of nim-waku rpc server (eg http://localhost:8546).
      */
     rpcURL: process.env.WAKU_RPC_URL ?? 'http://nwaku1:8546',
-    rpcURLBackup: process.env.WAKU_RPC_URL_BBACKUP ?? 'http://nwaku2:8547',
+    rpcURLBackup: process.env.WAKU_RPC_URL_BACKUP ?? 'http://nwaku2:8547',
 
     /**
      * Frequency to poll for new messages.
