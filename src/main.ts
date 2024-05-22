@@ -11,6 +11,7 @@ import { delay } from 'util/promise-utils';
 import config from 'server/config/config-defaults';
 import { WakuRestApiClient } from 'server/networking/waku-rest-api-client';
 import { waitForWaku } from './server/networking/waku-poller';
+import { closeSettingsDB } from './server/db/settings-db';
 
 const dbg = debug('broadcaster:main');
 
@@ -45,6 +46,7 @@ const main = async (): Promise<void> => {
 process.on('SIGINT', async () => {
   dbg('shutting down');
   await uninitBroadcasterModules();
+  await closeSettingsDB();
   await broadcaster.stop();
   await delay(2000);
   process.exit(0);
