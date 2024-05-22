@@ -4,22 +4,21 @@ import { EVMGasType, ChainType } from '@railgun-community/shared-models';
 import { GasHistoryPercentile } from '../../../models/gas-models';
 import { getGasDetailsForSpeed } from '../gas-by-speed';
 import { NetworkChainID } from '../../config/config-chains';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { initNetworkProviders } from '../../providers/active-network-providers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const chain: RelayerChain = {
+const chain: BroadcasterChain = {
   type: ChainType.EVM,
   id: NetworkChainID.PolygonPOS,
 };
 
 describe('gas-by-speed', () => {
-
   before(async () => {
     await initNetworkProviders([chain]);
-  })
+  });
 
   it('Should calculate gas speeds from RPC - Type0', async () => {
     await Promise.all(

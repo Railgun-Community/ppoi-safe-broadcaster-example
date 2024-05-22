@@ -3,12 +3,15 @@ import configTokens from '../server/config/config-tokens';
 import { CoingeckoNetworkID } from '../models/api-constants';
 import { NETWORK_CONFIG, NetworkName } from '@railgun-community/shared-models';
 import { Token, TokenConfig } from '../models/token-models';
-import { RelayerChain } from '../models/chain-models';
+import { BroadcasterChain } from '../models/chain-models';
 import fallbackProvidersEthereum from '../server/config/fallback-providers/1-ethereum';
 import fallbackProvidersEthereumGoerli from '../server/config/fallback-providers/5-ethereum-goerli';
 import { Network } from '../models/network-models';
 
-export const mockTokenConfig = (chain: RelayerChain, tokenAddress: string) => {
+export const mockTokenConfig = (
+  chain: BroadcasterChain,
+  tokenAddress: string,
+) => {
   // @ts-expect-error
   configTokens[chain.type] ??= {};
   configTokens[chain.type][chain.id] ??= {};
@@ -71,10 +74,12 @@ export const getMockGoerliNetwork = (): Network => {
       gasEstimateLimitToActualRatio: 1.25,
       profit: 0.05,
     },
-    proxyContract: NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].proxyContract,
+    proxyContract:
+      NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].proxyContract,
     relayAdaptContract:
       NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].relayAdaptContract,
-    deploymentBlock: NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].deploymentBlock,
+    deploymentBlock:
+      NETWORK_CONFIG[NetworkName.EthereumGoerli_DEPRECATED].deploymentBlock,
     fallbackProviderConfig: fallbackProvidersEthereumGoerli,
     priceTTLInMS: 5 * 60 * 1000,
     isTestNetwork: true,

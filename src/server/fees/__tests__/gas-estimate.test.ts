@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import {
   getEstimateGasDetailsPublic,
-  calculateMaximumGasRelayer,
+  calculateMaximumGasBroadcaster,
 } from '../gas-estimate';
 import {
   getMockNetwork,
@@ -49,7 +49,7 @@ describe('gas-estimate', () => {
       evmGasType,
       getMockContractTransaction(),
     );
-    const maximumGas = calculateMaximumGasRelayer(
+    const maximumGas = calculateMaximumGasBroadcaster(
       estimateGasDetails,
       MOCK_CHAIN,
     );
@@ -74,7 +74,7 @@ describe('gas-estimate', () => {
       evmGasType,
       getMockContractTransaction(),
     );
-    const maximumGas = calculateMaximumGasRelayer(
+    const maximumGas = calculateMaximumGasBroadcaster(
       estimateGasDetails,
       MOCK_CHAIN,
     );

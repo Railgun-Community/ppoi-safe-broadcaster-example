@@ -1,6 +1,6 @@
 import { ChainType } from '@railgun-community/shared-models';
 import axios from 'axios';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { logger } from '../../../util/logger';
 import { NetworkChainID } from '../../config/config-chains';
 import configDefaults from '../../config/config-defaults';
@@ -10,7 +10,9 @@ export enum ZeroXApiEndpoint {
   GetSwapQuote = 'swap/v1/quote',
 }
 
-export const getStablecoinReferenceSymbol = (chain: RelayerChain): string => {
+export const getStablecoinReferenceSymbol = (
+  chain: BroadcasterChain,
+): string => {
   const error = new Error(
     `Chain ${chain.type}:${chain.id} has no reference symbol, Unable to get price quotes.`,
   );
@@ -37,7 +39,7 @@ export const getStablecoinReferenceSymbol = (chain: RelayerChain): string => {
   throw error;
 };
 
-const zeroXApiUrl = (chain: RelayerChain): string => {
+const zeroXApiUrl = (chain: BroadcasterChain): string => {
   switch (chain.type) {
     case ChainType.EVM: {
       switch (chain.id) {
@@ -63,7 +65,7 @@ const zeroXApiUrl = (chain: RelayerChain): string => {
   }
 };
 
-export const zeroXSupportsNetwork = (chain: RelayerChain): boolean => {
+export const zeroXSupportsNetwork = (chain: BroadcasterChain): boolean => {
   try {
     zeroXApiUrl(chain);
     return true;
@@ -82,7 +84,7 @@ const paramString = (params?: MapType<any>) => {
 
 const createUrl = (
   endpoint: ZeroXApiEndpoint,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   params?: MapType<any>,
 ) => {
   const url = `${zeroXApiUrl(chain)}${endpoint}${paramString(params)}`;
@@ -91,7 +93,7 @@ const createUrl = (
 
 export const getZeroXData = async <T>(
   endpoint: ZeroXApiEndpoint,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   params?: MapType<any>,
 ): Promise<T> => {
   const url = createUrl(endpoint, chain, params);

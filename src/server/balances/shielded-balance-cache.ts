@@ -4,7 +4,7 @@ import {
 } from '@railgun-community/wallet';
 import { resetMapObject } from '../../util/utils';
 import { ERC20Amount } from '../../models/token-models';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   RailgunBalancesEvent,
   RailgunWalletBalanceBucket,
@@ -14,7 +14,7 @@ import {
 import { getRailgunWalletID } from '../wallets/active-wallets';
 import debug from 'debug';
 
-const dbg = debug('relayer:balances:shielded');
+const dbg = debug('broadcaster:balances:shielded');
 
 export type ShieldedCachedBalance = {
   erc20Amount: ERC20Amount;
@@ -34,7 +34,7 @@ let balancePromiseResolve: Optional<() => void>;
 
 export const updateShieldedBalances = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ) => {
   balancePromiseResolve = undefined;
 
@@ -67,10 +67,10 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
 
   erc20Amounts.forEach((erc20Amount) => {
     shieldedTokenBalanceCache[chain.type][chain.id][erc20Amount.tokenAddress] =
-    {
-      erc20Amount,
-      updatedAt: Date.now(),
-    };
+      {
+        erc20Amount,
+        updatedAt: Date.now(),
+      };
   });
 
   if (isDefined(balancePromiseResolve)) {
@@ -80,7 +80,7 @@ export const onBalanceUpdateCallback: BalancesUpdatedCallback = ({
 };
 
 export const getPrivateTokenBalanceCache = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): ShieldedCachedBalance[] => {
   shieldedTokenBalanceCache[chain.type] ??= {};
   shieldedTokenBalanceCache[chain.type][chain.id] ??= {};

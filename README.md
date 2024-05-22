@@ -1,10 +1,10 @@
-[![Unit Tests](https://github.com/Railgun-Community/poi-safe-relayer-example/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/poi-safe-relayer-example/actions)
+[![Unit Tests](https://github.com/Railgun-Community/poi-safe-broadcaster-example/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/poi-safe-broadcaster-example/actions)
 
 # Example code and tests for PPOI-Safe RAILGUN transactions
 
 Example code to forward RAILGUN transactions to the blockchain. Uses the Waku messaging protocol, while guaranteeing a Private Proof Of Innocence for all transactions.
 
-`ppoi-safe-relayer-example` is a node.js application that receives encrypted transactions from RAILGUN wallets equipped with Private Proof Of Innocence. The Relayer example verifies, signs and forwards the transactions to the blockchain. It will broadcast fees on the tokens you configure to accept at the rates defined in the config.
+`ppoi-safe-broadcaster-example` is a node.js application that receives encrypted transactions from RAILGUN wallets equipped with Private Proof Of Innocence. The Broadcaster example verifies, signs and forwards the transactions to the blockchain. It will broadcast fees on the tokens you configure to accept at the rates defined in the config.
 
 ## Private Proof Of Innocence
 
@@ -12,7 +12,7 @@ Private Proof Of Innocence is validated on every transaction for the safety of u
 
 Private Proof of Innocence is verified through a Proof Of Spendability, which verifies a merkle proof guaranteeing that the UTXOs that are spent are part of the Private Proof Of Innocence inclusion set for each list.
 
-This means that every fee that is gathered is guaranteed to be spendable by your wallet - and RAILGUN wallets without Private Proof Of Innocence will not be able to use the relayer to forward any transactions.
+This means that every fee that is gathered is guaranteed to be spendable by your wallet - and RAILGUN wallets without Private Proof Of Innocence will not be able to use the broadcaster to forward any transactions.
 
 ## Waku Messaging
 
@@ -28,6 +28,13 @@ This network runs on [Waku](https://wakunetwork.com/), a secure and decentralize
 - At least 1GB of RAM, at least 20GB of disk space
 
 ## Updating
+
+# NOTICE 5/20/2024
+
+- fetch the latest commits from main branch
+- run `./docker/stop.sh` if you're running the docker stack
+- run `./broadcaster-update`
+- run the update script as below or manually complete the needed steps as defined in the script
 
 This will: (**_docker only_**)
 
@@ -47,14 +54,14 @@ This will: (**_docker only_**)
 
 This is intended as a setup-wizard for running in docker.
 
-Only things required for setup are a capable system and a mnemonic to configure the relayer.
+Only things required for setup are a capable system and a mnemonic to configure the broadcaster.
 
 ```sh
 # clone repo
-git clone https://github.com/Railgun-Community/ppoi-safe-relayer-example.git
+git clone https://github.com/Railgun-Community/ppoi-safe-broadcaster-example.git
 
 # change to repo directory
-cd ppoi-safe-relayer-example
+cd ppoi-safe-broadcaster-example
 
 # May have to do this on a VPS
 docker swarm init --advertise-addr PUT.IP.ADDR.HERE
@@ -69,7 +76,7 @@ docker swarm init --advertise-addr PUT.IP.ADDR.HERE
 sudo ./docker/setup
 ```
 
-This will setup 2 naku nodes & 1 relayer node.
+This will setup 2 naku nodes & 1 broadcaster node.
 Configure its base defaults, and launch.
 
 ## Useful Commands
@@ -84,9 +91,9 @@ Configure its base defaults, and launch.
 
 ##### these commands may need to be run with sudo
 
-- `docker service logs relayer_relayer -f --raw` - displays running relayer logs
-- `docker service logs relayer_nwaku1 -f --raw` - displays running nwaku node 1 logs
-- `docker service logs relayer_nwaku2 -f --raw` - displays running nwaku node 2 logs
+- `docker service logs broadcaster_broadcaster -f --raw` - displays running broadcaster logs
+- `docker service logs broadcaster_nwaku1 -f --raw` - displays running nwaku node 1 logs
+- `docker service logs broadcaster_nwaku2 -f --raw` - displays running nwaku node 2 logs
 
 <hr>
 <br>
@@ -109,12 +116,12 @@ The fields to configure are described below. Note that you may leave the domain 
 
 ##### Required if running with Swag
 
-- `BASEDOMAIN` - If your full domain were 'relayer.railgun.org, this would be 'railgun.org'
-- `SUBDOMAIN` - If your domain were `relayer.railgun.org', this would be 'relayer'
+- `BASEDOMAIN` - If your full domain were 'broadcaster.railgun.org, this would be 'railgun.org'
+- `SUBDOMAIN` - If your domain were `broadcaster.railgun.org', this would be 'broadcaster'
 - `TZ` - timezone code; eg 'EST'
 - `EMAIL` - letsencrypt will generate an SSL certificate for your domain; an email address must be entered. Whether you enter a real email address or a fake one is up to you
 
-### [RELAYER]
+### [BROADCASTER]
 
 Customize your node by running `npm run copy-my-config`, which copies `src/MY-CONFIG.ts.example` to `src/MY-CONFIG.ts`.
 
@@ -124,7 +131,7 @@ The standard configurations are set in config files in `src/server/config/`. All
 
 - configDefaults.networks.active
 
-Configure the networks on which you want to run a relayer. Simply add or remove networks from `configDefaults.networks.active`
+Configure the networks on which you want to run a broadcaster. Simply add or remove networks from `configDefaults.networks.active`
 
 ```ts
 import { ChainType } from '@railgun-community/shared-models';
@@ -143,7 +150,7 @@ configDefaults.networks.active = [
 
 - configDefaults.waku.rpcURL
 
-Specify a waku server to use for your relayer's p2p communication. It defaults to http://localhost:8546.
+Specify a waku server to use for your broadcaster's p2p communication. It defaults to http://localhost:8546.
 
 ```ts
 //...
@@ -242,7 +249,7 @@ echo "0x98f1d79fae2fef3f562102eca9310a66af46f851e0d9c2f520c89ad95d67b5d0" | dock
 
       echo "my mnemonic words..." | docker secret create MNEMONIC -
 
-- Run `docker/build.sh` to build the `relayer` and `nwaku` docker images from your `docker/.env` environment definition. This will compose a 'swag' version (`creates SSL certs for DOMAINS, only needed if you're using a domain`) and one that just uses the `$EXTIP` for its nwaku visibility.
+- Run `docker/build.sh` to build the `broadcaster` and `nwaku` docker images from your `docker/.env` environment definition. This will compose a 'swag' version (`creates SSL certs for DOMAINS, only needed if you're using a domain`) and one that just uses the `$EXTIP` for its nwaku visibility.
 
 ```sh
       ./docker/build.sh                 # builds the swag docker stack
@@ -254,12 +261,12 @@ echo "0x98f1d79fae2fef3f562102eca9310a66af46f851e0d9c2f520c89ad95d67b5d0" | dock
 
         $ ./docker/run.sh
 
-        Creating network relayer_relayer
-        Creating service relayer_relayer
-        Creating service relayer_swag
-        Creating service relayer_nwaku
+        Creating network broadcaster_broadcaster
+        Creating service broadcaster_broadcaster
+        Creating service broadcaster_swag
+        Creating service broadcaster_nwaku
 
-If you get an error about the `relayer_relayer` network not existing, just execute `docker/run.sh` again until it works. This is a known issue with docker, but you may need to do it 5 times. Just press up instead of typing it again.
+If you get an error about the `broadcaster_broadcaster` network not existing, just execute `docker/run.sh` again until it works. This is a known issue with docker, but you may need to do it 5 times. Just press up instead of typing it again.
 
 - Stop stack:
 
@@ -267,9 +274,9 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 - View logs. append with `-f` to follow
 
-      docker service logs relayer_relayer       # relayer logs
-      docker service logs relayer_nwaku         # nwaku network node
-      docker service logs relayer_swag          # letsencrypt generation
+      docker service logs broadcaster_broadcaster       # broadcaster logs
+      docker service logs broadcaster_nwaku         # nwaku network node
+      docker service logs broadcaster_swag          # letsencrypt generation
 
 <br>
 
@@ -306,8 +313,8 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 ```
 {
   "listenAddresses": [
-    "/dns4/relayer.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg",
-    "/dns4/relayer.of.holdings/tcp/8000/ws/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg"
+    "/dns4/broadcaster.of.holdings/tcp/60000/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg",
+    "/dns4/broadcaster.of.holdings/tcp/8000/ws/p2p/16Uiu2HAmMUjGmiUhJeiZgu6ZZnLRkE2VViR2JgjqtW9aTZnHQqgg"
   ],
   "enrUri": "enr:-LO4QGvrbg2hqZnqdOFxGVZnDs9U2PWMkwfQUJdbjWixYkzUC8WOAkZXSlM3E4zxC-sh0yPcrYoiwrjooS2egIqnWnsBgmlkgnY0gmlwhKdH8B6KbXVsdGlhZGRyc5wAGjYTcmVsYXllci5vZi5ob2xkaW5ncwYfQN0DiXNlY3AyNTZrMaEDgxhTW1QQXUp6rmDAj8RflocYG0_fxiW9GnU_pzl_7XWDdGNwgupghXdha3UyDw"
 }
@@ -328,7 +335,7 @@ If you get an error about the `relayer_relayer` network not existing, just execu
     "connected": false
   },
   {
-    "multiaddr": "/dns4/relayer.railgun.org/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD",
+    "multiaddr": "/dns4/broadcaster.railgun.org/tcp/60000/p2p/16Uiu2HAmNy49QzXVWHMdhz7DQHXCpk9sHvVua99j3QcShUK8PVSD",
     "protocol": "/vac/waku/relay/2.0.0",
     "connected": true
   }
@@ -337,9 +344,9 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 - Monitor logs with commands like
 
-  - `docker service logs relayer_nwaku`
-  - `docker service logs relayer_relayer`
-  - `docker service logs relayer_swag`
+  - `docker service logs broadcaster_nwaku`
+  - `docker service logs broadcaster_broadcaster`
+  - `docker service logs broadcaster_swag`
 
 - In the event that services were restarted, the logs shown by the above commands may not be the true logs. If in doubt, execute:
   - `docker container ps`
@@ -348,9 +355,9 @@ If you get an error about the `relayer_relayer` network not existing, just execu
 
 ```
  CONTAINER ID   IMAGE                             COMMAND                  CREATED       STATUS       PORTS                            NAMES
-345265257f8f   relayer:latest                    "docker-entrypoint.s…"   5 hours ago   Up 5 hours                                    relayer_relayer.1.k8e9vk23lhzi79g3vcu02wtr9
-8fe5803a4314   nwaku:latest                      "wakunode2 --config-…"   5 hours ago   Up 5 hours   8545/tcp, 30303/tcp, 60000/tcp   relayer_nwaku.1.5kfe0bcahwbb95bdqxmqgx6ak
-4e76b7e1cd3d   ghcr.io/linuxserver/swag:latest   "/init"                  5 hours ago   Up 5 hours   80/tcp, 443/tcp                  relayer_swag.1.cmi0mo0r1fto3mbsz7iyfsms
+345265257f8f   broadcaster:latest                    "docker-entrypoint.s…"   5 hours ago   Up 5 hours                                    broadcaster_broadcaster.1.k8e9vk23lhzi79g3vcu02wtr9
+8fe5803a4314   nwaku:latest                      "wakunode2 --config-…"   5 hours ago   Up 5 hours   8545/tcp, 30303/tcp, 60000/tcp   broadcaster_nwaku.1.5kfe0bcahwbb95bdqxmqgx6ak
+4e76b7e1cd3d   ghcr.io/linuxserver/swag:latest   "/init"                  5 hours ago   Up 5 hours   80/tcp, 443/tcp                  broadcaster_swag.1.cmi0mo0r1fto3mbsz7iyfsms
 ```
 
 ## Run unit/integration tests

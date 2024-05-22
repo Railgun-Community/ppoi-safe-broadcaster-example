@@ -2,8 +2,8 @@ import { JsonRpcPayload } from '@walletconnect/jsonrpc-types';
 import debug from 'debug';
 
 import {
-  RelayerFeeMessage,
-  RelayerFeeMessageData,
+  BroadcasterFeeMessage,
+  BroadcasterFeeMessageData,
   isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
@@ -12,14 +12,17 @@ import {
   fromUTF8String,
   signWithWalletViewingKey,
 } from '@railgun-community/wallet';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { delay, promiseTimeout } from '../../util/promise-utils';
-import { getRelayerVersion } from '../../util/relayer-version';
+import { getBroadcasterVersion } from '../../util/broadcaster-version';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import { getAllUnitTokenFeesForChain } from '../fees/calculate-token-fee';
-import { WakuRestApiClient, WakuRelayMessage } from '../networking/waku-rest-api-client';
+import {
+  WakuRestApiClient,
+  WakuRelayMessage,
+} from '../networking/waku-rest-api-client';
 import {
   getRailgunWalletAddress,
   getRailgunWalletID,
@@ -39,13 +42,12 @@ export enum WakuMethodNames {
   Transact = 'transact',
 }
 
-export type WakuRelayerOptions = {
+export type WakuBroadcasterOptions = {
   topic: string;
   feeExpiration: number;
 };
 
-
-export class WakuRelayer {
+export class WakuBroadcaster {
   client: WakuRestApiClient;
 
   dbg: debug.Debugger;
@@ -60,7 +62,7 @@ export class WakuRelayer {
     ? configDefaults.instanceIdentifier
     : undefined;
 
-  options: WakuRelayerOptions;
+  options: WakuBroadcasterOptions;
 
   methods: MapType<JsonRPCMessageHandler> = {
     [WakuMethodNames.Transact]: transactMethod,
@@ -68,11 +70,11 @@ export class WakuRelayer {
 
   stopping = false;
 
-  constructor(client: WakuRestApiClient, options: WakuRelayerOptions) {
+  constructor(client: WakuRestApiClient, options: WakuBroadcasterOptions) {
     const chainIDs = configuredNetworkChains();
     this.client = client;
     this.options = options;
-    this.dbg = debug('relayer:waku:relayer');
+    this.dbg = debug('broadcaster:waku:broadcaster');
     this.subscribedContentTopics = [
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
     ];
@@ -83,11 +85,11 @@ export class WakuRelayer {
 
   static async init(
     client: WakuRestApiClient,
-    options: WakuRelayerOptions,
-  ): Promise<WakuRelayer> {
-    const relayer = new WakuRelayer(client, options);
-    await relayer.subscribe();
-    return relayer;
+    options: WakuBroadcasterOptions,
+  ): Promise<WakuBroadcaster> {
+    const broadcaster = new WakuBroadcaster(client, options);
+    await broadcaster.subscribe();
+    return broadcaster;
   }
 
   async stop() {
@@ -123,11 +125,12 @@ export class WakuRelayer {
   private async ensureTxResponse(msg: WakuMessage) {
     for (let i = 0; i < 20; i += 1) {
       // eslint-disable-next-line no-await-in-loop
-      await this.client.publish(msg, this.options.topic).then(
-        () => this.dbg('Published TX RESPONSE')
-      ).catch((e) => {
-        this.dbg('Error publishing message', e.message);
-      });
+      await this.client
+        .publish(msg, this.options.topic)
+        .then(() => this.dbg('Published TX RESPONSE'))
+        .catch((e) => {
+          this.dbg('Error publishing message', e.message);
+        });
       // eslint-disable-next-line no-await-in-loop
       await delay(1000);
     }
@@ -141,7 +144,7 @@ export class WakuRelayer {
     const { payload, contentTopic } = message;
 
     try {
-      const decoded = WakuRelayer.decode(payload);
+      const decoded = WakuBroadcaster.decode(payload);
       const request = JSON.parse(decoded);
       const { method, params, id } = request;
 
@@ -160,27 +163,27 @@ export class WakuRelayer {
   private createFeeBroadcastData = async (
     fees: MapType<bigint>,
     feeCacheID: string,
-    chain: RelayerChain,
-  ): Promise<RelayerFeeMessage> => {
+    chain: BroadcasterChain,
+  ): Promise<BroadcasterFeeMessage> => {
     const tokenAddresses = Object.keys(fees);
     const feesHex: MapType<string> = {};
     tokenAddresses.forEach((tokenAddress) => {
       feesHex[tokenAddress] = `0x${fees[tokenAddress].toString(16)}`;
     });
 
-    // Availability must be accurate or Relayer risks automatic blocking by clients.
+    // Availability must be accurate or Broadcaster risks automatic blocking by clients.
     const availableWallets = await numAvailableWallets(chain);
 
     const network = networkForChain(chain);
     if (!network) {
       throw new Error('No network found');
     }
-    // DO NOT CHANGE : Required in order to make relayer fees spendable
+    // DO NOT CHANGE : Required in order to make broadcaster fees spendable
     const requiredPOIListKeys = await POIRequired.getRequiredListKeys(
       network.name,
     );
 
-    const data: RelayerFeeMessageData = {
+    const data: BroadcasterFeeMessageData = {
       fees: feesHex,
       // client can't rely on message timestamp to calculate expiration
       feeExpiration: Date.now() + this.options.feeExpiration,
@@ -188,9 +191,9 @@ export class WakuRelayer {
       railgunAddress: this.railgunWalletAddress,
       identifier: this.identifier,
       availableWallets,
-      version: getRelayerVersion(),
+      version: getBroadcasterVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
-      requiredPOIListKeys, // DO NOT CHANGE : Required in order to make relayer fees spendable
+      requiredPOIListKeys, // DO NOT CHANGE : Required in order to make broadcaster fees spendable
     };
     const message = fromUTF8String(JSON.stringify(data));
     const signature = await signWithWalletViewingKey(
@@ -198,7 +201,8 @@ export class WakuRelayer {
       message,
     );
     this.dbg(
-      `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${Object.keys(fees).length
+      `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${
+        Object.keys(fees).length
       }, Available Wallets ${availableWallets}`,
     );
     return {
@@ -207,14 +211,14 @@ export class WakuRelayer {
     };
   };
 
-  async broadcastFeesForChain(chain: RelayerChain): Promise<void> {
+  async broadcastFeesForChain(chain: BroadcasterChain): Promise<void> {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chain);
     const feeBroadcastData = await promiseTimeout(
       this.createFeeBroadcastData(fees, feeCacheID, chain),
       3 * 1000,
     )
-      .then((result: RelayerFeeMessage) => {
+      .then((result: BroadcasterFeeMessage) => {
         return result;
       })
       .catch((err: Error) => {
@@ -257,10 +261,10 @@ export class WakuRelayer {
 
   async poll(frequency: number): Promise<void> {
     if (this.stopping) {
-      this.dbg('Sopping polling')
+      this.dbg('Sopping polling');
       return;
     }
-    this.dbg('Polling for messages')
+    this.dbg('Polling for messages');
     const messages = await this.client
       .getMessages(this.options.topic, this.subscribedContentTopics)
       .catch(async (e) => {
@@ -279,7 +283,7 @@ export class WakuRelayer {
       // eslint-disable-next-line no-await-in-loop
       this.handleMessage(message).catch((err) => {
         this.dbg(err);
-      })
+      });
       // eslint-disable-next-line no-await-in-loop
       await delay(250);
     }

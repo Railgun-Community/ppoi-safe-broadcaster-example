@@ -4,10 +4,10 @@ import {
   getFirstJsonRpcProviderForNetwork,
 } from '../providers/active-network-providers';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 
 export const getGasTokenBalance = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   walletAddress: string,
 ): Promise<Optional<bigint>> => {
   try {

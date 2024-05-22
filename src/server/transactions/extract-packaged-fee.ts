@@ -1,4 +1,4 @@
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   extractFirstNoteERC20AmountMapFromTransactionRequest,
   parseRailgunTokenAddress,
@@ -16,7 +16,7 @@ type PackagedFee = {
 
 export const extractPackagedFeeFromTransaction = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   transaction: ContractTransaction,
   useRelayAdapt: boolean,
 ): Promise<PackagedFee> => {
@@ -45,7 +45,7 @@ export const extractPackagedFeeFromTransaction = async (
 
   const tokens = Object.keys(firstNoteERC20Map);
   if (tokens.length < 1) {
-    throw new Error(ErrorMessage.NO_RELAYER_FEE);
+    throw new Error(ErrorMessage.NO_BROADCASTER_FEE);
   }
 
   const tokenAddress = parseRailgunTokenAddress(tokens[0]).toLowerCase();

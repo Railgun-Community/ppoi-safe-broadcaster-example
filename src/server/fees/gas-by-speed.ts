@@ -25,7 +25,7 @@ import {
   EVMGasType,
   isDefined,
 } from '@railgun-community/shared-models';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   GasHistoryPercentile,
   GasDetailsBySpeed,
@@ -119,7 +119,7 @@ const getMedianBigNumber = (feeHistoryOutputs: bigint[]): bigint => {
 
 // WARNING: TRANSACTIONS RISK BEING REVERTED IF YOU MODIFY THIS.
 const gasHistoryPercentileForChain = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): GasHistoryPercentile => {
   switch (chain.type) {
     case ChainType.EVM: {
@@ -145,10 +145,9 @@ const gasHistoryPercentileForChain = (
 
 export const getGasDetailsForSpeed = async (
   evmGasType: EVMGasType,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   percentile: GasHistoryPercentile,
 ): Promise<GasDetails> => {
-
   switch (evmGasType) {
     case EVMGasType.Type0:
     case EVMGasType.Type1: {
@@ -170,7 +169,7 @@ export const getGasDetailsForSpeed = async (
 
 export const getStandardGasDetails = (
   evmGasType: EVMGasType,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<GasDetails> => {
   const percentile = gasHistoryPercentileForChain(chain);
   return getGasDetailsForSpeed(evmGasType, chain, percentile);
@@ -186,7 +185,7 @@ const gasPriceForPercentile = (
 
 export const estimateGasPricesBySpeedUsingHeuristic = async (
   evmGasType: EVMGasType.Type0 | EVMGasType.Type1,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<GasDetailsBySpeed> => {
   const provider = getProviderForNetwork(chain);
   const { gasPrice } = await provider.getFeeData();
@@ -224,11 +223,13 @@ export const estimateGasPricesBySpeedUsingHeuristic = async (
  */
 const estimateGasMaxFeesBySpeedUsingHeuristic = async (
   evmGasType: EVMGasType.Type2,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<GasDetailsBySpeed> => {
   const feeHistory = await getFeeHistory(chain);
 
-  const mostRecentBaseFeePerGas = BigInt(feeHistory.baseFeePerGas[feeHistory.baseFeePerGas.length - 1]);
+  const mostRecentBaseFeePerGas = BigInt(
+    feeHistory.baseFeePerGas[feeHistory.baseFeePerGas.length - 1],
+  );
   const priorityFeePercentile: {
     [percentile in GasHistoryPercentile]: bigint[];
   } = {
@@ -241,8 +242,8 @@ const estimateGasMaxFeesBySpeedUsingHeuristic = async (
     [GasHistoryPercentile.High]: feeHistory.reward.map((feePriorityGroup) =>
       BigInt(feePriorityGroup[2]),
     ),
-    [GasHistoryPercentile.VeryHigh]: feeHistory.reward.map(
-      (feePriorityGroup) => BigInt(feePriorityGroup[3]),
+    [GasHistoryPercentile.VeryHigh]: feeHistory.reward.map((feePriorityGroup) =>
+      BigInt(feePriorityGroup[3]),
     ),
   };
 

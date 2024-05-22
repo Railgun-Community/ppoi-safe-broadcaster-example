@@ -27,7 +27,7 @@ import {
   ZeroXPriceParams,
   zeroXUpdatePricesByAddresses,
 } from '../0x-price';
-import { RelayerChain } from '../../../../models/chain-models';
+import { BroadcasterChain } from '../../../../models/chain-models';
 import {
   testChainEthereum,
   // testChainGoerli,
@@ -54,7 +54,7 @@ const expectedZeroXPriceOutput: ZeroXPriceData = {
   price: '1234.56',
 };
 
-const validatePriceRefresherOutput = (chain: RelayerChain) => {
+const validatePriceRefresherOutput = (chain: BroadcasterChain) => {
   TOKEN_ADDRESSES.forEach((address) => {
     const priceData = cachedTokenPriceForSource(
       TOKEN_PRICE_SOURCE,

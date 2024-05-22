@@ -12,16 +12,16 @@ import {
   TransactionResponse,
   keccak256,
 } from 'ethers';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
-import { ErrorMessage, sanitizeRelayerError } from '../../util/errors';
+import { ErrorMessage, sanitizeBroadcasterError } from '../../util/errors';
 import { promiseTimeout, throwErr } from '../../util/promise-utils';
 import { minBigInt } from '../../util/utils';
 import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
 import {
-  calculateGasLimitRelayer,
-  calculateMaximumGasRelayer,
+  calculateGasLimitBroadcaster,
+  calculateMaximumGasBroadcaster,
 } from '../fees/gas-estimate';
 import { getFirstJsonRpcProviderForNetwork } from '../providers/active-network-providers';
 import { createEthersWallet } from '../wallets/active-wallets';
@@ -37,11 +37,14 @@ import {
 import { ValidatedPOIData } from './poi-validator';
 import { POIAssurance } from './poi-assurance';
 
-const dbg = debug('relayer:transact:execute');
+const dbg = debug('broadcaster:transact:execute');
 
 const LAST_NONCE_KEY = 'last_nonce_key';
 
-export const getLastNonceKey = (chain: RelayerChain, wallet: EthersWallet) => {
+export const getLastNonceKey = (
+  chain: BroadcasterChain,
+  wallet: EthersWallet,
+) => {
   return `${LAST_NONCE_KEY}|${wallet.address}|${chain.type}|${chain.id}`;
 };
 
@@ -65,7 +68,7 @@ export const getCurrentWalletNonce = async (
  * Only limitation is if we restart during a pending tx, but blockTag 'pending' seems to help.
  */
 export const getCurrentNonce = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   wallet: EthersWallet,
 ): Promise<number> => {
   const blockTag = 'pending';
@@ -80,7 +83,7 @@ export const getCurrentNonce = async (
 };
 
 export const storeCurrentNonce = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   nonce: number,
   wallet: EthersWallet,
 ) => {
@@ -88,7 +91,7 @@ export const storeCurrentNonce = async (
 };
 
 export const executeTransaction = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   transaction: ContractTransaction,
   gasDetails: TransactionGasDetails,
   txidVersion?: TXIDVersion,
@@ -100,14 +103,14 @@ export const executeTransaction = async (
 ): Promise<TransactionResponse> => {
   dbg('Execute transaction');
 
-  const maximumGas = calculateMaximumGasRelayer(gasDetails, chain);
+  const maximumGas = calculateMaximumGasBroadcaster(gasDetails, chain);
   const activeWallet =
     wallet ?? (await getBestMatchWalletForNetwork(chain, maximumGas));
 
   const provider = getFirstJsonRpcProviderForNetwork(chain);
   const ethersWallet = createEthersWallet(activeWallet, provider);
   const nonce = overrideNonce ?? (await getCurrentWalletNonce(ethersWallet));
-  const gasLimit = calculateGasLimitRelayer(gasDetails.gasEstimate, chain);
+  const gasLimit = calculateGasLimitBroadcaster(gasDetails.gasEstimate, chain);
   // dbg('Nonce', nonce);
 
   const finalTransaction: ContractTransaction = {
@@ -179,7 +182,7 @@ export const executeTransaction = async (
     const txResponse: TransactionResponse = await promiseTimeout(
       ethersWallet.sendTransaction(finalTransaction),
       // 45-second time-out. A shorter or longer timeout may cause issues with frontends.
-      // Frontends submit to relayers with their own timeout; the frontend timeout may lapse before the Relayer timeout.
+      // Frontends submit to broadcasters with their own timeout; the frontend timeout may lapse before the Broadcaster timeout.
       45000,
     );
 
@@ -188,7 +191,6 @@ export const executeTransaction = async (
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
 
     if (setTxCached) {
-
       waitForTx(
         activeWallet,
         ethersWallet,
@@ -226,7 +228,7 @@ export const executeTransaction = async (
 
     if (isDefined(errMsg) && errMsg.includes('already known')) {
       await delay(45000); // force the mined pickup?
-      throw sanitizeRelayerError(err);
+      throw sanitizeBroadcasterError(err);
     }
     setWalletAvailability(activeWallet, chain, true);
 
@@ -273,7 +275,7 @@ export const executeTransaction = async (
     }
     // nonce errors
 
-    throw sanitizeRelayerError(err);
+    throw sanitizeBroadcasterError(err);
   }
 };
 
@@ -290,7 +292,7 @@ const hashTransactionRequest = (
 export const waitForTx = async (
   activeWallet: ActiveWallet,
   ethersWallet: EthersWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   txResponse: TransactionResponse,
   nonce: number,
   setAvailability = true,
@@ -313,7 +315,7 @@ export const waitForTx = async (
 export const waitForTxs = async (
   activeWallet: ActiveWallet,
   ethersWallet: EthersWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   txResponses: TransactionResponse[],
   setAvailability?: boolean,
 ) => {

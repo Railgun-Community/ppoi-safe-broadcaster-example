@@ -13,7 +13,7 @@ import {
   TransactionGasDetails,
   TXIDVersion,
 } from '@railgun-community/shared-models';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ERC20Amount } from '../../models/token-models';
 import { getStandardGasDetails } from '../fees/gas-by-speed';
 import {
@@ -34,7 +34,7 @@ import { getBestMatchWalletForNetwork } from '../wallets/best-match-wallet';
 import { TransactionResponse, ContractTransaction, formatUnits } from 'ethers';
 import debug from 'debug';
 
-const dbg = debug('relayer:top-up-unshield');
+const dbg = debug('broadcaster:top-up-unshield');
 
 export const generateUnshieldTransaction = async (
   txidVersion: TXIDVersion,
@@ -42,7 +42,7 @@ export const generateUnshieldTransaction = async (
   dbEncryptionKey: string,
   toWalletAddress: string,
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<ContractTransaction> => {
   const network = networkForChain(chain);
   if (!network) {
@@ -116,7 +116,7 @@ export const generateUnshieldTransaction = async (
     dbEncryptionKey,
     erc20AmountRecipients,
     [], // nftAmountRecipients
-    undefined, // relayerFeeERC20AmountRecipient
+    undefined, // broadcasterFeeERC20AmountRecipient
     sendWithPublicWallet,
     undefined, // overallBatchMinGasPrice
     (progress: number, status: string) => {
@@ -138,7 +138,7 @@ export const generateUnshieldTransaction = async (
     railgunWalletID,
     erc20AmountRecipients,
     [], // nftAmountRecipients
-    undefined, // relayerFeeERC20AmountRecipient
+    undefined, // broadcasterFeeERC20AmountRecipient
     true, // sendWithPublicWallet
     undefined, // overallBatchMinGasPrice
     finalGasDetails,
@@ -153,7 +153,7 @@ export const unshieldTokens = async (
   dbEncryptionKey: string,
   toWalletAddress: string,
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<TransactionResponse> => {
   const network = networkForChain(chain);
   if (!network) {
@@ -226,19 +226,19 @@ export const unshieldTokens = async (
     unshieldWallet,
     undefined, // overrideNonce
     false,
-    false
+    false,
   );
 
   return batchResponse;
 };
 
-const getMaxSpendPercentageForChain = (chain: RelayerChain): number => {
+const getMaxSpendPercentageForChain = (chain: BroadcasterChain): number => {
   return configNetworks[chain.type][chain.id].topUp.maxSpendPercentage;
 };
 
 const checkGasEstimate = async (
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   maxGasCost: bigint,
 ) => {
   logger.warn('TOP UP GASTIMATOR');

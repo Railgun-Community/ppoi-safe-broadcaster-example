@@ -1,7 +1,11 @@
-import { delay, TXIDVersion, promiseTimeout } from '@railgun-community/shared-models';
+import {
+  delay,
+  TXIDVersion,
+  promiseTimeout,
+} from '@railgun-community/shared-models';
 import debug from 'debug';
 import { formatEther, formatUnits, parseUnits } from 'ethers';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ERC20Amount } from '../../models/token-models';
 import { removeUndefineds } from '../../util/utils';
 import {
@@ -16,7 +20,7 @@ import configNetworks from '../config/config-networks';
 import { getTokenPricesFromCachedPrices } from '../fees/calculate-token-fee';
 import { getTransactionTokens } from '../tokens/network-tokens';
 
-const dbg = debug('relayer:topup-util');
+const dbg = debug('broadcaster:topup-util');
 
 const initialRun: NumMapType<NumMapType<boolean>> = {};
 
@@ -44,7 +48,7 @@ export const pollRefreshBalances = async () => {
 
 const getShieldedTokenAmountsForChain = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<ShieldedCachedBalance[]> => {
   const shieldedBalancesForChain = getPrivateTokenBalanceCache(chain);
 
@@ -60,7 +64,6 @@ const getShieldedTokenAmountsForChain = async (
   }
 
   if (forceRefresh) {
-
     const updatedBalances = getPrivateTokenBalanceCache(chain);
     return updatedBalances;
   }
@@ -102,7 +105,7 @@ const orderNativeTokenLast = (
 
 const getConsolidatedTokenAmounts = (
   tokenAmounts: Optional<TokenTopUpCache>[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Optional<ERC20Amount>[] => {
   let totalSwapValue = 0n;
   const topUpThreshold =
@@ -204,7 +207,7 @@ const getConsolidatedTokenAmounts = (
 
 export const getMultiTopUpTokenAmountsForChain = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   setNativeLast: boolean,
 ): Promise<ERC20Amount[]> => {
   const tokenAmountsForChain = await getShieldedTokenAmountsForChain(
@@ -343,9 +346,9 @@ export const getMultiTopUpTokenAmountsForChain = async (
   const consolidatedTokenAmountsForChain = getConsolidatedTokenAmounts(
     setNativeLast
       ? orderNativeTokenLast(
-        topUpTokenAmountsForChain,
-        getWrappedNativeTokenAddressForChain(chain),
-      )
+          topUpTokenAmountsForChain,
+          getWrappedNativeTokenAddressForChain(chain),
+        )
       : newSortedTopUpList,
     chain,
   );
@@ -376,7 +379,7 @@ export const getMultiTopUpTokenAmountsForChain = async (
 
 export const getTopUpTokenAmountsForChain = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<ERC20Amount[]> => {
   const tokenAmountsForChain = await getShieldedTokenAmountsForChain(
     txidVersion,
@@ -485,11 +488,11 @@ const removeDuplicates = (tokens: Optional<ERC20Amount>[]): ERC20Amount[] => {
 };
 
 export const cachedTopUpTokens: NumMapType<NumMapType<ERC20Amount[]>> = {};
-export const initTopUpTokenCache = (chain: RelayerChain) => {
+export const initTopUpTokenCache = (chain: BroadcasterChain) => {
   cachedTopUpTokens[chain.type] ??= {};
 };
 
-export const clearCachedTokens = (chain: RelayerChain) => {
+export const clearCachedTokens = (chain: BroadcasterChain) => {
   initTopUpTokenCache(chain);
   if (typeof cachedTopUpTokens[chain.type][chain.id] !== 'undefined')
     delete cachedTopUpTokens[chain.type][chain.id];

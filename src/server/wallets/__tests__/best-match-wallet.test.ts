@@ -132,7 +132,7 @@ describe('best-match-wallet', () => {
 
     await expect(
       getBestMatchWalletForNetwork(MOCK_CHAIN, 100n),
-    ).to.be.rejectedWith(ErrorMessage.RELAYER_OUT_OF_GAS);
+    ).to.be.rejectedWith(ErrorMessage.BROADCASTER_OUT_OF_GAS);
   }).timeout(31000);
 
   it('Should error if all wallets out of funds', async () => {
@@ -150,6 +150,6 @@ describe('best-match-wallet', () => {
 
     await expect(
       getBestMatchWalletForNetwork(MOCK_CHAIN, 10n ** 19n),
-    ).to.be.rejectedWith(ErrorMessage.RELAYER_OUT_OF_GAS);
+    ).to.be.rejectedWith(ErrorMessage.BROADCASTER_OUT_OF_GAS);
   }).timeout(31000);
 }).timeout(20000);

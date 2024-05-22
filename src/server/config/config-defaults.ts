@@ -14,8 +14,8 @@ const firstHDWalletDefault: {
 
 export default {
   /*
-   * String to identify this relayer instance.
-   * Required if running multiple Relayer instances with the same RAILGUN wallet / balance.
+   * String to identify this broadcaster instance.
+   * Required if running multiple Broadcaster instances with the same RAILGUN wallet / balance.
    */
   instanceIdentifier: '',
 
@@ -82,7 +82,7 @@ export default {
     /**
      * Checks if feeCacheID is in cache map before processing a transaction.
      * The fee cache ID ensures that this exact server sent out the fees.
-     * This enables a Relayer to run multiple servers with the same Rail Address,
+     * This enables a Broadcaster to run multiple servers with the same Rail Address,
      * although they must have different HD wallet indices.
      */
     requireMatchingFeeCacheID: false,
@@ -160,8 +160,8 @@ export default {
 
     /**
      * Indeces to configure HD wallets from the same mnemonic.
-     * Each separate Relayer instance must have its own HD wallets.
-     * If you run multiple Relayers with the same mnemonic, set `transactionFees.requireMatchingFeeCacheID = true`
+     * Each separate Broadcaster instance must have its own HD wallets.
+     * If you run multiple Broadcasters with the same mnemonic, set `transactionFees.requireMatchingFeeCacheID = true`
      * Add optional chains to run per wallet index. Defaults to all active chains.
      */
     hdWallets: [firstHDWalletDefault],
@@ -226,7 +226,7 @@ export default {
     /**
      * libp2p pubSubTopic to subscribe to.
      */
-    pubSubTopic: '/waku/2/railgun-relayer',
+    pubSubTopic: '/waku/2/railgun-broadcaster',
   },
 
   api: {

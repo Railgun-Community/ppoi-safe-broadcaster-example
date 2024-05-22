@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
+docker/stop.sh && \
 git fetch && \
 git rebase origin/main && \
-yarn && \
-docker/stop.sh && \
+./broadcaster-update && \
 docker/build.sh && \
 sleep 30 && \
 docker/run.sh;

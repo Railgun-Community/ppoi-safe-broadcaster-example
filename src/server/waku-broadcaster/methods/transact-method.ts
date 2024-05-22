@@ -1,6 +1,6 @@
 import * as ed from '@noble/ed25519';
 import {
-  hexlify,
+  ByteUtils,
   encryptJSONDataWithSharedKey,
   tryDecryptJSONDataWithSharedKey,
   EncryptedData,
@@ -16,26 +16,29 @@ import {
 } from '../../wallets/active-wallets';
 import { contentTopics } from '../topics';
 import { WakuMethodResponse } from '../waku-response';
-import { ErrorMessage, sanitizeCustomRelayerError } from '../../../util/errors';
+import {
+  ErrorMessage,
+  sanitizeCustomBroadcasterError,
+} from '../../../util/errors';
 import configDefaults from '../../config/config-defaults';
 import { recognizesFeeCacheID } from '../../fees/transaction-fee-cache';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import configNetworks from '../../config/config-networks';
 import {
-  RelayerEncryptedMethodParams,
-  RelayerRawParamsTransact,
+  BroadcasterEncryptedMethodParams,
+  BroadcasterRawParamsTransact,
   TXIDVersion,
   isDefined,
   versionCompare,
 } from '@railgun-community/shared-models';
-import { getRelayerVersion } from '../../../util/relayer-version';
+import { getBroadcasterVersion } from '../../../util/broadcaster-version';
 import { TransactionResponse, formatUnits, parseUnits } from 'ethers';
 import { createValidTransaction } from '../../transactions/transaction-validator';
-import { RelayerError } from '../../../models/error-models';
+import { BroadcasterError } from '../../../models/error-models';
 
 const handledClientPubKeys: string[] = [];
 
-const dbg = debug('relayer:transact');
+const dbg = debug('broadcaster:transact');
 
 const sanitizeSuggestedFee = (errorString: string) => {
   const pattern = /Suggested Gas Price was (\d+\.\d+)/;
@@ -50,7 +53,7 @@ const sanitizeSuggestedFee = (errorString: string) => {
 };
 
 export const transactMethod = async (
-  params: RelayerEncryptedMethodParams,
+  params: BroadcasterEncryptedMethodParams,
   id: number,
 ): Promise<Optional<WakuMethodResponse>> => {
   dbg('got transact');
@@ -72,7 +75,7 @@ export const transactMethod = async (
   const decrypted = (await tryDecryptData(
     encryptedData,
     sharedKey,
-  )) as RelayerRawParamsTransact;
+  )) as BroadcasterRawParamsTransact;
   if (decrypted == null) {
     // Incorrect key. Skipping transact message.
     dbg('Cannot decrypt - Not intended receiver');
@@ -86,7 +89,7 @@ export const transactMethod = async (
     feesID: feeCacheID,
     to,
     data,
-    relayerViewingKey,
+    broadcasterViewingKey,
     useRelayAdapt,
     devLog,
     minVersion,
@@ -97,7 +100,7 @@ export const transactMethod = async (
   const preTransactionPOIsPerTxidLeafPerList =
     decrypted.preTransactionPOIsPerTxidLeafPerList ?? {};
 
-  const chain: RelayerChain = {
+  const chain: BroadcasterChain = {
     type: chainType,
     id: chainID,
   };
@@ -110,20 +113,20 @@ export const transactMethod = async (
       // Do nothing. No error response.
       return;
     }
-    const relayerVersion = getRelayerVersion();
+    const broadcasterVersion = getBroadcasterVersion();
     if (
-      versionCompare(relayerVersion, minVersion) < 0 ||
-      versionCompare(relayerVersion, maxVersion) > 0
+      versionCompare(broadcasterVersion, minVersion) < 0 ||
+      versionCompare(broadcasterVersion, maxVersion) > 0
     ) {
       dbg(
-        `Cannot process tx - Relayer version ${relayerVersion} outside range ${minVersion}-${maxVersion}`,
+        `Cannot process tx - Broadcaster version ${broadcasterVersion} outside range ${minVersion}-${maxVersion}`,
       );
       // Do nothing. No error response.
       return;
     }
 
-    if (!relayerViewingKey) {
-      dbg(`Cannot process tx - Requires params relayerViewingKey`);
+    if (!broadcasterViewingKey) {
+      dbg(`Cannot process tx - Requires params broadcasterViewingKey`);
       // Do nothing. No error response.
       return;
     }
@@ -131,7 +134,7 @@ export const transactMethod = async (
     const railgunWalletAddress = getRailgunWalletAddress();
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
-    if (relayerViewingKey !== hexlify(viewingPublicKey)) {
+    if (broadcasterViewingKey !== ByteUtils.hexlify(viewingPublicKey)) {
       return undefined;
     }
 
@@ -145,13 +148,13 @@ export const transactMethod = async (
       !recognizesFeeCacheID(chain, feeCacheID)
     ) {
       dbg(
-        'Fee cache ID unrecognized. Transaction sent to another Relayer with same Rail Address.',
+        'Fee cache ID unrecognized. Transaction sent to another Broadcaster with same Rail Address.',
       );
       // Do nothing. No error response.
       return undefined;
     }
 
-    // Relayer validated. Begin error responses.
+    // Broadcaster validated. Begin error responses.
 
     if (
       chainType == null ||
@@ -160,7 +163,7 @@ export const transactMethod = async (
       feeCacheID == null ||
       to == null ||
       data == null ||
-      relayerViewingKey == null ||
+      broadcasterViewingKey == null ||
       useRelayAdapt == null
     ) {
       return errorResponse(
@@ -202,7 +205,7 @@ export const transactMethod = async (
     // custom error message
     if (err.message.indexOf('CMsg_') !== -1) {
       // strip the custom message. CM
-      const errReceived = sanitizeCustomRelayerError(err);
+      const errReceived = sanitizeCustomBroadcasterError(err);
       dbg(errReceived);
       const newErrorString = err.message.slice(5);
       const suggestedFee = sanitizeSuggestedFee(newErrorString);
@@ -284,7 +287,7 @@ export const transactMethod = async (
 
 const resultResponse = (
   id: number,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   sharedKey: Uint8Array,
   txResponse: TransactionResponse,
 ): WakuMethodResponse => {
@@ -303,7 +306,7 @@ const replaceErrorMessageNonDev = (
   switch (knownError) {
     case ErrorMessage.TRANSACTION_UNDERPRICED:
     case ErrorMessage.BAD_TOKEN_FEE:
-    case ErrorMessage.NO_RELAYER_FEE:
+    case ErrorMessage.NO_BROADCASTER_FEE:
     case ErrorMessage.GAS_ESTIMATE_ERROR:
     case ErrorMessage.GAS_ESTIMATE_REVERT:
     case ErrorMessage.TRANSACTION_SEND_TIMEOUT_ERROR:
@@ -315,7 +318,7 @@ const replaceErrorMessageNonDev = (
     case ErrorMessage.REJECTED_PACKAGED_FEE:
     case ErrorMessage.FAILED_TO_EXTRACT_PACKAGED_FEE:
     case ErrorMessage.REPEAT_TRANSACTION:
-    case ErrorMessage.RELAYER_OUT_OF_GAS:
+    case ErrorMessage.BROADCASTER_OUT_OF_GAS:
     case ErrorMessage.NOTE_ALREADY_SPENT:
     case ErrorMessage.UNKNOWN_ERROR:
     case ErrorMessage.POI_INVALID:
@@ -329,7 +332,7 @@ const replaceErrorMessageNonDev = (
 
 const errorResponse = (
   id: number,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   sharedKey: Uint8Array,
   err: Error,
   devLog?: boolean,
@@ -343,7 +346,7 @@ const errorResponse = (
 const encryptedRPCResponse = (
   response: object,
   id: number,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   sharedKey: Uint8Array,
 ) => {
   dbg('Response:', response);

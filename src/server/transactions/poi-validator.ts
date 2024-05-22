@@ -2,9 +2,9 @@ import {
   ByteLength,
   POIRequired,
   POIValidator,
-  nToHex,
+  ByteUtils,
 } from '@railgun-community/wallet';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   PreTransactionPOIsPerTxidLeafPerList,
   TXIDVersion,
@@ -16,7 +16,7 @@ import { ErrorMessage } from '../../util/errors';
 import { ContractTransaction } from 'ethers';
 import { getRailgunWalletID } from '../wallets/active-wallets';
 
-const dbg = debug('relayer:poi-validator');
+const dbg = debug('broadcaster:poi-validator');
 
 export type ValidatedPOIData = {
   railgunTxid: string;
@@ -30,7 +30,7 @@ export type ValidatedPOIData = {
 // WARNING: If you modify POI validation, you risk fees that aren't spendable, as they won't have valid POIs.
 export const validatePOI = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   transactionRequest: ContractTransaction,
   useRelayAdapt: boolean,
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList,
@@ -80,7 +80,7 @@ export const validatePOI = async (
     const validatedPOIData: ValidatedPOIData = {
       railgunTxid: feeTransactionData.railgunTxid,
       utxoTreeIn: Number(feeTransactionData.utxoTreeIn),
-      notePublicKey: nToHex(
+      notePublicKey: ByteUtils.nToHex(
         feeTransactionData.firstCommitmentNotePublicKey as bigint,
         ByteLength.UINT_256,
         true,

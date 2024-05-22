@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker stack rm relayer
+docker stack rm broadcaster

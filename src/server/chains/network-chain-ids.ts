@@ -1,15 +1,15 @@
 import { NetworkChainID } from '../config/config-chains';
 import configNetworks from '../config/config-networks';
 import configDefaults from '../config/config-defaults';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { removeUndefineds } from '../../util/utils';
 import { ChainType } from '@railgun-community/shared-models';
 
-export const configuredNetworkChains = (): RelayerChain[] => {
+export const configuredNetworkChains = (): BroadcasterChain[] => {
   const chainTypes: ChainType[] = removeUndefineds(
     Object.keys(configNetworks),
   ).map((chainType) => Number(chainType));
-  const chains: RelayerChain[] = [];
+  const chains: BroadcasterChain[] = [];
 
   chainTypes.forEach((chainType) => {
     const chainIDs: NetworkChainID[] = removeUndefineds(

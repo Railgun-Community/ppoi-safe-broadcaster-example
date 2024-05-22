@@ -16,7 +16,7 @@ import configDefaults from '../config/config-defaults';
 import configNetworks from '../config/config-networks';
 import debug from 'debug';
 import { swapZeroX } from './0x-swap';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { Wallet } from 'ethers';
 import { nativeUnwrap } from './native-unwrap';
 import { delay } from '../../util/promise-utils';
@@ -40,11 +40,11 @@ import { updateCachedGasTokenBalance } from '../balances/balance-cache';
 import { swapUniswap } from './uniswap-swap';
 import { approveZeroX } from './approve-spender';
 
-const dbg = debug('relayer:topup-util');
+const dbg = debug('broadcaster:topup-util');
 
 const getTopUpTokens = async (
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<ERC20Amount[]> => {
   initTopUpTokenCache(chain);
   if (typeof cachedTopUpTokens[chain.type][chain.id] !== 'undefined') {
@@ -58,10 +58,10 @@ const getTopUpTokens = async (
   const topUpTokens =
     allowMultiTokenTopUp === true
       ? await getMultiTopUpTokenAmountsForChain(
-        txidVersion,
-        chain,
-        accumulateNativeToken,
-      )
+          txidVersion,
+          chain,
+          accumulateNativeToken,
+        )
       : await getTopUpTokenAmountsForChain(txidVersion, chain);
   if (topUpTokens.length > 0) {
     // only cache if we get a result. don't store empty array.
@@ -73,7 +73,7 @@ const getTopUpTokens = async (
 export const topUpWallet = async (
   topUpWallet: ActiveWallet,
   txidVersion: TXIDVersion,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ) => {
   const topUpTokens = await getTopUpTokens(txidVersion, chain);
   // also cache the topUpTokens. this is to prevent it from halting if the balances increase to a point at which
@@ -245,7 +245,7 @@ export const topUpWallet = async (
 
 const handlePublicTokens = async (
   publicTokenAmounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   topUpWallet: ActiveWallet,
   ethersWallet: Wallet,
 ) => {
@@ -277,11 +277,11 @@ const handlePublicTokens = async (
   }
 
   if (filteredPublicTokens.length > 0) {
-
-    const shouldUseZeroX = configNetworks[chain.type][chain.id].topUp.useZeroXForSwap;
+    const shouldUseZeroX =
+      configNetworks[chain.type][chain.id].topUp.useZeroXForSwap;
     const hasZeroXAPIKey = configDefaults.api.zeroXApiKey !== '';
     if (shouldUseZeroX && hasZeroXAPIKey) {
-      dbg("Top-Up Swapping with 0x")
+      dbg('Top-Up Swapping with 0x');
 
       const approvalTxResponses = await approveZeroX(
         topUpWallet,
@@ -301,23 +301,23 @@ const handlePublicTokens = async (
         topUpWallet,
         filteredPublicTokens,
         chain,
-      )
-      await waitForTxs(topUpWallet, ethersWallet, chain, swapZeroXTxResponses, false);
-
-    } else {
-      dbg("Top-Up Swapping with Uniswap")
-      // perform swaps and approvals combined
-      await swapUniswap(
-        topUpWallet,
-        filteredPublicTokens,
-        chain,
       );
+      await waitForTxs(
+        topUpWallet,
+        ethersWallet,
+        chain,
+        swapZeroXTxResponses,
+        false,
+      );
+    } else {
+      dbg('Top-Up Swapping with Uniswap');
+      // perform swaps and approvals combined
+      await swapUniswap(topUpWallet, filteredPublicTokens, chain);
     }
-
   }
 };
 
-function clearTopUpCaches(chain: RelayerChain, topUpWallet: ActiveWallet) {
+function clearTopUpCaches(chain: BroadcasterChain, topUpWallet: ActiveWallet) {
   dbg('Clearing Topup Cache');
   clearCachedBalances(chain, topUpWallet.address);
   clearCachedTokens(chain);

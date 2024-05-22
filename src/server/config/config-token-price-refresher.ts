@@ -1,4 +1,4 @@
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { zeroXUpdatePricesByAddresses } from '../api/0x/0x-price';
 import { coingeckoUpdatePricesByAddresses } from '../api/coingecko/coingecko-price';
 import { uniswapUpdatePricesByAddresses } from '../api/uniswap/uniswap-price';
@@ -14,11 +14,14 @@ import configNetworks from './config-networks';
 export type TokenPriceRefresher = {
   enabled: boolean;
   refreshDelayInMS: number;
-  refresher: (chain: RelayerChain, tokenAddresses: string[]) => Promise<void>;
+  refresher: (
+    chain: BroadcasterChain,
+    tokenAddresses: string[],
+  ) => Promise<void>;
 };
 
 export const updateTestNetworkDefaultPrices = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   updater: TokenPriceUpdater,
 ): void => {
   // Assigns simple values for test nets without
@@ -38,7 +41,7 @@ export const updateTestNetworkDefaultPrices = (
 };
 
 const tokenPriceRefresherCoingecko = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddresses: string[],
 ): Promise<void> => {
   const updater: TokenPriceUpdater = (
@@ -69,7 +72,7 @@ const tokenPriceRefresherCoingecko = (
 };
 
 const tokenPriceRefresherZeroX = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddresses: string[],
 ): Promise<void> => {
   const network = configNetworks[chain.type][chain.id];
@@ -92,7 +95,7 @@ const tokenPriceRefresherZeroX = (
 };
 
 const tokenPriceRefresherUniswap = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddresses: string[],
 ): Promise<void> => {
   const updater: TokenPriceUpdater = (
@@ -110,12 +113,8 @@ const tokenPriceRefresherUniswap = (
   if (network.isTestNetwork ?? false) {
     return Promise.resolve();
   }
-  return uniswapUpdatePricesByAddresses(
-    chain,
-    tokenAddresses,
-    updater,
-  );
-}
+  return uniswapUpdatePricesByAddresses(chain, tokenAddresses, updater);
+};
 
 export default {
   tokenPriceRefreshers: {

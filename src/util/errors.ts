@@ -1,5 +1,5 @@
 import { sanitizeError } from '@railgun-community/shared-models';
-import { RelayerError } from '../models/error-models';
+import { BroadcasterError } from '../models/error-models';
 
 export enum ErrorMessage {
   BAD_TOKEN_FEE = 'Bad token fee.',
@@ -7,20 +7,20 @@ export enum ErrorMessage {
   GAS_PRICE_TOO_LOW = 'Gas price rejected as too low.',
   GAS_ESTIMATE_ERROR = 'Gas estimate error. Possible connection failure.',
   GAS_ESTIMATE_REVERT = 'Gas estimate error. Possible connection failure. Please try again.',
-  TRANSACTION_SEND_TIMEOUT_ERROR = `WARNING: Timed out while sending to the blockchain. The transaction may be processing on-chain, but we can't find the receipt. This can occur when a Relayer has a connection issue. You will not see this transaction in your history, but your balance will reflect it if successful. We recommend waiting at least 15 minutes before trying again.`,
-  TRANSACTION_SEND_RPC_ERROR = `WARNING: Relayer received an error while sending the transaction, The transaction may still be processing on-chain, but we can't find the receipt. This can occur when a Relayer has a connection issue. Your balance should reflect it if successful.  We recommend waiting at least 15 minutes before trying again.`,
+  TRANSACTION_SEND_TIMEOUT_ERROR = `WARNING: Timed out while sending to the blockchain. The transaction may be processing on-chain, but we can't find the receipt. This can occur when a Broadcaster has a connection issue. You will not see this transaction in your history, but your balance will reflect it if successful. We recommend waiting at least 15 minutes before trying again.`,
+  TRANSACTION_SEND_RPC_ERROR = `WARNING: Broadcaster received an error while sending the transaction, The transaction may still be processing on-chain, but we can't find the receipt. This can occur when a Broadcaster has a connection issue. Your balance should reflect it if successful.  We recommend waiting at least 15 minutes before trying again.`,
   REPEAT_TRANSACTION = 'Transaction has already been sent.',
-  UNSUPPORTED_NETWORK = `Relayer does not support this network.`,
+  UNSUPPORTED_NETWORK = `Broadcaster does not support this network.`,
   MISSING_REQUIRED_FIELD = `Missing required field.`,
-  NO_RELAYER_FEE = 'No Relayer Fee included in transaction.',
-  UNKNOWN_ERROR = 'Unknown Relayer error.',
-  REJECTED_PACKAGED_FEE = 'Network Gas Price has changed dramatically and the Relayer Fee was rejected.',
-  FAILED_TO_EXTRACT_PACKAGED_FEE = 'Failed to extract Relayer Fee from transaction. Please try again.',
-  RELAYER_OUT_OF_GAS = 'Relayer is out of gas, or currently does not have enough to process this transaction.',
+  NO_BROADCASTER_FEE = 'No Broadcaster Fee included in transaction.',
+  UNKNOWN_ERROR = 'Unknown Broadcaster error.',
+  REJECTED_PACKAGED_FEE = 'Network Gas Price has changed dramatically and the Broadcaster Fee was rejected.',
+  FAILED_TO_EXTRACT_PACKAGED_FEE = 'Failed to extract Broadcaster Fee from transaction. Please try again.',
+  BROADCASTER_OUT_OF_GAS = 'Broadcaster is out of gas, or currently does not have enough to process this transaction.',
   NOTE_ALREADY_SPENT = 'ALREADY SPENT: One of the notes contained in this transaction have already been spent!',
   TRANSACTION_UNDERPRICED = 'RPC Rejected Transction: Gas fee too low. Please select a higher gas price and resubmit.',
-  POI_INVALID = 'Could not validate Proof of Innocence - Relayer cannot process this transaction.',
-  NONCE_ALREADY_USED = 'WARNING: Relayer recieved an error from the RPC: Nonce already used. There is no way to tell if the transaction made it. We did not recieve a tx hash. Please check the chain, if nothing happens within 15 minutes. It is safe to try again.',
+  POI_INVALID = 'Could not validate Proof of Innocence - Broadcaster cannot process this transaction.',
+  NONCE_ALREADY_USED = 'WARNING: Broadcaster recieved an error from the RPC: Nonce already used. There is no way to tell if the transaction made it. We did not recieve a tx hash. Please check the chain, if nothing happens within 15 minutes. It is safe to try again.',
   MISSING_RESPONSE = 'RPC response is missing.',
   BAD_RESPONSE = 'Server responded 512. ',
 }
@@ -30,17 +30,19 @@ const sanitizeEthersError = (errMessage: string) => {
   return errMessage.split('[ See:')[0];
 };
 
-export const sanitizeRelayerError = (error: Error): Error => {
+export const sanitizeBroadcasterError = (error: Error): Error => {
   const sanitized = sanitizeError(error);
   return new Error(sanitizeEthersError(sanitized.message));
 };
 
-export const customRelayerError = (message: string, errorSeen?: Error) => {
+export const customBroadcasterError = (message: string, errorSeen?: Error) => {
   return new Error(`CMsg_${message}`);
-  // return new RelayerError(`CMsg_${message}`, errorSeen.message);
+  // return new BroadcasterError(`CMsg_${message}`, errorSeen.message);
 };
 // will strip the message back to its original desired string.
-export const sanitizeCustomRelayerError = (error: RelayerError): string => {
+export const sanitizeCustomBroadcasterError = (
+  error: BroadcasterError,
+): string => {
   const newErrorString = error.message.slice(5);
   return newErrorString;
 };

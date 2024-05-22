@@ -21,7 +21,7 @@ import {
 import { createTransactionGasDetailsLegacy } from '../calculate-transaction-gas-legacy';
 import { getTokenFee } from '../../calculate-token-fee';
 import {
-  calculateMaximumGasRelayer,
+  calculateMaximumGasBroadcaster,
   getEstimateGasDetailsPublic,
   getEstimateGasDetailsRelayed,
 } from '../../gas-estimate';
@@ -160,7 +160,7 @@ describe('calculate-transaction-gas-legacy', () => {
       evmGasType,
       populatedTransaction,
     );
-    const maximumGas = calculateMaximumGasRelayer(
+    const maximumGas = calculateMaximumGasBroadcaster(
       estimateGasDetails,
       MOCK_CHAIN,
     );
@@ -199,7 +199,7 @@ describe('calculate-transaction-gas-legacy', () => {
       MOCK_MAX_FEE_PER_GAS, // minGasPrice
       populatedTransaction,
     );
-    const maximumGas = calculateMaximumGasRelayer(
+    const maximumGas = calculateMaximumGasBroadcaster(
       estimateGasDetails,
       MOCK_CHAIN,
     );

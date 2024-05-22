@@ -5,8 +5,8 @@ volumes:
     name: 'nwaku1'
   nwaku2:
     name: 'nwaku2'
-  relayer:
-    name: 'relayer'
+  broadcaster:
+    name: 'broadcaster'
 
 services:
   nwaku1:
@@ -60,14 +60,14 @@ services:
         --websocket-secure-cert-path="/ssl/live/${SUBDOMAIN}.${BASEDOMAIN}/fullchain.pem"
         --ports-shift=1
 
-  relayer:
-    image: relayer:latest
-    hostname: 'relayer'
+  broadcaster:
+    image: broadcaster:latest
+    hostname: 'broadcaster'
     environment:
       WAKU_RPC_URL: 'http://nwaku1:8546'
-      LEPTON_DB: '/mnt/relayer.db'
+      LEPTON_DB: '/mnt/broadcaster.db'
       LOG_LEVEL: 'debug'
-      DEBUG: 'relayer*,waku:jsonrpc-api'
+      DEBUG: 'broadcaster*,waku:jsonrpc-api'
     secrets:
       - MNEMONIC
       - DB_ENCRYPTION_KEY
@@ -76,7 +76,7 @@ services:
     restart: always
     tty: true
     volumes:
-      - relayer:/mnt
+      - broadcaster:/mnt
     command: sh -c 'npm start'
 
   swag:

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import debug from 'debug';
-import { WakuMessage } from '../waku-relayer/waku-message';
+import { WakuMessage } from '../waku-broadcaster/waku-message';
 import { isDefined } from '@railgun-community/shared-models';
 import { promiseTimeout } from '../../util/promise-utils';
 
@@ -19,8 +19,8 @@ export type WakuApiClientOptions = {
 export enum WakuRequestMethods {
   DebugInfo = '/debug/v1/info', // GET
   PublishSubscription = '/relay/v1/subscriptions', // POST
-  PublishMessage = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-relayer', // POST - requires pubsub topic
-  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-relayer', // GET - requires pubsub topic
+  PublishMessage = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-broadcaster', // POST - requires pubsub topic
+  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-broadcaster', // GET - requires pubsub topic
   DeleteSubscriptions = '/relay/v1/subscriptions', // DELETE
 }
 
@@ -43,7 +43,7 @@ export class WakuRestApiClient {
   backupNwaku: string;
 
   constructor(options: WakuApiClientOptions) {
-    this.dbg = debug('relayer:waku:REST-api');
+    this.dbg = debug('broadcaster:waku:REST-api');
     this.mainNwaku = options.url;
     this.backupNwaku = options.urlBackup;
     const httpConfig = {

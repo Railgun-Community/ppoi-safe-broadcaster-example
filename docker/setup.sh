@@ -112,7 +112,7 @@ case ${answer:0:1} in
     ;;
 esac
 echo "Installation complete!"
-echo "Customize Relayer setup in src/MY-CONFIG.ts"
+echo "Customize Broadcaster setup in src/MY-CONFIG.ts"
 echo "First you must stop the current instance of the docker containers by running the following command:"
 echo "docker/stop.sh"
 echo "Then run the following command to rebuild the images with your changes. This will take a while please be patient."

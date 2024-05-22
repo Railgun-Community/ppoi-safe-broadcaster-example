@@ -1,5 +1,5 @@
 import { parseUnits } from 'ethers';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
 import { resetMapObject } from '../../util/utils';
@@ -10,17 +10,17 @@ import { hasPendingTransactions } from './pending-wallet';
 
 const unavailableWalletMap: NumMapType<NumMapType<MapType<boolean>>> = {};
 
-export const dbg = debug('relayer:wallets:availability');
+export const dbg = debug('broadcaster:wallets:availability');
 
 const lastUsedWalletAddressMap: NumMapType<NumMapType<string>> = {};
 
-export const getLastUsedWalletAddressForChain = (chain: RelayerChain) => {
+export const getLastUsedWalletAddressForChain = (chain: BroadcasterChain) => {
   return lastUsedWalletAddressMap?.[chain.type]?.[chain.id] ?? '';
 };
 
 export const setLastWalletUsed = (
   walletAddress: string,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ) => {
   lastUsedWalletAddressMap[chain.type] ??= {};
   lastUsedWalletAddressMap[chain.type][chain.id] = walletAddress;
@@ -28,7 +28,7 @@ export const setLastWalletUsed = (
 
 export const setWalletAvailability = (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   available: boolean,
   setWalleUsed = true,
 ) => {
@@ -43,7 +43,7 @@ export const setWalletAvailability = (
 
 export const isWalletAvailableWithEnoughFunds = async (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ) => {
   if (isWalletUnavailable(wallet, chain)) {
     return false;
@@ -60,7 +60,7 @@ export const isWalletAvailableWithEnoughFunds = async (
 };
 
 export const minimumGasBalanceForAvailability = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): bigint => {
   const { gasToken } = configNetworks[chain.type][chain.id];
   return parseUnits(
@@ -71,7 +71,7 @@ export const minimumGasBalanceForAvailability = (
 
 export const isBelowMinimumGasTokenBalance = async (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ) => {
   try {
     const balance = await getCachedGasTokenBalance(chain, wallet.address);
@@ -91,7 +91,7 @@ export const isBelowMinimumGasTokenBalance = async (
 
 export const isWalletUnavailable = (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ) => {
   unavailableWalletMap[chain.type] ??= {};
   unavailableWalletMap[chain.type][chain.id] ??= {};
@@ -103,7 +103,7 @@ export const isWalletUnavailable = (
 
 export const shouldTopUpWallet = async (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ) => {
   return (
     !isWalletUnavailable(wallet, chain) &&
@@ -113,7 +113,7 @@ export const shouldTopUpWallet = async (
 
 export const getAvailableWallets = async (
   activeWallets: ActiveWallet[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ) => {
   const availableWallets: boolean[] = [];
 
@@ -134,10 +134,7 @@ export const getAvailableWallets = async (
   return activeWallets.filter((_wallet, index) => availableWallets[index]);
 };
 
-export const resetAvailableWallets = (chain: RelayerChain) => {
+export const resetAvailableWallets = (chain: BroadcasterChain) => {
   unavailableWalletMap[chain.type] ??= {};
   resetMapObject(unavailableWalletMap[chain.type][chain.id]);
 };
-
-
-

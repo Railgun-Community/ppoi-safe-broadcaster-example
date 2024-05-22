@@ -26,7 +26,7 @@ coverage
 dist
 .ipfsdata/
 run-dev.sh
-start-relayer.sh
+start-broadcaster.sh
 src/MY-CONFIG.ts
 docker/secret
 src/test/test-config-overrides.test.ts
@@ -41,5 +41,6 @@ docker/docker-stack.yml
 docker/docker-stack-swagless.yml
 docker/appdata
 docker/custom.yml
+docker/UPDATED
 
 *.bak

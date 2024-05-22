@@ -8,13 +8,13 @@ import {
   removeUndefineds,
 } from '@railgun-community/shared-models';
 import { ValidatedPOIData } from './poi-validator';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import debug from 'debug';
 import {
   ByteLength,
   Database,
   POINodeRequest,
-  formatToByteLength,
+  ByteUtils,
   getRailgunTransactionsForTxid,
   refreshReceivePOIsForWallet,
   walletForID,
@@ -24,7 +24,7 @@ import { configuredNetworkChains } from '../chains/network-chain-ids';
 import configDefaults from '../config/config-defaults';
 import leveldown from 'leveldown';
 
-const dbg = debug('relayer:poi-assurance');
+const dbg = debug('broadcaster:poi-assurance');
 
 const POI_ASSURANCE_NAMESPACE = 'poi-assurance';
 
@@ -66,7 +66,7 @@ export class POIAssurance {
     namespace: string[],
     fieldCount: number,
   ): Promise<string[][]> {
-    if (!this.db) {
+    if (!isDefined(this.db)) {
       throw new Error('Call POIAssurance.init first to initialize DB');
     }
     const keys: string[] = await this.db.getNamespaceKeys(namespace);
@@ -78,12 +78,12 @@ export class POIAssurance {
 
   static async queueValidatedPOI(
     txidVersion: TXIDVersion,
-    chain: RelayerChain,
+    chain: BroadcasterChain,
     txid: string,
     validatedPOIData: ValidatedPOIData,
   ): Promise<void> {
     try {
-      if (!this.db) {
+      if (!isDefined(this.db)) {
         throw new Error('Call POIAssurance.init first to initialize DB');
       }
 
@@ -101,7 +101,7 @@ export class POIAssurance {
 
   private static getNamespace(
     txidVersion: TXIDVersion,
-    chain: RelayerChain,
+    chain: BroadcasterChain,
     txid?: string,
   ): string[] {
     const namespace = [
@@ -118,7 +118,7 @@ export class POIAssurance {
 
   static async getValidatedPOIs(
     txidVersion: TXIDVersion,
-    chain: RelayerChain,
+    chain: BroadcasterChain,
   ): Promise<StoredValidatedPOI[]> {
     try {
       // poi-assurance:txidVersion:chainType:chainId:DATA
@@ -128,7 +128,7 @@ export class POIAssurance {
       const validatedPOIs: StoredValidatedPOI[] = removeUndefineds(
         await Promise.all(
           keySplits.map(async (keySplit) => {
-            if (!this.db) {
+            if (!isDefined(this.db)) {
               throw new Error('Call POIAssurance.init first to initialize DB');
             }
             return (await this.db.get(keySplit, 'json')) as StoredValidatedPOI;
@@ -144,11 +144,11 @@ export class POIAssurance {
 
   static async deleteValidatedPOI(
     txidVersion: TXIDVersion,
-    chain: RelayerChain,
+    chain: BroadcasterChain,
     txid: string,
   ) {
     try {
-      if (!this.db) {
+      if (!isDefined(this.db)) {
         throw new Error('Call POIAssurance.init first to initialize DB');
       }
 
@@ -179,10 +179,10 @@ export class POIAssurance {
       const wallet = walletForID(walletID);
       const spendableReceivedTxids = (
         await wallet.getSpendableReceivedChainTxids(txidVersion, chain)
-      ).map((txid) => formatToByteLength(txid, ByteLength.UINT_256));
+      ).map((txid) => ByteUtils.formatToByteLength(txid, ByteLength.UINT_256));
 
       for (const validatedPOI of validatedPOIs) {
-        const txidFormatted = formatToByteLength(
+        const txidFormatted = ByteUtils.formatToByteLength(
           validatedPOI.txid,
           ByteLength.UINT_256,
         );

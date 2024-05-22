@@ -1,7 +1,7 @@
 import configNetworks from '../config/config-networks';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
 import { loadEngineProvider } from '../engine/engine-init';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   createFallbackProviderFromJsonConfig,
   FallbackProviderJsonConfig,
@@ -11,20 +11,18 @@ import {
 import debug from 'debug';
 import { FallbackProvider, JsonRpcProvider } from 'ethers';
 
-const dbg = debug('relayer:networks');
+const dbg = debug('broadcaster:networks');
 
 const activeNetworkProviders: NumMapType<NumMapType<FallbackProvider>> = {};
 
 // eslint-disable-next-line require-await
-export const initNetworkProviders = async (chains?: RelayerChain[]) => {
+export const initNetworkProviders = async (chains?: BroadcasterChain[]) => {
   const initChains = chains ?? configuredNetworkChains();
   for (const chain of initChains) {
     try {
       // eslint-disable-next-line no-await-in-loop
       await initNetworkProvider(chain);
     } catch (err) {
-
-
       const error = err as Error;
       const { message } = error;
       if (message.includes('Failed to get block number')) {
@@ -36,13 +34,11 @@ export const initNetworkProviders = async (chains?: RelayerChain[]) => {
           dbg(
             `Could not initialize network provider for chain: ${chain.type}:${chain.id} - ${secondErr.message}`,
           );
-
         }
       }
       throw new Error(
         `Could not initialize network provider for chain: ${chain.type}:${chain.id} - ${err.message}`,
       );
-
     }
   }
 };
@@ -51,7 +47,7 @@ export const initNetworkProviders = async (chains?: RelayerChain[]) => {
  * Note: This call is async, but you may call it synchronously
  * so it will run the slow scan in the background.
  */
-const initNetworkProvider = async (chain: RelayerChain) => {
+const initNetworkProvider = async (chain: BroadcasterChain) => {
   const network = configNetworks[chain.type][chain.id];
   if (!isDefined(network)) {
     return;
@@ -83,7 +79,7 @@ const initNetworkProvider = async (chain: RelayerChain) => {
 };
 
 export const getProviderForNetwork = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): FallbackProvider => {
   const provider = activeNetworkProviders[chain.type][chain.id];
   if (!isDefined(provider)) {
@@ -93,7 +89,7 @@ export const getProviderForNetwork = (
 };
 
 export const getFirstJsonRpcProviderForNetwork = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   useSecondary = false,
 ): JsonRpcProvider => {
   const fallbackProvider = getProviderForNetwork(chain);

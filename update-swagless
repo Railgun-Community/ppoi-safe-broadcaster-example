@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
+docker/stop.sh && \
 git fetch && \
 git rebase origin/main && \
-yarn && \
-docker/stop.sh && \
 docker/build.sh --no-swag && \
 sleep 30 && \
 docker/runswagless.sh;

@@ -1,15 +1,19 @@
-import axios from "axios"
-import { RelayerChain } from "../../../models/chain-models"
-import { UniswapProtocolType, UniswapQuoteInputs, UniswapQuoteParams, UniswapQuoteResponse } from "./uniswap-models"
-
+import axios from 'axios';
+import { BroadcasterChain } from '../../../models/chain-models';
+import {
+  UniswapProtocolType,
+  UniswapQuoteInputs,
+  UniswapQuoteParams,
+  UniswapQuoteResponse,
+} from './uniswap-models';
 
 export const getUniswapURL = () => {
-  return 'https://api.uniswap.org'
-}
+  return 'https://api.uniswap.org';
+};
 
 export const getUniswapQuoteURL = () => {
-  return `${getUniswapURL()}/v2/quote`
-}
+  return `${getUniswapURL()}/v2/quote`;
+};
 
 export const getUniswapHeaders = () => {
   return {
@@ -18,17 +22,15 @@ export const getUniswapHeaders = () => {
       origin: getUniswapURL(),
       'content-type': 'application/json',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
-    }
-  }
-}
-
+    },
+  };
+};
 
 export const getUniswapQuoteParams = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   recipientAddress: string,
-  quoteInputs: UniswapQuoteInputs
+  quoteInputs: UniswapQuoteInputs,
 ): UniswapQuoteParams => {
-
   const {
     slippage,
     tokenInAmount,
@@ -50,7 +52,7 @@ export const getUniswapQuoteParams = (
         protocols: [
           UniswapProtocolType.V2,
           UniswapProtocolType.V3,
-          UniswapProtocolType.MIXED
+          UniswapProtocolType.MIXED,
         ],
         enableUniversalRouter: true,
         routingType: 'CLASSIC',
@@ -58,24 +60,26 @@ export const getUniswapQuoteParams = (
         enableFeeOnTransferFeeFetching: true,
       },
     ],
-  }
-}
+  };
+};
 
-export const fetchUniswapQuote = async<T>(
-  quoteParams: UniswapQuoteParams
+export const fetchUniswapQuote = async <T>(
+  quoteParams: UniswapQuoteParams,
 ): Promise<T> => {
   try {
     const response = await axios.post(
       getUniswapQuoteURL(),
       quoteParams,
-      getUniswapHeaders()
+      getUniswapHeaders(),
     );
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const { data } = response;
     return data;
   } catch (error) {
-    const uniswapError = new Error("There was an error getting a quote from Uniswap.");
+    const uniswapError = new Error(
+      'There was an error getting a quote from Uniswap.',
+    );
     console.error(uniswapError);
     throw uniswapError;
   }
-}
+};

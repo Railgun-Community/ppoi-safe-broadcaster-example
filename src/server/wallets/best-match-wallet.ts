@@ -6,13 +6,13 @@ import {
 } from './available-wallets';
 import { ActiveWallet } from '../../models/wallet-models';
 import { logger } from '../../util/logger';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import configDefaults from '../config/config-defaults';
 import { randomElement } from '../../util/utils';
 import { ErrorMessage } from '../../util/errors';
 
 export const getBestMatchWalletForNetwork = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   minimumGasNeeded: bigint,
 ): Promise<ActiveWallet> => {
   const activeWallets = getActiveWalletsForChain(chain);
@@ -70,7 +70,7 @@ export const getBestMatchWalletForNetwork = async (
     logger.warn(
       `${availableWallets.length} wallets available. ${outofFundsWallets.length} wallets are out of gas funds. (Need gas: ${minimumGasNeeded})`,
     );
-    throw new Error(ErrorMessage.RELAYER_OUT_OF_GAS);
+    throw new Error(ErrorMessage.BROADCASTER_OUT_OF_GAS);
   }
 
   if (randomizeSelection) {

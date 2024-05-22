@@ -1,0 +1,19 @@
+#!/bin/bash
+# this will force the build script to re-generate the docker-stack.yml file with the apropriate image names
+# running this script can be avoided by manually replacing the occurances of 'relayer' with 'broadcaster' in the apropriate docker-stack file for the configuration you're running. 
+
+# check for docker/UPDATED file if not found, make it and run the rest of script
+if [ -f docker/UPDATED ]; then
+  echo "BROADCASTER PREVIOUSLY UPDATED... SKIPPING"
+else 
+    if [ -f docker/docker-stack-swagless.yml ]; then
+    mv docker/docker-stack-swagless.yml docker/docker-stack-swagless.bak.yml
+    echo "docker/docker-stack-swagless.yml moved to docker/docker-stack-swagless.bak.yml"
+    fi
+
+    if [ -f docker/docker-stack.yml ]; then
+    mv docker/docker-stack.yml docker/docker-stack.bak.yml
+    echo "docker/docker-stack.yml moved to docker/docker-stack.bak.yml"
+    fi
+    echo "DONE" >> docker/UPDATED
+fi

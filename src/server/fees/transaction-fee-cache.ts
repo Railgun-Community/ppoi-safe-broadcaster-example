@@ -1,6 +1,6 @@
 import configDefaults from '../config/config-defaults';
 import { resetMapObject } from '../../util/utils';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { isDefined } from '@railgun-community/shared-models';
 
 type CachedFees = {
@@ -29,7 +29,7 @@ const generateFeeCacheID = (length = 16) => {
   return retVal;
 };
 
-const clearExpiredFees = (chain: RelayerChain) => {
+const clearExpiredFees = (chain: BroadcasterChain) => {
   const cacheForChain = transactionFeeCache[chain.type][chain.id];
   const keys = Object.keys(cacheForChain);
   for (const key of keys) {
@@ -41,7 +41,7 @@ const clearExpiredFees = (chain: RelayerChain) => {
 };
 
 export const cacheUnitFeesForTokens = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenFees: MapType<bigint>,
 ): string => {
   const feeCacheID = generateFeeCacheID();
@@ -62,7 +62,7 @@ const cachedFeesExpired = (cachedFees: CachedFees) => {
 };
 
 export const lookUpCachedUnitTokenFee = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   feeCacheID: string,
   tokenAddress: string,
 ): Optional<bigint> => {
@@ -81,11 +81,11 @@ export const lookUpCachedUnitTokenFee = (
 /**
  * Checks if feeCacheID is in cache map. It's ok if it's expired.
  * The fee cache ID ensures that this exact server sent out the fees.
- * This enables a Relayer to run multiple servers with the same Rail Address (and different HD wallets).
- * We check whether the fee was dispatched by this Relayer in transact-method.ts.
+ * This enables a Broadcaster to run multiple servers with the same Rail Address (and different HD wallets).
+ * We check whether the fee was dispatched by this Broadcaster in transact-method.ts.
  */
 export const recognizesFeeCacheID = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   feeCacheID: string,
 ) => {
   transactionFeeCache[chain.type] ??= {};

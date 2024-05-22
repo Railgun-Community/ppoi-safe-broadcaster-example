@@ -6,11 +6,11 @@ import {
   type TransactionGasDetailsType2,
   isDefined,
 } from '@railgun-community/shared-models';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   ErrorMessage,
-  customRelayerError,
-  sanitizeRelayerError,
+  customBroadcasterError,
+  sanitizeBroadcasterError,
 } from '../../util/errors';
 import { logger } from '../../util/logger';
 import { throwErr, delay, promiseTimeout } from '../../util/promise-utils';
@@ -30,11 +30,11 @@ import {
 import debug from 'debug';
 import { GasDetails } from '../../models/gas-models';
 
-const dbg = debug('relayer:gas-estimate');
+const dbg = debug('broadcaster:gas-estimate');
 
-// this function is purely for relayer usage.
+// this function is purely for broadcaster usage.
 export const getEstimateGasDetailsPublic = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   evmGasType: EVMGasType,
   transaction: ContractTransaction,
   devLog?: boolean,
@@ -57,14 +57,14 @@ export const getEstimateGasDetailsPublic = async (
   } catch (err) {
     logger.error(err);
     if (devLog ?? false) {
-      throw sanitizeRelayerError(err);
+      throw sanitizeBroadcasterError(err);
     }
     throw new Error(ErrorMessage.GAS_ESTIMATE_ERROR);
   }
 };
 
 const raceGasEstimate = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   transaction: ContractTransaction,
 ): Promise<bigint> => {
   const provider1 = getProviderForNetwork(chain);
@@ -113,7 +113,7 @@ const sanitizeEthersError = (error: any) => {
 };
 
 export const getEstimateGasDetailsRelayed = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   evmGasType: EVMGasType,
   minGasPrice: bigint,
   transaction: ContractTransaction,
@@ -122,7 +122,7 @@ export const getEstimateGasDetailsRelayed = async (
 ): Promise<TransactionGasDetails> => {
   if (evmGasType === EVMGasType.Type2) {
     // minGasPrice not allowed on EVMGasType 2
-    throw new Error('EVMGasType 2 not allowed for Relayer transactions.');
+    throw new Error('EVMGasType 2 not allowed for Broadcaster transactions.');
   }
   const gasPrice = minGasPrice;
   const transactionWithOptionalMinGas: ContractTransaction = {
@@ -150,7 +150,7 @@ export const getEstimateGasDetailsRelayed = async (
     if (err?.info?.error?.message.includes('execution reverted') === true) {
       dbg('EXECUTION REVERTED.');
 
-      const executionRevertedError = customRelayerError(
+      const executionRevertedError = customBroadcasterError(
         'Tranaction is unable to be processed, RPC is saying Execution Reverted. Possible causes are volatile gas prices, Please re-generate your transaction and try again.',
       );
       throw executionRevertedError;
@@ -165,7 +165,7 @@ export const getEstimateGasDetailsRelayed = async (
         formatUnits(ethersError.baseFeePerGas, 'gwei'),
       ).toFixed(8);
 
-      const newCustomError = customRelayerError(
+      const newCustomError = customBroadcasterError(
         `ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`,
         err,
       );
@@ -188,14 +188,14 @@ export const getEstimateGasDetailsRelayed = async (
 
       if (retryCount >= failedRetryAttempts) {
         if (err.message.indexOf('Timed out') !== -1) {
-          const newCustomError = customRelayerError(
-            `ERROR: Relayer timed out attempting gas estimation. Please try again.`,
+          const newCustomError = customBroadcasterError(
+            `ERROR: Broadcaster timed out attempting gas estimation. Please try again.`,
             err,
           );
           throw newCustomError;
 
           // throw new Error(
-          //   `CMsg_ERROR: Relayer timed out attempting gas estimation. Please try again.`,
+          //   `CMsg_ERROR: Broadcaster timed out attempting gas estimation. Please try again.`,
           // );
         }
         const formattedProvidedGas = parseFloat(
@@ -215,7 +215,7 @@ export const getEstimateGasDetailsRelayed = async (
               const formattedBaseFeeGas = parseFloat(
                 formatUnits(gasPrice, 'gwei'),
               ).toFixed(2);
-              const newCustomError = customRelayerError(
+              const newCustomError = customBroadcasterError(
                 `ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`,
                 err,
               );
@@ -239,7 +239,7 @@ export const getEstimateGasDetailsRelayed = async (
               ).toFixed(2);
 
               // console.log('latestBlockError', newErrorMessage);
-              const newCustomError = customRelayerError(
+              const newCustomError = customBroadcasterError(
                 `ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The Suggested Gas Price was ${formattedBaseFeeGas}. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`,
                 err,
               );
@@ -259,7 +259,7 @@ export const getEstimateGasDetailsRelayed = async (
           // console.log('ERROR', newErr);
         }
 
-        const newCustomError = customRelayerError(
+        const newCustomError = customBroadcasterError(
           `ERROR: Supplied Gas Price ${formattedProvidedGas} is below the current blocks base fee. The transaction was rejected by the RPC Network. Please try again with a higher gas price.`,
           err,
         );
@@ -285,7 +285,7 @@ export const getEstimateGasDetailsRelayed = async (
       throw new Error(ErrorMessage.NOTE_ALREADY_SPENT);
     }
     if (devLog ?? false) {
-      throw sanitizeRelayerError(err);
+      throw sanitizeBroadcasterError(err);
     }
 
     if (err.message.indexOf('missing revert data') !== -1) {
@@ -312,9 +312,9 @@ export const getEstimateGasDetailsRelayed = async (
   }
 };
 
-export const calculateGasLimitRelayer = (
+export const calculateGasLimitBroadcaster = (
   gasEstimate: bigint,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): bigint => {
   switch (chain.type) {
     case ChainType.EVM: {
@@ -338,13 +338,13 @@ export const calculateGasLimitRelayer = (
   }
 };
 
-export const calculateMaximumGasRelayer = (
+export const calculateMaximumGasBroadcaster = (
   transactionGasDetails: TransactionGasDetails,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): bigint => {
   const gasPrice = calculateGasPrice(transactionGasDetails);
   const { gasEstimate } = transactionGasDetails;
-  return calculateGasLimitRelayer(gasEstimate, chain) * gasPrice;
+  return calculateGasLimitBroadcaster(gasEstimate, chain) * gasPrice;
 };
 
 export const calculateMaximumGasPublic = (
@@ -358,7 +358,8 @@ export const calculateMaximumGasPublic = (
   const checkForType2 = transactionGasDetails as TransactionGasDetailsType2;
   if (isDefined(checkForType2.maxPriorityFeePerGas)) {
     const { maxFeePerGas, maxPriorityFeePerGas } = checkForType2;
-    const newPublicGasEstimate = (maxFeePerGas * gasEstimate) + maxPriorityFeePerGas;
+    const newPublicGasEstimate =
+      maxFeePerGas * gasEstimate + maxPriorityFeePerGas;
     dbg(
       `TYPE 2 Gas Price Estimated at: ${formatEther(
         parseUnits(maxFeePerGas.toString(), 'gwei'),

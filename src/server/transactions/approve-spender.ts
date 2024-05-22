@@ -8,13 +8,13 @@ import { getEstimateGasDetailsPublic } from '../fees/gas-estimate';
 import { executeTransaction } from './execute-transaction';
 import { removeUndefineds } from '../../util/utils';
 import debug from 'debug';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import {
   getEVMGasTypeForTransaction,
   networkForChain,
 } from '@railgun-community/shared-models';
 
-const dbg = debug('relayer:approvals');
+const dbg = debug('broadcaster:approvals');
 
 export const MAX_UINT_ALLOWANCE = 2n ** 256n - 1n;
 
@@ -22,7 +22,7 @@ export const cachedApprovedTokens: string[] = [];
 
 export const generateApprovalTransactions = async (
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   sender: string,
 ): Promise<ContractTransaction[]> => {
   const populatedTransactions: Optional<ContractTransaction>[] = [];
@@ -67,7 +67,7 @@ export const generateApprovalTransactions = async (
 export const approveZeroX = async (
   activeWallet: ActiveWallet,
   erc20Amounts: ERC20Amount[],
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): Promise<TransactionResponse[]> => {
   const populatedApprovalTXs = await generateApprovalTransactions(
     erc20Amounts,

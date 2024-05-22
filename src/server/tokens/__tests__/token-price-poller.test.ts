@@ -13,7 +13,7 @@ import configTokenPriceRefresher, {
 import { initPricePoller, stopTokenPricePolling } from '../token-price-poller';
 import { delay } from '../../../util/promise-utils';
 import { initTokens } from '../network-tokens';
-import { RelayerChain } from '../../../models/chain-models';
+import { BroadcasterChain } from '../../../models/chain-models';
 import { ChainType } from '@railgun-community/shared-models';
 import { NetworkChainID } from '../../config/config-chains';
 import { testChainEthereum, testChainGoerli } from '../../../test/setup.test';
@@ -29,7 +29,7 @@ const MOCK_TOKEN_PRICE_2 = 20.0;
 const mockTokenPriceRefresherCoingecko = (
   refreshDelayInMS: number,
 ): TokenPriceRefresher => {
-  const refresher = (chain: RelayerChain, tokenAddresses: string[]) => {
+  const refresher = (chain: BroadcasterChain, tokenAddresses: string[]) => {
     if (chain.type !== ChainType.EVM) {
       throw new Error('Only EVMs mock prices');
     }

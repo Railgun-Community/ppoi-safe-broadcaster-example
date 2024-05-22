@@ -2,15 +2,15 @@ import { convertCachedTokenFee, getTokenFee } from './calculate-token-fee';
 import { lookUpCachedUnitTokenFee } from './transaction-fee-cache';
 import configNetworks from '../config/config-networks';
 import { ErrorMessage } from '../../util/errors';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { isDefined } from '@railgun-community/shared-models';
 import { tokenForAddress } from '../tokens/network-tokens';
 import debug from 'debug';
 
-const dbg = debug('relayer:fee:validator:');
+const dbg = debug('broadcaster:fee:validator:');
 
 const comparePackagedFeeToCalculated = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   packagedFee: bigint,
   calculatedFee: bigint,
 ) => {
@@ -24,7 +24,7 @@ const comparePackagedFeeToCalculated = (
 };
 
 export const validateFee = (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
   maximumGas: bigint,
   feeCacheID: string,

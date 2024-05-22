@@ -10,7 +10,7 @@ import debug from 'debug';
 
 let shouldPoll = true;
 
-const dbg = debug('relayer:price-poller');
+const dbg = debug('broadcaster:price-poller');
 
 const pullAndCacheCurrentPricesForAllNetworks = async (
   tokenPriceRefresher: TokenPriceRefresher,
@@ -26,7 +26,7 @@ const pullAndCacheCurrentPricesForAllNetworks = async (
     // eslint-disable-next-line no-await-in-loop
     await tokenPriceRefresher.refresher(chain, tokenAddresses);
     // eslint-disable-next-line no-await-in-loop
-    await delay(2000)
+    await delay(2000);
   }
 };
 
@@ -38,7 +38,6 @@ const pollPrices = async (source: TokenPriceSource) => {
     return;
   }
   try {
-
     await pullAndCacheCurrentPricesForAllNetworks(tokenPriceRefresher);
   } catch (err) {
     dbg('pollPrices error');

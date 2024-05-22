@@ -1,21 +1,27 @@
-import { ChainType, delay, isDefined, promiseTimeout } from "@railgun-community/shared-models";
-import { RelayerChain } from "../../../models/chain-models";
-import { NetworkChainID } from "../../config/config-chains";
-import { tokenForAddress } from "../../tokens/network-tokens";
-import { UniswapQuoteInputs, UniswapQuoteResponse } from "./uniswap-models";
-import { fetchUniswapQuote, getUniswapQuoteParams } from "./uniswap-fetch";
-import { TokenPrice, TokenPriceUpdater } from "../../tokens/token-price-cache";
+import {
+  ChainType,
+  delay,
+  isDefined,
+  promiseTimeout,
+} from '@railgun-community/shared-models';
+import { BroadcasterChain } from '../../../models/chain-models';
+import { NetworkChainID } from '../../config/config-chains';
+import { tokenForAddress } from '../../tokens/network-tokens';
+import { UniswapQuoteInputs, UniswapQuoteResponse } from './uniswap-models';
+import { fetchUniswapQuote, getUniswapQuoteParams } from './uniswap-fetch';
+import { TokenPrice, TokenPriceUpdater } from '../../tokens/token-price-cache';
 import debug from 'debug';
 
-const dbg = debug('relayer:UniswapPrice');
+const dbg = debug('broadcaster:UniswapPrice');
 const UNISWAP_PRICE_LOOKUP_DELAY = 1500;
 type UniswapFormattedPriceData = {
   price: number;
 };
 const refreshLocks: NumMapType<NumMapType<boolean>> = {};
 
-
-export const getStablecoinReferenceSymbols = (chain: RelayerChain): string[] => {
+export const getStablecoinReferenceSymbols = (
+  chain: BroadcasterChain,
+): string[] => {
   const error = new Error(
     `Chain ${chain.type}:${chain.id} has no reference symbol, Unable to get price quotes.`,
   );
@@ -41,10 +47,8 @@ export const getStablecoinReferenceSymbols = (chain: RelayerChain): string[] => 
   }
 };
 
-
-
 export const uniswapPriceLookupByAddress = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddress: string,
 ): Promise<Optional<UniswapFormattedPriceData>> => {
   try {
@@ -63,15 +67,18 @@ export const uniswapPriceLookupByAddress = async (
       tokenInAddress: tokenAddress,
       tokenOutAddress: stablecoinSymbol[0],
       tokenInAmount: sellAmount, // 1 token
-      slippage: 0.5
+      slippage: 0.5,
     };
 
     const quoteParams = getUniswapQuoteParams(
       chain,
-      "0x000000000000000000000000000000000000dead",
-      params);
+      '0x000000000000000000000000000000000000dead',
+      params,
+    );
 
-    const quoteResponse = await fetchUniswapQuote<UniswapQuoteResponse>(quoteParams);
+    const quoteResponse = await fetchUniswapQuote<UniswapQuoteResponse>(
+      quoteParams,
+    );
 
     if (isDefined(quoteResponse)) {
       const { quote } = quoteResponse;
@@ -85,9 +92,8 @@ export const uniswapPriceLookupByAddress = async (
   }
 };
 
-
 export const uniswapUpdatePricesByAddresses = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   tokenAddresses: string[],
   updater: TokenPriceUpdater,
 ): Promise<void> => {

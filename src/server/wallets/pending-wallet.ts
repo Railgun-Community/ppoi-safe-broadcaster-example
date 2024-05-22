@@ -1,5 +1,5 @@
 import { ContractTransaction, Wallet, parseUnits } from 'ethers';
-import { RelayerChain } from '../../models/chain-models';
+import { BroadcasterChain } from '../../models/chain-models';
 import { ActiveWallet } from '../../models/wallet-models';
 import { delay } from '../../util/promise-utils';
 import { getFirstJsonRpcProviderForNetwork } from '../providers/active-network-providers';
@@ -8,20 +8,20 @@ import debug from 'debug';
 import { NetworkChainID } from '../config/config-chains';
 import configDefaults from '../config/config-defaults';
 
-const dbg = debug('relayer:pending-transaction');
+const dbg = debug('broadcaster:pending-transaction');
 
 const pendingTransactionCache: NumMapType<NumMapType<MapType<boolean>>> = {};
-const initPendingTransactionCache = (chain: RelayerChain) => {
+const initPendingTransactionCache = (chain: BroadcasterChain) => {
   pendingTransactionCache[chain.type] ??= {};
   pendingTransactionCache[chain.type][chain.id] ??= {};
 };
 
-const getPendingCache = (chain: RelayerChain, wallet: ActiveWallet) => {
+const getPendingCache = (chain: BroadcasterChain, wallet: ActiveWallet) => {
   return pendingTransactionCache[chain.type][chain.id][wallet.address];
 };
 
 const populateTerminationTransaction = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   wallet: ActiveWallet,
 ): Promise<ContractTransaction | undefined> => {
   // get the current nonce,
@@ -71,7 +71,7 @@ const populateTerminationTransaction = async (
 };
 
 const sendTerminationTransaction = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   wallet: ActiveWallet,
 ) => {
   const terminationTransaction = await populateTerminationTransaction(
@@ -106,7 +106,7 @@ const sendTerminationTransaction = async (
 };
 
 const pollPendingTransactions = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   wallet: ActiveWallet,
   retryCount = 0,
 ) => {
@@ -156,7 +156,7 @@ const pollPendingTransactions = async (
 
 export const updatePendingTransactions = (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   value: boolean,
 ) => {
   initPendingTransactionCache(chain);
@@ -170,7 +170,7 @@ export const updatePendingTransactions = (
 };
 
 const checkForPendingTransactions = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   wallet: ActiveWallet,
 ) => {
   try {
@@ -193,7 +193,7 @@ const checkForPendingTransactions = async (
 // this only gets called when a wallet is being selected for sending a tx
 export const hasPendingTransactions = (
   wallet: ActiveWallet,
-  chain: RelayerChain,
+  chain: BroadcasterChain,
 ): boolean => {
   initPendingTransactionCache(chain);
 
@@ -207,7 +207,7 @@ export const hasPendingTransactions = (
     }
     return cached;
   }
-  // upon initial start of the relayer, no accounts should have pending transactions.
+  // upon initial start of the broadcaster, no accounts should have pending transactions.
   // or any subsequent restarts. please make sure to clear them out then restart if they become an issue.
   pendingTransactionCache[chain.type][chain.id][wallet.address] = false;
   return false;
@@ -218,7 +218,7 @@ type TransactionCount = {
 };
 
 const getTransactionCounts = async (
-  chain: RelayerChain,
+  chain: BroadcasterChain,
   wallet: ActiveWallet,
 ): Promise<TransactionCount | undefined> => {
   const provider = getFirstJsonRpcProviderForNetwork(chain);
