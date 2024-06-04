@@ -2,13 +2,14 @@ import { Database } from '@railgun-community/wallet';
 import leveldown from 'leveldown';
 import { logger } from '../../util/logger';
 import configDefaults from '../config/config-defaults';
+import { isDefined } from '@railgun-community/shared-models';
 
 const SETTINGS_DB_NAMESPACE = 'broadcaster:settings';
 
 let db: Optional<Database>;
 
 export const initSettingsDB = () => {
-  if (db) {
+  if (isDefined(db)) {
     return;
   }
   const level = leveldown(configDefaults.settings.dbDir);
@@ -25,7 +26,7 @@ export const closeSettingsDB = async () => {
 };
 
 export const clearSettingsDB = async () => {
-  if (db) {
+  if (isDefined(db)) {
     await db.clearNamespace([SETTINGS_DB_NAMESPACE]);
   }
 };
@@ -50,44 +51,52 @@ const handleNoDBError = () => {
   return Promise.resolve(undefined);
 };
 
-export const storeSettingsString = (
+export const storeSettingsString = async (
   key: string,
   value: string,
 ): Promise<void> => {
-  if (!db) {
+  if (!isDefined(db)) {
     return handleNoDBError();
   }
-  return db
-    .put(getPathsForKey(key), value, 'utf8')
-    .catch((err) => putDbErrorHandler(key, value, err));
+  try {
+    return db.put(getPathsForKey(key), value, 'utf8');
+  } catch (err) {
+    return putDbErrorHandler(key, value, err);
+  }
 };
 
-export const storeSettingsBytes = (
+export const storeSettingsBytes = async (
   key: string,
   value: string,
 ): Promise<void> => {
-  if (!db) {
+  if (!isDefined(db)) {
     return handleNoDBError();
   }
-  return db
-    .put(getPathsForKey(key), value)
-    .catch((err) => putDbErrorHandler(key, value, err));
+  try {
+    return db.put(getPathsForKey(key), value);
+  } catch (err) {
+    return putDbErrorHandler(key, value, err);
+  }
 };
 
-export const storeSettingsNumber = (
+export const storeSettingsNumber = async (
   key: string,
   value: number,
 ): Promise<void> => {
-  if (!db) {
+  if (!isDefined(db)) {
     return handleNoDBError();
   }
-  return db
-    .put(getPathsForKey(key), value, 'utf8')
-    .catch((err) => putDbErrorHandler(key, value, err));
+  try {
+    return db.put(getPathsForKey(key), value, 'utf8');
+  } catch (err) {
+    return putDbErrorHandler(key, value, err);
+  }
 };
 
-export const getSettingsString = (key: string): Promise<Optional<string>> => {
-  if (!db) {
+export const getSettingsString = async (
+  key: string,
+): Promise<Optional<string>> => {
+  if (!isDefined(db)) {
     return handleNoDBError();
   }
   return db
@@ -95,8 +104,10 @@ export const getSettingsString = (key: string): Promise<Optional<string>> => {
     .catch((err) => getDbErrorHandler(key, err));
 };
 
-export const getSettingsBytes = (key: string): Promise<Optional<string>> => {
-  if (!db) {
+export const getSettingsBytes = async (
+  key: string,
+): Promise<Optional<string>> => {
+  if (!isDefined(db)) {
     return handleNoDBError();
   }
   return db
@@ -104,8 +115,10 @@ export const getSettingsBytes = (key: string): Promise<Optional<string>> => {
     .catch((err) => getDbErrorHandler(key, err));
 };
 
-export const getSettingsNumber = (key: string): Promise<Optional<number>> => {
-  if (!db) {
+export const getSettingsNumber = async (
+  key: string,
+): Promise<Optional<number>> => {
+  if (!isDefined(db)) {
     return handleNoDBError();
   }
   return db

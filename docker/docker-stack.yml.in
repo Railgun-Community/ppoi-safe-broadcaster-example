@@ -39,7 +39,10 @@ services:
     hostname: 'broadcaster'
     environment:
       WAKU_RPC_URL: 'http://nwaku1:8546'
+      WAKU_RPC_URL_BACKUP: 'http://nwaku2:8547'
       LEPTON_DB: '/mnt/broadcaster.db'
+      SETTINGS_DB: '/mnt/settings.db'
+      POI_DB: '/mnt/poi.db',
       LOG_LEVEL: 'debug'
       DEBUG: 'broadcaster*,waku:jsonrpc-api'
     secrets:

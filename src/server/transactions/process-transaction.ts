@@ -20,6 +20,10 @@ import { executeTransaction } from './execute-transaction';
 import { extractPackagedFeeFromTransaction } from './extract-packaged-fee';
 import { ContractTransaction, TransactionResponse } from 'ethers';
 import { ValidatedPOIData, validatePOI } from './poi-validator';
+import {
+  ReliabilityMetric,
+  incrementReliability,
+} from '../../util/reliability';
 
 const dbg = debug('broadcaster:transact:validate');
 
@@ -68,7 +72,11 @@ export const processTransaction = async (
     minGasPrice,
     transactionRequestForGasEstimate,
     devLog,
-  );
+  ).catch(async (e) => {
+    dbg('Error getting gas estimate:', e);
+    await incrementReliability(chain, ReliabilityMetric.GAS_ESTIMATE_FAILURE);
+    throw e;
+  });
 
   dbg('transactionGasDetails:', transactionGasDetails);
 
@@ -85,11 +93,23 @@ export const processTransaction = async (
       transaction,
       useRelayAdapt,
     );
-  validateFee(chain, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
+  try {
+    validateFee(chain, tokenAddress, maximumGas, feeCacheID, packagedFeeAmount);
+  } catch (error) {
+    await incrementReliability(chain, ReliabilityMetric.GAS_ESTIMATE_FAILURE);
+    throw error;
+  }
+  await incrementReliability(chain, ReliabilityMetric.GAS_ESTIMATE_SUCCESS);
+
   dbg('Fee validated:', packagedFeeAmount, tokenAddress);
   dbg('Transaction gas details:', transactionGasDetails);
 
-  await validateMinGasPrice(chain, minGasPrice, evmGasType);
+  await validateMinGasPrice(chain, minGasPrice, evmGasType).catch(async (e) => {
+    dbg('Error validating min gas price:', e);
+    await incrementReliability(chain, ReliabilityMetric.FEE_VALIDATION_FAILURE);
+    throw e;
+  });
+  await incrementReliability(chain, ReliabilityMetric.FEE_VALIDATION_SUCCESS);
 
   // DO NOT MODIFY.
   // WARNING: If you modify POI validation, you risk fees that aren't spendable, as they won't have valid POIs.
@@ -99,8 +119,13 @@ export const processTransaction = async (
     transaction,
     useRelayAdapt,
     preTransactionPOIsPerTxidLeafPerList,
-  );
-  // DO NOT MODIFY.
+    // DO NOT MODIFY.
+  ).catch(async (e) => {
+    dbg('Error validating POI:', e);
+    await incrementReliability(chain, ReliabilityMetric.POI_VALIDATION_FAILURE);
+    throw e;
+  });
+  await incrementReliability(chain, ReliabilityMetric.POI_VALIDATION_SUCCESS);
 
   return executeTransaction(
     chain,

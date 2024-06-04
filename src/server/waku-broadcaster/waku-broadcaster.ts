@@ -32,6 +32,7 @@ import { transactMethod } from './methods/transact-method';
 import { contentTopics } from './topics';
 import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
+import { getReliabilityRatio } from '../../util/reliability';
 
 type JsonRPCMessageHandler = (
   params: any,
@@ -169,6 +170,7 @@ export class WakuBroadcaster {
     fees: MapType<bigint>,
     feeCacheID: string,
     chain: BroadcasterChain,
+    reliability: number,
   ): Promise<BroadcasterFeeMessage> => {
     const tokenAddresses = Object.keys(fees);
     const feesHex: MapType<string> = {};
@@ -199,6 +201,7 @@ export class WakuBroadcaster {
       version: getBroadcasterVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
       requiredPOIListKeys, // DO NOT CHANGE : Required in order to make broadcaster fees spendable
+      reliability,
     };
     const message = fromUTF8String(JSON.stringify(data));
     const signature = await signWithWalletViewingKey(
@@ -219,8 +222,9 @@ export class WakuBroadcaster {
   async broadcastFeesForChain(chain: BroadcasterChain): Promise<void> {
     // Map from tokenAddress to BigNumber hex string
     const { fees, feeCacheID } = getAllUnitTokenFeesForChain(chain);
+    const reliability = await getReliabilityRatio(chain);
     const feeBroadcastData = await promiseTimeout(
-      this.createFeeBroadcastData(fees, feeCacheID, chain),
+      this.createFeeBroadcastData(fees, feeCacheID, chain, reliability),
       3 * 1000,
     )
       .then((result: BroadcasterFeeMessage) => {
