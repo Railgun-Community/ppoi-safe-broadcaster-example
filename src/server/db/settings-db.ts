@@ -126,3 +126,24 @@ export const getSettingsNumber = async (
     .then((val) => parseInt(val, 10))
     .catch((err) => getDbErrorHandler(key, err));
 };
+
+export const getSettingsNumberNoError = async (
+  key: string,
+): Promise<Optional<number>> => {
+  if (!isDefined(db)) {
+    return handleNoDBError();
+  }
+  return db
+    .get(getPathsForKey(key), 'utf8')
+    .then((val) => parseInt(val, 10))
+    .catch(() => undefined);
+};
+
+export const getSettingsStringNoError = async (
+  key: string,
+): Promise<Optional<string>> => {
+  if (!isDefined(db)) {
+    return handleNoDBError();
+  }
+  return db.get(getPathsForKey(key), 'utf8').catch(() => undefined);
+};
