@@ -1,7 +1,7 @@
 import debug from 'debug';
 import type { BroadcasterChain } from '../models/chain-models';
 import {
-  getSettingsNumber,
+  getSettingsNumberNoError,
   storeSettingsNumber,
 } from '../server/db/settings-db';
 import { isDefined } from '@railgun-community/shared-models';
@@ -78,10 +78,7 @@ export const decrementReliability = async (
 export const getReliability = async (
   key: string,
 ): Promise<Optional<number>> => {
-  return await getSettingsNumber(key).catch((e) => {
-    dbg(`Error getting reliability metric, ${key}: ${e}`);
-    return undefined;
-  });
+  return await getSettingsNumberNoError(key);
 };
 
 export const setReliability = async (
@@ -166,11 +163,15 @@ export const getReliabilityRatio = async (
   const basicReliability = baseReliability / 4;
   const reliability = basicReliability * baselineSeenRatio;
 
-  if (!Number.isNaN(reliability)) {
+  if (!Number.isNaN(reliability) && Number.isFinite(reliability)) {
     return parseFloat(reliability.toFixed(2));
   }
 
-  if (isDefined(txSuccessCount) && isDefined(txFailureCount)) {
+  if (
+    isDefined(txSuccessCount) &&
+    txSuccessCount > 0 &&
+    isDefined(txFailureCount)
+  ) {
     return parseFloat(
       (txSuccessCount / (txSuccessCount + txFailureCount)).toFixed(2),
     );
@@ -184,15 +185,19 @@ export const getReliabilityRatio = async (
 export const initReliabilityMetricsForChain = async (
   chain: BroadcasterChain,
 ): Promise<void> => {
+  const initKeyPath = getReliabilityKeyPath(chain, 'chain_initialized');
+  const initialized = await getReliability(initKeyPath);
+
+  if (isDefined(initialized)) {
+    dbg(`Reliablitly Metrics initialized on chain ${chain.type}:${chain.id}`);
+    return;
+  }
   for (const metric of MetricsStrings) {
     const key = getReliabilityKeyPath(chain, metric);
     // eslint-disable-next-line no-await-in-loop
-    const current = await getReliability(key);
-    if (!isDefined(current)) {
-      // eslint-disable-next-line no-await-in-loop
-      await setReliability(key, 0);
-    }
+    await setReliability(key, 0);
   }
+  await setReliability(initKeyPath, 1337);
 };
 
 export const getAllMetricsForChain = async (
