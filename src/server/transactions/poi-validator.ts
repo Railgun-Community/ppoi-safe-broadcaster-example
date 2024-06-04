@@ -15,6 +15,10 @@ import debug from 'debug';
 import { ErrorMessage } from '../../util/errors';
 import { ContractTransaction } from 'ethers';
 import { getRailgunWalletID } from '../wallets/active-wallets';
+import {
+  ReliabilityMetric,
+  incrementReliability,
+} from '../../util/reliability';
 
 const dbg = debug('broadcaster:poi-validator');
 
@@ -88,6 +92,7 @@ export const validatePOI = async (
       commitment: feeTransactionData.firstCommitment as string,
       preTransactionPOIsPerTxidLeafPerList,
     };
+    await incrementReliability(chain, ReliabilityMetric.POI_VALIDATION_SUCCESS);
     return validatedPOIData;
   } catch (err) {
     console.log(err);
