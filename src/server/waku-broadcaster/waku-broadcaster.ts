@@ -37,6 +37,7 @@ import { getReliabilityRatio } from '../../util/reliability';
 type JsonRPCMessageHandler = (
   params: any,
   id: number,
+  incomingChain: BroadcasterChain,
 ) => Promise<Optional<WakuMethodResponse>>;
 
 export enum WakuMethodNames {
@@ -156,7 +157,12 @@ export class WakuBroadcaster {
 
       if (method in this.methods) {
         this.dbg(`Received message on ${contentTopic}`);
-        const response = await this.methods[method](params, id);
+        const rawTopic = contentTopic.split('/');
+        const incomingChain = {
+          type: parseInt(rawTopic[3], 10),
+          id: parseInt(rawTopic[4], 10),
+        };
+        const response = await this.methods[method](params, id, incomingChain);
         if (response) {
           await this.publish(response.rpcResult, response.contentTopic, true);
         }
@@ -201,7 +207,7 @@ export class WakuBroadcaster {
       version: getBroadcasterVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
       requiredPOIListKeys, // DO NOT CHANGE : Required in order to make broadcaster fees spendable
-      reliability,
+      // reliability,
     };
     const message = fromUTF8String(JSON.stringify(data));
     const signature = await signWithWalletViewingKey(
@@ -211,7 +217,7 @@ export class WakuBroadcaster {
     this.dbg(
       `Broadcasting fees for chain ${chain.type}:${chain.id}: Tokens ${
         Object.keys(fees).length
-      }, Available Wallets ${availableWallets}`,
+      }, Available Wallets ${availableWallets} | Reliability: ${reliability}`,
     );
     return {
       data: message,

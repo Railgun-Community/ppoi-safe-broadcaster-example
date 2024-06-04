@@ -21,12 +21,14 @@ import { setOnBalanceUpdateCallback } from '@railgun-community/wallet';
 import { onBalanceUpdateCallback } from '../balances/shielded-balance-cache';
 import { isDefined } from '@railgun-community/shared-models';
 import { POIAssurance } from '../transactions/poi-assurance';
+import { inflateHandledKeys } from '../../util/handled-keys';
 
 export const initBroadcasterModules = async (forTest = false) => {
   if (!forTest) {
     isDefined(myConfigOverrides) && myConfigOverrides();
   }
   initSettingsDB();
+  await inflateHandledKeys();
   await startEngine();
   await initNetworkProviders();
   await initWallets();

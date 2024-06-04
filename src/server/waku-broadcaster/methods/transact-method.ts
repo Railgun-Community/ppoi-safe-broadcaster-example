@@ -34,13 +34,15 @@ import {
 import { getBroadcasterVersion } from '../../../util/broadcaster-version';
 import { TransactionResponse, formatUnits, parseUnits } from 'ethers';
 import { createValidTransaction } from '../../transactions/transaction-validator';
-// import { BroadcasterError } from '../../../models/error-models';
 import {
   ReliabilityMetric,
   incrementReliability,
 } from '../../../util/reliability';
 
-const handledClientPubKeys: string[] = [];
+import {
+  isHandledClientPubKey,
+  storeHandledClientKey,
+} from '../../../util/handled-keys';
 
 const dbg = debug('broadcaster:transact');
 
@@ -59,17 +61,19 @@ const sanitizeSuggestedFee = (errorString: string) => {
 export const transactMethod = async (
   params: BroadcasterEncryptedMethodParams,
   id: number,
+  incomingChain: BroadcasterChain,
 ): Promise<Optional<WakuMethodResponse>> => {
   dbg('got transact');
   dbg(params);
 
   const { pubkey: clientPubKey, encryptedData } = params;
 
-  if (handledClientPubKeys.includes(clientPubKey)) {
+  if (isHandledClientPubKey(clientPubKey)) {
     // Client sent a repeated message. Ignore because we've already handled it.
     dbg('Repeat message - already handled');
     return undefined;
   }
+  await storeHandledClientKey(clientPubKey);
   await incrementReliability(
     {
       // @ts-ignore; this is a dummy chain object since we don't have the chain info yet
@@ -78,7 +82,6 @@ export const transactMethod = async (
     },
     ReliabilityMetric.TOTAL_SEEN,
   );
-  handledClientPubKeys.push(clientPubKey);
 
   const railgunWalletID = getRailgunWalletID();
   const viewingPrivateKey = getRailgunWalletPrivateViewingKey(railgunWalletID);
@@ -91,6 +94,7 @@ export const transactMethod = async (
   if (decrypted == null) {
     // Incorrect key. Skipping transact message.
     dbg('Cannot decrypt - Not intended receiver');
+    await incrementReliability(incomingChain, ReliabilityMetric.DECODE_FAILURE);
     return undefined;
   }
 
@@ -117,6 +121,11 @@ export const transactMethod = async (
     id: chainID,
   };
 
+  if (incomingChain.type !== chainType && incomingChain.id !== chainID) {
+    dbg(
+      `Incoming Chain mismatch! Expected ${chainType}:${chain.id} got ${incomingChain.type}:${incomingChain.id}`,
+    );
+  }
   await incrementReliability(chain, ReliabilityMetric.DECODE_SUCCESS);
 
   try {
