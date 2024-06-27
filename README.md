@@ -1,4 +1,4 @@
-[![Unit Tests](https://github.com/Railgun-Community/poi-safe-broadcaster-example/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/poi-safe-broadcaster-example/actions)
+[![Unit Tests](https://github.com/Railgun-Community/ppoi-safe-broadcaster-example/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/ppoi-safe-broadcaster-example/actions)
 
 # Example code and tests for PPOI-Safe RAILGUN transactions
 
