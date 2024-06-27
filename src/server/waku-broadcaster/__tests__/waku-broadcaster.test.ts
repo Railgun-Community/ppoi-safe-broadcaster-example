@@ -291,7 +291,7 @@ describe('waku-broadcaster', () => {
 
     await delay(20000);
     // After transact-response sent.
-    expect(clientHTTPStub.callCount).to.equal(1);
+    expect(clientHTTPStub.callCount).to.equal(21);
     const postCall = clientHTTPStub.getCall(0);
     expect(postCall.args[0]).to.equal(WakuRequestMethods.PublishMessage);
     const rpcArgs = postCall.args[1];
