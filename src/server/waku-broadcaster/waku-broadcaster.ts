@@ -108,6 +108,7 @@ export class WakuBroadcaster {
   async publish(
     payload: Optional<JsonRpcPayload<string>> | object,
     contentTopic: string,
+    isResponse = false,
   ): Promise<void> {
     if (!payload) {
       return;
@@ -116,6 +117,10 @@ export class WakuBroadcaster {
       JSON.stringify(payload),
       contentTopic,
     );
+    if (isResponse) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      this.ensureTxResponse(msg);
+    }
 
     return this.client.publish(msg, this.options.topic).catch((e) => {
       this.dbg('Error publishing message', e.message);
@@ -152,7 +157,7 @@ export class WakuBroadcaster {
         this.dbg(`Received message on ${contentTopic}`);
         const response = await this.methods[method](params, id);
         if (response) {
-          await this.publish(response.rpcResult, response.contentTopic);
+          await this.publish(response.rpcResult, response.contentTopic, true);
         }
       }
     } catch (e) {

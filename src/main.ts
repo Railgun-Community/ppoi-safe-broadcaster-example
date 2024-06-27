@@ -27,7 +27,6 @@ const main = async (): Promise<void> => {
 
   const client = new WakuRestApiClient({
     url: config.waku.rpcURL,
-    urlBackup: config.waku.rpcURLBackup,
   });
   const options: WakuBroadcasterOptions = {
     topic: config.waku.pubSubTopic,

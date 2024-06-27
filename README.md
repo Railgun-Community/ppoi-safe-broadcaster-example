@@ -155,7 +155,6 @@ Specify a waku server to use for your broadcaster's p2p communication. It defaul
 ```ts
 //...
 configDefaults.waku.rpcURL = 'http://nwaku1:8546';
-configDefaults.waku.rpcURLBackup = 'http://nwaku2:8547';
 ```
 
 - configDefaults.wallet.mnemonic

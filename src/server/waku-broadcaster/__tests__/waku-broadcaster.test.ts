@@ -103,7 +103,7 @@ describe('waku-broadcaster', () => {
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
 
-    client = new WakuRestApiClient({ url: '', urlBackup: '' });
+    client = new WakuRestApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
     wakuBroadcaster = await WakuBroadcaster.init(client, {
       topic: configDefaults.waku.pubSubTopic,
@@ -291,7 +291,7 @@ describe('waku-broadcaster', () => {
 
     await delay(20000);
     // After transact-response sent.
-    expect(clientHTTPStub.callCount).to.equal(1);
+    expect(clientHTTPStub.callCount).to.equal(21);
     const postCall = clientHTTPStub.getCall(0);
     expect(postCall.args[0]).to.equal(WakuRequestMethods.PublishMessage);
     const rpcArgs = postCall.args[1];

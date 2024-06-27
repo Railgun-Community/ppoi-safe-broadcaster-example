@@ -13,7 +13,6 @@ export type WakuRelayMessage = {
 
 export type WakuApiClientOptions = {
   url: string;
-  urlBackup: string;
 };
 
 export enum WakuRequestMethods {
@@ -40,12 +39,9 @@ export class WakuRestApiClient {
 
   mainNwaku: string;
 
-  backupNwaku: string;
-
   constructor(options: WakuApiClientOptions) {
     this.dbg = debug('broadcaster:waku:REST-api');
     this.mainNwaku = options.url;
-    this.backupNwaku = options.urlBackup;
     const httpConfig = {
       timeout: 60000,
       headers: { 'Content-Type': 'application/json' },
@@ -103,7 +99,7 @@ export class WakuRestApiClient {
     params: any,
     retry = 0,
   ): Promise<any> {
-    const baseURL = retry === 0 ? this.mainNwaku : this.backupNwaku;
+    const baseURL = this.mainNwaku;
     const formattedURL = `${baseURL}${method}`;
     try {
       switch (requestType) {
