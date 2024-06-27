@@ -207,7 +207,7 @@ export class WakuBroadcaster {
       version: getBroadcasterVersion(),
       relayAdapt: configNetworks[chain.type][chain.id].relayAdaptContract,
       requiredPOIListKeys, // DO NOT CHANGE : Required in order to make broadcaster fees spendable
-      // reliability,
+      reliability,
     };
     const message = fromUTF8String(JSON.stringify(data));
     const signature = await signWithWalletViewingKey(
