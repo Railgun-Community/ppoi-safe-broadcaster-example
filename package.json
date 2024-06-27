@@ -31,8 +31,8 @@
   "dependencies": {
     "@0x/contract-addresses": "^8.0.0",
     "@noble/ed25519": "^1.7.1",
-    "@railgun-community/shared-models": "7.0.x",
-    "@railgun-community/wallet": "9.0.x",
+    "@railgun-community/shared-models": "7.0.7",
+    "@railgun-community/wallet": "10.0.1",
     "@walletconnect/jsonrpc-types": "^1.0.2",
     "@walletconnect/jsonrpc-utils": "^1.0.4",
     "axios": "1.2.3",

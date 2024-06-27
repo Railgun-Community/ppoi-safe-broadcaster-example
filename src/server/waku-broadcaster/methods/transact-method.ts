@@ -34,9 +34,15 @@ import {
 import { getBroadcasterVersion } from '../../../util/broadcaster-version';
 import { TransactionResponse, formatUnits, parseUnits } from 'ethers';
 import { createValidTransaction } from '../../transactions/transaction-validator';
-import { BroadcasterError } from '../../../models/error-models';
+import {
+  ReliabilityMetric,
+  incrementReliability,
+} from '../../../util/reliability';
 
-const handledClientPubKeys: string[] = [];
+import {
+  isHandledClientPubKey,
+  storeHandledClientKey,
+} from '../../../util/handled-keys';
 
 const dbg = debug('broadcaster:transact');
 
@@ -55,18 +61,27 @@ const sanitizeSuggestedFee = (errorString: string) => {
 export const transactMethod = async (
   params: BroadcasterEncryptedMethodParams,
   id: number,
+  incomingChain: BroadcasterChain,
 ): Promise<Optional<WakuMethodResponse>> => {
   dbg('got transact');
   dbg(params);
 
   const { pubkey: clientPubKey, encryptedData } = params;
 
-  if (handledClientPubKeys.includes(clientPubKey)) {
+  if (isHandledClientPubKey(clientPubKey)) {
     // Client sent a repeated message. Ignore because we've already handled it.
     dbg('Repeat message - already handled');
     return undefined;
   }
-  handledClientPubKeys.push(clientPubKey);
+  await storeHandledClientKey(clientPubKey);
+  await incrementReliability(
+    {
+      // @ts-ignore; this is a dummy chain object since we don't have the chain info yet
+      id: 0,
+      type: 0,
+    },
+    ReliabilityMetric.TOTAL_SEEN,
+  );
 
   const railgunWalletID = getRailgunWalletID();
   const viewingPrivateKey = getRailgunWalletPrivateViewingKey(railgunWalletID);
@@ -79,6 +94,7 @@ export const transactMethod = async (
   if (decrypted == null) {
     // Incorrect key. Skipping transact message.
     dbg('Cannot decrypt - Not intended receiver');
+    await incrementReliability(incomingChain, ReliabilityMetric.DECODE_FAILURE);
     return undefined;
   }
 
@@ -105,13 +121,21 @@ export const transactMethod = async (
     id: chainID,
   };
 
+  if (incomingChain.type !== chainType && incomingChain.id !== chainID) {
+    dbg(
+      `Incoming Chain mismatch! Expected ${chainType}:${chain.id} got ${incomingChain.type}:${incomingChain.id}`,
+    );
+  }
+  await incrementReliability(chain, ReliabilityMetric.DECODE_SUCCESS);
+
   try {
     dbg('Decrypted - attempting to transact');
 
     if (!minVersion || !maxVersion) {
       dbg(`Cannot process tx - Requires params minVersion, maxVersion`);
       // Do nothing. No error response.
-      return;
+      await incrementReliability(chain, ReliabilityMetric.BAD_DATA);
+      return undefined;
     }
     const broadcasterVersion = getBroadcasterVersion();
     if (
@@ -122,26 +146,30 @@ export const transactMethod = async (
         `Cannot process tx - Broadcaster version ${broadcasterVersion} outside range ${minVersion}-${maxVersion}`,
       );
       // Do nothing. No error response.
-      return;
+      await incrementReliability(chain, ReliabilityMetric.BAD_DATA);
+      return undefined;
     }
 
     if (!broadcasterViewingKey) {
       dbg(`Cannot process tx - Requires params broadcasterViewingKey`);
       // Do nothing. No error response.
-      return;
+      await incrementReliability(chain, ReliabilityMetric.BAD_DATA);
+      return undefined;
     }
 
     const railgunWalletAddress = getRailgunWalletAddress();
     const { viewingPublicKey } =
       getRailgunWalletAddressData(railgunWalletAddress);
     if (broadcasterViewingKey !== ByteUtils.hexlify(viewingPublicKey)) {
+      await incrementReliability(chain, ReliabilityMetric.BAD_DATA);
       return undefined;
     }
 
     if (!feeCacheID) {
       dbg(`Cannot process tx - Requires params feeCacheID`);
       // Do nothing. No error response.
-      return;
+      await incrementReliability(chain, ReliabilityMetric.BAD_DATA);
+      return undefined;
     }
     if (
       configDefaults.transactionFees.requireMatchingFeeCacheID &&
@@ -151,6 +179,7 @@ export const transactMethod = async (
         'Fee cache ID unrecognized. Transaction sent to another Broadcaster with same Rail Address.',
       );
       // Do nothing. No error response.
+      await incrementReliability(chain, ReliabilityMetric.BAD_DATA);
       return undefined;
     }
 
@@ -166,6 +195,8 @@ export const transactMethod = async (
       broadcasterViewingKey == null ||
       useRelayAdapt == null
     ) {
+      await incrementReliability(chain, ReliabilityMetric.BAD_DATA);
+
       return errorResponse(
         id,
         chain,
@@ -179,6 +210,8 @@ export const transactMethod = async (
       !isDefined(configNetworks[chain.type]) ||
       !isDefined(configNetworks[chain.type][chain.id])
     ) {
+      await incrementReliability(chain, ReliabilityMetric.BAD_DATA);
+
       return errorResponse(
         id,
         chain,
@@ -200,6 +233,8 @@ export const transactMethod = async (
       preTransactionPOIsPerTxidLeafPerList,
       devLog,
     );
+    await incrementReliability(chain, ReliabilityMetric.SEND_SUCCESS);
+
     return resultResponse(id, chain, sharedKey, txResponse);
   } catch (err) {
     // custom error message
@@ -261,10 +296,14 @@ export const transactMethod = async (
               preTransactionPOIsPerTxidLeafPerList,
               devLog,
             );
+            await incrementReliability(chain, ReliabilityMetric.SEND_SUCCESS);
+
             return resultResponse(id, chain, sharedKey, txResponse);
           } catch (err) {
             // any error here. we just return original response instead.
             dbg('We Errored twice.', err);
+            await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
             return errorResponse(
               id,
               chain,
@@ -275,12 +314,14 @@ export const transactMethod = async (
           }
         }
       }
-      // check if this is a
-
       const newErr = new Error(newErrorString);
+      await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
       return errorResponse(id, chain, sharedKey, newErr, true);
     }
     dbg(err);
+    await incrementReliability(chain, ReliabilityMetric.SEND_FAILURE);
+
     return errorResponse(id, chain, sharedKey, err, devLog);
   }
 };

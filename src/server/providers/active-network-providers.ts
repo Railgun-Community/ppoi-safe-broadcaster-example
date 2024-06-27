@@ -10,6 +10,7 @@ import {
 } from '@railgun-community/shared-models';
 import debug from 'debug';
 import { FallbackProvider, JsonRpcProvider } from 'ethers';
+import { initReliabilityMetricsForChain } from '../../util/reliability';
 
 const dbg = debug('broadcaster:networks');
 
@@ -22,6 +23,8 @@ export const initNetworkProviders = async (chains?: BroadcasterChain[]) => {
     try {
       // eslint-disable-next-line no-await-in-loop
       await initNetworkProvider(chain);
+      // eslint-disable-next-line no-await-in-loop
+      await initReliabilityMetricsForChain(chain);
     } catch (err) {
       const error = err as Error;
       const { message } = error;
