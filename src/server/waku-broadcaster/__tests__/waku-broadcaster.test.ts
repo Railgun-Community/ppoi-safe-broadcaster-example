@@ -103,7 +103,7 @@ describe('waku-broadcaster', () => {
       .stub(processTransactionModule, 'processTransaction')
       .resolves({ hash: '123' } as TransactionResponse);
 
-    client = new WakuRestApiClient({ url: '', urlBackup: '' });
+    client = new WakuRestApiClient({ url: '' });
     clientHTTPStub = sinon.stub(client.http, 'post').callsFake(handleHTTPPost);
     wakuBroadcaster = await WakuBroadcaster.init(client, {
       topic: configDefaults.waku.pubSubTopic,
