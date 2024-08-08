@@ -5,6 +5,7 @@ import {
   delay,
   isDefined,
   networkForChain,
+  promiseTimeout,
   removeUndefineds,
 } from '@railgun-community/shared-models';
 import { ValidatedPOIData } from './poi-validator';
@@ -53,6 +54,8 @@ export class POIAssurance {
       for (const chain of configuredNetworkChains()) {
         // eslint-disable-next-line no-await-in-loop
         await this.submitValidatedPOIs(txidVersion, chain);
+        // eslint-disable-next-line no-await-in-loop
+        await delay(1000);
       }
     }
 
@@ -168,15 +171,17 @@ export class POIAssurance {
 
       const validatedPOIs = await this.getValidatedPOIs(txidVersion, chain);
 
-      if (validatedPOIs.length) {
+      if (validatedPOIs.length > 0) {
         const network = networkForChain(chain);
         if (!network) {
           throw new Error('Network not found');
         }
         await refreshReceivePOIsForWallet(txidVersion, network.name, walletID);
+        await delay(1000);
       }
 
       const wallet = walletForID(walletID);
+      await wallet.refreshReceivePOIsAllTXOs(txidVersion, chain);
       const spendableReceivedTxids = (
         await wallet.getSpendableReceivedChainTxids(txidVersion, chain)
       ).map((txid) => ByteUtils.formatToByteLength(txid, ByteLength.UINT_256));
@@ -192,7 +197,8 @@ export class POIAssurance {
           await this.deleteValidatedPOI(txidVersion, chain, validatedPOI.txid);
           continue;
         }
-
+        // eslint-disable-next-line no-await-in-loop
+        await delay(1000);
         // eslint-disable-next-line no-await-in-loop
         await this.submitValidatedPOI(txidVersion, chain, validatedPOI);
       }
@@ -252,13 +258,15 @@ export class POIAssurance {
         pois: preTransactionPOIsPerTxidLeafPerList,
       };
 
-      // eslint-disable-next-line no-await-in-loop
-      await poiNodeRequest.submitSingleCommitmentProof(
-        txidVersion,
-        chain,
-        singleCommitmentProofsData,
+      await promiseTimeout(
+        poiNodeRequest.submitSingleCommitmentProof(
+          txidVersion,
+          chain,
+          singleCommitmentProofsData,
+        ),
+        1000,
       );
-
+      await delay(500);
       dbg('Submitted single commitment proof to POI node');
     } catch (err) {
       dbg(
