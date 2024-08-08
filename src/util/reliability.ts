@@ -99,8 +99,6 @@ export const getReliabilityRatio = async (
     totalSeenCount,
     txSuccessCount,
     txFailureCount,
-    poiValidationSuccessCount,
-    poiValidationFailureCount,
     feeValidationSuccessCount,
     feeValidationFailureCount,
     gasEstimateSuccessCount,
@@ -113,16 +111,6 @@ export const getReliabilityRatio = async (
 
   const baselineSeenRatio =
     (decodeSuccessCount + decodeFailureCount) / totalSeenCount;
-  // poi ratios
-  let poiValidationRatio = 0;
-  if (
-    isDefined(poiValidationSuccessCount) &&
-    isDefined(poiValidationFailureCount)
-  ) {
-    poiValidationRatio =
-      poiValidationSuccessCount /
-      (poiValidationSuccessCount + poiValidationFailureCount);
-  }
 
   // fee ratios
   // best ratio should match the success & total seen
@@ -155,10 +143,7 @@ export const getReliabilityRatio = async (
   }
 
   const baseReliability =
-    poiValidationRatio + //
-    feeValidationRatio +
-    gasEstimateRatio +
-    decodeRatio;
+    1 + feeValidationRatio + gasEstimateRatio + decodeRatio;
 
   const basicReliability = baseReliability / 4;
   const reliability = basicReliability * baselineSeenRatio;
@@ -232,14 +217,6 @@ export const getAllMetricsForChain = async (
     chain,
     ReliabilityMetric.FEE_VALIDATION_FAILURE,
   );
-  const poiValidationSuccessKey = getReliabilityKeyPath(
-    chain,
-    ReliabilityMetric.POI_VALIDATION_SUCCESS,
-  );
-  const poiValidationFailureKey = getReliabilityKeyPath(
-    chain,
-    ReliabilityMetric.POI_VALIDATION_FAILURE,
-  );
   const txSendSuccessKey = getReliabilityKeyPath(
     chain,
     ReliabilityMetric.SEND_SUCCESS,
@@ -252,12 +229,7 @@ export const getAllMetricsForChain = async (
 
   const txSuccessCount = await getReliability(txSendSuccessKey);
   const txFailureCount = await getReliability(txSendFailureKey);
-  const poiValidationSuccessCount = await getReliability(
-    poiValidationSuccessKey,
-  );
-  const poiValidationFailureCount = await getReliability(
-    poiValidationFailureKey,
-  );
+
   const feeValidationSuccessCount = await getReliability(
     feeValidationSuccessKey,
   );
@@ -273,8 +245,6 @@ export const getAllMetricsForChain = async (
     totalSeenCount,
     txSuccessCount,
     txFailureCount,
-    poiValidationSuccessCount,
-    poiValidationFailureCount,
     feeValidationSuccessCount,
     feeValidationFailureCount,
     gasEstimateSuccessCount,

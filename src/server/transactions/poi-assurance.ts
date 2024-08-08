@@ -5,6 +5,7 @@ import {
   delay,
   isDefined,
   networkForChain,
+  promiseTimeout,
   removeUndefineds,
 } from '@railgun-community/shared-models';
 import { ValidatedPOIData } from './poi-validator';
@@ -18,6 +19,7 @@ import {
   getRailgunTransactionsForTxid,
   refreshReceivePOIsForWallet,
   walletForID,
+  refreshSpentPOIsForWallet,
 } from '@railgun-community/wallet';
 import { getRailgunWalletID } from '../wallets/active-wallets';
 import { configuredNetworkChains } from '../chains/network-chain-ids';
@@ -53,6 +55,8 @@ export class POIAssurance {
       for (const chain of configuredNetworkChains()) {
         // eslint-disable-next-line no-await-in-loop
         await this.submitValidatedPOIs(txidVersion, chain);
+        // eslint-disable-next-line no-await-in-loop
+        await delay(1000);
       }
     }
 
@@ -167,16 +171,17 @@ export class POIAssurance {
       const walletID = getRailgunWalletID();
 
       const validatedPOIs = await this.getValidatedPOIs(txidVersion, chain);
-
-      if (validatedPOIs.length) {
+      if (validatedPOIs.length > 0) {
         const network = networkForChain(chain);
         if (!network) {
           throw new Error('Network not found');
         }
         await refreshReceivePOIsForWallet(txidVersion, network.name, walletID);
+        await refreshSpentPOIsForWallet(txidVersion, network.name, walletID);
       }
 
       const wallet = walletForID(walletID);
+      await wallet.refreshReceivePOIsAllTXOs(txidVersion, chain);
       const spendableReceivedTxids = (
         await wallet.getSpendableReceivedChainTxids(txidVersion, chain)
       ).map((txid) => ByteUtils.formatToByteLength(txid, ByteLength.UINT_256));
@@ -192,7 +197,8 @@ export class POIAssurance {
           await this.deleteValidatedPOI(txidVersion, chain, validatedPOI.txid);
           continue;
         }
-
+        // eslint-disable-next-line no-await-in-loop
+        await delay(1000);
         // eslint-disable-next-line no-await-in-loop
         await this.submitValidatedPOI(txidVersion, chain, validatedPOI);
       }
@@ -252,14 +258,15 @@ export class POIAssurance {
         pois: preTransactionPOIsPerTxidLeafPerList,
       };
 
-      // eslint-disable-next-line no-await-in-loop
       await poiNodeRequest.submitSingleCommitmentProof(
         txidVersion,
         chain,
         singleCommitmentProofsData,
       );
-
-      dbg('Submitted single commitment proof to POI node');
+      await delay(500);
+      dbg(
+        `Submitted single commitment proof to POI node for chain ${chain.type}:${chain.id} for ${txidVersion}`,
+      );
     } catch (err) {
       dbg(
         `Could not submit validated POI for railgun txid ${railgunTxid} ${chain.type}:${chain.id} for ${txidVersion}: ${err.message}`,

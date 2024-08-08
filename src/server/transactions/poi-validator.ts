@@ -92,7 +92,6 @@ export const validatePOI = async (
       commitment: feeTransactionData.firstCommitment as string,
       preTransactionPOIsPerTxidLeafPerList,
     };
-    await incrementReliability(chain, ReliabilityMetric.POI_VALIDATION_SUCCESS);
     return validatedPOIData;
   } catch (err) {
     console.log(err);

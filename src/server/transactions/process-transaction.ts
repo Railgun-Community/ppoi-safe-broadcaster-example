@@ -120,12 +120,7 @@ export const processTransaction = async (
     useRelayAdapt,
     preTransactionPOIsPerTxidLeafPerList,
     // DO NOT MODIFY.
-  ).catch(async (e) => {
-    dbg('Error validating POI:', e);
-    await incrementReliability(chain, ReliabilityMetric.POI_VALIDATION_FAILURE);
-    throw e;
-  });
-  await incrementReliability(chain, ReliabilityMetric.POI_VALIDATION_SUCCESS);
+  );
 
   return executeTransaction(
     chain,

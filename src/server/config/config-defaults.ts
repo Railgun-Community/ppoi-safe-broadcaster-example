@@ -246,4 +246,5 @@ export default {
      */
     zeroXApiKey: '',
   },
+  lastFullSyncTimestamp: 1723624880556, // 2024-08-14 06:04:22 UTC
 };
