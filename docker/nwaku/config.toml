@@ -5,14 +5,14 @@ store=false
 filter=false
 lightpush=false
 rln-relay=false
-relay-peer-exchange=false
+relay-peer-exchange=true
 rest=true
 rest-address='0.0.0.0'
 rest-port=8546
 rest-admin=true
 rest-private=true
 rest-relay-cache-capacity=3000
-keep-alive=false
+keep-alive=true
 staticnode=[
   "/dns4/horsey.horsewithsixlegs.xyz/tcp/60000/p2p/16Uiu2HAmLWDFk5nGXgLx2Mz2deiEMRya1HNcvWELMDodkAC891Sd",
   "/dns4/waku.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAmATh6oki7ZCQEpCH2P9A1A2UXSRdVuU1hn9mzR3NKarPN",
