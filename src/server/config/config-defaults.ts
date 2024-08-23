@@ -240,10 +240,17 @@ export default {
      * Pro tiers are more stable and reliable.
      */
     coingeckoProApiKey: '',
+    /**
+     * API Key for Coingecko Price API.
+     * Demo tiers are free but less stable, sign up for an api key at https://www.coingecko.com/en/developers/dashboard.
+     * 10_000 requests per month
+     */
+    coingeckoDemoApiKey: '',
 
     /**
      * API Key for 0x Exchange APIs.
      */
     zeroXApiKey: '',
   },
+  lastFullSyncTimestamp: 1723624880556, // 2024-08-14 06:04:22 UTC
 };

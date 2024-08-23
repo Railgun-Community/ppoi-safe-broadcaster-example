@@ -33,7 +33,9 @@ describe('broadcaster-init', () => {
     const stubInitPricePoller = sinon
       .stub(activeTokenPricePollerModule, 'initPricePoller')
       .resolves();
-
+    const stubFullUTXOResyncBroadcasterWallets = sinon
+      .stub(activeWalletsModule, 'fullUTXOResyncBroadcasterWallets')
+      .resolves();
     const forTest = true;
     await initBroadcasterModules(forTest);
 
@@ -41,11 +43,13 @@ describe('broadcaster-init', () => {
     expect(stubInitWallets.calledOnce).to.be.true;
     expect(stubInitNetworkProviders.calledOnce).to.be.true;
     expect(stubInitPricePoller.calledOnce).to.be.true;
+    expect(stubFullUTXOResyncBroadcasterWallets.calledOnce).to.be.true;
 
     stubInitEngine.restore();
     stubInitWallets.restore();
     stubInitNetworkProviders.restore();
     stubInitPricePoller.restore();
+    stubFullUTXOResyncBroadcasterWallets.restore();
   });
 
   it('Should test MY-CONFIG loads correctly', () => {

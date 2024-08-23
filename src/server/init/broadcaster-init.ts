@@ -34,7 +34,7 @@ export const initBroadcasterModules = async (forTest = false) => {
   await initWallets();
   await initTokens();
   setOnBalanceUpdateCallback(onBalanceUpdateCallback);
-  // await fullUTXOResyncBroadcasterWallets();
+  await fullUTXOResyncBroadcasterWallets();
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   initPricePoller();
   // eslint-disable-next-line @typescript-eslint/no-floating-promises

@@ -18,11 +18,23 @@ import configNetworks from '../config/config-networks';
 import { BroadcasterChain } from '../../models/chain-models';
 import {
   createRailgunWallet,
+  generatePOIsForWallet,
   isBlockedAddress,
+  refreshBalances,
+  refreshReceivePOIsForWallet,
   rescanFullUTXOMerkletreesAndWallets,
+  resetFullTXIDMerkletreesV2,
+  walletForID,
 } from '@railgun-community/wallet';
-import { isDefined } from '@railgun-community/shared-models';
+import {
+  isDefined,
+  NETWORK_CONFIG,
+  networkForChain,
+  TXIDVersion,
+} from '@railgun-community/shared-models';
 import { delay } from '../../util/promise-utils';
+import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
+import { getReliabilityKeyPath } from '../../util/reliability';
 
 const activeWallets: ActiveWallet[] = [];
 
@@ -87,9 +99,44 @@ export const initWallets = async (railgunWalletDerivationIndex = 0) => {
 export const fullUTXOResyncBroadcasterWallets = async () => {
   const chains = configuredNetworkChains();
   for (const chain of chains) {
-    dbg(`Starting Full Rescan of ${chain.type}:${chain.id}`);
-    // eslint-disable-next-line no-await-in-loop
-    await rescanFullUTXOMerkletreesAndWallets(chain, undefined);
+    const network = networkForChain(chain);
+    if (!isDefined(network)) {
+      continue;
+    }
+    const key = `lastFullSyncTimestamp|${chain.type}|${chain.id}`;
+    const lastFULLSYNCtimestamp =
+      // eslint-disable-next-line no-await-in-loop
+      (await getSettingsNumber(key).catch((e) => {
+        dbg(`Error getting SyncTimestamp, ${key}: ${e}`);
+      })) ?? 0;
+    const shouldRESYNC =
+      !isDefined(lastFULLSYNCtimestamp) ||
+      lastFULLSYNCtimestamp < configDefaults.lastFullSyncTimestamp;
+    dbg(
+      `LASTFULLSYNC", ${lastFULLSYNCtimestamp}, ${configDefaults.lastFullSyncTimestamp}`,
+    );
+    if (shouldRESYNC) {
+      dbg(`Starting Full Rescan of ${chain.type}:${chain.id}`);
+      // eslint-disable-next-line no-await-in-loop
+      await refreshBalances(chain, [railgunWalletID]);
+      dbg(`Finished Balance Rescan of chain ${chain.type}:${chain.id}`);
+
+      dbg(`Now Starting Full UTXO Rescan on chain ${chain.type}:${chain.id}`);
+      // eslint-disable-next-line no-await-in-loop
+      await rescanFullUTXOMerkletreesAndWallets(chain, [railgunWalletID]);
+      dbg(`Finished Full UTXO Rescan on chain ${chain.type}:${chain.id}`);
+
+      dbg(`Starting Generation of PPOI for chain ${chain.type}:${chain.id}`);
+      // eslint-disable-next-line no-await-in-loop
+      await generatePOIsForWallet(network.name, railgunWalletID);
+      dbg(`Finished Generation of PPOI for chain ${chain.type}:${chain.id}`);
+
+      const newTimestamp = Date.now();
+      // eslint-disable-next-line no-await-in-loop
+      await storeSettingsNumber(key, newTimestamp).catch((e) => {
+        dbg(`Error setting SyncTimestamp, ${key}: ${newTimestamp}: ${e}`);
+      });
+    }
   }
 };
 

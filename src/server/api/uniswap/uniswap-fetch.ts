@@ -65,7 +65,7 @@ export const getUniswapQuoteParams = (
 
 export const fetchUniswapQuote = async <T>(
   quoteParams: UniswapQuoteParams,
-): Promise<T> => {
+): Promise<T | undefined> => {
   try {
     const response = await axios.post(
       getUniswapQuoteURL(),
@@ -76,10 +76,6 @@ export const fetchUniswapQuote = async <T>(
     const { data } = response;
     return data;
   } catch (error) {
-    const uniswapError = new Error(
-      'There was an error getting a quote from Uniswap.',
-    );
-    console.error(uniswapError);
-    throw uniswapError;
+    return undefined;
   }
 };

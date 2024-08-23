@@ -18,6 +18,9 @@ const coingeckoApiUrl = (): string => {
 const coingeckoProApiKey = (): Optional<string> => {
   return configDefaults.api.coingeckoProApiKey;
 };
+const coingeckoDemoApiKey = (): Optional<string> => {
+  return configDefaults.api.coingeckoDemoApiKey;
+};
 
 const paramString = (params?: MapType<any>) => {
   if (!params) {
@@ -26,8 +29,11 @@ const paramString = (params?: MapType<any>) => {
   const searchParams = new URLSearchParams(params);
 
   const proApiKey = coingeckoProApiKey();
+  const demoApiKey = coingeckoDemoApiKey();
   if (isDefined(proApiKey) && proApiKey !== '') {
     searchParams.append('x_cg_pro_api_key', proApiKey);
+  } else if (isDefined(demoApiKey) && demoApiKey !== '') {
+    searchParams.append('x_cg_demo_api_key', demoApiKey);
   }
 
   return searchParams.toString() ? `?${searchParams.toString()}` : '';
