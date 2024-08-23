@@ -243,6 +243,7 @@ export default {
     /**
      * API Key for Coingecko Price API.
      * Demo tiers are free but less stable, sign up for an api key at https://www.coingecko.com/en/developers/dashboard.
+     * 10_000 requests per month
      */
     coingeckoDemoApiKey: '',
 
