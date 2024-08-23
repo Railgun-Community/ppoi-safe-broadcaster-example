@@ -50,13 +50,19 @@ const coingeckoPriceLookup = async (
   });
   let coingeckoPriceMap: CoingeckoPriceMap = {};
   for (const params of paramArr) {
-    // eslint-disable-next-line no-await-in-loop
-    const geckoPriceMap: CoingeckoPriceMap = await getCoingeckoData(
-      CoingeckoApiEndpoint.PriceLookup,
-      coingeckoNetworkId,
-      params,
-    );
-    coingeckoPriceMap = { ...coingeckoPriceMap, ...geckoPriceMap };
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const geckoPriceMap: CoingeckoPriceMap = await getCoingeckoData(
+        CoingeckoApiEndpoint.PriceLookup,
+        coingeckoNetworkId,
+        params,
+      );
+      coingeckoPriceMap = { ...coingeckoPriceMap, ...geckoPriceMap };
+      // eslint-disable-next-line no-await-in-loop
+      await delay(250);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const tokenPrices = tokenPriceArrayFromCoingeckoPriceMap(

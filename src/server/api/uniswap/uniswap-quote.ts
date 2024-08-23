@@ -1,3 +1,4 @@
+import { isDefined } from '@railgun-community/shared-models';
 import { BroadcasterChain } from '../../../models/chain-models';
 import { ERC20Amount } from '../../../models/token-models';
 import { NetworkChainID } from '../../config/config-chains';
@@ -59,9 +60,11 @@ export const uniswapGetSwapQuote = async (
 
     const quoteParams = getUniswapQuoteParams(chain, walletAddress, params);
 
-    const { routing, quote } = await fetchUniswapQuote<UniswapQuoteResponse>(
-      quoteParams,
-    );
+    const quoteRaw = await fetchUniswapQuote<UniswapQuoteResponse>(quoteParams);
+    if (!isDefined(quoteRaw)) {
+      throw new Error('No quote returned from Uniswap');
+    }
+    const { routing, quote } = quoteRaw;
 
     if (routing !== 'CLASSIC') {
       throw new Error(`Invalid routing type: ${routing}`);

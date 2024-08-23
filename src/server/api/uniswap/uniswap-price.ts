@@ -38,7 +38,7 @@ export const getStablecoinReferenceSymbols = (
           return ['DAI'];
         case NetworkChainID.Arbitrum:
         case NetworkChainID.ArbitrumGoerli:
-          return ['USDT'];
+          return ['USDC'];
         case NetworkChainID.Hardhat:
         case NetworkChainID.PolygonAmoy:
           throw error;

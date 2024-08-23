@@ -21,12 +21,16 @@ import {
   generatePOIsForWallet,
   isBlockedAddress,
   refreshBalances,
+  refreshReceivePOIsForWallet,
   rescanFullUTXOMerkletreesAndWallets,
+  resetFullTXIDMerkletreesV2,
+  walletForID,
 } from '@railgun-community/wallet';
 import {
   isDefined,
   NETWORK_CONFIG,
   networkForChain,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { delay } from '../../util/promise-utils';
 import { getSettingsNumber, storeSettingsNumber } from '../db/settings-db';
@@ -114,13 +118,19 @@ export const fullUTXOResyncBroadcasterWallets = async () => {
     if (shouldRESYNC) {
       dbg(`Starting Full Rescan of ${chain.type}:${chain.id}`);
       // eslint-disable-next-line no-await-in-loop
-      await refreshBalances(chain, undefined);
-      dbg('REFRESHED BALANCES');
+      await refreshBalances(chain, [railgunWalletID]);
+      dbg(`Finished Balance Rescan of chain ${chain.type}:${chain.id}`);
+
+      dbg(`Now Starting Full UTXO Rescan on chain ${chain.type}:${chain.id}`);
       // eslint-disable-next-line no-await-in-loop
-      await rescanFullUTXOMerkletreesAndWallets(chain, undefined);
+      await rescanFullUTXOMerkletreesAndWallets(chain, [railgunWalletID]);
+      dbg(`Finished Full UTXO Rescan on chain ${chain.type}:${chain.id}`);
+
+      dbg(`Starting Generation of PPOI for chain ${chain.type}:${chain.id}`);
       // eslint-disable-next-line no-await-in-loop
       await generatePOIsForWallet(network.name, railgunWalletID);
-      dbg('FULL RESCAN COMPLETED');
+      dbg(`Finished Generation of PPOI for chain ${chain.type}:${chain.id}`);
+
       const newTimestamp = Date.now();
       // eslint-disable-next-line no-await-in-loop
       await storeSettingsNumber(key, newTimestamp).catch((e) => {
