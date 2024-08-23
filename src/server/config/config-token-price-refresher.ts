@@ -123,8 +123,8 @@ export default {
        * Refresh token prices through CoinGecko every 30 seconds.
        * Note that free Coingecko API tier only allows 50 requests per minute.
        */
-      enabled: true,
-      refreshDelayInMS: 30 * 1000,
+      enabled: false, // requires an api key | disabled by default
+      refreshDelayInMS: 60 * 1000,
       refresher: tokenPriceRefresherCoingecko,
     },
     [TokenPriceSource.ZeroX]: {
