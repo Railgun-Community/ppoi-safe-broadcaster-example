@@ -3,8 +3,6 @@ version: '3.9'
 volumes:
   nwaku1:
     name: 'nwaku1'
-  nwaku2:
-    name: 'nwaku2'
   broadcaster:
     name: 'broadcaster'
 
@@ -32,7 +30,6 @@ services:
     hostname: 'broadcaster'
     environment:
       WAKU_RPC_URL: 'http://nwaku1:8546'
-      WAKU_RPC_URL_BACKUP: 'http://nwaku2:8547'
       LEPTON_DB: '/mnt/broadcaster.db'
       SETTINGS_DB: '/mnt/settings.db'
       POI_DB: '/mnt/poi.db'
