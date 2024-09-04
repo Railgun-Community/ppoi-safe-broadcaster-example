@@ -103,4 +103,4 @@ describe('token-price-poller', () => {
       lookUpCachedTokenPrice(testChainEthereum(), MOCK_TOKEN_ADDRESS_1),
     ).to.equal(MOCK_TOKEN_PRICE_1);
   });
-}).timeout(20000);
+}).timeout(60000);

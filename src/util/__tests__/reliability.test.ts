@@ -108,7 +108,6 @@ describe('reliability-settings', () => {
     await incrementReliability(MOCK_CHAIN, ReliabilityMetric.SEND_FAILURE);
 
     const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
-    console.log('reliabilityRatio', reliabilityRatio);
     expect(reliabilityRatio).to.equal(0.5);
   });
 
@@ -119,7 +118,6 @@ describe('reliability-settings', () => {
     const failureValue = await getReliability(failureKey);
     expect(failureValue).to.equal(0);
     const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
-    console.log('reliabilityRatio', reliabilityRatio);
     expect(reliabilityRatio).to.equal(1);
   });
 
@@ -129,7 +127,6 @@ describe('reliability-settings', () => {
     const reliabilityValue = await getReliability(reliabilityKey);
     expect(reliabilityValue).to.be.undefined;
     const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
-    console.log('reliabilityRatio', reliabilityRatio);
     expect(reliabilityRatio).to.equal(-1);
   });
   it('Should have reliability -1 if there is 1 send and 0 failures', async () => {
@@ -142,7 +139,6 @@ describe('reliability-settings', () => {
     expect(incrementedValue).to.equal(1);
     expect(failureValue).to.equal(0);
     const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
-    console.log('reliabilityRatio', reliabilityRatio);
     expect(reliabilityRatio).to.equal(1);
   });
 
@@ -158,9 +154,6 @@ describe('reliability-settings', () => {
     expect(reliabilityRatio).to.equal(-1);
     await setReliability(failureKey, 2);
     const reliabilityRatioFinal = await getReliabilityRatio(MOCK_CHAIN);
-    console.log('reliabilityRatio', reliabilityRatio);
-    console.log('reliabilityRatioFinal', reliabilityRatioFinal);
-
     expect(reliabilityRatioFinal).to.equal(-1);
   });
 
@@ -177,7 +170,6 @@ describe('reliability-settings', () => {
       expect(incrementedValue).to.equal(1);
       expect(failureValue).to.equal(1);
       const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
-      console.log('reliabilityRatio', reliabilityRatio);
       expect(reliabilityRatio).to.equal(0.5);
     });
 
@@ -195,7 +187,6 @@ describe('reliability-settings', () => {
       expect(incrementedValue).to.equal(2);
       expect(failureValue).to.equal(2);
       const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
-      console.log('reliabilityRatio', reliabilityRatio);
       expect(reliabilityRatio).to.equal(0.5);
     });
 
@@ -219,7 +210,6 @@ describe('reliability-settings', () => {
       expect(incrementedValue).to.equal(1);
       expect(failureValue).to.equal(2);
       const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
-      console.log('reliabilityRatio', reliabilityRatio);
       expect(reliabilityRatio.toFixed(2)).to.equal('0.33');
     });
 
@@ -263,8 +253,8 @@ describe('reliability-settings', () => {
       await setReliability(decodeFailureKey, 1);
       // set total count
       await setReliability(totalSeenKey, 3);
-      const ratio = await getReliabilityRatio(MOCK_CHAIN);
-      console.log('reliabilityRatio', ratio);
+      const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
+      expect(reliabilityRatio.toFixed(2)).to.equal('0.83');
     });
     it('Should properly calculate "perfect" reliability for multiple metrics', async () => {
       await clearSettingsDB();
@@ -284,8 +274,8 @@ describe('reliability-settings', () => {
       await setReliability(decodeFailureKey, 10);
       // set total count
       await setReliability(totalSeenKey, 20);
-      const ratio = await getReliabilityRatio(MOCK_CHAIN);
-      console.log('reliabilityRatio', ratio);
+      const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
+      expect(reliabilityRatio).to.equal(1);
     });
 
     it('Should properly calculate "less than perfect" reliability for multiple metrics', async () => {
@@ -306,8 +296,8 @@ describe('reliability-settings', () => {
       await setReliability(decodeFailureKey, 10);
       // set total count
       await setReliability(totalSeenKey, 20);
-      const ratio = await getReliabilityRatio(MOCK_CHAIN);
-      console.log('reliabilityRatio', ratio);
+      const reliabilityRatio = await getReliabilityRatio(MOCK_CHAIN);
+      expect(reliabilityRatio).to.equal(0.95);
     });
   });
 });

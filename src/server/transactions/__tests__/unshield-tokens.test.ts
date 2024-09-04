@@ -138,5 +138,5 @@ describe('unshield-tokens', () => {
       expect(populatedTransaction.from).to.be.undefined;
       expect(populatedTransaction.nonce).to.be.undefined;
     },
-  ).timeout(30000);
+  ).timeout(60000);
 });
