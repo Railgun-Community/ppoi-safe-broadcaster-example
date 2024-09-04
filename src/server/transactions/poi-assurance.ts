@@ -177,11 +177,9 @@ export class POIAssurance {
           throw new Error('Network not found');
         }
         await refreshReceivePOIsForWallet(txidVersion, network.name, walletID);
-        await refreshSpentPOIsForWallet(txidVersion, network.name, walletID);
       }
 
       const wallet = walletForID(walletID);
-      await wallet.refreshReceivePOIsAllTXOs(txidVersion, chain);
       const spendableReceivedTxids = (
         await wallet.getSpendableReceivedChainTxids(txidVersion, chain)
       ).map((txid) => ByteUtils.formatToByteLength(txid, ByteLength.UINT_256));

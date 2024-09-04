@@ -1,6 +1,6 @@
 #!/bin/bash
 echo ""
-for ((i=1; i<=2; i++)); do
+for ((i=1; i<=1; i++)); do
     key=$(openssl rand -hex 32)
     if grep -q "NODEKEY_${i}=" docker/.env; then
       echo "NODEKEY_${i} already exists in .env."

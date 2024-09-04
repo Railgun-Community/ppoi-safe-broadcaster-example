@@ -160,12 +160,6 @@ export class WakuRestApiClient {
       'POST',
       topics,
     );
-    await this.request(
-      WakuRequestMethods.PublishSubscription,
-      'POST',
-      topics,
-      1,
-    ); // publish on nwaku2 as well
     return data;
   }
 

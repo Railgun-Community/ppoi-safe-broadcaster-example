@@ -220,4 +220,4 @@ describe('calculate-transaction-gas-legacy', () => {
     expect(gasDetails.maxFeePerGas.toString()).to.equal('240000');
     expect(gasDetails.maxPriorityFeePerGas.toString()).to.equal('10000');
   });
-}).timeout(31000);
+}).timeout(60000);

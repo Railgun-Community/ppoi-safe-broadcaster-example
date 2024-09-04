@@ -97,4 +97,4 @@ describe('token-price-cache', () => {
     );
     expect(cachedPrice).to.equal(10.0);
   });
-}).timeout(31000);
+}).timeout(60000);

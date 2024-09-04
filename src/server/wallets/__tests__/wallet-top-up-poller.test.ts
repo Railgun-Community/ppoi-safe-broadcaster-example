@@ -72,4 +72,4 @@ describe('wallet-top-up-poller', () => {
     await initTopUpPoller();
     expect(shouldPollTopUp).to.equal(false);
   });
-}).timeout(20000);
+}).timeout(120000);

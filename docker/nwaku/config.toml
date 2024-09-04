@@ -1,5 +1,5 @@
 # envsubst < config.toml.in > config.toml
-log-level='DEBUG'
+# log-level='DEBUG'
 relay=true
 store=false
 filter=false

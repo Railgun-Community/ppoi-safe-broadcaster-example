@@ -4,6 +4,7 @@
 cd -- "$( dirname -- "${BASH_SOURCE[0]}" )"
 
 USE_SWAGLESS=""
+FORCE_REBUILD=true
 
 if [ "$1" = "--no-swag" ]; then
   USE_SWAGLESS='-swagless'
@@ -14,6 +15,25 @@ SETUP_STACK=docker-stack$USE_SWAGLESS.yml
 # create empty custom.yml if it doesn't exist
 if [ ! -f custom.yml ]; then
   echo "version: '3.9'" > custom.yml
+fi
+
+function cleanup {
+  if [ -f $1 ]; then
+    echo "Cleaning up $1"
+    mv $1 $1.bak
+    echo "moved $1 to $1.bak"
+  fi
+}
+
+if [ $FORCE_REBUILD == true ]; then
+  DEFAULT_STACK=docker-stack.yml
+  SWAGLESS_STACK=docker-stack-swagless.yml
+  if [ -f $DEFAULT_STACK ]; then
+    cleanup $DEFAULT_STACK
+  fi
+  if [ -f $SWAGLESS_STACK ]; then
+    cleanup $SWAGLESS_STACK
+  fi
 fi
 
 if [ -f .env ]; then
