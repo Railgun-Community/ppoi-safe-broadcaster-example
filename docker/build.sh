@@ -20,8 +20,9 @@ fi
 function cleanup {
   if [ -f $1 ]; then
     echo "Cleaning up $1"
-    mv $1 $1.bak
-    echo "moved $1 to $1.bak"
+    filename=$1.$(date +%d-%m-%Y-%H-%M-%S).bak
+    mv $1 $filename
+    echo "moved $1 to $filename"
   fi
 }
 
