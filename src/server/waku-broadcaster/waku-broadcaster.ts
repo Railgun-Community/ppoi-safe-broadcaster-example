@@ -33,6 +33,7 @@ import { contentTopics } from './topics';
 import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
 import { getReliabilityRatio } from '../../util/reliability';
+import { metricsMethod } from './methods/metrics-method';
 
 type JsonRPCMessageHandler = (
   params: any,
@@ -42,6 +43,7 @@ type JsonRPCMessageHandler = (
 
 export enum WakuMethodNames {
   Transact = 'transact',
+  Metrics = 'metrics',
 }
 
 export type WakuBroadcasterOptions = {
@@ -68,6 +70,7 @@ export class WakuBroadcaster {
 
   methods: MapType<JsonRPCMessageHandler> = {
     [WakuMethodNames.Transact]: transactMethod,
+    [WakuMethodNames.Metrics]: metricsMethod,
   };
 
   stopping = false;
@@ -158,10 +161,15 @@ export class WakuBroadcaster {
       if (method in this.methods) {
         this.dbg(`Received message on ${contentTopic}`);
         const rawTopic = contentTopic.split('/');
-        const incomingChain = {
-          type: parseInt(rawTopic[3], 10),
-          id: parseInt(rawTopic[4], 10),
-        };
+        const incomingChain: any = {};
+        if (method.includes('metrics') === true) {
+          // no chain info in topic.
+          incomingChain.type = 0;
+          incomingChain.id = 1;
+        } else {
+          incomingChain.type = parseInt(rawTopic[3], 10);
+          incomingChain.id = parseInt(rawTopic[4], 10);
+        }
         const response = await this.methods[method](params, id, incomingChain);
         if (response) {
           await this.publish(response.rpcResult, response.contentTopic, true);
