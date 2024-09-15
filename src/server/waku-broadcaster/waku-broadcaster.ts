@@ -33,7 +33,7 @@ import { contentTopics } from './topics';
 import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
 import { getReliabilityRatio } from '../../util/reliability';
-import { metricsMethod } from './methods/metrics-method';
+import { METRICS_TOPIC, metricsMethod } from './methods/metrics-method';
 
 type JsonRPCMessageHandler = (
   params: any,
@@ -82,6 +82,7 @@ export class WakuBroadcaster {
     this.dbg = debug('broadcaster:waku:broadcaster');
     this.subscribedContentTopics = [
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
+      contentTopics.encrypted(METRICS_TOPIC),
     ];
     this.railgunWalletAddress = getRailgunWalletAddress();
     this.railgunWalletID = getRailgunWalletID();
@@ -133,17 +134,17 @@ export class WakuBroadcaster {
   }
 
   private async ensureTxResponse(msg: WakuMessage) {
-    for (let i = 0; i < 20; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      await this.client
-        .publish(msg, this.options.topic)
-        .then(() => this.dbg('Published TX RESPONSE'))
-        .catch((e) => {
-          this.dbg('Error publishing message', e.message);
-        });
-      // eslint-disable-next-line no-await-in-loop
-      await delay(1000);
-    }
+    // for (let i = 0; i < 20; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    await this.client
+      .publish(msg, this.options.topic)
+      .then(() => this.dbg('Published TX RESPONSE'))
+      .catch((e) => {
+        this.dbg('Error publishing message', e.message);
+      });
+    // eslint-disable-next-line no-await-in-loop
+    // await delay(1000);
+    // }
   }
 
   static decode(payload: Uint8Array): string {
