@@ -119,32 +119,32 @@ export class WakuBroadcaster {
     if (!payload) {
       return;
     }
-    const msg = WakuMessage.fromUtf8String(
-      JSON.stringify(payload),
-      contentTopic,
-    );
+
     if (isResponse) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.ensureTxResponse(msg);
-    }
-
-    return this.client.publish(msg, this.options.topic).catch((e) => {
-      this.dbg('Error publishing message', e.message);
-    });
-  }
-
-  private async ensureTxResponse(msg: WakuMessage) {
-    // for (let i = 0; i < 20; i += 1) {
-    // eslint-disable-next-line no-await-in-loop
-    await this.client
-      .publish(msg, this.options.topic)
-      .then(() => this.dbg('Published TX RESPONSE'))
-      .catch((e) => {
+      for (let i = 0; i < 5; i += 1) {
+        const msg = WakuMessage.fromUtf8String(
+          JSON.stringify(payload),
+          contentTopic,
+        );
+        // eslint-disable-next-line no-await-in-loop
+        await this.client
+          .publish(msg, this.options.topic)
+          .then(() => this.dbg('Published TX RESPONSE'))
+          .catch((e) => {
+            this.dbg('Error publishing message', e.message);
+          });
+        // eslint-disable-next-line no-await-in-loop
+        await delay(3000);
+      }
+    } else {
+      const msg = WakuMessage.fromUtf8String(
+        JSON.stringify(payload),
+        contentTopic,
+      );
+      return this.client.publish(msg, this.options.topic).catch((e) => {
         this.dbg('Error publishing message', e.message);
       });
-    // eslint-disable-next-line no-await-in-loop
-    // await delay(1000);
-    // }
+    }
   }
 
   static decode(payload: Uint8Array): string {
