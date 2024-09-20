@@ -227,8 +227,8 @@ export const executeTransaction = async (
     const errMsg: Optional<string> = err?.message;
 
     if (isDefined(errMsg) && errMsg.includes('already known')) {
-      await delay(45000); // force the mined pickup?
-      throw sanitizeBroadcasterError(err);
+      // await delay(45000); // force the mined pickup?
+      throw new Error(ErrorMessage.TRANSACTION_SEND_RPC_ERROR);
     }
     setWalletAvailability(activeWallet, chain, true);
 

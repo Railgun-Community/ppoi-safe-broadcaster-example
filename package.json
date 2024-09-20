@@ -1,6 +1,6 @@
 {
   "name": "@railgun-community/poi-safe-broadcaster-example",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "",
   "main": "dist/main.js",
   "packageManager": "yarn@1.22.19",
@@ -32,7 +32,7 @@
     "@0x/contract-addresses": "^8.0.0",
     "@noble/ed25519": "^1.7.1",
     "@railgun-community/shared-models": "7.4.3",
-    "@railgun-community/wallet": "10.2.3",
+    "@railgun-community/wallet": "10.2.4",
     "@walletconnect/jsonrpc-types": "^1.0.2",
     "@walletconnect/jsonrpc-utils": "^1.0.4",
     "axios": "1.7.2",

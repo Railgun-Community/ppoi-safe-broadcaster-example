@@ -12,9 +12,9 @@ WORKDIR /app
 
 COPY package.json ./
 COPY yarn.lock ./
-COPY patches ./patches
+# COPY patches ./patches
 RUN corepack yarn install
-RUN corepack npx patch-package
+# RUN corepack npx patch-package
 
 ### compile
 # compile typescript to /dist
@@ -23,8 +23,8 @@ WORKDIR /app
 
 COPY src ./src
 COPY ./tsconfig.json ./
-COPY patches ./patches
-RUN corepack npx patch-package
+# COPY patches ./patches
+# RUN corepack npx patch-package
 
 RUN corepack yarn tsc && corepack yarn tsc-alias
 
@@ -32,7 +32,7 @@ FROM compile AS build-prod
 WORKDIR /app
 
 RUN corepack yarn install
-RUN corepack npx patch-package
+# RUN corepack npx patch-package
 
 ### prod
 # copy compiled source and prod dependencies and run

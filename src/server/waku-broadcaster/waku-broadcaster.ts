@@ -33,6 +33,7 @@ import { contentTopics } from './topics';
 import { WakuMessage } from './waku-message';
 import { WakuMethodResponse } from './waku-response';
 import { getReliabilityRatio } from '../../util/reliability';
+import { METRICS_TOPIC, metricsMethod } from './methods/metrics-method';
 
 type JsonRPCMessageHandler = (
   params: any,
@@ -42,6 +43,7 @@ type JsonRPCMessageHandler = (
 
 export enum WakuMethodNames {
   Transact = 'transact',
+  Metrics = 'metrics',
 }
 
 export type WakuBroadcasterOptions = {
@@ -68,6 +70,7 @@ export class WakuBroadcaster {
 
   methods: MapType<JsonRPCMessageHandler> = {
     [WakuMethodNames.Transact]: transactMethod,
+    [WakuMethodNames.Metrics]: metricsMethod,
   };
 
   stopping = false;
@@ -79,6 +82,7 @@ export class WakuBroadcaster {
     this.dbg = debug('broadcaster:waku:broadcaster');
     this.subscribedContentTopics = [
       ...chainIDs.map((chainID) => contentTopics.transact(chainID)),
+      contentTopics.encrypted(METRICS_TOPIC),
     ];
     this.railgunWalletAddress = getRailgunWalletAddress();
     this.railgunWalletID = getRailgunWalletID();
@@ -115,31 +119,29 @@ export class WakuBroadcaster {
     if (!payload) {
       return;
     }
-    const msg = WakuMessage.fromUtf8String(
-      JSON.stringify(payload),
-      contentTopic,
-    );
+
     if (isResponse) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.ensureTxResponse(msg);
-    }
-
-    return this.client.publish(msg, this.options.topic).catch((e) => {
-      this.dbg('Error publishing message', e.message);
-    });
-  }
-
-  private async ensureTxResponse(msg: WakuMessage) {
-    for (let i = 0; i < 20; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      await this.client
-        .publish(msg, this.options.topic)
-        .then(() => this.dbg('Published TX RESPONSE'))
-        .catch((e) => {
+      this.dbg(`Publishing response to ${contentTopic}`);
+      for (let i = 0; i < 20; i += 1) {
+        const msg = WakuMessage.fromUtf8String(
+          JSON.stringify(payload),
+          contentTopic,
+        );
+        // eslint-disable-next-line no-await-in-loop
+        await this.client.publish(msg, this.options.topic).catch((e) => {
           this.dbg('Error publishing message', e.message);
         });
-      // eslint-disable-next-line no-await-in-loop
-      await delay(1000);
+        // eslint-disable-next-line no-await-in-loop
+        await delay(3000);
+      }
+    } else {
+      const msg = WakuMessage.fromUtf8String(
+        JSON.stringify(payload),
+        contentTopic,
+      );
+      return this.client.publish(msg, this.options.topic).catch((e) => {
+        this.dbg('Error publishing message', e.message);
+      });
     }
   }
 
@@ -158,10 +160,15 @@ export class WakuBroadcaster {
       if (method in this.methods) {
         this.dbg(`Received message on ${contentTopic}`);
         const rawTopic = contentTopic.split('/');
-        const incomingChain = {
-          type: parseInt(rawTopic[3], 10),
-          id: parseInt(rawTopic[4], 10),
-        };
+        const incomingChain: any = {};
+        if (method.includes('metrics') === true) {
+          // no chain info in topic.
+          incomingChain.type = 0;
+          incomingChain.id = 1;
+        } else {
+          incomingChain.type = parseInt(rawTopic[3], 10);
+          incomingChain.id = parseInt(rawTopic[4], 10);
+        }
         const response = await this.methods[method](params, id, incomingChain);
         if (response) {
           await this.publish(response.rpcResult, response.contentTopic, true);
