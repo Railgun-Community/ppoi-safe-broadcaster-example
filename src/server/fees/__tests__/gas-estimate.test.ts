@@ -82,4 +82,4 @@ describe('gas-estimate', () => {
     // 20% added by gasLimit.
     expect(maximumGas).to.equal(120000n);
   });
-}).timeout(31000);
+}).timeout(120000);

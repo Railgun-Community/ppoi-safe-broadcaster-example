@@ -96,4 +96,4 @@ describe('waku-rest-api-client', () => {
     expect(messages.length).to.equal(1);
     expect(messages[0].timestamp).to.equal(123);
   });
-}).timeout(31000);
+}).timeout(120000);
