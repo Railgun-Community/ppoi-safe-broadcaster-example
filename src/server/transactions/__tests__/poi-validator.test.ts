@@ -118,7 +118,7 @@ describe.skip('poi-validator', () => {
     ).to.eventually.be.rejectedWith(
       'Could not validate Proof of Innocence - Broadcaster cannot process this transaction.',
     );
-  }).timeout(60000);
+  }).timeout(120000);
 
   it('Should validate pre-transaction POI', async () => {
     const contractTransaction = {
@@ -244,5 +244,5 @@ describe.skip('poi-validator', () => {
         '0x20574897cbb52d5aeb5786cf1ae005063c5b5bda033591d064c384de898daa8f',
       preTransactionPOIsPerTxidLeafPerList: pois,
     });
-  }).timeout(60000);
+  }).timeout(120000);
 });

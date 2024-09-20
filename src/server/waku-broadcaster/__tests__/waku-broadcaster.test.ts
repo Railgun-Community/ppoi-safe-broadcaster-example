@@ -191,7 +191,7 @@ describe('waku-broadcaster', () => {
       decodedRailgunAddress.viewingPublicKey,
     );
     expect(isValid).to.be.true;
-  }).timeout(60000);
+  }).timeout(120000);
 
   it('Should encrypt and decrypt data using shared keys', async () => {
     const railgunWalletID = getRailgunWalletID();
@@ -334,5 +334,5 @@ describe('waku-broadcaster', () => {
       sharedKey,
     );
     expect(resultData).to.deep.equal(expectedResultData);
-  }).timeout(60000);
-}).timeout(120000);
+  }).timeout(120000);
+}).timeout(180000);

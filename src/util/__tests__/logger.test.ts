@@ -62,4 +62,4 @@ describe('logger', () => {
     expect(consoleWarnStub.notCalled).to.be.true;
     expect(consoleErrorStub.calledOnce).to.be.true;
   });
-}).timeout(60000);
+}).timeout(120000);

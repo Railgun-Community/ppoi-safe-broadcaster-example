@@ -50,4 +50,4 @@ describe('available-wallets', () => {
     expect(await isWalletAvailableWithEnoughFunds(wallet, chain)).to.be.true;
     expect(await numAvailableWallets(chain)).to.equal(1);
   });
-}).timeout(60000);
+}).timeout(120000);

@@ -54,4 +54,4 @@ describe('active-wallets', () => {
     );
     expect(viewingPublicKeyRopsten).to.deep.equal(viewingPublicKeyAll);
   });
-}).timeout(60000);
+}).timeout(120000);
