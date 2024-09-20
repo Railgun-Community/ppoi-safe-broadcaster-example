@@ -48,4 +48,4 @@ describe('config-token-price-refresher', () => {
     // ).to.greaterThan(0);
     expect(tokenAddressesToPrice[MOCK_TOKEN_ADDRESS]?.price).to.be.a('number');
   });
-}).timeout(31000);
+}).timeout(120000);

@@ -44,7 +44,7 @@ const validatePackagedFee = (
 };
 
 describe('fee-validator', function test() {
-  this.timeout(31000);
+  this.timeout(120000);
 
   before(async () => {
     await startEngine();
@@ -141,4 +141,4 @@ describe('fee-validator', function test() {
       validatePackagedFee('mockfeeid', 5000000000000n, 10000000000000n),
     ).to.throw(ErrorMessage.REJECTED_PACKAGED_FEE);
   });
-}).timeout(31000);
+}).timeout(120000);

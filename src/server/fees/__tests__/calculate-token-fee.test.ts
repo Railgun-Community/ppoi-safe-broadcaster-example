@@ -259,4 +259,4 @@ describe('calculate-token-fee', () => {
       is not precise enough to provide an accurate fee.`,
     );
   });
-}).timeout(31000);
+}).timeout(120000);

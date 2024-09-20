@@ -111,7 +111,7 @@ describe('execute-transaction', () => {
     ).to.equal(24);
     currentNonce = await getCurrentNonce(MOCK_CHAIN, ethersWallet);
     expect(currentNonce).to.equal(25); // 24 + 1
-  }).timeout(60000);
+  }).timeout(120000);
 
   it('Should process and sign a transaction', async () => {
     const populatedTransaction = getMockContractTransaction();

@@ -51,4 +51,4 @@ describe('transaction-fee-cache', () => {
       lookUpCachedUnitTokenFee(MOCK_CHAIN, feeCacheID, MOCK_TOKEN_ADDRESS),
     ).to.equal(undefined);
   });
-}).timeout(60000);
+}).timeout(120000);

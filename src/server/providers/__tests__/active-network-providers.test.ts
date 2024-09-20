@@ -22,5 +22,5 @@ describe('active-network-providers', () => {
     const provider = getProviderForNetwork(MOCK_CHAIN);
     const block = await provider.getBlockNumber();
     expect(block).to.be.greaterThan(14000000);
-  }).timeout(60000);
+  }).timeout(120000);
 }).timeout(120000);

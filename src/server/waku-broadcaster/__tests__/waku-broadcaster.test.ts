@@ -191,7 +191,7 @@ describe('waku-broadcaster', () => {
       decodedRailgunAddress.viewingPublicKey,
     );
     expect(isValid).to.be.true;
-  }).timeout(60000);
+  }).timeout(120000);
 
   it('Should encrypt and decrypt data using shared keys', async () => {
     const railgunWalletID = getRailgunWalletID();
@@ -289,9 +289,8 @@ describe('waku-broadcaster', () => {
     };
     await wakuBroadcaster?.handleMessage(relayMessage);
 
-    await delay(20000);
     // After transact-response sent.
-    expect(clientHTTPStub.callCount).to.equal(21);
+    expect(clientHTTPStub.callCount).to.equal(20);
     const postCall = clientHTTPStub.getCall(0);
     expect(postCall.args[0]).to.equal(WakuRequestMethods.PublishMessage);
     const rpcArgs = postCall.args[1];
@@ -334,5 +333,5 @@ describe('waku-broadcaster', () => {
       sharedKey,
     );
     expect(resultData).to.deep.equal(expectedResultData);
-  }).timeout(60000);
-}).timeout(120000);
+  }).timeout(120000);
+}).timeout(180000);

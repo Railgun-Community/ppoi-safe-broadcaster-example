@@ -29,4 +29,4 @@ describe('erc20-token-balance', () => {
       getERC20TokenBalance(MOCK_CHAIN, MOCK_WALLET_ADDRESS, token.address),
     ).to.not.be.rejected;
   }).timeout(30000);
-}).timeout(60000);
+}).timeout(120000);

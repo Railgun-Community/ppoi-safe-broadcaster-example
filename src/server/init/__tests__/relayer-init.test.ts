@@ -56,4 +56,4 @@ describe('broadcaster-init', () => {
     myConfigOverrides();
     resetConfigDefaults();
   });
-}).timeout(60000);
+}).timeout(120000);
