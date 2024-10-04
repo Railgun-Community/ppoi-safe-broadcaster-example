@@ -18,8 +18,8 @@ export type WakuApiClientOptions = {
 export enum WakuRequestMethods {
   DebugInfo = '/debug/v1/info', // GET
   PublishSubscription = '/relay/v1/subscriptions', // POST
-  PublishMessage = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-broadcaster', // POST - requires pubsub topic
-  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frailgun-broadcaster', // GET - requires pubsub topic
+  PublishMessage = '/relay/v1/messages/%2Fwaku%2F2%2Frs%2F1%2F3', // POST - requires pubsub topic
+  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frs%2F1%2F3', // GET - requires pubsub topic
   DeleteSubscriptions = '/relay/v1/subscriptions', // DELETE
 }
 
