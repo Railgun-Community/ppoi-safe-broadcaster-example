@@ -2,8 +2,8 @@
 # log-level='DEBUG'
 relay=true
 store=false
-filter=false
-lightpush=false
+filter=true
+lightpush=true
 rln-relay=false
 relay-peer-exchange=true
 rest=true
@@ -13,19 +13,7 @@ rest-admin=true
 rest-private=true
 rest-relay-cache-capacity=3000
 keep-alive=true
-staticnode=[
-  "/dns4/horsey.horsewithsixlegs.xyz/tcp/60000/p2p/16Uiu2HAmLWDFk5nGXgLx2Mz2deiEMRya1HNcvWELMDodkAC891Sd",
-  "/dns4/waku.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAmATh6oki7ZCQEpCH2P9A1A2UXSRdVuU1hn9mzR3NKarPN",
-  "/dns4/zebra.horsewithsixlegs.xyz/tcp/60000/p2p/16Uiu2HAm4LeP19jWXhQ6ayMX27vPYKGAo3WQeeFYrVDJ2nBi9gjv",
-  "/dns4/giraffe.horsewithsixlegs.xyz/tcp/60000/p2p/16Uiu2HAm6EBg9G12QTbL4UbRGgRW7GnWzAghCZskgwahtPUT1Fvf"
-]
 dns-discovery=false
 discv5-discovery=false
-discv5-bootstrap-node=[
-  # fleet
-  'enr:-OW4QF2eXPNrvihLXdfgsvxuXOUAbr356G4j3C2FYTg6CgLNMiTEViAoOf6VpMuPN3LUoyGmKsJ8MdU5VP6jFSgTuEcBgmlkgnY0gmlwhJ9Bw0aKbXVsdGlhZGRyc7hGACA2G2hvcnNleS5ob3JzZXdpdGhzaXhsZWdzLnh5egbqYAAiNhtob3JzZXkuaG9yc2V3aXRoc2l4bGVncy54eXoGH0DeA4lzZWNwMjU2azGhA3Sd2_FnlrSEnDZZ-DEkKp-RJnuZmDABK6s6kKcBnUweg3RjcILqYIN1ZHCCIyiFd2FrdTIP'
-]
-pubsub-topic=[
-  '/waku/2/rs/1/3',
-]
 max-connections=300
+shard=[0,1,2,3,4,5]
