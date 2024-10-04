@@ -225,7 +225,7 @@ export default {
     /**
      * libp2p pubSubTopic to subscribe to.
      */
-    pubSubTopic: '/waku/2/railgun-broadcaster',
+    pubSubTopic: '/waku/2/rs/1/3',
   },
 
   api: {

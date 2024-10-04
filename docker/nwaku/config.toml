@@ -26,6 +26,6 @@ discv5-bootstrap-node=[
   'enr:-OW4QF2eXPNrvihLXdfgsvxuXOUAbr356G4j3C2FYTg6CgLNMiTEViAoOf6VpMuPN3LUoyGmKsJ8MdU5VP6jFSgTuEcBgmlkgnY0gmlwhJ9Bw0aKbXVsdGlhZGRyc7hGACA2G2hvcnNleS5ob3JzZXdpdGhzaXhsZWdzLnh5egbqYAAiNhtob3JzZXkuaG9yc2V3aXRoc2l4bGVncy54eXoGH0DeA4lzZWNwMjU2azGhA3Sd2_FnlrSEnDZZ-DEkKp-RJnuZmDABK6s6kKcBnUweg3RjcILqYIN1ZHCCIyiFd2FrdTIP'
 ]
 pubsub-topic=[
-  '/waku/2/railgun-broadcaster',
+  '/waku/2/rs/1/3',
 ]
 max-connections=300
