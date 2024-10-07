@@ -18,8 +18,8 @@ export type WakuApiClientOptions = {
 export enum WakuRequestMethods {
   DebugInfo = '/debug/v1/info', // GET
   PublishSubscription = '/relay/v1/subscriptions', // POST
-  PublishMessage = '/relay/v1/messages/%2Fwaku%2F2%2Frs%2F0%2F1', // POST - requires pubsub topic
-  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frs%2F0%2F1', // GET - requires pubsub topic
+  PublishMessage = '/relay/v1/messages/%2Fwaku%2F2%2Frs%2F0%2F1', // POST - requires pubsub topic UTF8 URL encoded /waku/2/rs/0/1
+  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frs%2F0%2F1', // GET - requires pubsub topic UTF8 URL encoded /waku/2/rs/0/1
   DeleteSubscriptions = '/relay/v1/subscriptions', // DELETE
 }
 
@@ -212,7 +212,7 @@ export class WakuRestApiClient {
    * however, specifying contentTopics locally filters out uninteresting messages before return
    */
   async getMessages(
-    topic: string, // unused 
+    topic: string, // unused
     contentTopics: string[] = [],
   ): Promise<WakuRelayMessage[]> {
     const data = await this.request(WakuRequestMethods.GetMessages, 'GET', []);
