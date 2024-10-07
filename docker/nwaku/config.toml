@@ -29,3 +29,6 @@ pubsub-topic=[
 ]
 shard=[0, 1, 2, 3, 4, 5]
 max-msg-size="512KiB"
+
+#cluster-id=0 # needed when switch to 0.33 nwaku, pubsub-topic is deprecated
+#ip-colocation-limit=6
