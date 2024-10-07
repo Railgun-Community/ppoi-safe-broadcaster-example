@@ -19,7 +19,7 @@ import { encryptResponseData, tryDecryptData } from './transact-method';
 const dbg = debug('broadcaster:metrics');
 
 export const METRICS_TOPIC = 'metrics-ping';
-export const METRICS_RESPONSE_TOPIC = '-metrics-pong';
+export const METRICS_RESPONSE_TOPIC = 'metrics-pong';
 
 type MetricsMethodParams = {
   timestamp: number;
