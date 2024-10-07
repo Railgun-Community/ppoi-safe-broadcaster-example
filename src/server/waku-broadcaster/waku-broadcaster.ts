@@ -122,7 +122,7 @@ export class WakuBroadcaster {
 
     if (isResponse) {
       this.dbg(`Publishing response to ${contentTopic}`);
-      for (let i = 0; i < 20; i += 1) {
+      for (let i = 0; i < 10; i += 1) {
         const msg = WakuMessage.fromUtf8String(
           JSON.stringify(payload),
           contentTopic,

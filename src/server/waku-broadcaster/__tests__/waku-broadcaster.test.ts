@@ -154,7 +154,7 @@ describe('waku-broadcaster', () => {
       },
     );
 
-    const contentTopic = '/railgun/v2/0/1/fees/json';
+    const contentTopic = '/railgun/v2/0-1-fees/json';
     expect(contentTopic).to.equal(contentTopics.fees(chain));
 
     await wakuBroadcaster?.broadcastFeesForChain(chain);
@@ -290,7 +290,7 @@ describe('waku-broadcaster', () => {
     await wakuBroadcaster?.handleMessage(relayMessage);
 
     // After transact-response sent.
-    expect(clientHTTPStub.callCount).to.equal(20);
+    expect(clientHTTPStub.callCount).to.equal(10);
     const postCall = clientHTTPStub.getCall(0);
     expect(postCall.args[0]).to.equal(WakuRequestMethods.PublishMessage);
     const rpcArgs = postCall.args[1];
