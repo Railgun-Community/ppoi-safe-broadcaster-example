@@ -154,7 +154,7 @@ describe('waku-broadcaster', () => {
       },
     );
 
-    const contentTopic = '/railgun/v2/0/1/fees/json';
+    const contentTopic = '/railgun/v2/0-1-fees/json';
     expect(contentTopic).to.equal(contentTopics.fees(chain));
 
     await wakuBroadcaster?.broadcastFeesForChain(chain);
