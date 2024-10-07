@@ -1,5 +1,5 @@
 # envsubst < config.toml.in > config.toml
-log-level='DEBUG'
+#log-level='DEBUG'
 relay=true
 store=false
 filter=true
@@ -14,13 +14,6 @@ rest-private=true
 rest-relay-cache-capacity=3000
 keep-alive=true
 staticnode=[
- # this node"/dns4/fleet.rootedinprivacy.com/tcp/60000/p2p/16Uiu2HAm3GnUDQhBfax298CMkZX9MBHTJ9B8GXhrbueozESUaRZP",
- # this node "/dns4/fleet.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HAm3GnUDQhBfax298CMkZX9MBHTJ9B8GXhrbueozESUaRZP"
- # "/dns4/horsey.horsewithsixlegs.xyz/tcp/60000/p2p/16Uiu2HAmLWDFk5nGXgLx2Mz2deiEMRya1HNcvWELMDodkAC891Sd",
- # "/dns4/waku.wecamefromapes.com/tcp/60000/p2p/16Uiu2HAmATh6oki7ZCQEpCH2P9A1A2UXSRdVuU1hn9mzR3NKarPN",
- # "/dns4/zebra.horsewithsixlegs.xyz/tcp/60000/p2p/16Uiu2HAm4LeP19jWXhQ6ayMX27vPYKGAo3WQeeFYrVDJ2nBi9gjv",
- # "/dns4/giraffe.horsewithsixlegs.xyz/tcp/60000/p2p/16Uiu2HAm6EBg9G12QTbL4UbRGgRW7GnWzAghCZskgwahtPUT1Fvf"
-
  # dev-node
   "/dns4/core.rootedinprivacy.com/tcp/60000/p2p/16Uiu2HAm4Ai1GzKv4EykU26ST1BPT4AHtABsYCLKrDG74GWX7D6H",
 ]
@@ -35,3 +28,4 @@ pubsub-topic=[
   "/waku/2/rs/0/1"
 ]
 shard=[0, 1, 2, 3, 4, 5]
+max-msg-size="512KiB"
