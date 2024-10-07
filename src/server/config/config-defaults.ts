@@ -225,7 +225,7 @@ export default {
     /**
      * libp2p pubSubTopic to subscribe to.
      */
-    pubSubTopic: '',
+    pubSubTopic: '/waku/2/rs/0/1',
   },
 
   api: {
