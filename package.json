@@ -1,6 +1,6 @@
 {
   "name": "@railgun-community/poi-safe-broadcaster-example",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "",
   "main": "dist/main.js",
   "packageManager": "yarn@1.22.19",
