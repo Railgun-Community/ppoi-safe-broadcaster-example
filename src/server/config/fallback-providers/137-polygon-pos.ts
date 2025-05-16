@@ -4,7 +4,7 @@ const config: FallbackProviderJsonConfig = {
   chainId: 137,
   providers: [
     {
-      provider: 'https://rpc.ankr.com/polygon',
+      provider: 'https://rpc-mainnet.matic.quiknode.pro',
       priority: 2,
       weight: 2,
       maxLogsPerBatch: 1, // Supports up to 10, but at 1 ethers handles getLogs differently, and this seems to be more stable.
