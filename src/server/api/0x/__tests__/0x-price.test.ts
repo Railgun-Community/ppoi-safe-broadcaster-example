@@ -22,6 +22,7 @@ import configTokens from '../../../config/config-tokens';
 import { initTokens } from '../../../tokens/network-tokens';
 import { initNetworkProviders } from '../../../providers/active-network-providers';
 import {
+  formatPriceResponse,
   overrideZeroXPriceLookupDelay_TEST_ONLY,
   ZeroXPriceData,
   ZeroXPriceParams,
@@ -52,6 +53,8 @@ const TOKEN_PRICE_SOURCE = TokenPriceSource.ZeroX;
 
 const expectedZeroXPriceOutput: ZeroXPriceData = {
   price: '1234.56',
+  minBuyAmount: '1000000000000',
+  sellAmount: '100000000000'
 };
 
 const validatePriceRefresherOutput = (chain: BroadcasterChain) => {
@@ -83,7 +86,7 @@ describe('0x-price', () => {
     resetTokenPriceCache();
 
     const tokenConfigs = {
-      [TOKEN_ADDRESS_1]: getMockTokenConfig(),
+      [TOKEN_ADDRESS_1]: getMockTokenConfig('DAI'),
       [TOKEN_ADDRESS_2]: getMockTokenConfig(),
     };
 
@@ -100,18 +103,23 @@ describe('0x-price', () => {
 
   it('Should run live 0x API fetch for RAIL token', async () => {
     const params: ZeroXPriceParams = {
-      sellToken: '0xe76c6c83af64e4c60245d8c7de953df673a7a33d', // RAIL
-      buyToken: 'DAI',
-      sellAmount: '1000000000000000000', // 1 token
+      chainId: '1',
+      sellToken: configNetworks[0][1].gasToken.wrappedAddress, // '0xe76c6c83af64e4c60245d8c7de953df673a7a33d', // RAIL
+      buyToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+      sellAmount: (1 * 10 ** 18).toString(), // '1000000000000000000', // 1 token
     } as ZeroXPriceParams;
     const zeroXPriceData = await getZeroXData<ZeroXPriceData>(
       ZeroXApiEndpoint.PriceLookup,
       chainEthereum,
       params,
     );
+    const formattedPrice = formatPriceResponse(zeroXPriceData); //  BigInt(zeroXPriceData.minBuyAmount) / BigInt(zeroXPriceData.sellAmount)
+
     expect(zeroXPriceData).to.be.an('object');
-    expect(zeroXPriceData.price).to.be.a('string');
-    expect(parseFloat(zeroXPriceData.price)).to.be.a('number');
+    expect(zeroXPriceData.minBuyAmount).to.be.a('string');
+    expect(zeroXPriceData.sellAmount).to.be.a('string');
+
+    expect(formattedPrice).to.be.a('string');
   }).timeout(5000);
 
   it('Should format prices from mock ZeroX response', async () => {
@@ -130,6 +138,7 @@ describe('0x-price', () => {
           tokenPrice,
         ),
     );
+
     validatePriceRefresherOutput(chainEthereum);
 
     stubGetZeroXData.restore();

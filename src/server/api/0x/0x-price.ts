@@ -1,7 +1,7 @@
 import { isDefined } from '@railgun-community/shared-models';
 import { BroadcasterChain } from '../../../models/chain-models';
 import { delay, promiseTimeout } from '../../../util/promise-utils';
-import { tokenForAddress } from '../../tokens/network-tokens';
+import { tokenForAddress, tokenForSymbol } from '../../tokens/network-tokens';
 import { TokenPrice, TokenPriceUpdater } from '../../tokens/token-price-cache';
 import {
   ZeroXApiEndpoint,
@@ -20,10 +20,13 @@ let ZERO_X_PRICE_LOOKUP_DELAY = 1500;
 const refreshLocks: NumMapType<NumMapType<boolean>> = {};
 
 export type ZeroXPriceData = {
+  minBuyAmount: string;
+  sellAmount: string;
   price: string;
 };
 
 export type ZeroXPriceParams = {
+  chainId: string;
   sellToken: string;
   buyToken: string;
   sellAmount: string;
@@ -45,7 +48,6 @@ const zeroXPriceLookupByAddress = async (
 ): Promise<Optional<ZeroXFormattedPriceData>> => {
   try {
     const { decimals, symbol } = tokenForAddress(chain, tokenAddress);
-
     // TODO: This depends on DAI being stable at $1.
     // As we've seen, this isn't the safest methodology.
     // However, if the price of DAI drops, the broadcasted fees can only increase,
@@ -55,19 +57,23 @@ const zeroXPriceLookupByAddress = async (
     if (symbol === stablecoinSymbol) {
       return { price: 1 };
     }
+    const stablecoinToken = tokenForSymbol(chain, stablecoinSymbol);
+
     const sellAmount = (10n ** decimals).toString(10);
     const params: ZeroXPriceParams = {
+      chainId: chain.id.toString(),
       sellToken: tokenAddress,
-      buyToken: stablecoinSymbol,
+      buyToken: stablecoinToken.address,
       sellAmount, // 1 token
     };
-    const { price } = await getZeroXData<ZeroXPriceData>(
+    const zeroXPriceData= await getZeroXData<ZeroXPriceData>(
       ZeroXApiEndpoint.PriceLookup,
       chain,
       params,
     );
+    const formattedPrice = formatPriceResponse(zeroXPriceData);
     return {
-      price: parseFloat(price),
+      price: parseFloat(formattedPrice),
     };
   } catch (err) {
     return undefined;
@@ -118,3 +124,9 @@ export const zeroXUpdatePricesByAddresses = async (
 
   refreshLocks[chain.type][chain.id] = false;
 };
+
+
+export const formatPriceResponse = (zeroXPriceData: ZeroXPriceData)=>{
+  const formattedPrice = BigInt(zeroXPriceData.minBuyAmount) / BigInt(zeroXPriceData.sellAmount)
+  return formattedPrice.toString(10);
+}
