@@ -76,6 +76,21 @@ export const allTokenAddressesForNetwork = (
   );
 };
 
+export const tokenForSymbol = (
+  chain: BroadcasterChain,
+  symbol: string
+) =>{
+  const tokens = networkTokens[chain.type][chain.id];
+  for (const token of tokens) {
+    if (token.symbol.toLowerCase() === symbol.toLowerCase()) {
+      return token;
+    }
+  }
+  throw new Error(
+    `Unsupported token for chain ${chain.type}:${chain.id}: ${symbol}`,
+  );
+}
+
 export const tokenForAddress = (
   chain: BroadcasterChain,
   address: string,
