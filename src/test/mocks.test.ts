@@ -106,9 +106,9 @@ export const getMockSerializedTransaction = (): string => {
   return JSON.stringify(getMockContractTransaction());
 };
 
-export const getMockTokenConfig = (): TokenConfig => {
+export const getMockTokenConfig = (symbol = 'SHIB'): TokenConfig => {
   return {
-    symbol: 'SHIB',
+    symbol,
   };
 };
 
