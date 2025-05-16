@@ -8,7 +8,7 @@ const { expect } = chai;
 describe('transaction-validator', () => {
   it('Should throw on bad transaction validation', () => {
     expect(() =>
-      createValidTransaction('0x1234', '{{', BigInt('0x123')),
+      createValidTransaction({ id: 1, type: 0 },'0x1234', '{{', BigInt('0x123')),
     ).to.throw('Could not create valid transaction object.');
   });
 });
