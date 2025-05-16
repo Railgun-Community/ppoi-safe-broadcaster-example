@@ -6,8 +6,8 @@ import { NetworkChainID } from '../../config/config-chains';
 import configDefaults from '../../config/config-defaults';
 
 export enum ZeroXApiEndpoint {
-  PriceLookup = 'swap/v1/price',
-  GetSwapQuote = 'swap/v1/quote',
+  PriceLookup = 'swap/permit2/price',
+  GetSwapQuote = 'swap/allowance-holder/quote',
 }
 
 export const getStablecoinReferenceSymbol = (
@@ -44,19 +44,14 @@ const zeroXApiUrl = (chain: BroadcasterChain): string => {
     case ChainType.EVM: {
       switch (chain.id) {
         case NetworkChainID.Ethereum:
+        case NetworkChainID.BNBChain:
+        case NetworkChainID.PolygonPOS:
+        case NetworkChainID.Arbitrum:
+        case NetworkChainID.PolygonMumbai:
+        case NetworkChainID.EthereumSepolia:
           return 'https://api.0x.org/';
         case NetworkChainID.EthereumGoerli:
-          return 'https://goerli.api.0x.org/';
-        case NetworkChainID.BNBChain:
-          return 'https://bsc.api.0x.org/';
-        case NetworkChainID.PolygonPOS:
-          return 'https://polygon.api.0x.org/';
-        case NetworkChainID.Arbitrum:
-          return 'https://arbitrum.api.0x.org/';
-        case NetworkChainID.PolygonMumbai:
-          return 'https://mumbai.api.0x.org/';
         case NetworkChainID.ArbitrumGoerli:
-        case NetworkChainID.EthereumSepolia:
         case NetworkChainID.PolygonAmoy:
         case NetworkChainID.Hardhat:
           throw new Error(`No 0x API URL for chain ${chain.type}:${chain.id}`);
@@ -101,7 +96,6 @@ export const getZeroXData = async <T>(
   if (!apiKey) {
     throw new Error('Requires 0x API Key for prices/quotes.');
   }
-
   try {
     const rsp = await axios.get(url, {
       method: 'GET',
@@ -109,6 +103,7 @@ export const getZeroXData = async <T>(
         Accept: 'application/json',
         'Content-Type': 'application/json',
         '0x-api-key': apiKey,
+        '0x-version': 'v2'
       },
     });
     return rsp.data;
