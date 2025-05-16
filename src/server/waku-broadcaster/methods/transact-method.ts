@@ -221,7 +221,7 @@ export const transactMethod = async (
       );
     }
 
-    const transaction = createValidTransaction(to, data, 0n);
+    const transaction = createValidTransaction(chain, to, data, 0n);
 
     const txResponse = await processTransaction(
       txidVersion,
@@ -285,7 +285,7 @@ export const transactMethod = async (
             dbg(
               `LOW FEE DETECTED: Retrying Transaction with minGasPrice: ${formattedInflatedSuggestion}`,
             );
-            const transaction = createValidTransaction(to, data, 0n);
+            const transaction = createValidTransaction(chain, to, data, 0n);
             const txResponse = await processTransaction(
               txidVersion,
               chain,
