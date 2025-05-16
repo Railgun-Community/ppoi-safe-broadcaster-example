@@ -89,6 +89,8 @@ const handleHTTPPost = async (url: string, data?: unknown) => {
   return { data: {}, status: 200 };
 };
 
+const MOCK_TO_ADDRESS = configNetworks[chain.type][chain.id].proxyContract;
+
 describe('waku-broadcaster', () => {
   before(async () => {
     configDefaults.transactionFees.feeExpirationInMS = 5 * 60 * 1000;
@@ -255,7 +257,7 @@ describe('waku-broadcaster', () => {
       chainType: chain.type,
       feesID: '468abc',
       minGasPrice: '0x1000',
-      to: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE',
+      to: MOCK_TO_ADDRESS,
       data: '0x1234',
       broadcasterViewingKey: ByteUtils.hexlify(viewingPublicKey),
       useRelayAdapt: false,
