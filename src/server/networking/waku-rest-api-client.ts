@@ -149,7 +149,7 @@ export class WakuRestApiClient {
     const data = await this.request(
       WakuRequestMethods.DeleteSubscriptions,
       'DELETE',
-      [topics],
+      topics,
     );
     return data;
   }
