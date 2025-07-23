@@ -1,0 +1,132 @@
+diff --git a/node_modules/@railgun-community/engine/dist/contracts/railgun-smart-wallet/V2/railgun-smart-wallet.js b/node_modules/@railgun-community/engine/dist/contracts/railgun-smart-wallet/V2/railgun-smart-wallet.js
+index 62590aa..df099e9 100644
+--- a/node_modules/@railgun-community/engine/dist/contracts/railgun-smart-wallet/V2/railgun-smart-wallet.js
++++ b/node_modules/@railgun-community/engine/dist/contracts/railgun-smart-wallet/V2/railgun-smart-wallet.js
+@@ -161,6 +161,8 @@ class RailgunSmartWalletContract extends events_1.default {
+      * @param eventsUnshieldListener - unshield listener callback
+      */
+     async setTreeUpdateListeners(eventsCommitmentListener, eventsNullifierListener, eventsUnshieldListener) {
++        console.log("Disabled tree update listeners.")
++        return false; 
+         const nullifiedTopic = this.contract.getEvent('Nullified').getFragment().topicHash;
+         const shieldTopic = this.contract.getEvent('Shield').getFragment().topicHash;
+         const transactTopic = this.contract.getEvent('Transact').getFragment().topicHash;
+diff --git a/node_modules/@railgun-community/engine/dist/provider/polling-json-rpc-provider.js b/node_modules/@railgun-community/engine/dist/provider/polling-json-rpc-provider.js
+index a21d16c..4d51573 100644
+--- a/node_modules/@railgun-community/engine/dist/provider/polling-json-rpc-provider.js
++++ b/node_modules/@railgun-community/engine/dist/provider/polling-json-rpc-provider.js
+@@ -7,12 +7,13 @@ const ethers_1 = require("ethers");
+  * rather than using sparsely-implemented eth_filter events.
+  */
+ class PollingJsonRpcProvider extends ethers_1.JsonRpcProvider {
+-    constructor(url, chainId, pollingInterval = 10000, maxLogsPerBatch = 100) {
++    constructor(url, chainId, pollingInterval = 60000, maxLogsPerBatch = 2) {
+         const network = ethers_1.Network.from(chainId);
+         const options = {
+             polling: true,
+             staticNetwork: network,
+             batchMaxCount: maxLogsPerBatch,
++            batchStallTime: 2500,
+         };
+         super(url, network, options);
+         this.pollingInterval = pollingInterval;
+diff --git a/node_modules/@railgun-community/engine/dist/railgun-engine.d.ts b/node_modules/@railgun-community/engine/dist/railgun-engine.d.ts
+index 70dcd36..877ecc9 100644
+--- a/node_modules/@railgun-community/engine/dist/railgun-engine.d.ts
++++ b/node_modules/@railgun-community/engine/dist/railgun-engine.d.ts
+@@ -36,6 +36,7 @@ declare class RailgunEngine extends EventEmitter {
+     static walletSource: Optional<string>;
+     private readonly skipMerkletreeScans;
+     private readonly hasSyncedRailgunTransactionsV2;
++    private readonly isSyncingRailgunTransactionsV2;
+     readonly isPOINode: boolean;
+     private constructor();
+     /**
+diff --git a/node_modules/@railgun-community/engine/dist/railgun-engine.js b/node_modules/@railgun-community/engine/dist/railgun-engine.js
+index dfd6202..5da371e 100644
+--- a/node_modules/@railgun-community/engine/dist/railgun-engine.js
++++ b/node_modules/@railgun-community/engine/dist/railgun-engine.js
+@@ -53,6 +53,7 @@ class RailgunEngine extends events_1.default {
+     static walletSource;
+     skipMerkletreeScans;
+     hasSyncedRailgunTransactionsV2 = new registry_1.Registry();
++    isSyncingRailgunTransactionsV2 = new registry_1.Registry();
+     isPOINode;
+     constructor(walletSource, leveldown, artifactGetter, quickSyncEvents, quickSyncRailgunTransactionsV2, validateRailgunTxidMerkleroot, getLatestValidatedRailgunTxid, engineDebugger, skipMerkletreeScans, isPOINode) {
+         super();
+@@ -288,7 +289,7 @@ class RailgunEngine extends events_1.default {
+             await this.nullifierListener(txidVersion, chain, nullifierEvents);
+             debugger_1.default.log(`[${txidVersion}] QuickSync commitments: ${commitmentEvents.length}`);
+             // Make sure commitments are scanned after Unshields and Nullifiers.
+-            await this.commitmentListener(txidVersion, chain, commitmentEvents, false, // shouldUpdateTrees - wait until after all commitments added
++            await this.commitmentListener(txidVersion, chain, commitmentEvents, true, // shouldUpdateTrees - wait until after all commitments added
+             false);
+             // Scan after all leaves added.
+             if (commitmentEvents.length) {
+@@ -382,23 +383,25 @@ class RailgunEngine extends events_1.default {
+         await this.performQuickSync(txidVersion, chain, postQuickSyncProgress);
+         this.emitUTXOMerkletreeScanUpdateEvent(txidVersion, chain, postQuickSyncProgress); // 50%
+         // Get updated start-scanning block from new valid utxoMerkletree.
+-        const startScanningBlockSlowScan = await this.getNextStartingBlockSlowScan(txidVersion, chain);
+-        debugger_1.default.log(`[${txidVersion}] startScanningBlockSlowScan: ${startScanningBlockSlowScan} (note: continously updated during scan)`);
+-        const railgunSmartWalletContract = contract_store_1.ContractStore.railgunSmartWalletContracts.get(null, chain);
+-        if (!railgunSmartWalletContract?.contract.runner?.provider) {
+-            throw new Error('Requires RailgunSmartWalletContract with provider');
+-        }
+-        const latestBlock = await railgunSmartWalletContract.contract.runner.provider.getBlockNumber();
++        // const startScanningBlockSlowScan = await this.getNextStartingBlockSlowScan(txidVersion, chain);
++        // debugger_1.default.log(`[${txidVersion}] startScanningBlockSlowScan: ${startScanningBlockSlowScan} (note: continously updated during scan)`);
++        // const railgunSmartWalletContract = contract_store_1.ContractStore.railgunSmartWalletContracts.get(null, chain);
++        // if (!railgunSmartWalletContract?.contract.runner?.provider) {
++        //     throw new Error('Requires RailgunSmartWalletContract with provider');
++        // }
++        // SKIP SLOW SYNC
++        // const latestBlock = await railgunSmartWalletContract.contract.runner.provider.getBlockNumber();
+         try {
+-            switch (txidVersion) {
+-                case poi_types_1.TXIDVersion.V2_PoseidonMerkle:
+-                    await this.slowSyncV2(chain, utxoMerkletree, startScanningBlockSlowScan, latestBlock, postQuickSyncProgress);
+-                    break;
+-                case poi_types_1.TXIDVersion.V3_PoseidonMerkle:
+-                    await this.slowSyncV3(chain, utxoMerkletree, startScanningBlockSlowScan, latestBlock, postQuickSyncProgress);
+-                    break;
+-            }
++            // switch (txidVersion) {
++            //     case poi_types_1.TXIDVersion.V2_PoseidonMerkle:
++            //         await this.slowSyncV2(chain, utxoMerkletree, startScanningBlockSlowScan, latestBlock, postQuickSyncProgress);
++            //         break;
++            //     case poi_types_1.TXIDVersion.V3_PoseidonMerkle:
++            //         await this.slowSyncV3(chain, utxoMerkletree, startScanningBlockSlowScan, latestBlock, postQuickSyncProgress);
++            //         break;
++            // }
+             // Final balance decryption after all leaves added.
++
+             const decryptStartingProgress = 0.7;
+             await this.decryptBalancesAllWallets(txidVersion, chain, walletIdFilter, (progress) => {
+                 const overallProgress = progress * (0.97 - decryptStartingProgress) + decryptStartingProgress;
+@@ -505,11 +508,17 @@ class RailgunEngine extends events_1.default {
+      */
+     async scanTXIDHistoryV2(chain) {
+         const txidVersion = poi_types_1.TXIDVersion.V2_PoseidonMerkle;
++        if (this.isSyncingRailgunTransactionsV2.get(txidVersion, chain) === true) {
++            debugger_1.default.log(`Already synced txids for chain ${chain.type}:${chain.id}. Stopping additional re-sync.`);
++            return;
++        }
++
+         if (!this.hasTXIDMerkletree(txidVersion, chain)) {
+             debugger_1.default.log(`Cannot sync txids. Txid merkletree not yet loaded for chain ${chain.type}:${chain.id}.`);
+             return;
+         }
+         this.hasSyncedRailgunTransactionsV2.set(null, chain, true);
++        this.isSyncingRailgunTransactionsV2.set(txidVersion, chain, true);
+         await this.syncRailgunTransactionsV2(chain, 'poller');
+     }
+     /**
+@@ -537,6 +546,7 @@ class RailgunEngine extends events_1.default {
+         txidMerkletree.isScanning = true;
+         await this.performSyncRailgunTransactionsV2(chain, trigger);
+         txidMerkletree.isScanning = false;
++        this.isSyncingRailgunTransactionsV2.set(txidVersion, chain, false);
+     }
+     async shouldAddNewRailgunTransactions(txidVersion, chain, latestValidatedTxidIndex) {
+         if (!(0, is_defined_1.isDefined)(latestValidatedTxidIndex)) {
