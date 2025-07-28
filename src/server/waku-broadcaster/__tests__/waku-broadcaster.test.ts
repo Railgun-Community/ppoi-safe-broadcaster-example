@@ -177,7 +177,7 @@ describe('waku-broadcaster', () => {
       'string',
       'No fee for token in broadcast data',
     );
-    expect(BigInt(data.fees[MOCK_TOKEN_ADDRESS]).toString()).to.equal(
+    expect(BigInt(data.fees[MOCK_TOKEN_ADDRESS] as string).toString()).to.equal(
       '990424892220000000000',
     );
     expect(data.feeExpiration).to.be.a('number');
