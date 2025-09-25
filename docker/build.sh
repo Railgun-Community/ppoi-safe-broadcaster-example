@@ -38,11 +38,9 @@ if [ $FORCE_REBUILD == true ]; then
 fi
 
 if [ -f .env ]; then
-  if [ ! -f $SETUP_STACK ]; then
-    export $(cat .env | xargs)
-    envsubst < $SETUP_STACK.in > $SETUP_STACK
-    echo "generated $SETUP_STACK from .env and $SETUP_STACK.in"
-  fi
+  export $(cat .env | xargs)
+  envsubst < $SETUP_STACK.in > $SETUP_STACK
+  echo "generated $SETUP_STACK from .env and $SETUP_STACK.in"
 else echo "please copy .env.example to .env and enter your config"; exit 1
 fi
 
