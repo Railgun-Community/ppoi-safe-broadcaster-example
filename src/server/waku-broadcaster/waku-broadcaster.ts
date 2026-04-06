@@ -122,27 +122,15 @@ export class WakuBroadcaster {
 
     if (isResponse) {
       this.dbg(`Publishing response to ${contentTopic}`);
-      for (let i = 0; i < 10; i += 1) {
-        const msg = WakuMessage.fromUtf8String(
-          JSON.stringify(payload),
-          contentTopic,
-        );
-        // eslint-disable-next-line no-await-in-loop
-        await this.client.publish(msg, this.options.topic).catch((e) => {
-          this.dbg('Error publishing message', e.message);
-        });
-        // eslint-disable-next-line no-await-in-loop
-        await delay(3000);
-      }
-    } else {
-      const msg = WakuMessage.fromUtf8String(
-        JSON.stringify(payload),
-        contentTopic,
-      );
-      return this.client.publish(msg, this.options.topic).catch((e) => {
-        this.dbg('Error publishing message', e.message);
-      });
     }
+
+    const msg = WakuMessage.fromUtf8String(
+      JSON.stringify(payload),
+      contentTopic,
+    );
+    return this.client.publish(msg, this.options.topic).catch((e) => {
+      this.dbg('Error publishing message', e.message);
+    });
   }
 
   static decode(payload: Uint8Array): string {

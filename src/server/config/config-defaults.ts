@@ -208,9 +208,9 @@ export default {
 
   waku: {
     /**
-     * URL of nim-waku rpc server (eg http://localhost:8546).
+     * URL of nim-waku rpc server (eg http://localhost:8645).
      */
-    rpcURL: process.env.WAKU_RPC_URL ?? 'http://nwaku1:8546',
+    rpcURL: process.env.WAKU_RPC_URL ?? 'http://nwaku1:8645',
 
     /**
      * Frequency to poll for new messages.
@@ -225,7 +225,7 @@ export default {
     /**
      * libp2p pubSubTopic to subscribe to.
      */
-    pubSubTopic: '/waku/2/rs/0/1',
+    pubSubTopic: '/waku/2/rs/5/1',
   },
 
   api: {

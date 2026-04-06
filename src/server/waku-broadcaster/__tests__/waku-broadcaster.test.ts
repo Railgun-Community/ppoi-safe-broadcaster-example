@@ -17,12 +17,15 @@ import { WakuMethodNames, WakuBroadcaster } from '../waku-broadcaster';
 import {
   WakuRestApiClient,
   WakuRelayMessage,
-  WakuRequestMethods,
 } from '../../networking/waku-rest-api-client';
 import {
   encryptResponseData,
   tryDecryptData,
 } from '../methods/transact-method';
+import {
+  METRICS_RESPONSE_TOPIC,
+  METRICS_TOPIC,
+} from '../methods/metrics-method';
 import {
   setupSingleTestWallet,
   setupTestNetwork,
@@ -54,8 +57,8 @@ import {
   BroadcasterFeeMessage,
   BroadcasterFeeMessageData,
   BroadcasterRawParamsTransact,
+  BroadcasterTransactRequestType,
   TXIDVersion,
-  delay,
 } from '@railgun-community/shared-models';
 import { getBroadcasterVersion } from '../../../util/broadcaster-version';
 import {
@@ -75,6 +78,12 @@ let processTransactionStub: SinonStub;
 
 type WakuMessageInTransport = WakuMessage & {
   payload: string;
+};
+
+type MetricsResultData = {
+  recvTimestamp: number;
+  timeDifference: number;
+  sendTimestamp: number;
 };
 
 let requestData: Optional<WakuMessageInTransport>;
@@ -205,6 +214,7 @@ describe('waku-broadcaster', () => {
       getRailgunWalletAddressData(railgunWalletAddress);
 
     const data: BroadcasterRawParamsTransact = {
+      transactType: BroadcasterTransactRequestType.COMMON,
       txidVersion: TXIDVersion.V2_PoseidonMerkle,
       chainID: chain.id,
       chainType: chain.type,
@@ -236,6 +246,69 @@ describe('waku-broadcaster', () => {
     expect(await tryDecryptData(encryptedData, sharedKey)).to.deep.equal(data);
   });
 
+  it('Should test metrics method - single response', async () => {
+    clientHTTPStub.callsFake(() => {
+      return { data: {}, status: 200 };
+    });
+
+    const contentTopic = contentTopics.encrypted(METRICS_TOPIC);
+
+    const railgunWalletID = getRailgunWalletID();
+    const broadcasterPrivateKey =
+      getRailgunWalletPrivateViewingKey(railgunWalletID);
+    const broadcasterPublicKey = await ed.getPublicKey(broadcasterPrivateKey);
+
+    const metricsPayload = {
+      timestamp: Date.now(),
+    };
+
+    const randomPrivKey = getRandomBytes(32);
+    const randomPubKeyUint8Array = await ed.getPublicKey(randomPrivKey);
+    const clientPubKey = ByteUtils.hexlify(randomPubKeyUint8Array);
+    const sharedKey = await ed.getSharedSecret(
+      randomPrivKey,
+      broadcasterPublicKey,
+    );
+    const encryptedData = encryptResponseData(metricsPayload, sharedKey);
+    const params: BroadcasterEncryptedMethodParams = {
+      encryptedData,
+      pubkey: clientPubKey,
+    };
+
+    const payload = {
+      method: WakuMethodNames.Metrics,
+      params,
+      id: 987654,
+    };
+    const relayMessage: WakuRelayMessage = {
+      contentTopic,
+      payload: Uint8Array.from(Buffer.from(JSON.stringify(payload))),
+      timestamp: Date.now(),
+    };
+    await wakuBroadcaster?.handleMessage(relayMessage);
+
+    expect(clientHTTPStub.callCount).to.equal(1);
+    const postCall = clientHTTPStub.getCall(0);
+    expect(postCall.args[0]).to.include('/relay/v1/messages/');
+    const rpcArgs = postCall.args[1];
+    expect(rpcArgs.contentTopic).to.equal(
+      contentTopics.encrypted(METRICS_RESPONSE_TOPIC),
+    );
+
+    const decoded = JSON.parse(
+      WakuBroadcaster.decode(Uint8Array.from(Buffer.from(rpcArgs.payload, 'base64'))),
+    );
+    const resultData = (await tryDecryptJSONDataWithSharedKey(
+      decoded.result,
+      sharedKey,
+    )) as Optional<MetricsResultData>;
+    expect(resultData).to.not.equal(null);
+    expect(resultData).to.be.an('object');
+    expect(resultData?.recvTimestamp).to.be.a('number');
+    expect(resultData?.timeDifference).to.be.a('number');
+    expect(resultData?.sendTimestamp).to.be.a('number');
+  });
+
   it('Should test transact method - transfer', async () => {
     clientHTTPStub.callsFake(() => {
       return { data: {}, status: 200 };
@@ -252,6 +325,7 @@ describe('waku-broadcaster', () => {
       getRailgunWalletAddressData(railgunWalletAddress);
 
     const data: BroadcasterRawParamsTransact = {
+      transactType: BroadcasterTransactRequestType.COMMON,
       txidVersion: TXIDVersion.V2_PoseidonMerkle,
       chainID: chain.id,
       chainType: chain.type,
@@ -286,15 +360,15 @@ describe('waku-broadcaster', () => {
     };
     const relayMessage: WakuRelayMessage = {
       contentTopic,
-      payload: Buffer.from(JSON.stringify(payload)),
+      payload: Uint8Array.from(Buffer.from(JSON.stringify(payload))),
       timestamp: Date.now(),
     };
     await wakuBroadcaster?.handleMessage(relayMessage);
 
     // After transact-response sent.
-    expect(clientHTTPStub.callCount).to.equal(10);
+    expect(clientHTTPStub.callCount).to.equal(1);
     const postCall = clientHTTPStub.getCall(0);
-    expect(postCall.args[0]).to.equal(WakuRequestMethods.PublishMessage);
+    expect(postCall.args[0]).to.include('/relay/v1/messages/');
     const rpcArgs = postCall.args[1];
     expect(rpcArgs.version).to.be.a('number');
     expect(rpcArgs.contentTopic).to.equal(
@@ -321,7 +395,7 @@ describe('waku-broadcaster', () => {
     expect(expectedWakuMessage.payload).to.be.instanceof(Buffer);
 
     const decoded = JSON.parse(
-      WakuBroadcaster.decode(Buffer.from(rpcArgs.payload, 'base64')),
+      WakuBroadcaster.decode(Uint8Array.from(Buffer.from(rpcArgs.payload, 'base64'))),
     );
     const decodedExpected = JSON.parse(
       WakuBroadcaster.decode(expectedWakuMessage.payload as Uint8Array),

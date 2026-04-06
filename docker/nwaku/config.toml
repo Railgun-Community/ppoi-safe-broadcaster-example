@@ -1,5 +1,4 @@
-# envsubst < config.toml.in > config.toml
-#log-level='DEBUG'
+log-level='INFO'
 relay=true
 store=false
 filter=true
@@ -8,32 +7,28 @@ rln-relay=false
 relay-peer-exchange=true
 rest=true
 rest-address='0.0.0.0'
-rest-port=8546
+rest-port=8645
 rest-admin=true
 #rest-private=true
 rest-relay-cache-capacity=3000
-keep-alive=false
+keep-alive=true
 staticnode=[
- # dev-node
-  "/dns4/core.rootedinprivacy.com/tcp/60000/p2p/16Uiu2HAm4Ai1GzKv4EykU26ST1BPT4AHtABsYCLKrDG74GWX7D6H",
+  "/ip4/45.63.79.142/tcp/30304/p2p/16Uiu2HAmRPE5WTCjSYkbsMWiD6Cbc4SgZDepXh24o3BFe1x5vihD",
+  "/ip4/149.28.124.211/tcp/30304/p2p/16Uiu2HAmVJc3KrLDGXEwXQB1vL8my2WrNsPnBe42jqKfGv8GBQ7f",
 ]
-dns-discovery=false
-discv5-discovery=false
-discv5-bootstrap-node=[
-  # dev-node
-  "enr:-Ou4QF5uFxGUG9WVUuysEWm8nketT_Pe6hG0P6NRxu9dTOwHWHWQgGFhm-vqmYwUvU0LtrW2LhSEO7iEHKD4l8JEd14BgmlkgnY0gmlwhIxSIGiKbXVsdGlhZGRyc7hAAB02GGNvcmUucm9vdGVkaW5wcml2YWN5LmNvbQbqYAAfNhhjb3JlLnJvb3RlZGlucHJpdmFjeS5jb20GH0DeA4Jyc48AAAYAAAABAAIAAwAEAAWJc2VjcDI1NmsxoQKB48KxVciQEh-6cSmBBGdTm-ehZ_6_oht-pjmrU52YEoN0Y3CC6mCFd2FrdTIN",
+dns-discovery=true
+dns-discovery-url=[
+  "enrtree://APMYHUVNQWHJNPI5L2KQ765EMCKUAMRWPUH3U2QIKPK6XEV3OW442@discovery.rootedinprivacy.com",
 ]
-shard=[0, 1, 2, 3, 4, 5]
+discv5-discovery=true
+discv5-enr-auto-update=true
+shard=[1]
 max-msg-size="512KiB"
 
-cluster-id=0 # needed when switch to 0.33 nwaku, pubsub-topic is deprecated
-filter-subscription-timeout=3000
-filter-max-peers-to-serve=10000
-reliability=false
-num-shards-in-network=6
+cluster-id=5
+filter-subscription-timeout=120
+filter-max-peers-to-serve=500
+num-shards-in-network=8
 
-peer-store-capacity=500
-max-connections=500
-max-relay-peers=500
-ip-colocation-limit=100
-peer-persistence=false
+max-connections=400
+ip-colocation-limit=5

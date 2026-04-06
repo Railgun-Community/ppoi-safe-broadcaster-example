@@ -18,7 +18,7 @@ services:
       - '60000:60000'
       - '9000:9000'
       - '8000:8000'
-      - '8546:8546'
+      - '8645:8645'
     restart: always
     volumes:
       - nwaku1:/data
@@ -44,7 +44,7 @@ services:
         max-size: "10m"
         max-file: "3"
     environment:
-      WAKU_RPC_URL: 'http://nwaku1:8546'
+      WAKU_RPC_URL: 'http://nwaku1:8645'
       LEPTON_DB: '/mnt/broadcaster.db'
       SETTINGS_DB: '/mnt/settings.db'
       POI_DB: '/mnt/poi.db'
