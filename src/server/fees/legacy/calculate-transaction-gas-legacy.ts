@@ -70,6 +70,9 @@ export const createTransactionGasDetailsLegacy = (
         maxPriorityFeePerGas,
       };
     }
+    case EVMGasType.Type4: {
+      throw new Error('Type 4 gas is not supported for Broadcaster transactions.');
+    }
   }
 
   throw new Error('Unrecognized gas type.');

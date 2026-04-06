@@ -1,7 +1,9 @@
+import { CoingeckoNetworkID } from '../../models/api-constants';
+import * as zeroXPrice from '../api/0x/0x-price';
+import * as coingeckoPrice from '../api/coingecko/coingecko-price';
 import { BroadcasterChain } from '../../models/chain-models';
-import { zeroXUpdatePricesByAddresses } from '../api/0x/0x-price';
-import { coingeckoUpdatePricesByAddresses } from '../api/coingecko/coingecko-price';
-import { uniswapUpdatePricesByAddresses } from '../api/uniswap/uniswap-price';
+import * as defiLlamaPrice from '../api/defi-llama/defi-llama-price';
+import * as uniswapPrice from '../api/uniswap/uniswap-price';
 import { allTokenAddressesForNetwork } from '../tokens/network-tokens';
 import {
   cacheTokenPriceForNetwork,
@@ -19,6 +21,69 @@ export type TokenPriceRefresher = {
     tokenAddresses: string[],
   ) => Promise<void>;
 };
+
+
+const updaterForPriceFetcher = (source: TokenPriceSource, chain: BroadcasterChain): TokenPriceUpdater => {
+ return (
+    tokenAddress: string,
+    tokenPrice: TokenPrice,
+  ) => cacheTokenPriceForNetwork(
+    source,
+    chain,
+    tokenAddress,
+    tokenPrice,
+  );
+}
+
+const testFetcher = TokenPriceSource.DefiLlama
+
+const priceFetcherSources = {
+  [TokenPriceSource.DefiLlama]: (chain: BroadcasterChain, tokenAddresses: string[], updater: TokenPriceUpdater) => defiLlamaPrice.defiLlamaUpdatePricesByAddresses(chain, tokenAddresses, updater),
+  [TokenPriceSource.CoinGecko]: (id: CoingeckoNetworkID, tokenAddresses: string[], updater: TokenPriceUpdater) => coingeckoPrice.coingeckoUpdatePricesByAddresses(id, tokenAddresses, updater),
+  [TokenPriceSource.Uniswap]: (chain: BroadcasterChain, tokenAddresses: string[], updater: TokenPriceUpdater) => uniswapPrice.uniswapUpdatePricesByAddresses(chain, tokenAddresses, updater),
+  [TokenPriceSource.ZeroX]: (chain: BroadcasterChain, tokenAddresses: string[], updater: TokenPriceUpdater) => zeroXPrice.zeroXUpdatePricesByAddresses(chain, tokenAddresses, updater),
+}
+
+const refresherForPriceFetcher = (
+  source: TokenPriceSource,
+) =>{
+
+  return async (
+    chain: BroadcasterChain,
+    tokenAddresses: string[]
+  ) => {
+
+    const network = configNetworks[chain.type][chain.id];
+
+    if (source !== testFetcher && (network.isTestNetwork ?? false)) {
+      return Promise.resolve();
+    }
+    const updater = updaterForPriceFetcher(source, chain)
+
+    const { coingeckoNetworkId } = network;
+    if(!coingeckoNetworkId){
+      if (network.isTestNetwork ?? false) {
+        updateTestNetworkDefaultPrices(chain, updater);
+      }
+      return Promise.resolve();
+    }
+
+    if(source === TokenPriceSource.CoinGecko){
+      return priceFetcherSources[source](
+        coingeckoNetworkId as CoingeckoNetworkID,
+        tokenAddresses,
+        updater,
+      )
+    }
+
+    return priceFetcherSources[source](
+      chain,
+      tokenAddresses,
+      updater,
+    )
+  }
+
+}
 
 export const updateTestNetworkDefaultPrices = (
   chain: BroadcasterChain,
@@ -40,105 +105,15 @@ export const updateTestNetworkDefaultPrices = (
   });
 };
 
-const tokenPriceRefresherCoingecko = (
-  chain: BroadcasterChain,
-  tokenAddresses: string[],
-): Promise<void> => {
-  const updater: TokenPriceUpdater = (
-    tokenAddress: string,
-    tokenPrice: TokenPrice,
-  ) =>
-    cacheTokenPriceForNetwork(
-      TokenPriceSource.CoinGecko,
-      chain,
-      tokenAddress,
-      tokenPrice,
-    );
-
-  const network = configNetworks[chain.type][chain.id];
-  const { coingeckoNetworkId } = network;
-  if (!coingeckoNetworkId) {
-    if (network.isTestNetwork ?? false) {
-      updateTestNetworkDefaultPrices(chain, updater);
-    }
-    return Promise.resolve();
-  }
-
-  return coingeckoUpdatePricesByAddresses(
-    coingeckoNetworkId,
-    tokenAddresses,
-    updater,
-  );
-};
-
-const tokenPriceRefresherZeroX = (
-  chain: BroadcasterChain,
-  tokenAddresses: string[],
-): Promise<void> => {
-  const network = configNetworks[chain.type][chain.id];
-  if (network.isTestNetwork ?? false) {
-    return Promise.resolve();
-  }
-
-  const updater: TokenPriceUpdater = (
-    tokenAddress: string,
-    tokenPrice: TokenPrice,
-  ) =>
-    cacheTokenPriceForNetwork(
-      TokenPriceSource.ZeroX,
-      chain,
-      tokenAddress,
-      tokenPrice,
-    );
-
-  return zeroXUpdatePricesByAddresses(chain, tokenAddresses, updater);
-};
-
-const tokenPriceRefresherUniswap = (
-  chain: BroadcasterChain,
-  tokenAddresses: string[],
-): Promise<void> => {
-  const updater: TokenPriceUpdater = (
-    tokenAddress: string,
-    tokenPrice: TokenPrice,
-  ) =>
-    cacheTokenPriceForNetwork(
-      TokenPriceSource.Uniswap,
-      chain,
-      tokenAddress,
-      tokenPrice,
-    );
-
-  const network = configNetworks[chain.type][chain.id];
-  if (network.isTestNetwork ?? false) {
-    return Promise.resolve();
-  }
-  return uniswapUpdatePricesByAddresses(chain, tokenAddresses, updater);
-};
-
 export default {
   tokenPriceRefreshers: {
-    [TokenPriceSource.CoinGecko]: {
+    [TokenPriceSource.DefiLlama]: {
       /**
-       * Refresh token prices through CoinGecko every 30 seconds.
-       * Note that free Coingecko API tier only allows 50 requests per minute.
+       * Refresh token prices through DefiLlama every 30 seconds.
        */
-      enabled: false, // requires an api key | disabled by default
-      refreshDelayInMS: 60 * 1000,
-      refresher: tokenPriceRefresherCoingecko,
-    },
-    [TokenPriceSource.ZeroX]: {
-      /**
-       * Kick off a token price refresh serially through 0x every minute.
-       * Note that 0x API only allows 40 requests per minute, and 3 requests per second.
-       * https://docs.0x.org/0x-api-swap/advanced-topics/rate-limiting
-       * So, we automatically look up 20-40 tokens per minute through 0x API, depending on request latency.
-       * Requests must be processed serially because of the 0x API rate limit.
-       * If a refresh is ongoing, we will skip the next request for a refresh.
-       */
-      enabled: false, // requires 0x API key | disabled by default
-      refreshDelayInMS: 60 * 1000,
-      refresher: tokenPriceRefresherZeroX,
+      enabled: true,
+      refreshDelayInMS: 30 * 1000,
+      refresher: refresherForPriceFetcher(TokenPriceSource.DefiLlama),
     },
     [TokenPriceSource.Uniswap]: {
       /**
@@ -147,7 +122,17 @@ export default {
        */
       enabled: true,
       refreshDelayInMS: 30 * 1000,
-      refresher: tokenPriceRefresherUniswap,
+      refresher: refresherForPriceFetcher(TokenPriceSource.Uniswap),
+    },
+    [TokenPriceSource.CoinGecko]: {
+      enabled: false,
+      refreshDelayInMS: 60 * 1000,
+      refresher: refresherForPriceFetcher(TokenPriceSource.CoinGecko),
+    },
+    [TokenPriceSource.ZeroX]: {
+      enabled: false,
+      refreshDelayInMS: 60 * 1000,
+      refresher: refresherForPriceFetcher(TokenPriceSource.ZeroX),
     },
   },
 } as { tokenPriceRefreshers: MapType<TokenPriceRefresher> };

@@ -164,6 +164,8 @@ export const getGasDetailsForSpeed = async (
       );
       return gasDetailsBySpeed[percentile];
     }
+    case EVMGasType.Type4:
+      throw new Error('EVMGasType 4 is not supported in this implementation.');
   }
 };
 

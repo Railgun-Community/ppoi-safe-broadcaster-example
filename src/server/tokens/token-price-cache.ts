@@ -11,6 +11,7 @@ export enum TokenPriceSource {
   CoinGecko = 'CoinGecko',
   ZeroX = '0x',
   Uniswap = 'Uniswap',
+  DefiLlama = 'DefiLlama',
 }
 
 export type TokenPrice = {

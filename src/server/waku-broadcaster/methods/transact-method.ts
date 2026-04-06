@@ -27,6 +27,7 @@ import configNetworks from '../../config/config-networks';
 import {
   BroadcasterEncryptedMethodParams,
   BroadcasterRawParamsTransact,
+  BroadcasterRawParamsTransactCommon,
   TXIDVersion,
   isDefined,
   versionCompare,
@@ -45,6 +46,18 @@ import {
 } from '../../../util/handled-keys';
 
 const dbg = debug('broadcaster:transact');
+
+const isCommonTransactRequest = (
+  value: BroadcasterRawParamsTransact,
+): value is BroadcasterRawParamsTransactCommon => {
+  return (
+    'minGasPrice' in value &&
+    'to' in value &&
+    'data' in value &&
+    'useRelayAdapt' in value &&
+    'preTransactionPOIsPerTxidLeafPerList' in value
+  );
+};
 
 const sanitizeSuggestedFee = (errorString: string) => {
   const pattern = /Suggested Gas Price was (\d+\.\d+)/;
@@ -101,20 +114,17 @@ export const transactMethod = async (
   const {
     chainType,
     chainID,
-    minGasPrice,
     feesID: feeCacheID,
-    to,
-    data,
     broadcasterViewingKey,
-    useRelayAdapt,
     devLog,
     minVersion,
     maxVersion,
   } = decrypted;
 
   const txidVersion = decrypted.txidVersion ?? TXIDVersion.V2_PoseidonMerkle;
-  const preTransactionPOIsPerTxidLeafPerList =
-    decrypted.preTransactionPOIsPerTxidLeafPerList ?? {};
+  const commonRequest = isCommonTransactRequest(decrypted)
+    ? decrypted
+    : undefined;
 
   const chain: BroadcasterChain = {
     type: chainType,
@@ -127,6 +137,26 @@ export const transactMethod = async (
     );
   }
   await incrementReliability(chain, ReliabilityMetric.DECODE_SUCCESS);
+
+  if (!commonRequest) {
+    await incrementReliability(chain, ReliabilityMetric.BAD_DATA);
+
+    return errorResponse(
+      id,
+      chain,
+      sharedKey,
+      new Error(ErrorMessage.UNSUPPORTED_TRANSACTION_TYPE),
+      devLog,
+    );
+  }
+
+  const {
+    minGasPrice,
+    to,
+    data,
+    useRelayAdapt,
+    preTransactionPOIsPerTxidLeafPerList,
+  } = commonRequest;
 
   try {
     dbg('Decrypted - attempting to transact');
@@ -366,6 +396,7 @@ const replaceErrorMessageNonDev = (
     case ErrorMessage.NONCE_ALREADY_USED:
     case ErrorMessage.BAD_RESPONSE:
     case ErrorMessage.MISSING_RESPONSE:
+    case ErrorMessage.UNSUPPORTED_TRANSACTION_TYPE:
       return errMsg;
   }
   return ErrorMessage.UNKNOWN_ERROR;

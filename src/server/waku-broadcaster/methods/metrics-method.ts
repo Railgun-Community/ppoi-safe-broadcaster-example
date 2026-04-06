@@ -1,5 +1,4 @@
 import * as ed from '@noble/ed25519';
-import type { BroadcasterChain } from '../../../models/chain-models';
 import type { WakuMethodResponse } from '../waku-response';
 import { contentTopics } from '../topics';
 import { formatJsonRpcResult } from '@walletconnect/jsonrpc-utils';
@@ -34,7 +33,6 @@ type MetricsMethodResponse = {
 export const metricsMethod = async (
   params: BroadcasterEncryptedMethodParams,
   id: number,
-  incomingChain: BroadcasterChain,
 ): Promise<Optional<WakuMethodResponse>> => {
   // incoming message params
   const now = Date.now();

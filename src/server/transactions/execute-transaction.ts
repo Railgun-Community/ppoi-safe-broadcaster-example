@@ -144,6 +144,8 @@ export const executeTransaction = async (
       // dbg(`Max priority fee: ${maxPriorityFeePerGas}`);
       break;
     }
+    case EVMGasType.Type4:
+      throw new Error('Type 4 gas is not supported for Broadcaster transactions.');
   }
   let hashGlobal = '';
 

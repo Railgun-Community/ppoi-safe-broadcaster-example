@@ -120,8 +120,8 @@ export const getEstimateGasDetailsRelayed = async (
   devLog?: boolean,
   retryCount = 1,
 ): Promise<TransactionGasDetails> => {
-  if (evmGasType === EVMGasType.Type2) {
-    // minGasPrice not allowed on EVMGasType 2
+  if (evmGasType === EVMGasType.Type2 || evmGasType === EVMGasType.Type4) {
+    // minGasPrice not allowed on EVMGasType 2 or Type4
     throw new Error('EVMGasType 2 not allowed for Broadcaster transactions.');
   }
   const gasPrice = minGasPrice;
@@ -139,7 +139,11 @@ export const getEstimateGasDetailsRelayed = async (
     ).catch(throwErr);
     logger.warn('Finished Gas Estimation'); // add this for proper timing logs in debug
 
-    return { evmGasType, gasEstimate, gasPrice };
+    return {
+      evmGasType: evmGasType as EVMGasType.Type0 | EVMGasType.Type1,
+      gasEstimate,
+      gasPrice,
+    };
   } catch (err) {
     dbg('Gas Estimate Error');
     dbg('Action', err.action);

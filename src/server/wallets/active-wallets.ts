@@ -121,15 +121,15 @@ export const fullUTXOResyncBroadcasterWallets = async () => {
       await refreshBalances(chain, [railgunWalletID]);
       dbg(`Finished Balance Rescan of chain ${chain.type}:${chain.id}`);
 
-      dbg(`Now Starting Full UTXO Rescan on chain ${chain.type}:${chain.id}`);
-      // eslint-disable-next-line no-await-in-loop
-      await rescanFullUTXOMerkletreesAndWallets(chain, [railgunWalletID]);
-      dbg(`Finished Full UTXO Rescan on chain ${chain.type}:${chain.id}`);
+      // dbg(`Now Starting Full UTXO Rescan on chain ${chain.type}:${chain.id}`);
+      // // eslint-disable-next-line no-await-in-loop
+      // await rescanFullUTXOMerkletreesAndWallets(chain, [railgunWalletID]);
+      // dbg(`Finished Full UTXO Rescan on chain ${chain.type}:${chain.id}`);
 
-      dbg(`Starting Generation of PPOI for chain ${chain.type}:${chain.id}`);
-      // eslint-disable-next-line no-await-in-loop
-      await generatePOIsForWallet(network.name, railgunWalletID);
-      dbg(`Finished Generation of PPOI for chain ${chain.type}:${chain.id}`);
+      // dbg(`Starting Generation of PPOI for chain ${chain.type}:${chain.id}`);
+      // // eslint-disable-next-line no-await-in-loop
+      // await generatePOIsForWallet(network.name, railgunWalletID);
+      // dbg(`Finished Generation of PPOI for chain ${chain.type}:${chain.id}`);
 
       const newTimestamp = Date.now();
       // eslint-disable-next-line no-await-in-loop

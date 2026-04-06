@@ -55,7 +55,7 @@ export const processTransaction = async (
     network.name,
     sendWithPublicWallet,
   );
-  if (evmGasType === EVMGasType.Type2) {
+  if (evmGasType === EVMGasType.Type2 || evmGasType === EVMGasType.Type4) {
     throw new Error('Invalid gas type for Broadcaster transaction.');
   }
 

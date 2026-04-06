@@ -23,6 +23,7 @@ export enum ErrorMessage {
   NONCE_ALREADY_USED = 'WARNING: Broadcaster recieved an error from the RPC: Nonce already used. There is no way to tell if the transaction made it. We did not recieve a tx hash. Please check the chain, if nothing happens within 15 minutes. It is safe to try again.',
   MISSING_RESPONSE = 'RPC response is missing.',
   BAD_RESPONSE = 'Server responded 512. ',
+  UNSUPPORTED_TRANSACTION_TYPE = 'Broadcaster does not support this transaction type.',
 }
 
 const sanitizeEthersError = (errMessage: string) => {
