@@ -47,7 +47,7 @@ export const REN_TOKENS_ETH: AddressToTokenMap = {
 
 export const BLUECHIP_BSC: AddressToTokenMap = {
   [TokenAddressBSC.WBNB]: {
-    symbol: 'WETH',
+    symbol: 'WBNB',
   },
 
   [TokenAddressBSC.CAKE]: {
