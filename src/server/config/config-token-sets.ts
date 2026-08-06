@@ -58,9 +58,6 @@ export const BLUECHIP_POLY: AddressToTokenMap = {
   [TokenAddressPolygonPOS.WETH]: {
     symbol: 'WETH',
   },
-  [TokenAddressPolygonPOS.BNB]: {
-    symbol: 'WETH',
-  },
   [TokenAddressPolygonPOS.WMATIC]: {
     symbol: 'WMATIC',
   },

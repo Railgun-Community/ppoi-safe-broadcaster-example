@@ -28,7 +28,8 @@ export enum TokenAddressBSC {
 export enum TokenAddressPolygonPOS {
   WMATIC = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
   DAI = '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063',
-  BNB = '0xA649325Aa7C5093d12D6F98EB4378deAe68CE23F',
+  // Unused: bridged BNB via Multichain, bridge defunct since 2023 hack. $0 liquidity/price on-chain.
+  // BNB = '0xA649325Aa7C5093d12D6F98EB4378deAe68CE23F',
   WETH = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
   USDC = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
   USDT = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
