@@ -6,9 +6,16 @@ export enum TokenAddressEthereum {
   USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
   RAIL = '0xe76C6c83af64e4C60245D8C7dE953DF673a7A33D',
   FRAX = '0x853d955acef822db058eb8505911ed77f175b99e',
-  FEI = '0x956F47F50A910163D8BF957Cf5846D573E7f87CA',
   RAI = '0x03ab458634910aad20ef5f1c8ee96f1d6ac54919',
-  RENBTC = '0xeb4c2781e4eba804ce9a9803c67d0893436bb27d',
+  // Unused: Fei Protocol dissolved Aug 2022 (Tribe DAO voted to redeem
+  // FEI->DAI and wind down). CoinGecko price consistently fails to
+  // refresh in production (observed stuck >25min while other tokens
+  // refreshed normally every cycle).
+  // FEI = '0x956F47F50A910163D8BF957Cf5846D573E7f87CA',
+  // Unused: backing bridge (RenVM) shut down in late 2022 after the
+  // Alameda/FTX collapse. No active development since; ~$3/24h volume
+  // on-chain as of 2026. Not viable as a fee token.
+  // RENBTC = '0xeb4c2781e4eba804ce9a9803c67d0893436bb27d',
 }
 export enum TokenAddressGoerli {
   WETH = '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',

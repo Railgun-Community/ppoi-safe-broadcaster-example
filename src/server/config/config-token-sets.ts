@@ -19,9 +19,6 @@ export const STABLES_ETH: AddressToTokenMap = {
   [TokenAddressEthereum.FRAX]: {
     symbol: 'FRAX',
   },
-  [TokenAddressEthereum.FEI]: {
-    symbol: 'FEI',
-  },
   [TokenAddressEthereum.RAI]: {
     symbol: 'RAI',
   },
@@ -36,12 +33,6 @@ export const BLUECHIP_ETH: AddressToTokenMap = {
   },
   [TokenAddressEthereum.RAIL]: {
     symbol: 'RAIL',
-  },
-};
-
-export const REN_TOKENS_ETH: AddressToTokenMap = {
-  [TokenAddressEthereum.RENBTC]: {
-    symbol: 'RENBTC',
   },
 };
 

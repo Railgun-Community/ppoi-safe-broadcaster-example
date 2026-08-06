@@ -11,7 +11,6 @@ import {
   STABLES_BSC,
   STABLES_POLY,
   BLUECHIP_ETH,
-  REN_TOKENS_ETH,
   BLUECHIP_BSC,
   BLUECHIP_POLY,
   BLUECHIP_ARBITRUM,
@@ -36,7 +35,6 @@ const tokensConfig: NetworkTokensConfig = {
     [NetworkChainID.Ethereum]: {
       ...STABLES_ETH,
       ...BLUECHIP_ETH,
-      ...REN_TOKENS_ETH,
     },
     [NetworkChainID.EthereumGoerli]: {
       [TokenAddressGoerli.WETH]: {
