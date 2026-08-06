@@ -41,28 +41,20 @@ const coingeckoPriceLookup = async (
 ): Promise<TokenAddressPrice[]> => {
   const currency = 'usd';
 
-  const paramArr = tokenAddresses.map((address) => {
-    return {
-      contract_addresses: address,
-      vs_currencies: currency,
-      include_last_updated_at: true,
-    };
-  });
   let coingeckoPriceMap: CoingeckoPriceMap = {};
-  for (const params of paramArr) {
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      const geckoPriceMap: CoingeckoPriceMap = await getCoingeckoData(
-        CoingeckoApiEndpoint.PriceLookup,
-        coingeckoNetworkId,
-        params,
-      );
-      coingeckoPriceMap = { ...coingeckoPriceMap, ...geckoPriceMap };
-      // eslint-disable-next-line no-await-in-loop
-      await delay(250);
-    } catch (error) {
-      console.error(error);
-    }
+  try {
+    const geckoPriceMap: CoingeckoPriceMap = await getCoingeckoData(
+      CoingeckoApiEndpoint.PriceLookup,
+      coingeckoNetworkId,
+      {
+        contract_addresses: tokenAddresses.join(','),
+        vs_currencies: currency,
+        include_last_updated_at: true,
+      },
+    );
+    coingeckoPriceMap = { ...coingeckoPriceMap, ...geckoPriceMap };
+  } catch (error) {
+    console.error(error);
   }
 
   const tokenPrices = tokenPriceArrayFromCoingeckoPriceMap(
@@ -77,7 +69,7 @@ export const coingeckoUpdatePricesByAddresses = async (
   tokenAddresses: string[],
   updater: TokenPriceUpdater,
 ): Promise<void> => {
-  const batchSize = 50;
+  const batchSize = 30; // CoinGecko Demo API tier limit is 30 addresses per request
   for (let i = 0; i < tokenAddresses.length; i += batchSize) {
     const batch = tokenAddresses.slice(i, i + batchSize);
     // eslint-disable-next-line no-await-in-loop
