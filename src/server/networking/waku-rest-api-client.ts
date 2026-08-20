@@ -18,10 +18,11 @@ export type WakuApiClientOptions = {
 export enum WakuRequestMethods {
   DebugInfo = '/debug/v1/info', // GET
   PublishSubscription = '/relay/v1/subscriptions', // POST
-  PublishMessage = '/relay/v1/messages/%2Fwaku%2F2%2Frs%2F0%2F1', // POST - requires pubsub topic UTF8 URL encoded /waku/2/rs/0/1
-  GetMessages = '/relay/v1/messages/%2Fwaku%2F2%2Frs%2F0%2F1', // GET - requires pubsub topic UTF8 URL encoded /waku/2/rs/0/1
   DeleteSubscriptions = '/relay/v1/subscriptions', // DELETE
 }
+
+const relayMessagesPath = (topic: string): string =>
+  `/relay/v1/messages/${encodeURIComponent(topic)}`;
 
 const MAX_RETRIES = 4;
 
@@ -76,12 +77,10 @@ export class WakuRestApiClient {
 
   static determineRequestType(method: string) {
     switch (method) {
-      case WakuRequestMethods.DebugInfo:
-      case WakuRequestMethods.GetMessages: {
+      case WakuRequestMethods.DebugInfo: {
         return 'GET';
       }
-      case WakuRequestMethods.PublishSubscription:
-      case WakuRequestMethods.PublishMessage: {
+      case WakuRequestMethods.PublishSubscription: {
         return 'POST';
       }
       case WakuRequestMethods.DeleteSubscriptions: {
@@ -175,10 +174,11 @@ export class WakuRestApiClient {
     const { timestamp } = message;
     const payload = Buffer.from(message.payload).toString('base64');
     const { contentTopic } = message;
+    const publishPath = relayMessagesPath(topic);
     if (contentTopic?.includes('fees') === true) {
       // we have fee message.. dont try to resend.
       const data = await this.request(
-        WakuRequestMethods.PublishMessage,
+        publishPath,
         'POST',
         { payload, timestamp, version: 0, contentTopic },
         MAX_RETRIES,
@@ -186,7 +186,7 @@ export class WakuRestApiClient {
       return data;
     }
 
-    const data = await this.request(WakuRequestMethods.PublishMessage, 'POST', {
+    const data = await this.request(publishPath, 'POST', {
       payload,
       timestamp,
       version: 0,
@@ -212,10 +212,10 @@ export class WakuRestApiClient {
    * however, specifying contentTopics locally filters out uninteresting messages before return
    */
   async getMessages(
-    topic: string, // unused
+    topic: string,
     contentTopics: string[] = [],
   ): Promise<WakuRelayMessage[]> {
-    const data = await this.request(WakuRequestMethods.GetMessages, 'GET', []);
+    const data = await this.request(relayMessagesPath(topic), 'GET', []);
 
     if (isDefined(data.error)) {
       throw data.error;
