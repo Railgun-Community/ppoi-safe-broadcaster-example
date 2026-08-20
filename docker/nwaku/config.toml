@@ -16,6 +16,12 @@ keep-alive=false
 staticnode=[
  # dev-node
   "/dns4/core.rootedinprivacy.com/tcp/60000/p2p/16Uiu2HAm4Ai1GzKv4EykU26ST1BPT4AHtABsYCLKrDG74GWX7D6H",
+  "/dns4/relay-a.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HAmMkCL9Y4R6V8eyTfHRfPA9JUBSnsJXwiUvgUJHU7N9AsR",
+  "/dns4/relay-a.rootedinprivacy.com/tcp/30304/p2p/16Uiu2HAmMkCL9Y4R6V8eyTfHRfPA9JUBSnsJXwiUvgUJHU7N9AsR",
+  "/dns4/relay-b.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HAm1XAZUTsZcbvLBWe9MR2QxEJ1oowv5VgZavwiwTEx4uPC",
+  "/dns4/relay-b.rootedinprivacy.com/tcp/30304/p2p/16Uiu2HAm1XAZUTsZcbvLBWe9MR2QxEJ1oowv5VgZavwiwTEx4uPC",
+  "/dns4/client-edge.rootedinprivacy.com/tcp/8000/wss/p2p/16Uiu2HAmS8YbNhE1rJGBQ3VaubZjM1iAR7zVvtLf6CrEB3Hc9Krr",
+  "/dns4/client-edge.rootedinprivacy.com/tcp/30304/p2p/16Uiu2HAmS8YbNhE1rJGBQ3VaubZjM1iAR7zVvtLf6CrEB3Hc9Krr",
 ]
 dns-discovery=false
 discv5-discovery=false
@@ -23,14 +29,14 @@ discv5-bootstrap-node=[
   # dev-node
   "enr:-Ou4QF5uFxGUG9WVUuysEWm8nketT_Pe6hG0P6NRxu9dTOwHWHWQgGFhm-vqmYwUvU0LtrW2LhSEO7iEHKD4l8JEd14BgmlkgnY0gmlwhIxSIGiKbXVsdGlhZGRyc7hAAB02GGNvcmUucm9vdGVkaW5wcml2YWN5LmNvbQbqYAAfNhhjb3JlLnJvb3RlZGlucHJpdmFjeS5jb20GH0DeA4Jyc48AAAYAAAABAAIAAwAEAAWJc2VjcDI1NmsxoQKB48KxVciQEh-6cSmBBGdTm-ehZ_6_oht-pjmrU52YEoN0Y3CC6mCFd2FrdTIN",
 ]
-shard=[0, 1, 2, 3, 4, 5]
+shard=[0, 1, 2, 3, 4, 5, 6, 7]
 max-msg-size="512KiB"
 
-cluster-id=0 # needed when switch to 0.33 nwaku, pubsub-topic is deprecated
+cluster-id=5 # needed when switch to 0.33 nwaku, pubsub-topic is deprecated
 filter-subscription-timeout=3000
 filter-max-peers-to-serve=10000
 reliability=false
-num-shards-in-network=6
+num-shards-in-network=8
 
 peer-store-capacity=500
 max-connections=500
