@@ -45,6 +45,15 @@ const MINIMUM_BALANCE_FOR_AVAILABILITY_L2 = 0.01;
 
 // 10 minute timeout on ticket prices retrieved from API.
 // Shorter is safer, but Coingecko free tier can lag by 15-30 minutes.
+//
+// IMPORTANT: this MUST stay >= the price refresher's refreshDelayInMS
+// (configTokenPriceRefresher.tokenPriceRefreshers[...].refreshDelayInMS,
+// overridable in MY-CONFIG.ts). If you raise the refresh interval (e.g. to
+// save CoinGecko free-tier quota) without raising this TTL by at least as
+// much, every cycle gets a guaranteed window - equal to the gap between the
+// two values - where cached prices are considered "expired" and the
+// broadcaster silently stops publishing fees for every token (NO TOKEN
+// PRICE warnings), with no underlying error: the API call itself succeeds.
 const defaultTokenPriceTTL = 10 * 60 * 1000;
 
 const networksConfig: NetworksConfig = {
