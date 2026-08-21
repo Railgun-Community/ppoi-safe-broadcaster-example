@@ -11,6 +11,16 @@ const feeConfig = (
   profit,
 });
 
+// IMPORTANT: `profit` defaults to configDefaults.transactionFees.profitMargin,
+// but a default parameter is resolved the moment this function is CALLED,
+// not read live afterwards. Default network fee configs are built once, at
+// module load time in config-networks.ts, using whatever profitMargin holds
+// at that point (the built-in default). If you override profitMargin later
+// in MY-CONFIG.ts, the fee config already built for a network is NOT
+// retroactively updated - setting profitMargin alone silently does nothing
+// to fees computed before the override ran. To actually apply a new margin,
+// call setFeesForNetworkEVM(chain, feeConfigL1(ratio)) (or feeConfigL2)
+// again, AFTER setting profitMargin, so it re-reads the current value.
 export const feeConfigL1 = (
   gasEstimateLimitToActualRatio: number,
   gasEstimateVarianceBuffer = 0.1,
