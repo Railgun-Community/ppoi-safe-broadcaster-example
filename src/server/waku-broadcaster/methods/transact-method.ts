@@ -27,6 +27,7 @@ import configNetworks from '../../config/config-networks';
 import {
   BroadcasterEncryptedMethodParams,
   BroadcasterRawParamsTransact,
+  BroadcasterTransactRequestType,
   TXIDVersion,
   isDefined,
   versionCompare,
@@ -95,6 +96,17 @@ export const transactMethod = async (
     // Incorrect key. Skipping transact message.
     dbg('Cannot decrypt - Not intended receiver');
     await incrementReliability(incomingChain, ReliabilityMetric.DECODE_FAILURE);
+    return undefined;
+  }
+
+  // EIP-7702 (TX7702) requests are not yet supported by this broadcaster.
+  // Reject explicitly instead of assuming the old COMMON-only shape - the
+  // fields below (to/data/minGasPrice/useRelayAdapt/etc.) only exist on the
+  // COMMON variant.
+  if (decrypted.transactType !== BroadcasterTransactRequestType.COMMON) {
+    dbg('Cannot process tx - TX7702 (EIP-7702) requests not yet supported');
+    // Do nothing. No error response.
+    await incrementReliability(incomingChain, ReliabilityMetric.BAD_DATA);
     return undefined;
   }
 

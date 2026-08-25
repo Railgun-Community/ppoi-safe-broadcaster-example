@@ -58,6 +58,12 @@ export const processTransaction = async (
   if (evmGasType === EVMGasType.Type2) {
     throw new Error('Invalid gas type for Broadcaster transaction.');
   }
+  if (evmGasType === EVMGasType.Type4) {
+    // EIP-7702 requests are rejected earlier, in transact-method.ts, before
+    // reaching this point - this is a defensive guard, not expected in
+    // practice today.
+    throw new Error('EVMGasType 4 (EIP-7702) not yet supported for Broadcaster transactions.');
+  }
 
   const transactionRequestForGasEstimate: ContractTransaction = {
     ...transaction,

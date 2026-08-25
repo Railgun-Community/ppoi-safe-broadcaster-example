@@ -164,6 +164,12 @@ export const getGasDetailsForSpeed = async (
       );
       return gasDetailsBySpeed[percentile];
     }
+    case EVMGasType.Type4: {
+      // EIP-7702 not yet supported by this broadcaster.
+      throw new Error(
+        'EVMGasType 4 (EIP-7702) not yet supported for gas-by-speed lookups.',
+      );
+    }
   }
 };
 
