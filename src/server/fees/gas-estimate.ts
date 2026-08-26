@@ -124,6 +124,11 @@ export const getEstimateGasDetailsRelayed = async (
     // minGasPrice not allowed on EVMGasType 2
     throw new Error('EVMGasType 2 not allowed for Broadcaster transactions.');
   }
+  if (evmGasType === EVMGasType.Type4) {
+    // EIP-7702 (Type4) transactions use maxFeePerGas/maxPriorityFeePerGas,
+    // not gasPrice - not yet supported on this relayed estimation path.
+    throw new Error('EVMGasType 4 (EIP-7702) not yet supported for Broadcaster transactions.');
+  }
   const gasPrice = minGasPrice;
   const transactionWithOptionalMinGas: ContractTransaction = {
     ...transaction,
